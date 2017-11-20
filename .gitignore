@@ -1,0 +1,11 @@
+tramp
+smex-items
+projectile-*
+prez-theme.el
+kkcrc
+*~
+*.last
+eshell/
+*theme.el
+bookmarks
+#*
