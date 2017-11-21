@@ -15,7 +15,17 @@
   (scroll-bar-mode -1))
 
 ;;; Load current favorite theme, -insert theme-
-;(load-theme 'default-black)
+(require 'powerline)
+
+(require 'moe-theme)
+(powerline-moe-theme)
+(setq moe-theme-highlight-buffer-id t)
+(moe-theme-set-color 'purple)
+
+
+(moe-dark)
+
+
 
 ;;; im sick of yes-or-no
 (defalias 'yes-or-no-p 'y-or-n-p)
@@ -31,7 +41,7 @@
 
 ;;; Font functionality
 
-(setq lp/default-font "Source Code Pro")
+(setq lp/default-font "Consolas")
 (setq lp/default-font-size 14)
 (setq lp/current-font-size lp/default-font-size)
 
@@ -421,13 +431,16 @@
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
+ '(ansi-color-names-vector
+   ["black" "#d55e00" "#009e73" "#f8ec59" "#0072b2" "#cc79a7" "#56b4e9" "white"])
  '(custom-safe-themes
    (quote
     ("c03d60937e814932cd707a487676875457e0b564a615c1edfd453f23b06fe879" "9527feeeec43970b1d725bdc04e97eb2b03b15be982ac50089ad223d3c6f2920" default)))
  '(inhibit-startup-screen t)
+ '(org-agenda-tags-column 80)
  '(package-selected-packages
    (quote
-    (f auctex ido-vertical-mode flx-ido ido-ubiquitous yasnippet org-bullets rainbow-delimiters projectile paredit org-link-minor-mode magit diminish diff-hl)))
+    (powerline moe-theme f auctex ido-vertical-mode flx-ido ido-ubiquitous yasnippet org-bullets rainbow-delimiters projectile paredit org-link-minor-mode magit diminish diff-hl)))
  '(send-mail-function (quote mailclient-send-it)))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
