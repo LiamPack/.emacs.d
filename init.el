@@ -8,23 +8,27 @@
   (add-to-list 'package-archives '("gnu" . "http://elpa.gnu.org/packages/")))
 (package-initialize) ;; You might already have this line
 
+;; themes
+(add-to-list 'custom-theme-load-path "~/.emacs.d/themes")
+
+;; paren mode
+(setq show-paren-mode t)
+
 ;;; Disable window chrome
 (tool-bar-mode 0)
 (menu-bar-mode 0)
 (when window-system
   (scroll-bar-mode -1))
 
+
+
 ;;; Load current favorite theme, -insert theme-
-(require 'powerline)
 
-(require 'moe-theme)
-(powerline-moe-theme)
-(setq moe-theme-highlight-buffer-id t)
-(moe-theme-set-color 'purple)
-
-
-(moe-dark)
-
+;; (require 'powerline)
+;; (require 'moe-theme)
+;; (powerline-moe-theme)
+;; ;(setq moe-theme-highlight-buffer-id t)
+;; (moe-theme-set-color 'green)
 
 
 ;;; im sick of yes-or-no
@@ -41,7 +45,9 @@
 
 ;;; Font functionality
 
+
 (setq lp/default-font "Consolas")
+
 (setq lp/default-font-size 14)
 (setq lp/current-font-size lp/default-font-size)
 
@@ -248,7 +254,11 @@
         ("t" "Todo"
          entry
          (file+headline org-index-file "Tasks")
-         "* TODO %?\n")))
+         "* TODO %?\n")
+        ("j" "Journal"
+         entry
+         (file "~/Dropbox/org/journal.org")
+         "** %u :journal: \n %?")))
 
 ;;; Org Keybindings
 ;; Useful keybinds
@@ -380,7 +390,6 @@
 ;;; Projectile everywhere obviously
 (projectile-global-mode)
 
-
 ;;; Lets bind C-c C-k to compile buffer
 (global-set-key (kbd "C-c C-k") 'eval-buffer)
 
@@ -393,6 +402,7 @@
 
 ;; Gotta keep those buffers clean
 (global-set-key (kbd "C-c n") 'lp/cleanup-buffer)
+(global-set-key (kbd "C-c C-n") 'lp/cleanup-buffer)
 
 ;; Open up a randomly generated scratch buffer (cause i like scratch buffers)
 (global-set-key (kbd "<f12>") 'lp/generate-scratch-buffer)
@@ -412,15 +422,17 @@
 (setq TeX-auto-save t)
 (setq TeX-parse-self t)
 (setq TeX-save-query nil)
-(require 'flymake)
-
 (set-default 'preview-scale-function 2.0)
+;(require 'flymake)
 
-(defun flymake-(get symbol {2:propname})-tex-args (file-name)
-       (list "pdflatex"
-             (list "-file-line-error" "-draftmode" "-interaction=nonstopmode" file-name)))
 
-(add-hook 'LaTeX-mode-hook 'flymake-mode)
+
+;; (defun flymake-(get symbol {2:propname})-tex-args (file-name)
+;;        (list "pdflatex"
+;;              (list "-file-line-error" "-draftmode" "-interaction=nonstopmode" file-name)))
+
+;(add-hook 'LaTeX-mode-hook 'flymake-mode)
+
 
 
 
@@ -435,7 +447,7 @@
    ["black" "#d55e00" "#009e73" "#f8ec59" "#0072b2" "#cc79a7" "#56b4e9" "white"])
  '(custom-safe-themes
    (quote
-    ("c03d60937e814932cd707a487676875457e0b564a615c1edfd453f23b06fe879" "9527feeeec43970b1d725bdc04e97eb2b03b15be982ac50089ad223d3c6f2920" default)))
+    ("b9a06c75084a7744b8a38cb48bc987de10d68f0317697ccbd894b2d0aca06d2b" "a19265ef7ecc16ac4579abb1635fd4e3e1185dcacbc01b7a43cf7ad107c27ced" "b9cbfb43711effa2e0a7fbc99d5e7522d8d8c1c151a3194a4b176ec17c9a8215" "c03d60937e814932cd707a487676875457e0b564a615c1edfd453f23b06fe879" "9527feeeec43970b1d725bdc04e97eb2b03b15be982ac50089ad223d3c6f2920" default)))
  '(inhibit-startup-screen t)
  '(org-agenda-tags-column 80)
  '(package-selected-packages
