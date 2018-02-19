@@ -1,14 +1,25 @@
 ;;; init.el --- -*- lexical-binding: t; -*-
-
-(require 'package) ;; You might already have this line
+(require 'package)
 (let* ((no-ssl (and (memq system-type '(windows-nt ms-dos))
                     (not (gnutls-available-p))))
-       (url (concat (if no-ssl "http" "https") "://melpa.org/packages/")))
-  (add-to-list 'package-archives (cons "melpa" url) t))
-(when (< emacs-major-version 24)
-  ;; For important compatibility libraries like cl-lib
-  (add-to-list 'package-archives '("gnu" . "http://elpa.gnu.org/packages/")))
-(package-initialize) ;; You might already have this line
+       (proto (if no-ssl "http" "https")))
+  ;; Comment/uncomment these two lines to enable/disable MELPA and MELPA Stable as desired
+  (add-to-list 'package-archives (cons "melpa" (concat proto "://melpa.org/packages/")) t)
+  ;;(add-to-list 'package-archives (cons "melpa-stable" (concat proto "://stable.melpa.org/packages/")) t)
+  (when (< emacs-major-version 24)
+    ;; For important compatibility libraries like cl-lib
+    (add-to-list 'package-archives '("gnu" . (concat proto "://elpa.gnu.org/packages/")))))
+(package-initialize)
+
+;; (require 'package) ;; You might already have this line
+;; (let* ((no-ssl (and (memq system-type '(windows-nt ms-dos))
+;;                     (not (gnutls-available-p))))
+;;        (url (concat (if no-ssl "http" "https") "://melpa.org/packages/")))
+;;   (add-to-list 'package-archives (cons "melpa" url) t))
+;; (when (< emacs-major-version 24)
+;;   ;; For important compatibility libraries like cl-lib
+;;   (add-to-list 'package-archives '("gnu" . "http://elpa.gnu.org/packages/")))
+;; (package-initialize) ;; You might already have this line
 
                                         ;(require 'autoloads)
 (setf package-enable-at-startup nil)
@@ -26,13 +37,16 @@
   (scroll-bar-mode -1))
 
 
+
 ;;; Load current favorite theme, -insert theme-
+
 (require 'powerline)
 (powerline-center-theme)
 ;; (require 'moe-theme)
 ;; (powerline-moe-theme)
 ;; (moe-theme-set-color 'green)
 ;; (moe-light)
+
 
 ;;; im sick of yes-or-no
 (defalias 'yes-or-no-p 'y-or-n-p)
@@ -48,8 +62,10 @@
 
 ;;; Font functionality
 
+
 (setq lp/default-font "Iosevka")
 (setq lp/default-font-size 12)
+
 (setq lp/current-font-size lp/default-font-size)
 
 ;; Define the factor that we should go by when increasing/decreasing
@@ -266,7 +282,8 @@
         ("j" "Journal"
          entry
          (file "~/Dropbox/org/journal.org")
-         "* %u :journal: \n %?")
+
+         "** %u :journal: \n %?")
         ("t" "Todo"
          entry
          (file+headline org-index-file "Tasks")
@@ -560,6 +577,7 @@
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
+
  '(ansi-color-faces-vector
    [default bold shadow italic underline bold bold-italic bold])
  '(ansi-color-names-vector
@@ -572,8 +590,7 @@
  '(fci-rule-color "#d6d6d6")
  '(flycheck-color-mode-line-face-to-color (quote mode-line-buffer-id))
  '(inhibit-startup-screen t)
- '(org-agenda-tags-column 85)
- '(org-tags-column 80)
+ '(org-agenda-tags-column 80)
  '(package-selected-packages
    (quote
     (monokai-alt-theme monokai-theme elfeed-web elfeed-org elfeed color-theme-sanityinc-solarized color-theme-sanityinc-tomorrow interleave org-ref pdf-tools tuareg merlin slime powerline moe-theme f auctex ido-vertical-mode flx-ido ido-ubiquitous yasnippet org-bullets rainbow-delimiters projectile paredit org-link-minor-mode magit diminish diff-hl)))
