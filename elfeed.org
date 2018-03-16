@@ -1,18 +1,33 @@
-* blogs                                                                         :elfeed:
+* blogs                                                              :elfeed:
 ** entry-title: \(linux\|linus\|ubuntu\|kde\|gnome\)                  :linux:
+** dev                                                                  :dev:
+*** https://www.bennee.com/~alex/blog/feed/
 ** daily                                                        :daily:
 *** http://telescoper.wordpress.com/feed/
 *** http://timharford.com/feed/
 *** http://understandinguncertainty.org/rss.xml
+*** https://www.reddit.com/r/dailyprogrammer/.rss :dp:
 ** emacs                                                        :emacs:
 *** entry-title: \(emacs\|org-mode\) :orgmode:
 *** http://www.reddit.com/r/emacs/.rss
 *** http://planet.emacsen.org/atom.xml
 *** http://feeds.feedburner.com/XahsEmacsBlog
 *** http://pragmaticemacs.com/feed/
+*** https://oremacs.com/atom.xml
 *** [[http://emacs.stackexchange.com/feeds][SX]] :ignore:
+** hackernews :hn:
+*** https://hnrss.org/newest?points=100
+** roguelike :roguelike:
+*** http://www.goldenkronehotel.com/wordpress/feed/
 *** http://www.terminally-incoherent.com/blog/feed
+*** https://www.reddit.com/r/roguelikedev.rss :dev:
+*** https://www.reddit.com/r/roguelikes.rss
+*** http://rodneylives.blogspot.com/
 ** http://nullprogram.com/feed/
 ** melee :melee:
-* webcomic                                                                      :elfeed:
+*** https://supersmash.blog/feed/
+* webcomic                                                           :elfeed:
 ** http://xkcd.com/rss.xml
+* podcast                                                            :elfeed:
+** roguelike :roguelike:
+*** http://feeds.feedburner.com/RoguelikeRadio
