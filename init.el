@@ -55,8 +55,8 @@
 (menu-bar-mode 0)
 (when window-system
   (scroll-bar-mode -1))
-(setq inhibit-startup-message t
-      initial-scratch-message (format ";; %s\n" (adafruit-wisdom-select)))
+(setq inhibit-startup-message t)
+                                        ;      initial-scratch-message (format ";; %s\n" (adafruit-wisdom-select)))
 
 ;; stop truncating lines
 (set-default 'truncate-lines t)
@@ -284,33 +284,37 @@
 
 ;;; Hide a whole bunch of stuff on the modeline. It's a bit annoying.
 ;;; Using the =diminish= package for this.
-(defmacro diminish-minor-mode (filename mode &optional abbrev)
-  `(eval-after-load (symbol-name ,filename)
-     '(diminish ,mode ,abbrev)))
+(use-package diminish
+  :ensure t
+  :config
+  (progn
+    (defmacro diminish-minor-mode (filename mode &optional abbrev)
+      `(eval-after-load (symbol-name ,filename)
+         '(diminish ,mode ,abbrev)))
 
-(defmacro diminish-major-mode (mode-hook abbrev)
-  `(add-hook ,mode-hook
-             (lambda () (setq mode-name ,abbrev))))
+    (defmacro diminish-major-mode (mode-hook abbrev)
+      `(add-hook ,mode-hook
+                 (lambda () (setq mode-name ,abbrev))))
 
-(diminish-minor-mode 'abbrev 'abbrev-mode)
-(diminish-minor-mode 'simple 'auto-fill-function)
-(diminish-minor-mode 'company 'company-mode)
-(diminish-minor-mode 'eldoc 'eldoc-mode)
-(diminish-minor-mode 'flycheck 'flycheck-mode)
-(diminish-minor-mode 'flyspell 'flyspell-mode)
-(diminish-minor-mode 'global-whitespace 'global-whitespace-mode)
-(diminish-minor-mode 'projectile 'projectile-mode)
-(diminish-minor-mode 'ruby-end 'ruby-end-mode)
-(diminish-minor-mode 'subword 'subword-mode)
-(diminish-minor-mode 'undo-tree 'undo-tree-mode)
-(diminish-minor-mode 'yard-mode 'yard-mode)
-(diminish-minor-mode 'yasnippet 'yas-minor-mode)
-(diminish-minor-mode 'wrap-region 'wrap-region-mode)
-(diminish-minor-mode 'paredit 'paredit-mode " π")
-(diminish-major-mode 'emacs-lisp-mode-hook "el")
-(diminish-major-mode 'haskell-mode-hook "λ=")
-(diminish-major-mode 'lisp-interaction-mode-hook "λ")
-(diminish-major-mode 'python-mode-hook "Py")
+    (diminish-minor-mode 'abbrev 'abbrev-mode)
+    (diminish-minor-mode 'simple 'auto-fill-function)
+    (diminish-minor-mode 'company 'company-mode)
+    (diminish-minor-mode 'eldoc 'eldoc-mode)
+    (diminish-minor-mode 'flycheck 'flycheck-mode)
+    (diminish-minor-mode 'flyspell 'flyspell-mode)
+    (diminish-minor-mode 'global-whitespace 'global-whitespace-mode)
+    (diminish-minor-mode 'projectile 'projectile-mode)
+    (diminish-minor-mode 'ruby-end 'ruby-end-mode)
+    (diminish-minor-mode 'subword 'subword-mode)
+    (diminish-minor-mode 'undo-tree 'undo-tree-mode)
+    (diminish-minor-mode 'yard-mode 'yard-mode)
+    (diminish-minor-mode 'yasnippet 'yas-minor-mode)
+    (diminish-minor-mode 'wrap-region 'wrap-region-mode)
+    (diminish-minor-mode 'paredit 'paredit-mode " π")
+    (diminish-major-mode 'emacs-lisp-mode-hook "el")
+    (diminish-major-mode 'haskell-mode-hook "λ=")
+    (diminish-major-mode 'lisp-interaction-mode-hook "λ")
+    (diminish-major-mode 'python-mode-hook "Py")))
 
 
 
@@ -326,7 +330,10 @@
 
 ;; quicktramp setup
 (setq tramp-default-method "ssh")
-
+(use-package paredit
+  :ensure t)
+(use-package rainbow-delimiters
+  :ensure t)
 ;; We want all lispy languages to use =paredit-mode= and =rainbow-delimiters
 (setq lisp-mode-hooks
       '(clojure-mode-hook
@@ -362,18 +369,21 @@
 (setq dired-use-ls-dired nil)
 
 ;;; Projectile ! TODO - use-package this
+(use-package projectile
+  :ensure t
+  :config
+  (progn
+    (require 'projectile)
 
-(require 'projectile)
+    ;; Projectile everywhere obviously
+    (projectile-global-mode)
 
-;; Projectile everywhere obviously
-(projectile-global-mode)
-
-(defun lp/search-project-for-symbol-at-point ()
-  "Use projectile-ag to search current project for the current symbol."
-  (interactive)
-  (projectile-ag (projectile-symbol-at-point)))
-(global-set-key  (kbd "C-c v") 'projectile-ag)
-(global-set-key (kbd "C-c C-v") 'lp/search-project-for-symbol-at-point)
+    (defun lp/search-project-for-symbol-at-point ()
+      "Use projectile-ag to search current project for the current symbol."
+      (interactive)
+      (projectile-ag (projectile-symbol-at-point)))
+    (global-set-key  (kbd "C-c v") 'projectile-ag)
+    (global-set-key (kbd "C-c C-v") 'lp/search-project-for-symbol-at-point)))
 
 ;;; Currently using eshell for my shell sessions. Bound to C-c s.
 (global-set-key (kbd "C-c s") 'eshell)
@@ -435,20 +445,20 @@
             #b00000000
             #b00000000))
   (flycheck-define-error-level 'error
-    :severity 2
-    :overlay-category 'flycheck-error-overlay
-    :fringe-bitmap 'flycheck-fringe-bitmap-ball
-    :fringe-face 'flycheck-fringe-error)
+                               :severity 2
+                               :overlay-category 'flycheck-error-overlay
+                               :fringe-bitmap 'flycheck-fringe-bitmap-ball
+                               :fringe-face 'flycheck-fringe-error)
   (flycheck-define-error-level 'warning
-    :severity 1
-    :overlay-category 'flycheck-warning-overlay
-    :fringe-bitmap 'flycheck-fringe-bitmap-ball
-    :fringe-face 'flycheck-fringe-warning)
+                               :severity 1
+                               :overlay-category 'flycheck-warning-overlay
+                               :fringe-bitmap 'flycheck-fringe-bitmap-ball
+                               :fringe-face 'flycheck-fringe-warning)
   (flycheck-define-error-level 'info
-    :severity 0
-    :overlay-category 'flycheck-info-overlay
-    :fringe-bitmap 'flycheck-fringe-bitmap-ball
-    :fringe-face 'flycheck-fringe-info))
+                               :severity 0
+                               :overlay-category 'flycheck-info-overlay
+                               :fringe-bitmap 'flycheck-fringe-bitmap-ball
+                               :fringe-face 'flycheck-fringe-info))
 
 ;; Yasnippet configuration
 (use-package yasnippet
@@ -649,8 +659,8 @@ after `multiple-cursors-mode' is quit.")
                                         ; TODO - speed-keys?
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-(require 'org)
-(require 'org-bullets)
+;; (require 'org)
+;; (require 'org-bullets)
 
 (use-package org-bullets
   :ensure t
@@ -777,14 +787,18 @@ after `multiple-cursors-mode' is quit.")
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 ;; pdf-tools init
-(pdf-tools-install)
+(use-package pdf-tools
+  :ensure t
+  :config
+  (pdf-tools-install))
 
 ;; org-ref
-(require 'org-ref)
-(require 'bibtex-utils)
-(require 'biblio)
-(require 'helm-bibtex)
-(require 'doi-utils)
+
+(use-package bibtex-utils
+  :ensure t)
+(use-package biblio
+  :ensure t)
+
 ;;(require 'pubmed)
 ;;(require 'arxiv)
 ;;(require 'sci-id)
@@ -794,10 +808,12 @@ after `multiple-cursors-mode' is quit.")
 (use-package org-ref
   :ensure t
   :config
-  (setq org-ref-notes-directory "~/Dropbox/res"
-        org-ref-bibliography-notes "~/Dropbox/res/notes.org"
-        org-ref-default-bibliography '("~/Dropbox/res/index.bib")
-        org-ref-pdf-directory "~/Dropbox/res/lib/"))
+  (progn
+    (require 'doi-utils)
+    (setq org-ref-notes-directory "~/Dropbox/res"
+             org-ref-bibliography-notes "~/Dropbox/res/notes.org"
+             org-ref-default-bibliography '("~/Dropbox/res/index.bib")
+             org-ref-pdf-directory "~/Dropbox/res/lib/")))
 
 (use-package helm-bibtex
   :ensure t
@@ -959,14 +975,13 @@ after `multiple-cursors-mode' is quit.")
    [default bold shadow italic underline bold bold-italic bold])
  '(ansi-color-names-vector
    (vector "#eaeaea" "#d54e53" "DarkOliveGreen3" "#e7c547" "DeepSkyBlue1" "#c397d8" "#70c0b1" "#181a26"))
- '(custom-enabled-themes (quote (eclipse)))
  '(custom-safe-themes
    (quote
     ("cc60d17db31a53adf93ec6fad5a9cfff6e177664994a52346f81f62840fe8e23" "28ec8ccf6190f6a73812df9bc91df54ce1d6132f18b4c8fcc85d45298569eb53" "e1994cf306356e4358af96735930e73eadbaf95349db14db6d9539923b225565" "eea01f540a0f3bc7c755410ea146943688c4e29bea74a29568635670ab22f9bc" default)))
  '(fci-rule-color "#14151E")
  '(package-selected-packages
    (quote
-    (cherry-blossom-theme afternoon-theme auto-yasnippet eclipse-theme academic-phrases expand-region writegood-mode use-package tuareg smex slime rainbow-delimiters projectile powerline paredit org-ref org-link-minor-mode org-bullets multiple-cursors monokai-theme monokai-alt-theme merlin markdown-mode magit interleave ido-vertical-mode ido-completing-read+ helm-ag flycheck flx-ido elpy elfeed-org diminish diff-hl counsel bibtex-utils bibretrieve auto-compile ag adafruit-wisdom ace-window)))
+    (doi-utils cherry-blossom-theme afternoon-theme auto-yasnippet eclipse-theme academic-phrases expand-region writegood-mode use-package tuareg smex slime rainbow-delimiters projectile powerline paredit org-ref org-link-minor-mode org-bullets multiple-cursors monokai-theme monokai-alt-theme merlin markdown-mode magit interleave ido-vertical-mode ido-completing-read+ helm-ag flycheck flx-ido elpy elfeed-org diminish diff-hl counsel bibtex-utils bibretrieve auto-compile ag adafruit-wisdom ace-window)))
  '(vc-annotate-background nil)
  '(vc-annotate-color-map
    (quote
