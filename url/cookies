@@ -1,18 +1,0 @@
-;; Emacs-W3 HTTP cookies file
-;; Automatically generated file!!! DO NOT EDIT!!!
-
-(setq url-cookie-storage
- '((".acm.org"
-  [url-cookie "__cfduid" "d72163420bd7bbef14e1961ab4ed0bc861517514594" "01 Feb 19 19:49:54 [GMT]" "/" ".acm.org" nil]
-  [url-cookie "HttpOnly" nil "01 Feb 19 19:49:54 [GMT]" "/" ".acm.org" nil])
- (".adafruit.com"
-  [url-cookie "__cfduid" "d71fd11bb9b4fb5e1ee565c1892b2a9491520464470" "07 Mar 19 23:14:30 [GMT]" "/" ".adafruit.com" nil]
-  [url-cookie "HttpOnly" nil "07 Mar 19 23:14:30 [GMT]" "/" ".adafruit.com" nil]))
-)
-(setq url-cookie-secure-storage
- 'nil)
-
-;; Local Variables:
-;; version-control: never
-;; no-byte-compile: t
-;; End:
