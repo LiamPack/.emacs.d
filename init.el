@@ -90,6 +90,7 @@
 
 ;; time on modeline is cool
 (use-package time
+  :ensure t
   :config
   (progn
     (setf display-time-default-load-average nil
@@ -395,6 +396,7 @@
 
 
 (use-package python
+  :ensure t
   :mode ("\\.py\\'" . python-mode)
   :interpreter ("python" . python-mode)
   :config
@@ -450,6 +452,7 @@
 
 ;; Yasnippet configuration
 (use-package yasnippet
+  :ensure t
   :diminish yas-minor-mode
   :config
   (progn
@@ -461,6 +464,21 @@
     ;; (define-key yas-minor-mode-map [(tab)] nil)
     ;; (define-key yas-minor-mode-map (kbd "TAB") nil)
     ))
+
+(use-package auto-yasnippet
+  :ensure t
+  :bind ((  "C-1" . aya-create)
+         (  "C-2" . aya-expand)))
+
+
+(use-package recentf
+  :ensure t
+  :diminish recentf-mode
+  :config
+  (progn
+    (recentf-mode 1)
+    (setq recentf-max-menu-items 25)))
+
 
 ;; Ido configuration
 (use-package flx-ido
@@ -499,10 +517,7 @@
     (setq ivy-use-virtual-buffers t)
     (setq ivy-initial-inputs-alist nil)
     (setq enable-recursive-minibuffers t)
-    (setq ivy-count-format "%d/%d ")
-    (setq ivy-re-builders-alist
-      '((ivy-switch-buffer . ivy--regex-plus)
-        (t . ivy--regex-fuzzy)))))
+    (setq ivy-count-format "%d/%d ")))
 
 ;; sick of this blinking
 (blink-cursor-mode -1)
@@ -575,6 +590,7 @@
 ;; BTW, I highly recommend adding mc/mark-next-like-this to a key
 ;; binding that's right next to the key for er/expand-region.
 (use-package multiple-cursors
+  :ensure t
   :bind (("C-S-c C-S-c" . mc/edit-lines)
          ("C->" . mc/mark-next-like-this)
          ("C-<" . mc/mark-previous-like-this)
@@ -625,129 +641,138 @@ after `multiple-cursors-mode' is quit.")
     (add-hook 'multiple-cursors-mode-enabled-hook #'modi/mc-when-enabled)
     (add-hook 'multiple-cursors-mode-disabled-hook #'modi/mc-when-disabled)))
 
+(use-package expand-region
+  :ensure t
+  :bind ("C-," . er/expand-region))
 
                                         ; org-mode
                                         ; TODO - speed-keys?
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-
 (require 'org)
 (require 'org-bullets)
+
 (use-package org-bullets
+  :ensure t
   :hook org
   :config
   (setq org-ellipsis "⤵"))
-;; Pretty bullets are better than list of asterisk
-(add-hook 'org-mode-hook
-          (lambda ()
-            (org-bullets-mode t)))
 
-(global-set-key "\C-cl" 'org-store-link)
-(global-set-key "\C-cb" 'org-iswitchb)
+(use-package org
+  :ensure t
+  :bind (("\C-cl" . org-store-link)
+         ("\C-cl" . org-store-link)
+         ("\C-cb" . org-iswitchb))
+  :config
+  (progn
+    (add-hook 'org-mode-hook
+              (lambda ()
+                (org-bullets-mode t)))
+    (setq org-M-RET-may-split-line nil)
+    (setq org-src-fontify-natively t)
+    (setq org-src-tab-acts-natively t)
+    (setq org-edit-src-content-indentation 0)
+    (setq org-src-window-setup 'current-window)
+    (add-to-list 'org-babel-load-languages '(emacs-lisp . t))
+    (add-to-list 'org-babel-load-languages '(dot . t))
+    (add-to-list 'org-babel-load-languages '(ditaa . t))
+    (add-to-list 'org-babel-load-languages '(ipython . t))
+    (add-to-list 'org-babel-load-languages '(python . t))
+    (add-to-list 'org-babel-load-languages '(C . t))
+    (add-to-list 'org-babel-load-languages '(shell . t))
 
-(setq org-M-RET-may-split-line nil)
+    (org-babel-do-load-languages
+     'org-babel-load-languages
+     '((C . t) (python . t) (emacs-lisp . t) (gnuplot . t) (shell .t)))
 
-;; When editing code snippet/ block, use syntax highlighting for that language
-;; Also don't open new window for src blocks
-(setq org-src-fontify-natively t)
-(setq org-src-tab-acts-natively t)
-(setq org-edit-src-content-indentation 0)
-(setq org-src-window-setup 'current-window)
-(add-to-list 'org-babel-load-languages '(emacs-lisp . t))
-(add-to-list 'org-babel-load-languages '(dot . t))
-(add-to-list 'org-babel-load-languages '(ditaa . t))
-(add-to-list 'org-babel-load-languages '(ipython . t))
-(add-to-list 'org-babel-load-languages '(python . t))
-(add-to-list 'org-babel-load-languages '(C . t))
-(org-babel-do-load-languages
- 'org-babel-load-languages
- '((C . t) (python . t) (emacs-lisp . t) (gnuplot . t)))
+    (setq org-confirm-babel-evaluate nil)
+    ;; Org-capture management + Tasks
+    (setq org-directory "~/Dropbox/org/")
 
-(setq org-confirm-babel-evaluate nil)
-;; Org-capture management + Tasks
-(setq org-directory "~/Dropbox/org/")
+    (defun org-file-path (filename)
+      "Return absolute address of an org file give its relative name."
+      (concat (file-name-as-directory org-directory) filename))
 
-(defun org-file-path (filename)
-  "Return absolute address of an org file give its relative name."
-  (concat (file-name-as-directory org-directory) filename))
-
-(setq org-inbox-file "~/Dropbox/inbox.org")
-(setq org-index-file (org-file-path "index.org"))
-(setq org-personal-file (org-file-path "personal.org"))
-(setq org-archive-location
-      (concat (org-file-path "archive.org") "::* From %s"))
+    (setq org-inbox-file "~/Dropbox/inbox.org")
+    (setq org-index-file (org-file-path "index.org"))
+    (setq org-personal-file (org-file-path "personal.org"))
+    (setq org-archive-location
+          (concat (org-file-path "archive.org") "::* From %s"))
 
 
-;; I keep all of my todos in =~/org/index.org= so I derive my agenda from there
-(setq org-agenda-files (list org-index-file org-personal-file))
+    ;; I keep all of my todos in =~/org/index.org= so I derive my
+    ;; agenda from there
+    (setq org-agenda-files (list org-index-file org-personal-file))
 
-;; Bind C-c C-x C-s to mark todo as done and archive it
-(defun lp/mark-done-and-archive ()
-  "Mark the state of an org-mode item as DONE and archive it"
-  (interactive)
-  (org-todo 'done)
-  (org-archive-subtree))
-(define-key org-mode-map (kbd "C-c C-x C-s") 'lp/mark-done-and-archive)
-(setq org-log-done 'time) ; also record when the TODO was archived
+    ;; Bind C-c C-x C-s to mark todo as done and archive it
+    (defun lp/mark-done-and-archive ()
+      "Mark the state of an org-mode item as DONE and archive it"
+      (interactive)
+      (org-todo 'done)
+      (org-archive-subtree))
+    (define-key org-mode-map (kbd "C-c C-x C-s") 'lp/mark-done-and-archive)
+    (setq org-log-done 'time) ; also record when the TODO was archived
 
-(setq org-capture-templates
-      '(("r" "to-read"
-         checkitem
-         (file "~/Dropbox/org/to-read.org"))
-        ("i" "Ideas"
-         entry
-         (file "~/Dropbox/org/ideas.org")
-         "* %?\n")
-        ("j" "Journal"
-         entry
-         (file "~/Dropbox/org/journal.org")
+    (setq org-capture-templates
+          '(("r" "to-read"
+             checkitem
+             (file "~/Dropbox/org/to-read.org"))
+            ("i" "Ideas"
+             entry
+             (file "~/Dropbox/org/ideas.org")
+             "* %?\n")
+            ("j" "Journal"
+             entry
+             (file "~/Dropbox/org/journal.org")
 
-         "** %u :journal: \n %?")
-        ("t" "Todo"
-         entry
-         (file+headline org-index-file "Tasks")
-         "* TODO %?\n")
-        ("p" "Personal todo"
-         entry
-         (file+headline org-personal-file "general")
-         "* TODO %?\n")))
+             "** %u :journal: \n %?")
+            ("t" "Todo"
+             entry
+             (file+headline org-index-file "Tasks")
+             "* TODO %?\n")
+            ("p" "Personal todo"
+             entry
+             (file+headline org-personal-file "general")
+             "* TODO %?\n")))
 
 ;;; Org Keybindings
-;; Useful keybinds
-(define-key global-map (kbd "C-c a") 'org-agenda)
-(define-key global-map (kbd "C-c c") 'org-capture)
+    ;; Useful keybinds
+    (define-key global-map (kbd "C-c a") 'org-agenda)
+    (define-key global-map (kbd "C-c c") 'org-capture)
 
-;; Hit C-c i to open up my todo list.
-(defun lp/open-index-file ()
-  "Open the org TODO list."
-  (interactive)
-  (find-file org-index-file)
-  (flycheck-mode -1)
-  (end-of-buffer))
+    ;; Hit C-c i to open up my todo list.
+    (defun lp/open-index-file ()
+      "Open the org TODO list."
+      (interactive)
+      (find-file org-index-file)
+      (flycheck-mode -1)
+      (end-of-buffer))
 
-(global-set-key (kbd "C-c i") 'lp/open-index-file)
+    (global-set-key (kbd "C-c i") 'lp/open-index-file)
 
-(defun lp/org-capture-todo ()
-  (interactive)
-  (org-capture :keys "t"))
+    (defun lp/org-capture-todo ()
+      (interactive)
+      (org-capture :keys "t"))
 
-(defun lp/open-full-agenda()
-  (interactive)
-  (org-agenda :keys "n")
-  (delete-other-windows))
+    (defun lp/open-full-agenda()
+      (interactive)
+      (org-agenda :keys "n")
+      (delete-other-windows))
 
-(global-set-key (kbd "M-n") 'lp/org-capture-todo)
-(global-set-key (kbd "<f1>") 'lp/open-full-agenda)
-
-
-;; Auto wrap paragraphs in some modes (auto-fill-mode)
-(add-hook 'text-mode-hook 'turn-on-auto-fill)
-(add-hook 'org-mode-hook 'turn-on-auto-fill)
-
-;; sometimes i don't want to wrap text though, so we will toggle with C-c q
-(global-set-key (kbd "C-c q") 'auto-fill-mode)
+    (global-set-key (kbd "M-n") 'lp/org-capture-todo)
+    (global-set-key (kbd "<f1>") 'lp/open-full-agenda)
 
 
+    ;; Auto wrap paragraphs in some modes (auto-fill-mode)
+    (add-hook 'text-mode-hook 'turn-on-auto-fill)
+    (add-hook 'org-mode-hook 'turn-on-auto-fill)
+
+    ;; sometimes i don't want to wrap text though, so we will toggle
+    ;; with C-c q
+    (global-set-key (kbd "C-c q") 'auto-fill-mode)))
+
+;; When editing code snippet/ block, use syntax highlighting for that
+;; language Also don't open new window for src blocks
                                         ; research with org-mode!
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
@@ -767,6 +792,7 @@ after `multiple-cursors-mode' is quit.")
 (autoload 'helm-bibtex "helm-bibtex" "" t)
 
 (use-package org-ref
+  :ensure t
   :config
   (setq org-ref-notes-directory "~/Dropbox/res"
         org-ref-bibliography-notes "~/Dropbox/res/notes.org"
@@ -774,6 +800,7 @@ after `multiple-cursors-mode' is quit.")
         org-ref-pdf-directory "~/Dropbox/res/lib/"))
 
 (use-package helm-bibtex
+  :ensure t
   :config
   (setq helm-bibtex-bibliography "~/Dropbox/res/index.bib" ;; where your references are stored
         helm-bibtex-library-path "~/Dropbox/res/lib/"
@@ -917,7 +944,7 @@ after `multiple-cursors-mode' is quit.")
 (defun lp/open-challenges-notes ()
   "Open the org TODO list."
   (interactive)
-  (find-file "~/code/personal/dailies/dailies.org")
+  (find-file "~/code/dailies/dailies.org")
   (flycheck-mode -1))
 
 (global-set-key  (kbd "C-c y") 'lp/open-challenges-notes)
@@ -931,71 +958,43 @@ after `multiple-cursors-mode' is quit.")
  '(ansi-color-faces-vector
    [default bold shadow italic underline bold bold-italic bold])
  '(ansi-color-names-vector
-   (vector "#d6d6d6" "#c82829" "#718c00" "#eab700" "#4271ae" "#8959a8" "#3e999f" "#4d4d4c"))
- '(beacon-color "#c82829")
- '(compilation-message-face (quote default))
- '(custom-enabled-themes (quote (monokai-alt)))
+   (vector "#eaeaea" "#d54e53" "DarkOliveGreen3" "#e7c547" "DeepSkyBlue1" "#c397d8" "#70c0b1" "#181a26"))
+ '(custom-enabled-themes (quote (eclipse)))
  '(custom-safe-themes
    (quote
-    ("c4c2c9c728c6c16d7155c3851ae7309446bee8b5eb5973d9cccb9f7a178d55ff" "d3a406c5905923546d8a3ad0164a266deaf451856eca5f21b36594ffcb08413a" "eea01f540a0f3bc7c755410ea146943688c4e29bea74a29568635670ab22f9bc" "82d2cac368ccdec2fcc7573f24c3f79654b78bf133096f9b40c20d97ec1d8016" "06f0b439b62164c6f8f84fdda32b62fb50b6d00e8b01c2208e55543a6337433a" "628278136f88aa1a151bb2d6c8a86bf2b7631fbea5f0f76cba2a0079cd910f7d" "bb08c73af94ee74453c90422485b29e5643b73b05e8de029a6909af6a3fb3f58" "1b8d67b43ff1723960eb5e0cba512a2c7a2ad544ddb2533a90101fd1852b426e" "4cf3221feff536e2b3385209e9b9dc4c2e0818a69a1cdb4b522756bcdf4e00a4" "4aee8551b53a43a883cb0b7f3255d6859d766b6c5e14bcb01bed572fcbef4328" "b9a06c75084a7744b8a38cb48bc987de10d68f0317697ccbd894b2d0aca06d2b" "a19265ef7ecc16ac4579abb1635fd4e3e1185dcacbc01b7a43cf7ad107c27ced" "b9cbfb43711effa2e0a7fbc99d5e7522d8d8c1c151a3194a4b176ec17c9a8215" "c03d60937e814932cd707a487676875457e0b564a615c1edfd453f23b06fe879" "9527feeeec43970b1d725bdc04e97eb2b03b15be982ac50089ad223d3c6f2920" default)))
- '(fci-rule-color "#3C3D37")
- '(flycheck-color-mode-line-face-to-color (quote mode-line-buffer-id))
- '(highlight-changes-colors (quote ("#FD5FF0" "#AE81FF")))
- '(highlight-tail-colors
-   (quote
-    (("#3C3D37" . 0)
-     ("#679A01" . 20)
-     ("#4BBEAE" . 30)
-     ("#1DB4D0" . 50)
-     ("#9A8F21" . 60)
-     ("#A75B00" . 70)
-     ("#F309DF" . 85)
-     ("#3C3D37" . 100))))
- '(inhibit-startup-screen t)
- '(magit-diff-use-overlays nil)
- '(org-agenda-tags-column 80)
+    ("cc60d17db31a53adf93ec6fad5a9cfff6e177664994a52346f81f62840fe8e23" "28ec8ccf6190f6a73812df9bc91df54ce1d6132f18b4c8fcc85d45298569eb53" "e1994cf306356e4358af96735930e73eadbaf95349db14db6d9539923b225565" "eea01f540a0f3bc7c755410ea146943688c4e29bea74a29568635670ab22f9bc" default)))
+ '(fci-rule-color "#14151E")
  '(package-selected-packages
    (quote
-    (ace-window multiple-cursors counsel helm-ag elpy writegood-mode markdown-mode flycheck adafruit-wisdom auto-compile color-theme-solarized color-theme ivy swiper ag monokai-alt-theme monokai-theme elfeed-org elfeed color-theme-sanityinc-solarized color-theme-sanityinc-tomorrow interleave org-ref pdf-tools tuareg merlin slime powerline moe-theme f auctex ido-vertical-mode flx-ido ido-ubiquitous yasnippet org-bullets rainbow-delimiters projectile paredit org-link-minor-mode magit diminish diff-hl)))
- '(pos-tip-background-color "#FFFACE")
- '(pos-tip-foreground-color "#272822")
- '(send-mail-function (quote mailclient-send-it))
+    (cherry-blossom-theme afternoon-theme auto-yasnippet eclipse-theme academic-phrases expand-region writegood-mode use-package tuareg smex slime rainbow-delimiters projectile powerline paredit org-ref org-link-minor-mode org-bullets multiple-cursors monokai-theme monokai-alt-theme merlin markdown-mode magit interleave ido-vertical-mode ido-completing-read+ helm-ag flycheck flx-ido elpy elfeed-org diminish diff-hl counsel bibtex-utils bibretrieve auto-compile ag adafruit-wisdom ace-window)))
  '(vc-annotate-background nil)
  '(vc-annotate-color-map
    (quote
-    ((20 . "#c82829")
-     (40 . "#f5871f")
-     (60 . "#eab700")
-     (80 . "#718c00")
-     (100 . "#3e999f")
-     (120 . "#4271ae")
-     (140 . "#8959a8")
-     (160 . "#c82829")
-     (180 . "#f5871f")
-     (200 . "#eab700")
-     (220 . "#718c00")
-     (240 . "#3e999f")
-     (260 . "#4271ae")
-     (280 . "#8959a8")
-     (300 . "#c82829")
-     (320 . "#f5871f")
-     (340 . "#eab700")
-     (360 . "#718c00"))))
- '(vc-annotate-very-old-color nil)
- '(weechat-color-list
-   (unspecified "#272822" "#3C3D37" "#F70057" "#F92672" "#86C30D" "#A6E22E" "#BEB244" "#E6DB74" "#40CAE4" "#66D9EF" "#FB35EA" "#FD5FF0" "#74DBCD" "#A1EFE4" "#F8F8F2" "#F8F8F0")))
+    ((20 . "#d54e53")
+     (40 . "goldenrod")
+     (60 . "#e7c547")
+     (80 . "DarkOliveGreen3")
+     (100 . "#70c0b1")
+     (120 . "DeepSkyBlue1")
+     (140 . "#c397d8")
+     (160 . "#d54e53")
+     (180 . "goldenrod")
+     (200 . "#e7c547")
+     (220 . "DarkOliveGreen3")
+     (240 . "#70c0b1")
+     (260 . "DeepSkyBlue1")
+     (280 . "#c397d8")
+     (300 . "#d54e53")
+     (320 . "goldenrod")
+     (340 . "#e7c547")
+     (360 . "DarkOliveGreen3"))))
+ '(vc-annotate-very-old-color nil))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
- '(erc-input-face ((t (:foreground "antique white"))))
- '(helm-selection ((t (:background "ForestGreen" :foreground "black"))))
- '(org-agenda-clocking ((t (:inherit secondary-selection :foreground "black"))))
- '(org-agenda-done ((t (:foreground "dim gray" :strike-through nil))))
- '(org-clock-overlay ((t (:background "SkyBlue4" :foreground "black"))))
- '(org-headline-done ((((class color) (min-colors 16) (background dark)) (:foreground "LightSalmon" :strike-through t))))
- '(outline-1 ((t (:inherit font-lock-function-name-face :foreground "cornflower blue")))))
+ )
 ;; ## added by OPAM user-setup for emacs / base ## 56ab50dc8996d2bb95e7856a6eddb17b ## you can edit, but keep this line
 (require 'opam-user-setup "~/.emacs.d/opam-user-setup.el")
 ;; ## end of OPAM user-setup addition for emacs / base ## keep this line

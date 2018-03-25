@@ -14,6 +14,7 @@
 *** http://feeds.feedburner.com/XahsEmacsBlog
 *** http://pragmaticemacs.com/feed/
 *** https://oremacs.com/atom.xml
+*** http://cestlaz.github.io/rss.xm/
 *** [[http://emacs.stackexchange.com/feeds][SX]] :ignore:
 ** hackernews :hn:
 *** https://hnrss.org/newest?points=100
@@ -23,6 +24,8 @@
 *** https://www.reddit.com/r/roguelikedev.rss :dev:
 *** https://www.reddit.com/r/roguelikes.rss
 *** http://rodneylives.blogspot.com/
+** art :art:
+*** http://inconvergent.net/atom.xml :inconvergent:
 ** http://nullprogram.com/feed/
 ** melee :melee:
 *** https://supersmash.blog/feed/
