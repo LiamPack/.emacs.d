@@ -38,7 +38,7 @@
 (setq backup-directory-alist '(("." . "~/.emacs.d/backups")))
 
 ;; Disk space is cheap. Save lots.
-
+(setq gc-cons-threshold 50000000)
 (setq delete-old-versions -1)
 (setq version-control t)
 (setq vc-make-backup-files t)
@@ -354,11 +354,24 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; Magit
 ;; God bless magit and all that it does
-(use-package magit
-  :ensure t
-  :bind ("C-x g" . magit-status)
+(use-package magit  :ensure t
+  :commands magit-status magit-blame
+  :init
+  (defadvice magit-status (around magit-fullscreen activate)
+    (window-configuration-to-register :magit-fullscreen)
+    ad-do-it
+    (delete-other-windows))
   :config
-  (setq magit-push-always-verify nil))
+  (setq magit-branch-arguments nil
+        ;; use ido to look for branches
+        magit-completing-read-function 'magit-ido-completing-read
+        ;; don't put "origin-" in front of new branch names by default
+        magit-default-tracking-name-function 'magit-default-tracking-name-branch-only
+        magit-push-always-verify nil
+        ;; Get rid of the previous advice to go into fullscreen
+        magit-restore-window-configuration t)
+
+  :bind ("C-x g" . magit-status))
 
 ;;; Dired
 ;; clean up permissions and owners, less noisy
@@ -368,7 +381,6 @@
 ;; disable ls by default
 (setq dired-use-ls-dired nil)
 
-;;; Projectile ! TODO - use-package this
 (use-package projectile
   :ensure t
   :config
@@ -385,8 +397,221 @@
     (global-set-key  (kbd "C-c v") 'projectile-ag)
     (global-set-key (kbd "C-c C-v") 'lp/search-project-for-symbol-at-point)))
 
+
+
+
+
+                                        ; eshell my goodness
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; chec kout
+;; [[https://github.com/howardabrams/dot-files/blob/master/emacs-eshell.org][this
+;; guy]] for some of his amazing eshell config
+
 ;;; Currently using eshell for my shell sessions. Bound to C-c s.
+;; Going to do some setup for this though
+(setenv "PATH"
+        (concat
+         "/usr/local/bin:/usr/local/sbin:"
+         (getenv "PATH")))
+(use-package eshell
+  :init
+  (setq ;; eshell-buffer-shorthand t ...  Can't see Bug#19391
+   eshell-scroll-to-bottom-on-input 'all
+   eshell-error-if-no-glob t
+   eshell-hist-ignoredups t
+   eshell-save-history-on-exit t
+   eshell-prefer-lisp-functions nil
+   eshell-destroy-buffer-when-process-dies t))
+
+
+(add-hook 'eshell-mode-hook (lambda ()
+                              (eshell/alias "e" "find-file $1")
+                              (eshell/alias "ff" "find-file $1")
+                              (eshell/alias "emacs" "find-file $1")
+                              (eshell/alias "ee" "find-file-other-window $1")
+
+                              (eshell/alias "gd" "magit-diff-unstaged")
+                              (eshell/alias "gds" "magit-diff-staged")
+                              (eshell/alias "d" "dired $1")
+
+                              ;; The 'ls' executable requires the Gnu version on the Mac
+                              (let ((ls (if (file-exists-p "/usr/local/bin/gls")
+                                            "/usr/local/bin/gls"
+                                          "/bin/ls")))
+                                (eshell/alias "ll" (concat ls " -AlohG --color=always")))))
+
 (global-set-key (kbd "C-c s") 'eshell)
+
+;; Change up some
+(defun curr-dir-git-branch-string (pwd)
+  "Returns current git branch as a string, or the empty string if
+PWD is not in a git repo (or the git command is not found)."
+  (interactive)
+  (when (and (not (file-remote-p pwd))
+             (eshell-search-path "git")
+             (locate-dominating-file pwd ".git"))
+    (let* ((git-url (shell-command-to-string "git config --get remote.origin.url"))
+           (git-repo (file-name-base (s-trim git-url)))
+           (git-output (shell-command-to-string (concat "git rev-parse --abbrev-ref HEAD")))
+           (git-branch (s-trim git-output))
+           (git-icon  "\xe0a0")
+           (git-icon2 (propertize "\xf020" 'face `(:family "octicons"))))
+      (concat git-repo " " git-icon2 " " git-branch))))
+
+(defun pwd-replace-home (pwd)
+  "Replace home in PWD with tilde (~) character."
+  (interactive)
+  (let* ((home (expand-file-name (getenv "HOME")))
+         (home-len (length home)))
+    (if (and
+         (>= (length pwd) home-len)
+         (equal home (substring pwd 0 home-len)))
+        (concat "~" (substring pwd home-len))
+      pwd)))
+
+(defun pwd-shorten-dirs (pwd)
+  "Shorten all directory names in PWD except the last two."
+  (let ((p-lst (split-string pwd "/")))
+    (if (> (length p-lst) 2)
+        (concat
+         (mapconcat (lambda (elm) (if (zerop (length elm)) ""
+                                    (substring elm 0 1)))
+                    (butlast p-lst 2)
+                    "/")
+         "/"
+         (mapconcat (lambda (elm) elm)
+                    (last p-lst 2)
+                    "/"))
+      pwd)))  ;; Otherwise, we just return the PWD
+
+(defun split-directory-prompt (directory)
+  (if (string-match-p ".*/.*" directory)
+      (list (file-name-directory directory) (file-name-base directory))
+    (list "" directory)))
+
+(defun ruby-prompt ()
+  "Returns a string (may be empty) based on the current Ruby Virtual Environment."
+  (let* ((executable "~/.rvm/bin/rvm-prompt")
+         (command    (concat executable "v g")))
+    (when (file-exists-p executable)
+      (let* ((results (shell-command-to-string executable))
+             (cleaned (string-trim results))
+             (gem     (propertize "\xe92b" 'face `(:family "alltheicons"))))
+        (when (and cleaned (not (equal cleaned "")))
+          (s-replace "ruby-" gem cleaned))))))
+
+(defun python-prompt ()
+  "Returns a string (may be empty) based on the current Python
+   Virtual Environment. Assuming the M-x command: `pyenv-mode-set'
+   has been called."
+  (when (fboundp #'pyenv-mode-version)
+    (let ((venv (pyenv-mode-version)))
+      (when venv
+        (concat
+         (propertize "\xe928" 'face `(:family "alltheicons"))
+         (pyenv-mode-version))))))
+
+(defun eshell/eshell-local-prompt-function ()
+  "A prompt for eshell that works locally (in that is assumes
+that it could run certain commands) in order to make a prettier,
+more-helpful local prompt."
+  (interactive)
+  (let* ((pwd        (eshell/pwd))
+         (directory (split-directory-prompt
+                     (pwd-shorten-dirs
+                      (pwd-replace-home pwd))))
+         (parent (car directory))
+         (name   (cadr directory))
+         (branch (curr-dir-git-branch-string pwd))
+         (ruby   (when (not (file-remote-p pwd)) (ruby-prompt)))
+         (python (when (not (file-remote-p pwd)) (python-prompt)))
+
+         (dark-env (eq 'dark (frame-parameter nil 'background-mode)))
+         (for-bars                 `(:weight bold))
+         (for-parent  (if dark-env `(:foreground "dark orange") `(:foreground "blue")))
+         (for-dir     (if dark-env `(:foreground "orange" :weight bold)
+                        `(:foreground "blue" :weight bold)))
+         (for-git                  `(:foreground "green"))
+         (for-ruby                 `(:foreground "red"))
+         (for-python               `(:foreground "#5555FF")))
+
+    (concat
+     (propertize "⟣─ "    'face for-bars)
+     (propertize parent   'face for-parent)
+     (propertize name     'face for-dir)
+     (when branch
+       (concat (propertize " ── "    'face for-bars)
+               (propertize branch   'face for-git)))
+     (when ruby
+       (concat (propertize " ── " 'face for-bars)
+               (propertize ruby   'face for-ruby)))
+     (when python
+       (concat (propertize " ── " 'face for-bars)
+               (propertize python 'face for-python)))
+     (propertize "\n"     'face for-bars)
+     (propertize (if (= (user-uid) 0) " #" " $") 'face `(:weight ultra-bold))
+     ;; (propertize " └→" 'face (if (= (user-uid) 0) `(:weight ultra-bold :foreground "red") `(:weight ultra-bold)))
+     (propertize " "    'face `(:weight bold)))))
+
+(setq eshell-highlight-prompt nil)
+(setq-default eshell-prompt-function #'eshell/eshell-local-prompt-function)
+
+;; ehsell here!
+(defun eshell-here ()
+  "Opens up a new shell in the directory associated with the
+current buffer's file. The eshell is renamed to match that
+directory to make multiple eshell windows easier."
+  (interactive)
+  (let* ((parent (if (buffer-file-name)
+                     (file-name-directory (buffer-file-name))
+                   default-directory))
+         (height (/ (window-total-height) 3))
+         (name   (car (last (split-string parent "/" t)))))
+    (split-window-vertically (- height))
+    (other-window 1)
+    (eshell "new")
+    (rename-buffer (concat "*eshell: " name "*"))
+
+    (insert (concat "ls"))
+    (eshell-send-input)))
+
+(bind-key "C-!" 'eshell-here)
+
+(defun eshell-here ()
+  "Opens up a new shell in the directory associated with the
+    current buffer's file. The eshell is renamed to match that
+    directory to make multiple eshell windows easier."
+  (interactive)
+  (let* ((height (/ (window-total-height) 3)))
+    (split-window-vertically (- height))
+    (other-window 1)
+    (eshell "new")
+    (insert (concat "ls"))
+    (eshell-send-input)))
+
+(bind-key "C-!" 'eshell-here)
+
+(use-package eshell
+  :config
+  (defun ha/eshell-quit-or-delete-char (arg)
+    (interactive "p")
+    (if (and (eolp) (looking-back eshell-prompt-regexp))
+        (progn
+          (eshell-life-is-too-much) ; Why not? (eshell/exit)
+          (ignore-errors
+            (delete-window)))
+      (delete-forward-char arg)))
+  :init
+  (add-hook 'eshell-mode-hook
+            (lambda ()
+              (bind-keys :map eshell-mode-map
+                         ("C-d" . ha/eshell-quit-or-delete-char)))))
+
+
+(setq qtramp-default-method "ssh")
+
+
+
 
 ;;; A quick hook to C modes to quickswap to =.h= files or =.c= files. It's nice
 (add-hook 'c-mode-common-hook
@@ -416,49 +641,21 @@
 
 
 
+;; mark any TODO or somethign like that in red font!
+(add-hook 'prog-common-hook
+          (lambda ()
+            (font-lock-add-keywords nil
+                                    '(("\\<\\(FIX\\|FIXME\\|TODO\\|BUG\\|HACK\\):" 1 font-lock-warning-face t)))))
+
 ;; flycheck mode is not too bad.
+
+
 (use-package flycheck
   :ensure t
-  :disabled
-  :config
+  :init
   (add-hook 'after-init-hook 'global-flycheck-mode)
-  (add-hook 'flycheck-mode-hook 'jc/use-eslint-from-node-modules)
-  (add-to-list 'flycheck-checkers 'proselint)
-  (setq-default flycheck-highlighting-mode 'lines)
-  ;; Define fringe indicator / warning levels
-  (define-fringe-bitmap 'flycheck-fringe-bitmap-ball
-    (vector #b00000000
-            #b00000000
-            #b00000000
-            #b00000000
-            #b00000000
-            #b00000000
-            #b00000000
-            #b00011100
-            #b00111110
-            #b00111110
-            #b00111110
-            #b00011100
-            #b00000000
-            #b00000000
-            #b00000000
-            #b00000000
-            #b00000000))
-  (flycheck-define-error-level 'error
-                               :severity 2
-                               :overlay-category 'flycheck-error-overlay
-                               :fringe-bitmap 'flycheck-fringe-bitmap-ball
-                               :fringe-face 'flycheck-fringe-error)
-  (flycheck-define-error-level 'warning
-                               :severity 1
-                               :overlay-category 'flycheck-warning-overlay
-                               :fringe-bitmap 'flycheck-fringe-bitmap-ball
-                               :fringe-face 'flycheck-fringe-warning)
-  (flycheck-define-error-level 'info
-                               :severity 0
-                               :overlay-category 'flycheck-info-overlay
-                               :fringe-bitmap 'flycheck-fringe-bitmap-ball
-                               :fringe-face 'flycheck-fringe-info))
+  :config
+  (setq-default flycheck-disabled-checkers '(emacs-lisp-checkdoc)))
 
 ;; Yasnippet configuration
 (use-package yasnippet
@@ -655,6 +852,9 @@ after `multiple-cursors-mode' is quit.")
   :ensure t
   :bind ("C-," . er/expand-region))
 
+
+
+
                                         ; org-mode
                                         ; TODO - speed-keys?
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -713,8 +913,9 @@ after `multiple-cursors-mode' is quit.")
     ;; I keep all of my todos in =~/org/index.org= so I derive my
     ;; agenda from there
     (setq org-agenda-files (list org-index-file org-personal-file))
-
-    ;; Bind C-c C-x C-s to mark todo as done and archive it
+    
+    (setq org-agenda-tags-column 80)
+;; Bind C-c C-x C-s to mark todo as done and archive it
     (defun lp/mark-done-and-archive ()
       "Mark the state of an org-mode item as DONE and archive it"
       (interactive)
@@ -811,9 +1012,9 @@ after `multiple-cursors-mode' is quit.")
   (progn
     (require 'doi-utils)
     (setq org-ref-notes-directory "~/Dropbox/res"
-             org-ref-bibliography-notes "~/Dropbox/res/notes.org"
-             org-ref-default-bibliography '("~/Dropbox/res/index.bib")
-             org-ref-pdf-directory "~/Dropbox/res/lib/")))
+          org-ref-bibliography-notes "~/Dropbox/res/notes.org"
+          org-ref-default-bibliography '("~/Dropbox/res/index.bib")
+          org-ref-pdf-directory "~/Dropbox/res/lib/")))
 
 (use-package helm-bibtex
   :ensure t
@@ -965,6 +1166,75 @@ after `multiple-cursors-mode' is quit.")
 
 (global-set-key  (kbd "C-c y") 'lp/open-challenges-notes)
 
+
+                                        ; w3m and internet
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+    ;; TAB to jump from link to link.
+    ;; RETURN to follow a link
+    ;; SPACE to move down the page
+    ;; b to move up the page
+    ;; B to move back in the history
+    ;; M to open the URL in Firefox
+    ;; I to open the image if it didn’t show up correctly
+    ;; c to copy the URL of the current page in the kill ring.
+    ;; u to copy the URL of the link in the kill ring.
+    ;; a to bookmark this page
+    ;; v to look at the bookmarks
+    ;; s to look through the page history for this session.
+
+(use-package w3m
+  :commands w3m-goto-url w3m-search
+  :init
+  (setq browse-url-browser-function 'w3m-browse-url)
+  (setq w3m-use-cookies t)
+
+  ;; clean up the w3m buffers:
+  (add-hook 'w3m-display-functions 'w3m-hide-stuff)
+  (add-hook 'w3m-mode 'ace-link-mode)
+
+  (global-set-key (kbd "C-c w w") 'w3m-goto-url)
+  (global-set-key (kbd "C-c w l") 'browse-url-at-point)
+  (global-set-key (kbd "C-c w g") 'w3m-search)
+
+  :config
+  (define-key w3m-mode-map (kbd "&") 'w3m-view-url-with-external-browser))
+
+(defun ha-switch-default-browser ()
+  "Switches the default browser between the internal and external web browser."
+  (interactive)
+  ;;         | Variable                  | Function
+  (if (equal browse-url-browser-function 'browse-url-default-browser)
+      (if (fboundp 'w3m)
+          (setq browse-url-browser-function 'w3m-browse-url)
+        (setq browse-url-browser-function 'eww-browse-url))
+    (setq browse-url-browser-function 'browse-url-default-browser))
+
+  ;; Now we need to display the current setting. The variables are
+  ;; pretty typical and have the goodies, but I just need to get rid
+  ;; of the word "url" or "browser", and the results are pretty close:
+  (cl-flet ((remove-bad-parts (l)
+                              (-filter (lambda (s) (pcase s
+                                                ("url"     nil)
+                                                ("browse"  nil)
+                                                ("browser" nil)
+                                                (_  t))) l)))
+    (message "Browser set to: %s"
+             (-> (symbol-name browse-url-browser-function)
+                 (split-string "-")
+                 remove-bad-parts
+                 car))))
+
+(global-set-key (kbd "C-c w d") 'ha-switch-default-browser)
+
+(defun w3m-skip-in-google ()
+  "For a Google Search, skip to the first result."
+  (beginning-of-buffer)
+  (search-forward-regexp "[0-9, ]+ results")
+  (forward-line 2)
+  (recenter-top-bottom 0))
+
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 (custom-set-variables
  ;; custom-set-variables was added by Custom.
@@ -975,13 +1245,14 @@ after `multiple-cursors-mode' is quit.")
    [default bold shadow italic underline bold bold-italic bold])
  '(ansi-color-names-vector
    (vector "#eaeaea" "#d54e53" "DarkOliveGreen3" "#e7c547" "DeepSkyBlue1" "#c397d8" "#70c0b1" "#181a26"))
+ '(custom-enabled-themes (quote (cyberpunk)))
  '(custom-safe-themes
    (quote
-    ("cc60d17db31a53adf93ec6fad5a9cfff6e177664994a52346f81f62840fe8e23" "28ec8ccf6190f6a73812df9bc91df54ce1d6132f18b4c8fcc85d45298569eb53" "e1994cf306356e4358af96735930e73eadbaf95349db14db6d9539923b225565" "eea01f540a0f3bc7c755410ea146943688c4e29bea74a29568635670ab22f9bc" default)))
+    ("d6922c974e8a78378eacb01414183ce32bc8dbf2de78aabcc6ad8172547cb074" "cc60d17db31a53adf93ec6fad5a9cfff6e177664994a52346f81f62840fe8e23" "28ec8ccf6190f6a73812df9bc91df54ce1d6132f18b4c8fcc85d45298569eb53" "e1994cf306356e4358af96735930e73eadbaf95349db14db6d9539923b225565" "eea01f540a0f3bc7c755410ea146943688c4e29bea74a29568635670ab22f9bc" default)))
  '(fci-rule-color "#14151E")
  '(package-selected-packages
    (quote
-    (doi-utils cherry-blossom-theme afternoon-theme auto-yasnippet eclipse-theme academic-phrases expand-region writegood-mode use-package tuareg smex slime rainbow-delimiters projectile powerline paredit org-ref org-link-minor-mode org-bullets multiple-cursors monokai-theme monokai-alt-theme merlin markdown-mode magit interleave ido-vertical-mode ido-completing-read+ helm-ag flycheck flx-ido elpy elfeed-org diminish diff-hl counsel bibtex-utils bibretrieve auto-compile ag adafruit-wisdom ace-window)))
+    (w3m cyberpunk-theme doi-utils cherry-blossom-theme afternoon-theme auto-yasnippet eclipse-theme academic-phrases expand-region writegood-mode use-package tuareg smex slime rainbow-delimiters projectile powerline paredit org-ref org-link-minor-mode org-bullets multiple-cursors monokai-theme monokai-alt-theme merlin markdown-mode magit interleave ido-vertical-mode ido-completing-read+ helm-ag flycheck flx-ido elpy elfeed-org diminish diff-hl counsel bibtex-utils bibretrieve auto-compile ag adafruit-wisdom ace-window)))
  '(vc-annotate-background nil)
  '(vc-annotate-color-map
    (quote
