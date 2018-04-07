@@ -1,0 +1,10 @@
+# -*- mode: snippet -*-
+# name: ir-with-varnothing
+# key: irv
+# --
+
+\ir[$1]{
+  $0
+}{
+  \varnothing\vdash $2 :  
+}

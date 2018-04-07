@@ -1,0 +1,10 @@
+# -*- mode: snippet -*-
+# name: ir
+# key: ir
+# --
+
+\ir[$1]{
+  $0
+}{
+  $2
+}

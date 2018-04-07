@@ -1,0 +1,10 @@
+# -*- mode: snippet -*-
+# name: ir-with-gammas
+# key: irg
+# --
+
+\ir[$1]{
+  $0
+}{
+  \Gamma\vdash $2 :  
+}

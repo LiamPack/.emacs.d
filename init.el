@@ -38,11 +38,12 @@
 (setq backup-directory-alist '(("." . "~/.emacs.d/backups")))
 
 ;; Disk space is cheap. Save lots.
-(setq gc-cons-threshold 50000000)
 (setq delete-old-versions -1)
 (setq version-control t)
 (setq vc-make-backup-files t)
 (setq auto-save-file-name-transforms '((".*" "~/.emacs.d/auto-save-list/" t)))
+;; we don't live in the past. bump that memory up.
+(setq gc-cons-threshold 50000000)
 
 ;; fuck cursor lagging on moving
 (setq auto-window-vscroll nil)
@@ -62,8 +63,19 @@
 (set-default 'truncate-lines t)
 (setq truncate-partial-width-windows nil)
 
-
+;; Themes or something
+;;
+;;  * cyberpunk
+;;  * leuven
+;;  * base16
+;;  * syscolors
+;;  * avk-emacs-themes - mine!
+;;  * tdsh
+;;  * subatomic
+;;  * nothcode
 ;; powerline is terrific
+(add-to-list 'custom-theme-load-path "~/.emacs.d/themes/")
+
 (use-package powerline
   :ensure t
   :config (powerline-center-theme))
@@ -72,9 +84,13 @@
   "Clear existing theme settings instead of layering them"
   (mapc #'disable-theme custom-enabled-themes))
 
+                                        ; themes!?
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; espresso ; cyberpunk ; moe-light ;
 
 ;; wrap visual lines! it helps.
 (global-visual-line-mode 1)
+
 
 ;; im sick of yes-or-no
 (defalias 'yes-or-no-p 'y-or-n-p)
@@ -153,8 +169,7 @@
                                         ;  'nil
                                         ;  :family "Helvetica Neue"
                                         ;  :height 150)
-
-;; linum mode with spaces? TODO / WIP
+;;  TODO: Tlinum mode with spaces?
 ;; (global-linum-mode 1)
 ;; (defadvice linum-update-window (around linum-dynamic activate)
 ;;   (let* ((w (length (number-to-string
@@ -170,6 +185,15 @@
 ;; global-hl-line-mode softly highlights bg color of line. Its nice.
 (when window-system
   (global-hl-line-mode))
+
+;; Helps with stupid ^L characters - allows a page break to appear!
+(use-package page-break-lines
+  :ensure t
+  :diminish page-break-lines-mode
+  :config
+  (global-page-break-lines-mode))
+
+
 
                                         ; useful functions + keybinds
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -232,6 +256,8 @@
 ;; pop to the last command mark! its cool.
 (bind-key "C-x p" 'pop-to-mark-command)
 (setq set-mark-command-repeat-pop t)
+                                        ; themes
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
                                         ; window management
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -310,6 +336,7 @@
     (diminish-minor-mode 'yard-mode 'yard-mode)
     (diminish-minor-mode 'yasnippet 'yas-minor-mode)
     (diminish-minor-mode 'wrap-region 'wrap-region-mode)
+    (diminish-minor-mode 'simple 'visual-line-mode)
     (diminish-minor-mode 'paredit 'paredit-mode " π")
     (diminish-major-mode 'emacs-lisp-mode-hook "el")
     (diminish-major-mode 'haskell-mode-hook "λ=")
@@ -318,43 +345,25 @@
 
 
 
-
-                                        ; lisps
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;; I'd prefer that compilation output goes to *compilation buffer*
-;;; Rarely have the window selected, so the output disappears past the
-;;; bottom of the window
-(setq compilation-scroll-output t)
-(setq compilation-window-height 15)
-
-
-;; quicktramp setup
-(setq tramp-default-method "ssh")
-(use-package paredit
-  :ensure t)
-(use-package rainbow-delimiters
-  :ensure t)
-;; We want all lispy languages to use =paredit-mode= and =rainbow-delimiters
-(setq lisp-mode-hooks
-      '(clojure-mode-hook
-        emacs-lisp-mode-hook
-        lisp-mode-hook
-        scheme-mode-hook)) ; can add more or whatever
-
-
-(dolist (hook lisp-mode-hooks)
-  (add-hook hook (lambda ()
-                   (setq show-paren-style 'expression)
-                   (paredit-mode)
-                   (rainbow-delimiters-mode))))
-                                        ; (add-hook 'text-mode-hook 'hook-function)
+;; calc is here for some reason
+(use-package calc
+  :ensure t
+  :bind ("C-c =" . calc))
 
 
                                         ; programming environment
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+;; Mark TODOs as red n stuff
+(add-hook 'prog-mode-hook
+          (lambda ()
+            (font-lock-add-keywords nil
+                                    '(("\\<\\(FIXME\\|TODO\\|BUG\\)" 1 font-lock-warning-face prepend)))))
+
 ;;; Magit
 ;; God bless magit and all that it does
-(use-package magit  :ensure t
+(use-package magit
+  :ensure t
   :commands magit-status magit-blame
   :init
   (defadvice magit-status (around magit-fullscreen activate)
@@ -414,6 +423,7 @@
          "/usr/local/bin:/usr/local/sbin:"
          (getenv "PATH")))
 (use-package eshell
+  :ensure t
   :init
   (setq ;; eshell-buffer-shorthand t ...  Can't see Bug#19391
    eshell-scroll-to-bottom-on-input 'all
@@ -607,11 +617,8 @@ directory to make multiple eshell windows easier."
               (bind-keys :map eshell-mode-map
                          ("C-d" . ha/eshell-quit-or-delete-char)))))
 
-
-(setq qtramp-default-method "ssh")
-
-
-
+                                        ; c-stuff
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 ;;; A quick hook to C modes to quickswap to =.h= files or =.c= files. It's nice
 (add-hook 'c-mode-common-hook
@@ -620,7 +627,36 @@ directory to make multiple eshell windows easier."
 ;; also gdb is cool
 (setq gdb-many-windows 't)
 
-;; Slime for lisps!
+                                        ; slime and lisps
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;; I'd prefer that compilation output goes to *compilation buffer*
+;;; Rarely have the window selected, so the output disappears past the
+;;; bottom of the window
+(setq compilation-scroll-output t)
+(setq compilation-window-height 15)
+
+
+;; quicktramp setup
+(setq tramp-default-method "ssh")
+(use-package paredit
+  :ensure t)
+(use-package rainbow-delimiters
+  :ensure t)
+;; We want all lispy languages to use =paredit-mode= and =rainbow-delimiters
+(setq lisp-mode-hooks
+      '(clojure-mode-hook
+        emacs-lisp-mode-hook
+        lisp-mode-hook
+        scheme-mode-hook)) ; can add more or whatever
+
+
+(dolist (hook lisp-mode-hooks)
+  (add-hook hook (lambda ()
+                   (setq show-paren-style 'expression)
+                   (paredit-mode)
+                   (rainbow-delimiters-mode))))
+                                        ; (add-hook 'text-mode-hook 'hook-function)
+
 (use-package slime
   :ensure t
   :config
@@ -629,9 +665,24 @@ directory to make multiple eshell windows easier."
     (setq inferior-lisp-program "/usr/bin/sbcl")
     (setq slime-contribs '(slime-fancy))))
 
+;; eldoc provides minibuffer hints for elisp things. it's super nice
+(use-package "eldoc"
+  :ensure t
+  :diminish eldoc-mode
+  :commands turn-on-eldoc-mode
+  :init
+  (progn
+    (add-hook 'emacs-lisp-mode-hook 'turn-on-eldoc-mode)
+    (add-hook 'lisp-interaction-mode-hook 'turn-on-eldoc-mode)
+    (add-hook 'ielm-mode-hook 'turn-on-eldoc-mode)))
+
+(use-package elpy
+  :ensure t
+  :defer t)
 
 (use-package python
   :ensure t
+  :defer t
   :mode ("\\.py\\'" . python-mode)
   :interpreter ("python" . python-mode)
   :config
@@ -639,25 +690,18 @@ directory to make multiple eshell windows easier."
     (elpy-enable)
     (setq python-indent-offsett 2)))
 
-
-
-;; mark any TODO or somethign like that in red font!
-(add-hook 'prog-common-hook
-          (lambda ()
-            (font-lock-add-keywords nil
-                                    '(("\\<\\(FIX\\|FIXME\\|TODO\\|BUG\\|HACK\\):" 1 font-lock-warning-face t)))))
-
 ;; flycheck mode is not too bad.
+;; (use-package flycheck
+;;   :ensure t
+
+;;   :init
+;;   (add-hook 'after-init-hook 'global-flycheck-mode)
+;;   :config
+;;   (setq-default flycheck-disabled-checkers '(emacs-lisp-checkdoc)))
 
 
-(use-package flycheck
-  :ensure t
-  :init
-  (add-hook 'after-init-hook 'global-flycheck-mode)
-  :config
-  (setq-default flycheck-disabled-checkers '(emacs-lisp-checkdoc)))
 
-;; Yasnippet configuration
+;; configuration
 (use-package yasnippet
   :ensure t
   :diminish yas-minor-mode
@@ -672,6 +716,10 @@ directory to make multiple eshell windows easier."
     ;; (define-key yas-minor-mode-map (kbd "TAB") nil)
     ))
 
+(use-package yasnippet-snippets
+  :ensure t)
+
+;; auto yas is pretty damn cool
 (use-package auto-yasnippet
   :ensure t
   :bind ((  "C-1" . aya-create)
@@ -744,11 +792,36 @@ directory to make multiple eshell windows easier."
 
 (use-package swiper
   :ensure t
+  :defer t
   ;; :bind (:map isearch-mode-map
   ;;             ("M-i" . swiper-from-isearch)) ; isearch > swiper
   :bind (("C-c C-r" . swiper)
          ("C-c C-s" . counsel-grep-or-swiper))
   )
+
+
+
+;; anzu does active showing of all
+(use-package anzu
+  :ensure t
+  :defer t
+  :diminish anzu-mode
+  :config
+  (progn
+    (global-anzu-mode +1)
+    (set-face-attribute 'anzu-mode-line nil
+                        :foreground "yellow" :weight 'bold)
+
+    (custom-set-variables
+     '(anzu-mode-lighter "")
+     '(nvm-deactivate-region t)
+     '(anzu-search-threshold 1000)
+     '(anzu-replace-threshold 50)
+     '(anzu-replace-to-string-separator " => "))
+
+    (define-key isearch-mode-map [remap isearch-query-replace]  #'anzu-isearch-query-replace)
+    (define-key isearch-mode-map [remap isearch-query-replace-regexp] #'anzu-isearch-query-replace-regexp)))
+
                                         ; mc tips and tricks!
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;     To get out of multiple-cursors-mode, press <return> or C-g. The
@@ -798,6 +871,7 @@ directory to make multiple eshell windows easier."
 ;; binding that's right next to the key for er/expand-region.
 (use-package multiple-cursors
   :ensure t
+  :defer t
   :bind (("C-S-c C-S-c" . mc/edit-lines)
          ("C->" . mc/mark-next-like-this)
          ("C-<" . mc/mark-previous-like-this)
@@ -852,6 +926,40 @@ after `multiple-cursors-mode' is quit.")
   :ensure t
   :bind ("C-," . er/expand-region))
 
+                                        ; web dev
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+(use-package web-mode
+  :ensure t
+  :mode "\\.html?\\'"
+  :defer t
+  :config
+  (progn
+    (setq web-mode-markup-indent-offset 2)
+    (setq web-mode-code-indent-offset 2)
+    (setq web-mode-enable-current-element-highlight t)
+    (setq web-mode-ac-sources-alist
+          '(("css" . (ac-source-css-property))
+            ("html" . (ac-source-words-in-buffer ac-source-abbrev)))
+          )))
+
+
+
+;; hceck it out https://github.com/smihica/emmet-mode
+(use-package emmet-mode
+  :ensure t
+  :defer t
+  :diminish emmet-mode
+  :config
+  (progn
+    (add-hook 'sgml-mode-hook 'emmet-mode) ;; Auto-start on any markup modes
+    (add-hook 'css-mode-hook  'emmet-mode) ;; enable Emmet's css abbreviation.
+
+    (add-hook 'emmet-mode-hook (lambda () (setq emmet-indentation 2))) ;; indent 2 spaces.
+
+    (add-hook 'emmet-mode-hook (lambda () (setq emmet-indent-after-insert nil)))
+
+    ))
 
 
 
@@ -860,11 +968,13 @@ after `multiple-cursors-mode' is quit.")
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 ;; (require 'org)
+
 ;; (require 'org-bullets)
+
+
 
 (use-package org-bullets
   :ensure t
-  :hook org
   :config
   (setq org-ellipsis "⤵"))
 
@@ -878,24 +988,24 @@ after `multiple-cursors-mode' is quit.")
     (add-hook 'org-mode-hook
               (lambda ()
                 (org-bullets-mode t)))
+    ;; NOTE: If this isn't working, make sure to delete /
+    ;; byte-recompile the /elpa/org/.. directory!
+    (org-babel-do-load-languages
+     'org-babel-load-languages
+     '((C . t)
+       (python . t)
+       (emacs-lisp . t)
+       (gnuplot . t)
+       (shell . t)))
+
+    (setq org-confirm-babel-evaluate nil)
     (setq org-M-RET-may-split-line nil)
     (setq org-src-fontify-natively t)
     (setq org-src-tab-acts-natively t)
     (setq org-edit-src-content-indentation 0)
     (setq org-src-window-setup 'current-window)
-    (add-to-list 'org-babel-load-languages '(emacs-lisp . t))
-    (add-to-list 'org-babel-load-languages '(dot . t))
-    (add-to-list 'org-babel-load-languages '(ditaa . t))
-    (add-to-list 'org-babel-load-languages '(ipython . t))
-    (add-to-list 'org-babel-load-languages '(python . t))
-    (add-to-list 'org-babel-load-languages '(C . t))
-    (add-to-list 'org-babel-load-languages '(shell . t))
 
-    (org-babel-do-load-languages
-     'org-babel-load-languages
-     '((C . t) (python . t) (emacs-lisp . t) (gnuplot . t) (shell .t)))
 
-    (setq org-confirm-babel-evaluate nil)
     ;; Org-capture management + Tasks
     (setq org-directory "~/Dropbox/org/")
 
@@ -912,10 +1022,11 @@ after `multiple-cursors-mode' is quit.")
 
     ;; I keep all of my todos in =~/org/index.org= so I derive my
     ;; agenda from there
-    (setq org-agenda-files (list org-index-file org-personal-file))
-    
-    (setq org-agenda-tags-column 80)
-;; Bind C-c C-x C-s to mark todo as done and archive it
+    (setq org-agenda-files
+          (list org-index-file org-personal-file (org-file-path "school.org")))
+
+    (setq org-agenda-tags-column 90)
+    ;; Bind C-c C-x C-s to mark todo as done and archive it
     (defun lp/mark-done-and-archive ()
       "Mark the state of an org-mode item as DONE and archive it"
       (interactive)
@@ -925,22 +1036,26 @@ after `multiple-cursors-mode' is quit.")
     (setq org-log-done 'time) ; also record when the TODO was archived
 
     (setq org-capture-templates
-          '(("r" "to-read"
-             checkitem
-             (file "~/Dropbox/org/to-read.org"))
+          '(("g" "Groceries"
+             entry
+             (file "~/Dropbox/org/groceries.org")
+             "- [ ] %?\n")
             ("i" "Ideas"
              entry
              (file "~/Dropbox/org/ideas.org")
-             "* %?\n")
+             "* [#9] %?\n")
             ("j" "Journal"
              entry
-             (file "~/Dropbox/org/journal.org")
-
-             "** %u :journal: \n %?")
+             (file+datetree "~/Dropbox/org/journal.org")
+             "** %U :journal:\n%?")
+            ("r" "to-read"
+             checkitem
+             (file+headline "~/Dropbox/org/to-read.org" "To File")
+             "%?  %^g\n %t")
             ("t" "Todo"
              entry
              (file+headline org-index-file "Tasks")
-             "* TODO %?\n")
+             "* TODO %? %^G\n %^{DEADLINE:}%^t")
             ("p" "Personal todo"
              entry
              (file+headline org-personal-file "general")
@@ -980,10 +1095,36 @@ after `multiple-cursors-mode' is quit.")
 
     ;; sometimes i don't want to wrap text though, so we will toggle
     ;; with C-c q
-    (global-set-key (kbd "C-c q") 'auto-fill-mode)))
+    (global-set-key (kbd "C-c q") 'auto-fill-mode)
 
-;; When editing code snippet/ block, use syntax highlighting for that
-;; language Also don't open new window for src blocks
+    ;; refiling
+
+    ;; I like to look at
+    (setq org-refile-targets '((org-agenda-files :maxlevel . 3)))
+
+    ;; only look at top level headings. Since org-mode represents
+    ;; these as files, this also means that the highest level heading
+    ;; will be the first "file" so to speak
+    (setq org-refile-use-outline-path 'file)
+    (setq org-outline-path-complete-in-steps nil)
+
+    ;; allow creating new parents on refile
+    (setq org-refile-allow-creating-parent-nodes 'confirm)
+    (setq org-todo-keywords '((sequence "TODO(t)" "WAITING(w)" "|" "DONE(d)" "CANCELLED(c)")))
+    (defun lp/refile-to (file headline)
+      (let ((pos (save-excursion
+                   (find-file file)
+                   (org-find-exact-headline-in-buffer headline))))
+        (org-refile nil nil (list headline file nil pos))))
+
+    (defun lp/refile-school ()
+      (interactive)
+      (while (< (point) (buffer-size))
+        (search-forward ":school:" nil t)
+        (beginning-of-visual-line)
+        (lp/refile-to "~/Dropbox/org/school.org" "Classes")))))
+
+
                                         ; research with org-mode!
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
@@ -994,12 +1135,14 @@ after `multiple-cursors-mode' is quit.")
   (pdf-tools-install))
 
 ;; org-ref
-
 (use-package bibtex-utils
   :ensure t)
+
 (use-package biblio
   :ensure t)
 
+(use-package interleave
+  :ensure t)
 ;;(require 'pubmed)
 ;;(require 'arxiv)
 ;;(require 'sci-id)
@@ -1007,6 +1150,7 @@ after `multiple-cursors-mode' is quit.")
 (autoload 'helm-bibtex "helm-bibtex" "" t)
 
 (use-package org-ref
+  :defer t
   :ensure t
   :config
   (progn
@@ -1017,13 +1161,14 @@ after `multiple-cursors-mode' is quit.")
           org-ref-pdf-directory "~/Dropbox/res/lib/")))
 
 (use-package helm-bibtex
+  :defer t
   :ensure t
   :config
   (setq helm-bibtex-bibliography "~/Dropbox/res/index.bib" ;; where your references are stored
         helm-bibtex-library-path "~/Dropbox/res/lib/"
         bibtex-completion-library-path '("~/Dropbox/res/lib/") ;; where your pdfs etc are stored
         helm-bibtex-notes-path "~/Dropbox/res/notes.org" ;; where your notes are stored
-        bibtex-completion-bibliography "~/Dropbox/res/index.bib" ;; writing completion
+        bibtex-completion-bibliography "~/Dropbox/res/index.bib" ;; completion
         bibtex-completion-notes-path "~/Dropbox/res/notes.org"))
 
 (defun lp/open-paper-notes ()
@@ -1037,6 +1182,7 @@ after `multiple-cursors-mode' is quit.")
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 (use-package markdown-mode
   :ensure t
+  :defer t
   :commands (markdown-mode gfm-mode)
   :mode (("README\\.md\\'" . gfm-mode)
          ("\\.md\\'" . markdown-mode)
@@ -1046,6 +1192,10 @@ after `multiple-cursors-mode' is quit.")
 
                                         ; tex
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+
+
+
 
 (setq TeX-PDF-mode t)
 (setq TeX-auto-save t)
@@ -1058,13 +1208,16 @@ after `multiple-cursors-mode' is quit.")
 
 ;; revert pdf-view after compilation
 (add-hook 'TeX-after-compilation-finished-functions #'TeX-revert-document-buffer)
-
+(use-package auctex
+  :defer t
+  :ensure t)
 
 
                                         ; elfeed
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 (use-package elfeed
   :ensure t
+  :defer t
   :bind (:map elfeed-search-mode-map
               ("A" . bjm/elfeed-show-all)
               ("E" . bjm/elfeed-show-emacs)
@@ -1146,14 +1299,22 @@ after `multiple-cursors-mode' is quit.")
 
                                         ; writing
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
 ;; highlights bad word choices and does stuff
 (use-package writegood-mode
   :ensure t
+  :defer t
+  :hook text-mode
+  :diminish writegood-mode
   :bind (("C-c g" . writegood-mode)
          ("\C-c\C-gg" . writegood-grade-level)
          ("\C-c\C-ge" . writegood-reading-ease))
   :config
   (add-to-list 'writegood-weasel-words "actionable"))
+
+
+;; TODO - decide whether to use this or not
+;; More badword highlighting! -
 
 
                                         ; toy areas of computer
@@ -1170,20 +1331,23 @@ after `multiple-cursors-mode' is quit.")
                                         ; w3m and internet
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-    ;; TAB to jump from link to link.
-    ;; RETURN to follow a link
-    ;; SPACE to move down the page
-    ;; b to move up the page
-    ;; B to move back in the history
-    ;; M to open the URL in Firefox
-    ;; I to open the image if it didn’t show up correctly
-    ;; c to copy the URL of the current page in the kill ring.
-    ;; u to copy the URL of the link in the kill ring.
-    ;; a to bookmark this page
-    ;; v to look at the bookmarks
-    ;; s to look through the page history for this session.
+;; TAB to jump from link to link.
+;; RETURN to follow a link
+;; SPACE to move down the page
+;; b to move up the page
+;; B to move back in the history
+;; M to open the URL in Firefox
+;; I to open the image if it didn’t show up correctly
+;; c to copy the URL of the current page in the kill ring.
+;; u to copy the URL of the link in the kill ring.
+;; a to bookmark this page
+;; v to look at the bookmarks
+;; s to look through the page history for this session.
 
 (use-package w3m
+  :defer t
+  :ensure t
+  :defer t
   :commands w3m-goto-url w3m-search
   :init
   (setq browse-url-browser-function 'w3m-browse-url)
@@ -1215,10 +1379,10 @@ after `multiple-cursors-mode' is quit.")
   ;; of the word "url" or "browser", and the results are pretty close:
   (cl-flet ((remove-bad-parts (l)
                               (-filter (lambda (s) (pcase s
-                                                ("url"     nil)
-                                                ("browse"  nil)
-                                                ("browser" nil)
-                                                (_  t))) l)))
+                                                     ("url"     nil)
+                                                     ("browse"  nil)
+                                                     ("browser" nil)
+                                                     (_  t))) l)))
     (message "Browser set to: %s"
              (-> (symbol-name browse-url-browser-function)
                  (split-string "-")
@@ -1233,6 +1397,30 @@ after `multiple-cursors-mode' is quit.")
   (search-forward-regexp "[0-9, ]+ results")
   (forward-line 2)
   (recenter-top-bottom 0))
+                                        ; misc
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+
+                                        ; weather
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+(use-package wttrin
+  :defer t
+  :ensure t
+  :commands (wttrin)
+  :init
+  (setq wttrin-default-cities '("Swarthmore")))
+
+                                        ; image manipulation
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+(use-package image+
+  :ensure t
+  :defer t
+                                        ;    :load-path "~/elisp/Emacs-imagex"
+  :commands (imagex-global-sticky-mode imagex-auto-adjust-mode)
+  :init (progn (imagex-global-sticky-mode) (imagex-auto-adjust-mode)))
+
+
+
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -1245,14 +1433,14 @@ after `multiple-cursors-mode' is quit.")
    [default bold shadow italic underline bold bold-italic bold])
  '(ansi-color-names-vector
    (vector "#eaeaea" "#d54e53" "DarkOliveGreen3" "#e7c547" "DeepSkyBlue1" "#c397d8" "#70c0b1" "#181a26"))
- '(custom-enabled-themes (quote (cyberpunk)))
+ '(custom-enabled-themes (quote (challenger-deep)))
  '(custom-safe-themes
    (quote
-    ("d6922c974e8a78378eacb01414183ce32bc8dbf2de78aabcc6ad8172547cb074" "cc60d17db31a53adf93ec6fad5a9cfff6e177664994a52346f81f62840fe8e23" "28ec8ccf6190f6a73812df9bc91df54ce1d6132f18b4c8fcc85d45298569eb53" "e1994cf306356e4358af96735930e73eadbaf95349db14db6d9539923b225565" "eea01f540a0f3bc7c755410ea146943688c4e29bea74a29568635670ab22f9bc" default)))
+    ("4b4cfb4e96e4a1c20416eeb16b1f90c895df31479a8255e01e671c503a48f707" "dcb9fd142d390bb289fee1d1bb49cb67ab7422cd46baddf11f5c9b7ff756f64c" "999d592328968aa33154e4e2385d53fd4c06b6ff60008fdadb682b07013f884c" "38b2a8441df2a4863bf5ca28648203ba0213d38f6630d3a7527828eb15f5a510" "616dc92e410a7f362757cb4dd3450bd650a69fd830cc2a7c73de2bdc90c526ad" "5acb6002127f5d212e2d31ba2ab5503df9cd1baa1200fbb5f57cc49f6da3056d" "cfc62276fa8aa37e6567cf4b4502dfdb4995a2aaebc0dd9b9aee40383fa329c9" "d6922c974e8a78378eacb01414183ce32bc8dbf2de78aabcc6ad8172547cb074" "cc60d17db31a53adf93ec6fad5a9cfff6e177664994a52346f81f62840fe8e23" "28ec8ccf6190f6a73812df9bc91df54ce1d6132f18b4c8fcc85d45298569eb53" "e1994cf306356e4358af96735930e73eadbaf95349db14db6d9539923b225565" "eea01f540a0f3bc7c755410ea146943688c4e29bea74a29568635670ab22f9bc" default)))
  '(fci-rule-color "#14151E")
  '(package-selected-packages
    (quote
-    (w3m cyberpunk-theme doi-utils cherry-blossom-theme afternoon-theme auto-yasnippet eclipse-theme academic-phrases expand-region writegood-mode use-package tuareg smex slime rainbow-delimiters projectile powerline paredit org-ref org-link-minor-mode org-bullets multiple-cursors monokai-theme monokai-alt-theme merlin markdown-mode magit interleave ido-vertical-mode ido-completing-read+ helm-ag flycheck flx-ido elpy elfeed-org diminish diff-hl counsel bibtex-utils bibretrieve auto-compile ag adafruit-wisdom ace-window)))
+    (challenger-deep-theme auctex emmet-mode page-break-lines yasnippet-snippets poet-theme artbollocks-mode image+ wttrin forecast web-mode espresso-theme comint w3m cyberpunk-theme doi-utils cherry-blossom-theme afternoon-theme auto-yasnippet eclipse-theme academic-phrases expand-region writegood-mode use-package tuareg smex slime rainbow-delimiters projectile powerline paredit org-ref org-link-minor-mode org-bullets multiple-cursors monokai-theme monokai-alt-theme merlin markdown-mode magit interleave ido-vertical-mode ido-completing-read+ helm-ag flycheck flx-ido elpy elfeed-org diminish diff-hl counsel bibtex-utils bibretrieve auto-compile ag adafruit-wisdom ace-window)))
  '(vc-annotate-background nil)
  '(vc-annotate-color-map
    (quote
