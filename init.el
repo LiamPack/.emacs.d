@@ -1055,11 +1055,11 @@ after `multiple-cursors-mode' is quit.")
             ("t" "Todo"
              entry
              (file+headline org-index-file "Tasks")
-             "* TODO %? %^G\n %^{DEADLINE:}%^t")
+             "* TODO %^{Task} %^G\n %?")
             ("p" "Personal todo"
              entry
              (file+headline org-personal-file "general")
-             "* TODO %?\n")))
+             "* TODO %^{Task} %^g\n %?")))
 
 ;;; Org Keybindings
     ;; Useful keybinds
@@ -1111,18 +1111,41 @@ after `multiple-cursors-mode' is quit.")
     ;; allow creating new parents on refile
     (setq org-refile-allow-creating-parent-nodes 'confirm)
     (setq org-todo-keywords '((sequence "TODO(t)" "WAITING(w)" "|" "DONE(d)" "CANCELLED(c)")))
+
     (defun lp/refile-to (file headline)
       (let ((pos (save-excursion
                    (find-file file)
                    (org-find-exact-headline-in-buffer headline))))
         (org-refile nil nil (list headline file nil pos))))
-
     (defun lp/refile-school ()
       (interactive)
-      (while (< (point) (buffer-size))
-        (search-forward ":school:" nil t)
+      (while (not (equal nil (search-forward ":school:" nil t)))
         (beginning-of-visual-line)
-        (lp/refile-to "~/Dropbox/org/school.org" "Classes")))))
+        (lp/refile-to "~/Dropbox/org/school.org" "Classes"))
+      (switch-to-buffer "index.org"))
+
+    (defun lp/refile-personal ()
+      (interactive)
+      (while (not (equal nil (search-forward ":personal:" nil t)))
+        (beginning-of-visual-line)
+        (lp/refile-to "~/Dropbox/org/personal.org" "general"))
+      (switch-to-buffer "index.org"))
+
+    (defun lp/refile-all ()
+      (interactive)
+      (beginning-of-buffer)
+      (lp/refile-school)
+      (beginning-of-buffer)
+      (lp/refile-personal)
+      (universal-argument)
+      (save-some-buffers))
+
+    (defun lp/refile-projects ()
+      (interactive)
+      (while (not (equal (re-search-forward "\[\#[1-3]\]" nil t) nil))
+        (beginning-of-visual-line)
+        (lp/refile-to "~/Dropbox/org/projects.org" "projects"))
+      (switch-to-buffer "ideas.org"))))
 
 
                                         ; research with org-mode!
