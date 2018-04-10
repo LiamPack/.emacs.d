@@ -76,9 +76,63 @@
 ;; powerline is terrific
 (add-to-list 'custom-theme-load-path "~/.emacs.d/themes/")
 
+;; powerline theme where the modes are on the right side.
 (use-package powerline
   :ensure t
-  :config (powerline-center-theme))
+  :config
+  (defun powerline-right-theme ()
+    "Setup a mode-line with major and minor modes on the right side."
+    (interactive)
+    (setq-default mode-line-format
+                  '("%e"
+                    (:eval
+                     (let* ((active (powerline-selected-window-active))
+                            (mode-line-buffer-id (if active 'mode-line-buffer-id 'mode-line-buffer-id-inactive))
+                            (mode-line (if active 'mode-line 'mode-line-inactive))
+                            (face0 (if active 'powerline-active0 'powerline-inactive0))
+                            (face1 (if active 'powerline-active1 'powerline-inactive1))
+                            (face2 (if active 'powerline-active2 'powerline-inactive2))
+                            (separator-left (intern (format "powerline-%s-%s"
+                                                            (powerline-current-separator)
+                                                            (car powerline-default-separator-dir))))
+                            (separator-right (intern (format "powerline-%s-%s"
+                                                             (powerline-current-separator)
+                                                             (cdr powerline-default-separator-dir))))
+                            (lhs (list (powerline-raw "%*" face0 'l)
+                                       (powerline-buffer-size face0 'l)
+                                       (powerline-buffer-id `(mode-line-buffer-id ,face0) 'l)
+                                       (powerline-raw " ")
+                                       (funcall separator-left face0 face1)
+                                       (powerline-narrow face1 'l)
+                                       (powerline-vc face1)))
+                            (center (list (powerline-raw global-mode-string face1 'r)
+                                          (powerline-raw "%4l" face1 'r)
+                                          (powerline-raw ":" face1)
+                                          (powerline-raw "%3c" face1 'r)
+                                          (funcall separator-right face1 face0)
+                                          (powerline-raw " ")
+                                          (powerline-raw "%6p" face0 'r)
+                                          (powerline-hud face2 face1)
+                                          ))
+                            (rhs (list (powerline-raw " " face1)
+                                       (funcall separator-left face1 face2)
+                                       (when (and (boundp 'erc-track-minor-mode) erc-track-minor-mode)
+                                         (powerline-raw erc-modified-channels-object face2 'l))
+                                       (powerline-major-mode face2 'l)
+                                       (powerline-process face2)
+                                       (powerline-raw " :" face2)
+                                       (powerline-minor-modes face2 'l)
+                                       (powerline-raw " " face2)
+                                       (funcall separator-right face2 face1)
+                                       ))
+                            )
+                       (concat (powerline-render lhs)
+                               (powerline-fill-center face1 (/ (powerline-width center) 2.0))
+                               (powerline-render center)
+                               (powerline-fill face1 (powerline-width rhs))
+                               (powerline-render rhs)))))))
+  (powerline-right-theme))
+
 
 (defadvice load-theme (before clear-previous-themes activate)
   "Clear existing theme settings instead of layering them"
@@ -108,11 +162,10 @@
 (use-package time
   :ensure t
   :config
-  (progn
-    (setf display-time-default-load-average nil
-          display-time-use-mail-icon t
-          display-time-24hr-format t)
-    (display-time-mode t)))
+  (setf display-time-default-load-average nil
+        display-time-use-mail-icon t
+        display-time-24hr-format t)
+  (display-time-mode t))
 
 ;; Font functionality
                                         ; iosevka, consolas, source code pro, Fira Code
@@ -178,9 +231,9 @@
 ;;     ad-do-it))
 ;;(setq fci-rule-color (face-attribute 'linum :foreground))
 
-;; Fill column
+;; Fill column + always show column
 (setq fci-rule-column 80)
-
+(setq column-number-mode t)
 
 ;; global-hl-line-mode softly highlights bg color of line. Its nice.
 (when window-system
@@ -197,6 +250,8 @@
 
                                         ; useful functions + keybinds
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+(defvar my:compile-command "clang++ -Wall -Wextra -std=c++14 ")
+
 (defun lp/kill-current-buffer ()
   "Just kill the buffer man (no prompt when killing buffer)"
   (interactive)
@@ -235,6 +290,7 @@
 
 ;; hippie expand is quite nice for aut-completing
 (global-set-key (kbd "M-/") 'hippie-expand)
+(global-set-key (kbd "M-TAB") 'hippie-expand)
                                         ;(global-set-key (kbd "M-o") 'other-window)
 
 ;; Gotta keep those buffers clean
@@ -248,10 +304,19 @@
 (global-set-key (kbd "C-<f7>") 'compile)
 
 ;; Quickly comment region
-(global-set-key (kbd "C-<f8>") 'comment-or-uncomment-region)
+(global-set-key (kbd "C-;") 'comment-or-uncomment-region)
 
 ;; fuk these defaults
 (global-set-key (kbd "M-g") #'goto-line)
+
+(global-set-key (kbd "C-@") #'align-regexp)
+
+;; backspace change!
+(global-set-key (kbd "C-?") 'help-command)
+(global-set-key (kbd "C-h") 'delete-backward-char)
+(global-set-key (kbd "M-h") 'backward-kill-word)
+(global-set-key (kbd "C-m") 'newline-and-indent)
+
 
 ;; pop to the last command mark! its cool.
 (bind-key "C-x p" 'pop-to-mark-command)
@@ -303,8 +368,7 @@
   :ensure t
   :bind ("M-o" . ace-window)
   :config
-  (progn
-    (setq  aw-keys '(?a ?s ?d ?f ?g ?h ?j ?k ?l))))
+  (setq  aw-keys '(?a ?s ?d ?f ?g ?h ?j ?k ?l)))
 
 
 
@@ -313,35 +377,35 @@
 (use-package diminish
   :ensure t
   :config
-  (progn
-    (defmacro diminish-minor-mode (filename mode &optional abbrev)
-      `(eval-after-load (symbol-name ,filename)
-         '(diminish ,mode ,abbrev)))
 
-    (defmacro diminish-major-mode (mode-hook abbrev)
-      `(add-hook ,mode-hook
-                 (lambda () (setq mode-name ,abbrev))))
+  (defmacro diminish-minor-mode (filename mode &optional abbrev)
+    `(eval-after-load (symbol-name ,filename)
+       '(diminish ,mode ,abbrev)))
 
-    (diminish-minor-mode 'abbrev 'abbrev-mode)
-    (diminish-minor-mode 'simple 'auto-fill-function)
-    (diminish-minor-mode 'company 'company-mode)
-    (diminish-minor-mode 'eldoc 'eldoc-mode)
-    (diminish-minor-mode 'flycheck 'flycheck-mode)
-    (diminish-minor-mode 'flyspell 'flyspell-mode)
-    (diminish-minor-mode 'global-whitespace 'global-whitespace-mode)
-    (diminish-minor-mode 'projectile 'projectile-mode)
-    (diminish-minor-mode 'ruby-end 'ruby-end-mode)
-    (diminish-minor-mode 'subword 'subword-mode)
-    (diminish-minor-mode 'undo-tree 'undo-tree-mode)
-    (diminish-minor-mode 'yard-mode 'yard-mode)
-    (diminish-minor-mode 'yasnippet 'yas-minor-mode)
-    (diminish-minor-mode 'wrap-region 'wrap-region-mode)
-    (diminish-minor-mode 'simple 'visual-line-mode)
-    (diminish-minor-mode 'paredit 'paredit-mode " π")
-    (diminish-major-mode 'emacs-lisp-mode-hook "el")
-    (diminish-major-mode 'haskell-mode-hook "λ=")
-    (diminish-major-mode 'lisp-interaction-mode-hook "λ")
-    (diminish-major-mode 'python-mode-hook "Py")))
+  (defmacro diminish-major-mode (mode-hook abbrev)
+    `(add-hook ,mode-hook
+               (lambda () (setq mode-name ,abbrev))))
+
+  (diminish-minor-mode 'abbrev 'abbrev-mode)
+  (diminish-minor-mode 'simple 'auto-fill-function)
+  (diminish-minor-mode 'company 'company-mode)
+  (diminish-minor-mode 'eldoc 'eldoc-mode)
+  (diminish-minor-mode 'flycheck 'flycheck-mode)
+  (diminish-minor-mode 'flyspell 'flyspell-mode)
+  (diminish-minor-mode 'global-whitespace 'global-whitespace-mode)
+  (diminish-minor-mode 'projectile 'projectile-mode)
+  (diminish-minor-mode 'ruby-end 'ruby-end-mode)
+  (diminish-minor-mode 'subword 'subword-mode)
+  (diminish-minor-mode 'undo-tree 'undo-tree-mode)
+  (diminish-minor-mode 'yard-mode 'yard-mode)
+  (diminish-minor-mode 'yasnippet 'yas-minor-mode)
+  (diminish-minor-mode 'wrap-region 'wrap-region-mode)
+  (diminish-minor-mode 'simple 'visual-line-mode)
+  (diminish-minor-mode 'paredit 'paredit-mode " π")
+  (diminish-major-mode 'emacs-lisp-mode-hook "el")
+  (diminish-major-mode 'haskell-mode-hook "λ=")
+  (diminish-major-mode 'lisp-interaction-mode-hook "λ")
+  (diminish-major-mode 'python-mode-hook "Py"))
 
 
 
@@ -393,18 +457,17 @@
 (use-package projectile
   :ensure t
   :config
-  (progn
-    (require 'projectile)
+  (require 'projectile)
 
-    ;; Projectile everywhere obviously
-    (projectile-global-mode)
+  ;; Projectile everywhere obviously
+  (projectile-global-mode)
 
-    (defun lp/search-project-for-symbol-at-point ()
-      "Use projectile-ag to search current project for the current symbol."
-      (interactive)
-      (projectile-ag (projectile-symbol-at-point)))
-    (global-set-key  (kbd "C-c v") 'projectile-ag)
-    (global-set-key (kbd "C-c C-v") 'lp/search-project-for-symbol-at-point)))
+  (defun lp/search-project-for-symbol-at-point ()
+    "Use projectile-ag to search current project for the current symbol."
+    (interactive)
+    (projectile-ag (projectile-symbol-at-point)))
+  (global-set-key  (kbd "C-c v") 'projectile-ag)
+  (global-set-key (kbd "C-c C-v") 'lp/search-project-for-symbol-at-point))
 
 
 
@@ -627,6 +690,46 @@ directory to make multiple eshell windows easier."
 ;; also gdb is cool
 (setq gdb-many-windows 't)
 
+;; from https://gist.github.com/nilsdeppe/7645c096d93b005458d97d6874a91ea9
+(use-package clang-format
+  :defer t
+  :ensure t
+  :bind (("C-c C-f" . clang-format-region)))
+
+
+(use-package cc-mode
+  :defer t
+  :ensure t
+  :config
+  (define-key c++-mode-map (kbd "C-c C-c") 'compile)
+  (define-key c++-mode-map (kbd "C-c C-k") 'kill-compilation)
+  (setq compile-command my:compile-command)
+  (use-package google-c-style
+    :ensure t
+    :config
+    ;; This prevents the extra two spaces in a namespace that Emacs
+    ;; otherwise wants to put... Gawd!
+    (add-hook 'c-mode-common-hook 'google-set-c-style)
+    ;; Autoindent using google style guide
+    (add-hook 'c-mode-common-hook 'google-make-newline-indent)
+    )
+  )
+
+;; Load CUDA mode so we get syntax highlighting in .cu files
+(use-package cuda-mode
+  :ensure t
+  :mode (("\\.cu\\'" . cuda-mode)
+         ("\\.cuh\\'" . cuda-mode)))
+
+;; Enable hide/show of code blocks
+(add-hook 'c-mode-common-hook 'hs-minor-mode)
+
+;; handle very large files
+(use-package vlf
+  :ensure t
+  :config
+  (require 'vlf-setup))
+
                                         ; slime and lisps
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; I'd prefer that compilation output goes to *compilation buffer*
@@ -638,10 +741,15 @@ directory to make multiple eshell windows easier."
 
 ;; quicktramp setup
 (setq tramp-default-method "ssh")
+
+;; paren stuff
+;;;;;;;;;;;;;;;;;;;;
 (use-package paredit
   :ensure t)
 (use-package rainbow-delimiters
   :ensure t)
+(show-paren-mode t)
+
 ;; We want all lispy languages to use =paredit-mode= and =rainbow-delimiters
 (setq lisp-mode-hooks
       '(clojure-mode-hook
@@ -660,10 +768,9 @@ directory to make multiple eshell windows easier."
 (use-package slime
   :ensure t
   :config
-  (progn
-    (slime-setup '(slime-repl))
-    (setq inferior-lisp-program "/usr/bin/sbcl")
-    (setq slime-contribs '(slime-fancy))))
+  (slime-setup '(slime-repl))
+  (setq inferior-lisp-program "/usr/bin/sbcl")
+  (setq slime-contribs '(slime-fancy)))
 
 ;; eldoc provides minibuffer hints for elisp things. it's super nice
 (use-package "eldoc"
@@ -671,10 +778,9 @@ directory to make multiple eshell windows easier."
   :diminish eldoc-mode
   :commands turn-on-eldoc-mode
   :init
-  (progn
-    (add-hook 'emacs-lisp-mode-hook 'turn-on-eldoc-mode)
-    (add-hook 'lisp-interaction-mode-hook 'turn-on-eldoc-mode)
-    (add-hook 'ielm-mode-hook 'turn-on-eldoc-mode)))
+  (add-hook 'emacs-lisp-mode-hook 'turn-on-eldoc-mode)
+  (add-hook 'lisp-interaction-mode-hook 'turn-on-eldoc-mode)
+  (add-hook 'ielm-mode-hook 'turn-on-eldoc-mode))
 
 (use-package elpy
   :ensure t
@@ -686,9 +792,8 @@ directory to make multiple eshell windows easier."
   :mode ("\\.py\\'" . python-mode)
   :interpreter ("python" . python-mode)
   :config
-  (progn
-    (elpy-enable)
-    (setq python-indent-offsett 2)))
+  (elpy-enable)
+  (setq python-indent-offsett 2))
 
 ;; flycheck mode is not too bad.
 ;; (use-package flycheck
@@ -706,18 +811,18 @@ directory to make multiple eshell windows easier."
   :ensure t
   :diminish yas-minor-mode
   :config
-  (progn
-    (yas-global-mode 1)
-    (setq yas-fallback-behavior 'return-nil)
-    (setq yas-triggers-in-field t)
-    (setq yas-verbosity 0)
-    (setq yas-snippet-dirs (list "~/.emacs.d/snippets/" "~/.emacs.d/elpa/yasnippet-20170923.1646/snippets/"))
-    ;; (define-key yas-minor-mode-map [(tab)] nil)
-    ;; (define-key yas-minor-mode-map (kbd "TAB") nil)
-    ))
+  (yas-global-mode 1)
+  (setq yas-fallback-behavior 'return-nil)
+  (setq yas-triggers-in-field t)
+  (setq yas-verbosity 0)
+  (setq yas-snippet-dirs (list "~/.emacs.d/snippets/" "~/.emacs.d/elpa/yasnippet-20170923.1646/snippets/"))
+  ;; (define-key yas-minor-mode-map [(tab)] nil)
+  ;; (define-key yas-minor-mode-map (kbd "TAB") nil)
+  )
 
 (use-package yasnippet-snippets
-  :ensure t)
+  :ensure t
+  :after yasnippet)
 
 ;; auto yas is pretty damn cool
 (use-package auto-yasnippet
@@ -730,9 +835,8 @@ directory to make multiple eshell windows easier."
   :ensure t
   :diminish recentf-mode
   :config
-  (progn
-    (recentf-mode 1)
-    (setq recentf-max-menu-items 25)))
+  (recentf-mode 1)
+  (setq recentf-max-menu-items 25))
 
 
 ;; Ido configuration
@@ -740,21 +844,21 @@ directory to make multiple eshell windows easier."
   :disabled
   :ensure t
   :config
-  (progn
-    (setq ido-enable-flex-matching t)
-    (setq ido-everywhere t)
-    (ido-mode 1)
-    (ido-ubiquitous-mode 1)
-    (flx-ido-mode 1) ; better/faster matching
-    (setq ido-create-new-buffer 'always) ; don't confirm to create new buffers
-    (ido-vertical-mode 1)
-    (setq ido-vertical-define-keys 'C-n-and-C-p-only)))
+  (setq ido-enable-flex-matching t)
+  (setq ido-everywhere t)
+  (ido-mode 1)
+  (ido-ubiquitous-mode 1)
+  (flx-ido-mode 1) ; better/faster matching
+  (setq ido-create-new-buffer 'always) ; don't confirm to create new buffers
+  (ido-vertical-mode 1)
+  (setq ido-vertical-define-keys 'C-n-and-C-p-only))
 
 (use-package ido-completing-read+
   :ensure t)
 
 ;; ivy stuff
 (use-package smex
+  :defer t
   :ensure t
   :config
   (smex-initialize))
@@ -763,16 +867,15 @@ directory to make multiple eshell windows easier."
   :ensure t
   :diminish ivy-mode
   :config
-  (progn
-    (with-eval-after-load 'ido
-      (ido-mode -1)
-      ;; Enable ivy
-      (ivy-mode 1))
+  (with-eval-after-load 'ido
+    (ido-mode -1)
+    ;; Enable ivy
+    (ivy-mode 1))
 
-    (setq ivy-use-virtual-buffers t)
-    (setq ivy-initial-inputs-alist nil)
-    (setq enable-recursive-minibuffers t)
-    (setq ivy-count-format "%d/%d ")))
+  (setq ivy-use-virtual-buffers t)
+  (setq ivy-initial-inputs-alist nil)
+  (setq enable-recursive-minibuffers t)
+  (setq ivy-count-format "%d/%d "))
 
 ;; sick of this blinking
 (blink-cursor-mode -1)
@@ -781,14 +884,13 @@ directory to make multiple eshell windows easier."
 (use-package counsel
   :ensure t
   :bind (("C-x f" . counsel-find-file)
-         ("C-h f" . counsel-describe-function)
-         ("C-h v" . counsel-describe-variable)
+         ("C-? f" . counsel-describe-function)
+         ("C-? v" . counsel-describe-variable)
          ("M-x" . counsel-M-x)
          ("C-c o" . counsel-recentf)
          ("C-x l" . counsel-locate))
   :config
-  (progn
-    (setq counsel-find-file-at-point t)))
+  (setq counsel-find-file-at-point t))
 
 (use-package swiper
   :ensure t
@@ -807,20 +909,19 @@ directory to make multiple eshell windows easier."
   :defer t
   :diminish anzu-mode
   :config
-  (progn
-    (global-anzu-mode +1)
-    (set-face-attribute 'anzu-mode-line nil
-                        :foreground "yellow" :weight 'bold)
+  (global-anzu-mode +1)
+  (set-face-attribute 'anzu-mode-line nil
+                      :foreground "yellow" :weight 'bold)
 
-    (custom-set-variables
-     '(anzu-mode-lighter "")
-     '(nvm-deactivate-region t)
-     '(anzu-search-threshold 1000)
-     '(anzu-replace-threshold 50)
-     '(anzu-replace-to-string-separator " => "))
+  (custom-set-variables
+   '(anzu-mode-lighter "")
+   '(nvm-deactivate-region t)
+   '(anzu-search-threshold 1000)
+   '(anzu-replace-threshold 50)
+   '(anzu-replace-to-string-separator " => "))
 
-    (define-key isearch-mode-map [remap isearch-query-replace]  #'anzu-isearch-query-replace)
-    (define-key isearch-mode-map [remap isearch-query-replace-regexp] #'anzu-isearch-query-replace-regexp)))
+  (define-key isearch-mode-map [remap isearch-query-replace]  #'anzu-isearch-query-replace)
+  (define-key isearch-mode-map [remap isearch-query-replace-regexp] #'anzu-isearch-query-replace-regexp))
 
                                         ; mc tips and tricks!
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -892,35 +993,34 @@ directory to make multiple eshell windows easier."
               ("^" . mc/edit-beginnings-of-lines)
               ("$" . mc/edit-ends-of-lines))
   :init
-  (progn
-    (setq mc/list-file (locate-user-emacs-file "mc-lists"))
+  (setq mc/list-file (locate-user-emacs-file "mc-lists"))
 
-    ;; Disable the annoying sluggish matching paren blinks for all cursors
-    ;; when you happen to type a ")" or "}" at all cursor locations.
-    (defvar modi/mc-blink-matching-paren--store nil
-      "Internal variable used to restore the value of `blink-matching-paren'
+  ;; Disable the annoying sluggish matching paren blinks for all cursors
+  ;; when you happen to type a ")" or "}" at all cursor locations.
+  (defvar modi/mc-blink-matching-paren--store nil
+    "Internal variable used to restore the value of `blink-matching-paren'
 after `multiple-cursors-mode' is quit.")
 
-    ;; The `multiple-cursors-mode-enabled-hook' and
-    ;; `multiple-cursors-mode-disabled-hook' are run in the
-    ;; `multiple-cursors-mode' minor mode definition, but they are not declared
-    ;; (not `defvar'd). So do that first before using `add-hook'.
-    (defvar multiple-cursors-mode-enabled-hook nil
-      "Hook that is run after `multiple-cursors-mode' is enabled.")
-    (defvar multiple-cursors-mode-disabled-hook nil
-      "Hook that is run after `multiple-cursors-mode' is disabled.")
+  ;; The `multiple-cursors-mode-enabled-hook' and
+  ;; `multiple-cursors-mode-disabled-hook' are run in the
+  ;; `multiple-cursors-mode' minor mode definition, but they are not declared
+  ;; (not `defvar'd). So do that first before using `add-hook'.
+  (defvar multiple-cursors-mode-enabled-hook nil
+    "Hook that is run after `multiple-cursors-mode' is enabled.")
+  (defvar multiple-cursors-mode-disabled-hook nil
+    "Hook that is run after `multiple-cursors-mode' is disabled.")
 
-    (defun modi/mc-when-enabled ()
-      "Function to be added to `multiple-cursors-mode-enabled-hook'."
-      (setq modi/mc-blink-matching-paren--store blink-matching-paren)
-      (setq blink-matching-paren nil))
+  (defun modi/mc-when-enabled ()
+    "Function to be added to `multiple-cursors-mode-enabled-hook'."
+    (setq modi/mc-blink-matching-paren--store blink-matching-paren)
+    (setq blink-matching-paren nil))
 
-    (defun modi/mc-when-disabled ()
-      "Function to be added to `multiple-cursors-mode-disabled-hook'."
-      (setq blink-matching-paren modi/mc-blink-matching-paren--store))
+  (defun modi/mc-when-disabled ()
+    "Function to be added to `multiple-cursors-mode-disabled-hook'."
+    (setq blink-matching-paren modi/mc-blink-matching-paren--store))
 
-    (add-hook 'multiple-cursors-mode-enabled-hook #'modi/mc-when-enabled)
-    (add-hook 'multiple-cursors-mode-disabled-hook #'modi/mc-when-disabled)))
+  (add-hook 'multiple-cursors-mode-enabled-hook #'modi/mc-when-enabled)
+  (add-hook 'multiple-cursors-mode-disabled-hook #'modi/mc-when-disabled))
 
 (use-package expand-region
   :ensure t
@@ -934,14 +1034,13 @@ after `multiple-cursors-mode' is quit.")
   :mode "\\.html?\\'"
   :defer t
   :config
-  (progn
-    (setq web-mode-markup-indent-offset 2)
-    (setq web-mode-code-indent-offset 2)
-    (setq web-mode-enable-current-element-highlight t)
-    (setq web-mode-ac-sources-alist
-          '(("css" . (ac-source-css-property))
-            ("html" . (ac-source-words-in-buffer ac-source-abbrev)))
-          )))
+  (setq web-mode-markup-indent-offset 2)
+  (setq web-mode-code-indent-offset 2)
+  (setq web-mode-enable-current-element-highlight t)
+  (setq web-mode-ac-sources-alist
+        '(("css" . (ac-source-css-property))
+          ("html" . (ac-source-words-in-buffer ac-source-abbrev)))
+        ))
 
 
 
@@ -951,15 +1050,14 @@ after `multiple-cursors-mode' is quit.")
   :defer t
   :diminish emmet-mode
   :config
-  (progn
-    (add-hook 'sgml-mode-hook 'emmet-mode) ;; Auto-start on any markup modes
-    (add-hook 'css-mode-hook  'emmet-mode) ;; enable Emmet's css abbreviation.
+  (add-hook 'sgml-mode-hook 'emmet-mode) ;; Auto-start on any markup modes
+  (add-hook 'css-mode-hook  'emmet-mode) ;; enable Emmet's css abbreviation.
 
-    (add-hook 'emmet-mode-hook (lambda () (setq emmet-indentation 2))) ;; indent 2 spaces.
+  (add-hook 'emmet-mode-hook (lambda () (setq emmet-indentation 2))) ;; indent 2 spaces.
 
-    (add-hook 'emmet-mode-hook (lambda () (setq emmet-indent-after-insert nil)))
+  (add-hook 'emmet-mode-hook (lambda () (setq emmet-indent-after-insert nil)))
 
-    ))
+  )
 
 
 
@@ -984,168 +1082,169 @@ after `multiple-cursors-mode' is quit.")
          ("\C-cl" . org-store-link)
          ("\C-cb" . org-iswitchb))
   :config
-  (progn
-    (add-hook 'org-mode-hook
-              (lambda ()
-                (org-bullets-mode t)))
-    ;; NOTE: If this isn't working, make sure to delete /
-    ;; byte-recompile the /elpa/org/.. directory!
-    (org-babel-do-load-languages
-     'org-babel-load-languages
-     '((C . t)
-       (python . t)
-       (emacs-lisp . t)
-       (gnuplot . t)
-       (shell . t)))
+  (add-hook 'org-mode-hook
+            (lambda ()
+              (org-bullets-mode t)))
+  ;; NOTE: If this isn't working, make sure to delete /
+  ;; byte-recompile the /elpa/org/.. directory!
+  (org-babel-do-load-languages
+   'org-babel-load-languages
+   '((C . t)
+     (python . t)
+     (emacs-lisp . t)
+     (gnuplot . t)
+     (shell . t)))
 
-    (setq org-confirm-babel-evaluate nil)
-    (setq org-M-RET-may-split-line nil)
-    (setq org-src-fontify-natively t)
-    (setq org-src-tab-acts-natively t)
-    (setq org-edit-src-content-indentation 0)
-    (setq org-src-window-setup 'current-window)
-
-
-    ;; Org-capture management + Tasks
-    (setq org-directory "~/Dropbox/org/")
-
-    (defun org-file-path (filename)
-      "Return absolute address of an org file give its relative name."
-      (concat (file-name-as-directory org-directory) filename))
-
-    (setq org-inbox-file "~/Dropbox/inbox.org")
-    (setq org-index-file (org-file-path "index.org"))
-    (setq org-personal-file (org-file-path "personal.org"))
-    (setq org-archive-location
-          (concat (org-file-path "archive.org") "::* From %s"))
+  (setq org-confirm-babel-evaluate nil)
+  (setq org-M-RET-may-split-line nil)
+  (setq org-src-fontify-natively t)
+  (setq org-src-tab-acts-natively t)
+  (setq org-edit-src-content-indentation 0)
+  (setq org-src-window-setup 'current-window)
 
 
-    ;; I keep all of my todos in =~/org/index.org= so I derive my
-    ;; agenda from there
-    (setq org-agenda-files
-          (list org-index-file org-personal-file (org-file-path "school.org")))
+  ;; Org-capture management + Tasks
+  (setq org-directory "~/Dropbox/org/")
 
-    (setq org-agenda-tags-column 90)
-    ;; Bind C-c C-x C-s to mark todo as done and archive it
-    (defun lp/mark-done-and-archive ()
-      "Mark the state of an org-mode item as DONE and archive it"
-      (interactive)
-      (org-todo 'done)
-      (org-archive-subtree))
-    (define-key org-mode-map (kbd "C-c C-x C-s") 'lp/mark-done-and-archive)
-    (setq org-log-done 'time) ; also record when the TODO was archived
+  (defun org-file-path (filename)
+    "Return absolute address of an org file give its relative name."
+    (concat (file-name-as-directory org-directory) filename))
 
-    (setq org-capture-templates
-          '(("g" "Groceries"
-             entry
-             (file "~/Dropbox/org/groceries.org")
-             "- [ ] %?\n")
-            ("i" "Ideas"
-             entry
-             (file "~/Dropbox/org/ideas.org")
-             "* [#9] %?\n")
-            ("j" "Journal"
-             entry
-             (file+datetree "~/Dropbox/org/journal.org")
-             "** %U :journal:\n%?")
-            ("r" "to-read"
-             checkitem
-             (file+headline "~/Dropbox/org/to-read.org" "To File")
-             "%?  %^g\n %t")
-            ("t" "Todo"
-             entry
-             (file+headline org-index-file "Tasks")
-             "* TODO %^{Task} %^G\n %?")
-            ("p" "Personal todo"
-             entry
-             (file+headline org-personal-file "general")
-             "* TODO %^{Task} %^g\n %?")))
+  (setq org-inbox-file "~/Dropbox/inbox.org")
+  (setq org-index-file (org-file-path "index.org"))
+  (setq org-personal-file (org-file-path "personal.org"))
+  (setq org-school-file (org-file-path "school.org"))
+  (setq org-projects-file (org-file-path "projects.org"))
+  (setq org-archive-location
+        (concat (org-file-path "archive.org") "::* From %s"))
+
+
+  ;; I keep all of my todos in =~/org/index.org= so I derive my
+  ;; agenda from there
+  (setq org-agenda-files
+        (list org-index-file org-personal-file org-school-file org-projects-file))
+
+  (setq org-agenda-tags-column 90)
+  ;; Bind C-c C-x C-s to mark todo as done and archive it
+  (defun lp/mark-done-and-archive ()
+    "Mark the state of an org-mode item as DONE and archive it"
+    (interactive)
+    (org-todo 'done)
+    (org-archive-subtree))
+  (define-key org-mode-map (kbd "C-c C-x C-s") 'lp/mark-done-and-archive)
+  (setq org-log-done 'time) ; also record when the TODO was archived
+
+  (setq org-capture-templates
+        '(("g" "Groceries"
+           entry
+           (file "~/Dropbox/org/groceries.org")
+           "- [ ] %?\n")
+          ("i" "Ideas"
+           entry
+           (file+headline "~/Dropbox/org/ideas.org" "Project Ideas")
+           "** [#%^{9}] %?\n")
+          ("j" "Journal"
+           entry
+           (file+datetree "~/Dropbox/org/journal.org")
+           "** %U :journal:\n%?")
+          ("r" "to-read"
+           checkitem
+           (file+headline "~/Dropbox/org/to-read.org" "To File")
+           "%?  %^g\n %t")
+          ("t" "Todo"
+           entry
+           (file+headline org-index-file "Tasks")
+           "* TODO %^{Task} %^G\n %?")
+          ("p" "Personal todo"
+           entry
+           (file+headline org-personal-file "general")
+           "* TODO %^{Task} %^g\n %?")))
 
 ;;; Org Keybindings
-    ;; Useful keybinds
-    (define-key global-map (kbd "C-c a") 'org-agenda)
-    (define-key global-map (kbd "C-c c") 'org-capture)
+  ;; Useful keybinds
+  (define-key global-map (kbd "C-c a") 'org-agenda)
+  (define-key global-map (kbd "C-c c") 'org-capture)
 
-    ;; Hit C-c i to open up my todo list.
-    (defun lp/open-index-file ()
-      "Open the org TODO list."
-      (interactive)
-      (find-file org-index-file)
-      (flycheck-mode -1)
-      (end-of-buffer))
+  ;; Hit C-c i to open up my todo list.
+  (defun lp/open-index-file ()
+    "Open the org TODO list."
+    (interactive)
+    (find-file org-index-file)
+    (flycheck-mode -1)
+    (end-of-buffer))
 
-    (global-set-key (kbd "C-c i") 'lp/open-index-file)
+  (global-set-key (kbd "C-c i") 'lp/open-index-file)
 
-    (defun lp/org-capture-todo ()
-      (interactive)
-      (org-capture :keys "t"))
+  (defun lp/org-capture-todo ()
+    (interactive)
+    (org-capture :keys "t"))
 
-    (defun lp/open-full-agenda()
-      (interactive)
-      (org-agenda :keys "n")
-      (delete-other-windows))
+  (defun lp/open-full-agenda()
+    (interactive)
+    (org-agenda :keys "n")
+    (delete-other-windows))
 
-    (global-set-key (kbd "M-n") 'lp/org-capture-todo)
-    (global-set-key (kbd "<f1>") 'lp/open-full-agenda)
+  (global-set-key (kbd "M-n") 'lp/org-capture-todo)
+  (global-set-key (kbd "<f1>") 'lp/open-full-agenda)
 
 
-    ;; Auto wrap paragraphs in some modes (auto-fill-mode)
-    (add-hook 'text-mode-hook 'turn-on-auto-fill)
-    (add-hook 'org-mode-hook 'turn-on-auto-fill)
+  ;; Auto wrap paragraphs in some modes (auto-fill-mode)
+  (add-hook 'text-mode-hook 'turn-on-auto-fill)
+  (add-hook 'org-mode-hook 'turn-on-auto-fill)
 
-    ;; sometimes i don't want to wrap text though, so we will toggle
-    ;; with C-c q
-    (global-set-key (kbd "C-c q") 'auto-fill-mode)
+  ;; sometimes i don't want to wrap text though, so we will toggle
+  ;; with C-c q
+  (global-set-key (kbd "C-c q") 'auto-fill-mode)
 
-    ;; refiling
+  ;; refiling
 
-    ;; I like to look at
-    (setq org-refile-targets '((org-agenda-files :maxlevel . 3)))
+  ;; I like to look at
+  (setq org-refile-targets '((org-agenda-files :maxlevel . 3)))
 
-    ;; only look at top level headings. Since org-mode represents
-    ;; these as files, this also means that the highest level heading
-    ;; will be the first "file" so to speak
-    (setq org-refile-use-outline-path 'file)
-    (setq org-outline-path-complete-in-steps nil)
+  ;; only look at top level headings. Since org-mode represents
+  ;; these as files, this also means that the highest level heading
+  ;; will be the first "file" so to speak
+  (setq org-refile-use-outline-path 'file)
+  (setq org-outline-path-complete-in-steps nil)
 
-    ;; allow creating new parents on refile
-    (setq org-refile-allow-creating-parent-nodes 'confirm)
-    (setq org-todo-keywords '((sequence "TODO(t)" "WAITING(w)" "|" "DONE(d)" "CANCELLED(c)")))
+  ;; allow creating new parents on refile
+  (setq org-refile-allow-creating-parent-nodes 'confirm)
+  (setq org-todo-keywords '((sequence "TODO(t)" "WAITING(w)" "|" "DONE(d)" "CANCELLED(c)")))
 
-    (defun lp/refile-to (file headline)
-      (let ((pos (save-excursion
-                   (find-file file)
-                   (org-find-exact-headline-in-buffer headline))))
-        (org-refile nil nil (list headline file nil pos))))
-    (defun lp/refile-school ()
-      (interactive)
-      (while (not (equal nil (search-forward ":school:" nil t)))
-        (beginning-of-visual-line)
-        (lp/refile-to "~/Dropbox/org/school.org" "Classes"))
-      (switch-to-buffer "index.org"))
+  (defun lp/refile-to (file headline)
+    (let ((pos (save-excursion
+                 (find-file file)
+                 (org-find-exact-headline-in-buffer headline))))
+      (org-refile nil nil (list headline file nil pos))))
+  (defun lp/refile-school ()
+    (interactive)
+    (while (not (equal nil (search-forward ":school:" nil t)))
+      (beginning-of-visual-line)
+      (lp/refile-to "~/Dropbox/org/school.org" "Classes"))
+    (switch-to-buffer "index.org"))
 
-    (defun lp/refile-personal ()
-      (interactive)
-      (while (not (equal nil (search-forward ":personal:" nil t)))
-        (beginning-of-visual-line)
-        (lp/refile-to "~/Dropbox/org/personal.org" "general"))
-      (switch-to-buffer "index.org"))
+  (defun lp/refile-personal ()
+    (interactive)
+    (while (not (equal nil (search-forward ":personal:" nil t)))
+      (beginning-of-visual-line)
+      (lp/refile-to "~/Dropbox/org/personal.org" "general"))
+    (switch-to-buffer "index.org"))
 
-    (defun lp/refile-all ()
-      (interactive)
-      (beginning-of-buffer)
-      (lp/refile-school)
-      (beginning-of-buffer)
-      (lp/refile-personal)
-      (universal-argument)
-      (save-some-buffers))
+  (defun lp/refile-all ()
+    (interactive)
+    (beginning-of-buffer)
+    (lp/refile-school)
+    (beginning-of-buffer)
+    (lp/refile-personal)
+    (universal-argument)
+    (save-some-buffers))
 
-    (defun lp/refile-projects ()
-      (interactive)
-      (while (not (equal (re-search-forward "\[\#[1-3]\]" nil t) nil))
-        (beginning-of-visual-line)
-        (lp/refile-to "~/Dropbox/org/projects.org" "projects"))
-      (switch-to-buffer "ideas.org"))))
+  (defun lp/refile-projects ()
+    (interactive)
+    (while (not (equal (re-search-forward "\[\#[1-3]\]" nil t) nil))
+      (beginning-of-visual-line)
+      (lp/refile-to "~/Dropbox/org/projects.org" "projects"))
+    (switch-to-buffer "ideas.org")))
 
 
                                         ; research with org-mode!
@@ -1176,12 +1275,11 @@ after `multiple-cursors-mode' is quit.")
   :defer t
   :ensure t
   :config
-  (progn
-    (require 'doi-utils)
-    (setq org-ref-notes-directory "~/Dropbox/res"
-          org-ref-bibliography-notes "~/Dropbox/res/notes.org"
-          org-ref-default-bibliography '("~/Dropbox/res/index.bib")
-          org-ref-pdf-directory "~/Dropbox/res/lib/")))
+  (require 'doi-utils)
+  (setq org-ref-notes-directory "~/Dropbox/res"
+        org-ref-bibliography-notes "~/Dropbox/res/notes.org"
+        org-ref-default-bibliography '("~/Dropbox/res/index.bib")
+        org-ref-pdf-directory "~/Dropbox/res/lib/"))
 
 (use-package helm-bibtex
   :defer t
@@ -1231,86 +1329,95 @@ after `multiple-cursors-mode' is quit.")
 
 ;; revert pdf-view after compilation
 (add-hook 'TeX-after-compilation-finished-functions #'TeX-revert-document-buffer)
-(use-package auctex
+(use-package tex
   :defer t
-  :ensure t)
-
-
+  :ensure auctex
+  :mode ("\\.tex\\'" . TeX-latex-mode)
+  :config
+  (setq TeX-auto-save t)
+  (setq TeX-parse-self t)
+  (setq TeX-view-program-list
+        '(("Evince" "evince --page-index=%(outpage) %o")))
+  (setq TeX-view-program-selection '((output-pdf "Evince")))
+  (setq TeX-source-correlate-start-server t)
+  (add-hook 'LaTeX-mode-hook 'TeX-source-correlate-mode)
+  (add-hook 'LaTeX-mode-hook 'auto-fill-mode)
+  (add-hook 'LaTeX-mode-hook 'flyspell-mode)
+  (add-hook 'LaTeX-mode-hook 'flyspell-buffer)
+  (add-hook 'LaTeX-mode-hook 'turn-on-reftex)
+  (setq reftex-plug-into-AUCTeX t)
+  (setq-default TeX-source-correlate-mode t))
                                         ; elfeed
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 (use-package elfeed
   :ensure t
   :defer t
-  :bind (:map elfeed-search-mode-map
-              ("A" . bjm/elfeed-show-all)
-              ("E" . bjm/elfeed-show-emacs)
-              ("D" . bjm/elfeed-show-daily)))
-(global-set-key (kbd "C-x w") 'elfeed)
-(setq shr-width 80)
+  :config
+  (global-set-key (kbd "C-x w") 'elfeed)
+  (setq shr-width 80)
 
-(setq-default elfeed-search-filter "@2-weeks-ago +unread ")
+  (setq-default elfeed-search-filter "@2-weeks-ago +unread ")
+
+  (defun lp/elfeed-show-all ()
+    (interactive)
+    (bookmark-maybe-load-default-file)
+    (bookmark-jump "elfeed-all"))
+  (defun lp/elfeed-show-emacs ()
+    (interactive)
+    (bookmark-maybe-load-default-file)
+    (bookmark-jump "elfeed-emacs"))
+  (defun lp/elfeed-show-daily ()
+    (interactive)
+    (bookmark-maybe-load-default-file)
+    (bookmark-jump "elfeed-daily"))
+
+  ;; Entries older than 2 weeks are marked as readn
+  (add-hook 'elfeed-new-entry-hook
+            (elfeed-make-tagger :before "2 weeks ago"
+                                :remove 'unread))
+
+
+  ;; code to add and remove a starred tag to elfeed article
+  ;; based on http://matt.hackinghistory.ca/2015/11/22/elfeed/
+
+  ;; add a star
+  (defun bjm/elfeed-star ()
+    "Apply starred to all selected entries."
+    (interactive )
+    (let* ((entries (elfeed-search-selected))
+           (tag (intern "starred")))
+
+      (cl-loop for entry in entries do (elfeed-tag entry tag))
+      (mapc #'elfeed-search-update-entry entries)
+      (unless (use-region-p) (forward-line))))
+
+  ;; remove a start
+  (defun bjm/elfeed-unstar ()
+    "Remove starred tag from all selected entries."
+    (interactive )
+    (let* ((entries (elfeed-search-selected))
+           (tag (intern "starred")))
+
+      (cl-loop for entry in entries do (elfeed-untag entry tag))
+      (mapc #'elfeed-search-update-entry entries)
+      (unless (use-region-p) (forward-line))))
+
+  ;; face for starred articles
+  (defface elfeed-search-starred-title-face
+    '((t :foreground "#f77"))
+    "Marks a starred Elfeed entry.")
+
+  (push '(starred elfeed-search-starred-title-face) elfeed-search-face-alist)
+  (eval-after-load 'elfeed-search
+    '(define-key elfeed-search-mode-map (kbd "*") 'bjm/elfeed-star))
+  (eval-after-load 'elfeed-search
+    '(define-key elfeed-search-mode-map (kbd "8") 'bjm/elfeed-unstar)))
+
 (use-package elfeed-org
   :ensure t
   :config
   (elfeed-org)
   (setq rmh-elfeed-org-files (list "~/.emacs.d/elfeed.org")))
-
-
-(defun lp/elfeed-show-all ()
-  (interactive)
-  (bookmark-maybe-load-default-file)
-  (bookmark-jump "elfeed-all"))
-(defun lp/elfeed-show-emacs ()
-  (interactive)
-  (bookmark-maybe-load-default-file)
-  (bookmark-jump "elfeed-emacs"))
-(defun lp/elfeed-show-daily ()
-  (interactive)
-  (bookmark-maybe-load-default-file)
-  (bookmark-jump "elfeed-daily"))
-
-;; Entries older than 2 weeks are marked as readn
-(add-hook 'elfeed-new-entry-hook
-          (elfeed-make-tagger :before "2 weeks ago"
-                              :remove 'unread))
-
-
-;; code to add and remove a starred tag to elfeed article
-;; based on http://matt.hackinghistory.ca/2015/11/22/elfeed/
-
-;; add a star
-(defun bjm/elfeed-star ()
-  "Apply starred to all selected entries."
-  (interactive )
-  (let* ((entries (elfeed-search-selected))
-         (tag (intern "starred")))
-
-    (cl-loop for entry in entries do (elfeed-tag entry tag))
-    (mapc #'elfeed-search-update-entry entries)
-    (unless (use-region-p) (forward-line))))
-
-;; remove a start
-(defun bjm/elfeed-unstar ()
-  "Remove starred tag from all selected entries."
-  (interactive )
-  (let* ((entries (elfeed-search-selected))
-         (tag (intern "starred")))
-
-    (cl-loop for entry in entries do (elfeed-untag entry tag))
-    (mapc #'elfeed-search-update-entry entries)
-    (unless (use-region-p) (forward-line))))
-
-;; face for starred articles
-(defface elfeed-search-starred-title-face
-  '((t :foreground "#f77"))
-  "Marks a starred Elfeed entry.")
-
-(push '(starred elfeed-search-starred-title-face) elfeed-search-face-alist)
-(eval-after-load 'elfeed-search
-  '(define-key elfeed-search-mode-map (kbd "*") 'bjm/elfeed-star))
-(eval-after-load 'elfeed-search
-  '(define-key elfeed-search-mode-map (kbd "8") 'bjm/elfeed-unstar))
-
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; (defalias 'elfeed-toggle-star
@@ -1370,7 +1477,6 @@ after `multiple-cursors-mode' is quit.")
 (use-package w3m
   :defer t
   :ensure t
-  :defer t
   :commands w3m-goto-url w3m-search
   :init
   (setq browse-url-browser-function 'w3m-browse-url)
@@ -1443,9 +1549,130 @@ after `multiple-cursors-mode' is quit.")
   :init (progn (imagex-global-sticky-mode) (imagex-auto-adjust-mode)))
 
 
+                                        ; TODO refile this
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+;; theme stuff
+;; The deeper blue theme is loaded but the resulting text
+;; appears black in Aquamacs. This can be fixed by setting
+;; the font color under Menu Bar->Options->Appearance->Font For...
+;; and then setting "Adopt Face and Frame Parameter as Frame Default"
+(use-package sourcerer-theme
+  :ensure t)
+
+;; (set-face-background 'hl-line "#372E2D")
+;; ;; The minibuffer default colors with my theme are impossible to read, so change
+;; ;; them to something better using ivy-minibuffer-match-face.
+;; (custom-set-faces
+;;  ;; custom-set-faces was added by Custom.
+;;  ;; If you edit it by hand, you could mess it up, so be careful.
+;;  ;; Your init file should contain only one such instance.
+;;  ;; If there is more than one, they won't work right.
+;;  '(default ((((type tty) (background dark)) (:background "nil"))))
+;;  '(company-preview ((t (:background "#073642" :foreground "#2aa198"))))
+;;  '(company-preview-common ((t (:foreground "#93a1a1" :underline t))))
+;;  '(company-scrollbar-bg ((t (:background "#073642" :foreground "#2aa198"))))
+;;  '(company-scrollbar-fg ((t (:foreground "#002b36" :background "#839496"))))
+;;  '(company-template-field ((t (:background "#7B6000" :foreground "#073642"))))
+;;  '(company-tooltip ((t (:background "black" :foreground "DeepSkyBlue1"))))
+;;  '(company-tooltip-annotation ((t (:foreground "#93a1a1" :background "#073642"))))
+;;  '(company-tooltip-common ((t (:foreground "#93a1a1" :underline t))))
+;;  '(company-tooltip-common-selection ((t (:foreground "#93a1a1" :underline t))))
+;;  '(company-tooltip-mouse ((t (:background "DodgerBlue4" :foreground "CadetBlue1"))))
+;;  '(company-tooltip-selection ((t (:background "DodgerBlue4" :foreground "CadetBlue1"))))
+;;  '(header-line ((t (:background "#003366"))))
+;;  '(ivy-minibuffer-match-face-1 ((((class color) (background light)) (:background "#555555")) (((class color) (background dark)) (:background "#555555"))))
+;;  '(ivy-minibuffer-match-face-2 ((t (:background "#314f30" :weight bold))))
+;;  '(ivy-minibuffer-match-face-3 ((t (:background "#48225b" :weight bold))))
+;;  '(ivy-minibuffer-match-face-4 ((t (:background "#680a0a" :weight bold))))
+;;  '(which-func ((t (:foreground "#8fb28f")))))
 
 
 
+;; get something up there for header
+(which-function-mode t)
+
+;; Remove function from mode bar
+(setq mode-line-misc-info
+      (delete (assoc 'which-func-mode
+                     mode-line-misc-info) mode-line-misc-info))
+
+(defmacro with-face
+    (str &rest properties)
+  `(propertize ,str 'face (list ,@properties)))
+
+(defun sl/make-header ()
+  "."
+  (let* ((sl/full-header (abbreviate-file-name buffer-file-name))
+         (sl/header (file-name-directory sl/full-header))
+         (sl/drop-str "[...]")
+         )
+    (if (> (length sl/full-header)
+           (window-body-width))
+        (if (> (length sl/header)
+               (window-body-width))
+            (progn
+              (concat (with-face sl/drop-str
+                                 :background "blue"
+                                 :weight 'bold
+                                 )
+                      (with-face (substring sl/header
+                                            (+ (- (length sl/header)
+                                                  (window-body-width))
+                                               (length sl/drop-str))
+                                            (length sl/header))
+                                 ;; :background "red"
+                                 :weight 'bold
+                                 )))
+          (concat
+           (with-face sl/header
+                      ;; :background "red"
+                      :foreground "red"
+                      :weight 'bold)))
+      (concat (if window-system ;; In the terminal the green is hard to read
+                  (with-face sl/header
+                             ;; :background "green"
+                             ;; :foreground "black"
+                             :weight 'bold
+                             :foreground "#8fb28f"
+                             )
+                (with-face sl/header
+                           ;; :background "green"
+                           ;; :foreground "black"
+                           :weight 'bold
+                           :foreground "blue"
+                           ))
+              (with-face (file-name-nondirectory buffer-file-name)
+                         :weight 'bold
+                         ;; :background "red"
+                         )))))
+
+(defun sl/display-header ()
+  "Create the header string and display it."
+  ;; The dark blue in the header for which-func is terrible to read.
+  ;; However, in the terminal it's quite nice
+  (if window-system
+      (custom-set-faces
+       '(which-func ((t (:foreground "#8fb28f")))))
+    (custom-set-faces
+     '(which-func ((t (:foreground "blue"))))))
+  ;; Set the header line
+  (setq header-line-format
+
+        (list "-"
+              '(which-func-mode ("" which-func-format))
+              '("" ;; invocation-name
+                (:eval (if (buffer-file-name)
+                           (concat "[" (sl/make-header) "]")
+                         "[%b]")))
+              )
+        )
+  )
+;; Call the header line update
+(add-hook 'buffer-list-update-hook
+          'sl/display-header)
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 (custom-set-variables
  ;; custom-set-variables was added by Custom.
@@ -1456,14 +1683,14 @@ after `multiple-cursors-mode' is quit.")
    [default bold shadow italic underline bold bold-italic bold])
  '(ansi-color-names-vector
    (vector "#eaeaea" "#d54e53" "DarkOliveGreen3" "#e7c547" "DeepSkyBlue1" "#c397d8" "#70c0b1" "#181a26"))
- '(custom-enabled-themes (quote (challenger-deep)))
+ '(custom-enabled-themes (quote (sourcerer)))
  '(custom-safe-themes
    (quote
-    ("4b4cfb4e96e4a1c20416eeb16b1f90c895df31479a8255e01e671c503a48f707" "dcb9fd142d390bb289fee1d1bb49cb67ab7422cd46baddf11f5c9b7ff756f64c" "999d592328968aa33154e4e2385d53fd4c06b6ff60008fdadb682b07013f884c" "38b2a8441df2a4863bf5ca28648203ba0213d38f6630d3a7527828eb15f5a510" "616dc92e410a7f362757cb4dd3450bd650a69fd830cc2a7c73de2bdc90c526ad" "5acb6002127f5d212e2d31ba2ab5503df9cd1baa1200fbb5f57cc49f6da3056d" "cfc62276fa8aa37e6567cf4b4502dfdb4995a2aaebc0dd9b9aee40383fa329c9" "d6922c974e8a78378eacb01414183ce32bc8dbf2de78aabcc6ad8172547cb074" "cc60d17db31a53adf93ec6fad5a9cfff6e177664994a52346f81f62840fe8e23" "28ec8ccf6190f6a73812df9bc91df54ce1d6132f18b4c8fcc85d45298569eb53" "e1994cf306356e4358af96735930e73eadbaf95349db14db6d9539923b225565" "eea01f540a0f3bc7c755410ea146943688c4e29bea74a29568635670ab22f9bc" default)))
+    ("8bb8a5b27776c39b3c7bf9da1e711ac794e4dc9d43e32a075d8aa72d6b5b3f59" "4b4cfb4e96e4a1c20416eeb16b1f90c895df31479a8255e01e671c503a48f707" "dcb9fd142d390bb289fee1d1bb49cb67ab7422cd46baddf11f5c9b7ff756f64c" "999d592328968aa33154e4e2385d53fd4c06b6ff60008fdadb682b07013f884c" "38b2a8441df2a4863bf5ca28648203ba0213d38f6630d3a7527828eb15f5a510" "616dc92e410a7f362757cb4dd3450bd650a69fd830cc2a7c73de2bdc90c526ad" "5acb6002127f5d212e2d31ba2ab5503df9cd1baa1200fbb5f57cc49f6da3056d" "cfc62276fa8aa37e6567cf4b4502dfdb4995a2aaebc0dd9b9aee40383fa329c9" "d6922c974e8a78378eacb01414183ce32bc8dbf2de78aabcc6ad8172547cb074" "cc60d17db31a53adf93ec6fad5a9cfff6e177664994a52346f81f62840fe8e23" "28ec8ccf6190f6a73812df9bc91df54ce1d6132f18b4c8fcc85d45298569eb53" "e1994cf306356e4358af96735930e73eadbaf95349db14db6d9539923b225565" "eea01f540a0f3bc7c755410ea146943688c4e29bea74a29568635670ab22f9bc" default)))
  '(fci-rule-color "#14151E")
  '(package-selected-packages
    (quote
-    (challenger-deep-theme auctex emmet-mode page-break-lines yasnippet-snippets poet-theme artbollocks-mode image+ wttrin forecast web-mode espresso-theme comint w3m cyberpunk-theme doi-utils cherry-blossom-theme afternoon-theme auto-yasnippet eclipse-theme academic-phrases expand-region writegood-mode use-package tuareg smex slime rainbow-delimiters projectile powerline paredit org-ref org-link-minor-mode org-bullets multiple-cursors monokai-theme monokai-alt-theme merlin markdown-mode magit interleave ido-vertical-mode ido-completing-read+ helm-ag flycheck flx-ido elpy elfeed-org diminish diff-hl counsel bibtex-utils bibretrieve auto-compile ag adafruit-wisdom ace-window)))
+    (cuda-mode google-c-style vlf clang-format preview auctex challenger-deep-theme emmet-mode page-break-lines yasnippet-snippets poet-theme artbollocks-mode image+ wttrin forecast web-mode espresso-theme comint w3m cyberpunk-theme doi-utils cherry-blossom-theme afternoon-theme auto-yasnippet eclipse-theme academic-phrases expand-region writegood-mode use-package tuareg smex slime rainbow-delimiters projectile powerline paredit org-ref org-link-minor-mode org-bullets multiple-cursors monokai-theme monokai-alt-theme merlin markdown-mode magit interleave ido-vertical-mode ido-completing-read+ helm-ag flycheck flx-ido elpy elfeed-org diminish diff-hl counsel bibtex-utils bibretrieve auto-compile ag adafruit-wisdom ace-window)))
  '(vc-annotate-background nil)
  '(vc-annotate-color-map
    (quote
@@ -1491,7 +1718,24 @@ after `multiple-cursors-mode' is quit.")
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
- )
+ '(default ((((type tty) (background dark)) (:background "nil"))))
+ '(company-preview ((t (:background "#073642" :foreground "#2aa198"))))
+ '(company-preview-common ((t (:foreground "#93a1a1" :underline t))))
+ '(company-scrollbar-bg ((t (:background "#073642" :foreground "#2aa198"))))
+ '(company-scrollbar-fg ((t (:foreground "#002b36" :background "#839496"))))
+ '(company-template-field ((t (:background "#7B6000" :foreground "#073642"))))
+ '(company-tooltip ((t (:background "black" :foreground "DeepSkyBlue1"))))
+ '(company-tooltip-annotation ((t (:foreground "#93a1a1" :background "#073642"))))
+ '(company-tooltip-common ((t (:foreground "#93a1a1" :underline t))))
+ '(company-tooltip-common-selection ((t (:foreground "#93a1a1" :underline t))))
+ '(company-tooltip-mouse ((t (:background "DodgerBlue4" :foreground "CadetBlue1"))))
+ '(company-tooltip-selection ((t (:background "DodgerBlue4" :foreground "CadetBlue1"))))
+ '(header-line ((t (:background "#003366"))))
+ '(ivy-minibuffer-match-face-1 ((((class color) (background light)) (:background "#555555")) (((class color) (background dark)) (:background "#555555"))))
+ '(ivy-minibuffer-match-face-2 ((t (:background "#314f30" :weight bold))))
+ '(ivy-minibuffer-match-face-3 ((t (:background "#48225b" :weight bold))))
+ '(ivy-minibuffer-match-face-4 ((t (:background "#680a0a" :weight bold))))
+ '(which-func ((t (:foreground "#8fb28f")))))
 ;; ## added by OPAM user-setup for emacs / base ## 56ab50dc8996d2bb95e7856a6eddb17b ## you can edit, but keep this line
 (require 'opam-user-setup "~/.emacs.d/opam-user-setup.el")
 ;; ## end of OPAM user-setup addition for emacs / base ## keep this line
