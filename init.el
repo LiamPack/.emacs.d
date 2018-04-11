@@ -712,7 +712,7 @@ directory to make multiple eshell windows easier."
     (add-hook 'c-mode-common-hook 'google-set-c-style)
     ;; Autoindent using google style guide
     (add-hook 'c-mode-common-hook 'google-make-newline-indent)
-    )
+    (add-to-list 'auto-mode-alist '("\\.cu$" . c++-mode)))
   )
 
 ;; Load CUDA mode so we get syntax highlighting in .cu files
@@ -1211,16 +1211,19 @@ after `multiple-cursors-mode' is quit.")
   (setq org-refile-allow-creating-parent-nodes 'confirm)
   (setq org-todo-keywords '((sequence "TODO(t)" "WAITING(w)" "|" "DONE(d)" "CANCELLED(c)")))
 
+
+  ;; TODO - make a macro for this. it's pretty shitty like this lol. learn how to use macros
   (defun lp/refile-to (file headline)
     (let ((pos (save-excursion
                  (find-file file)
                  (org-find-exact-headline-in-buffer headline))))
       (org-refile nil nil (list headline file nil pos))))
+
   (defun lp/refile-school ()
     (interactive)
     (while (not (equal nil (search-forward ":school:" nil t)))
       (beginning-of-visual-line)
-      (lp/refile-to "~/Dropbox/org/school.org" "Classes"))
+      (lp/refile-to "~/Dropbox/org/school.org" "index"))
     (switch-to-buffer "index.org"))
 
   (defun lp/refile-personal ()
@@ -1683,7 +1686,7 @@ after `multiple-cursors-mode' is quit.")
    [default bold shadow italic underline bold bold-italic bold])
  '(ansi-color-names-vector
    (vector "#eaeaea" "#d54e53" "DarkOliveGreen3" "#e7c547" "DeepSkyBlue1" "#c397d8" "#70c0b1" "#181a26"))
- '(custom-enabled-themes (quote (sourcerer)))
+ '(custom-enabled-themes (quote (northcode)))
  '(custom-safe-themes
    (quote
     ("8bb8a5b27776c39b3c7bf9da1e711ac794e4dc9d43e32a075d8aa72d6b5b3f59" "4b4cfb4e96e4a1c20416eeb16b1f90c895df31479a8255e01e671c503a48f707" "dcb9fd142d390bb289fee1d1bb49cb67ab7422cd46baddf11f5c9b7ff756f64c" "999d592328968aa33154e4e2385d53fd4c06b6ff60008fdadb682b07013f884c" "38b2a8441df2a4863bf5ca28648203ba0213d38f6630d3a7527828eb15f5a510" "616dc92e410a7f362757cb4dd3450bd650a69fd830cc2a7c73de2bdc90c526ad" "5acb6002127f5d212e2d31ba2ab5503df9cd1baa1200fbb5f57cc49f6da3056d" "cfc62276fa8aa37e6567cf4b4502dfdb4995a2aaebc0dd9b9aee40383fa329c9" "d6922c974e8a78378eacb01414183ce32bc8dbf2de78aabcc6ad8172547cb074" "cc60d17db31a53adf93ec6fad5a9cfff6e177664994a52346f81f62840fe8e23" "28ec8ccf6190f6a73812df9bc91df54ce1d6132f18b4c8fcc85d45298569eb53" "e1994cf306356e4358af96735930e73eadbaf95349db14db6d9539923b225565" "eea01f540a0f3bc7c755410ea146943688c4e29bea74a29568635670ab22f9bc" default)))
