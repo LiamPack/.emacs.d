@@ -1,3 +1,4 @@
+
 (require 'use-package)
                                         ; org-mode
                                         ; TODO speed-keys?
@@ -29,7 +30,6 @@
      (python . t)
      (emacs-lisp . t)
      (gnuplot . t)
-     (shell . t)
      (R . t)))
   (setq org-confirm-babel-evaluate nil)
   (setq org-M-RET-may-split-line nil)
@@ -404,7 +404,7 @@ last month with the Category Foo."
           ("z" "Todo"
            entry
            (file+headline org-index-file "Tasks")
-           "* TODO %^{Task} %^G\n %t\n%?")
+           "* TODO %^{Task} %^G\n %U\n%?")
           ("p" "Personal todo"
            entry
            (file+headline org-personal-file "general")

@@ -28,6 +28,13 @@
 
   :bind ("C-x g" . magit-status))
 
+
+;; More info here: [[https://github.com/syohex/emacs-git-gutter]]
+(use-package git-gutter ; TODO - git gutter keybinds, going to different hunks and staging only certain portions! 
+  :ensure t
+  :config
+  (global-git-gutter-mode +1))
+
 (use-package poporg ; pop-out org mode window to edit comments. opposite of the embedding of source blocks
   :bind (("C-c /" . poporg-dwim)))
 

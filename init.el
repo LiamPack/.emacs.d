@@ -1,4 +1,4 @@
-;a;; init.el --- -*- lexical-binding: t; -*-
+;;; init.el --- -*- lexical-binding: t; -*-
 (add-to-list 'load-path "~/.emacs.d/lisp")
 (add-to-list 'load-path "~/.emacs.d/etc")
 
