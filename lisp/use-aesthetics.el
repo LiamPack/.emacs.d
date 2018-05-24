@@ -160,7 +160,7 @@
 ;; iosevka, consolas, source code pro, Fira Code, dejavu, IBM 3270
 (setq lp/default-font "IBM 3270")
 
-(setq lp/default-font-size 10)
+(setq lp/default-font-size 14)
 
 (setq lp/current-font-size lp/default-font-size)
 
