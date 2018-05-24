@@ -32,6 +32,7 @@
 ;; More info here: [[https://github.com/syohex/emacs-git-gutter]]
 (use-package git-gutter ; TODO - git gutter keybinds, going to different hunks and staging only certain portions! 
   :ensure t
+  :diminish git-gutter-mode
   :config
   (global-git-gutter-mode +1))
 
