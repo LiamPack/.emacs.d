@@ -24,7 +24,7 @@
 (defun lp/open-challenges-notes ()
   "Open the org TODO list."
   (interactive)
-  (find-file "~/personal/dailies/dailies.org")
+  (find-file "~/Dropbox/org/dailies.org")
   (flycheck-mode -1))
 
 (global-set-key  (kbd "C-c y") 'lp/open-challenges-notes)
