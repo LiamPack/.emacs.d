@@ -29,7 +29,6 @@
      (python . t)
      (emacs-lisp . t)
      (gnuplot . t)
-     (shell . t)
      (R . t)))
   (setq org-confirm-babel-evaluate nil)
   (setq org-M-RET-may-split-line nil)
@@ -57,10 +56,6 @@
   (setq org-monthly-file (org-file-path "monthly.org"))
   (setq org-archive-location
         (concat (org-file-path "archive.org") "::* From %s"))
-
-
-
-
 
   ;; I keep all of my todos in =~/Dropbox/org/index.org= so I derive my
   ;; agenda from there
@@ -317,9 +312,7 @@ last month with the Category Foo."
        (tags-todo "-REFILE-CANCELLED-WAITING-HOLD/!-DONE-HOLD"
                   ((org-agenda-overriding-header "Personal Stuff")
                    (org-tags-match-list-sublevels nil)
-                   (org-agenda-files (list org-personal-file))))
-       )
-      )
+                   (org-agenda-files (list org-personal-file))))))
      ("t" "To Read Stuff"
       ((tags-todo "music/!-DONE-HOLD"
                   ((org-agenda-overriding-header "Music")
@@ -348,11 +341,8 @@ last month with the Category Foo."
        (tags-todo "books-learning/!-DONE-HOLD-WAITING"
                   ((org-agenda-overriding-header "Books")
                    (orgs-tags-match-list-sublevels nil)
-                   (org-agenda-files (list (org-file-path "to-read.org")))))
-       ))
-
+                   (org-agenda-files (list (org-file-path "to-read.org")))))))
      )
-
    org-agenda-span 'week
    org-agenda-prefix-format '((agenda . "  %?-12t% s")
                               (todo   . "  ")
@@ -363,7 +353,8 @@ last month with the Category Foo."
    org-agenda-clockreport-parameter-plist `(:link t :maxlevel 6 :fileskip0 t :compact t :narrow 100)
    org-agenda-dim-blocked-tasks nil
    org-agenda-block-separator ""
-   org-agenda-time-grid '((daily today require-timed) nil "......" "----------------"))
+;   org-agenda-time-grid '((daily today require-timed) nil "......" "----------------")
+   )
   ;; Custom agenda command definitions
                                         ; ((org-agenda-finalize-hook 'nox/org-agenda-finalize))
   (setq org-tags-match-list-sublevels t)
@@ -404,7 +395,7 @@ last month with the Category Foo."
           ("z" "Todo"
            entry
            (file+headline org-index-file "Tasks")
-           "* TODO %^{Task} %^G\n %t\n%?")
+           "* TODO %^{Task} %^G\n %U\n%?")
           ("p" "Personal todo"
            entry
            (file+headline org-personal-file "general")

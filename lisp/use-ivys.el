@@ -38,6 +38,7 @@
 
 (use-package counsel                    ; Ivy-powered commands
   :ensure t
+  :diminish counsel-mode
   :init (counsel-mode)
   :bind (([remap execute-extended-command] . counsel-M-x)
          ([remap find-file]                . counsel-find-file)

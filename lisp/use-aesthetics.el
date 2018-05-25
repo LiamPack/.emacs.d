@@ -27,7 +27,9 @@
 ;;  * leuven
 ;;  * porple
 ;;  * doom-tomorrow-night
-;;  * just the doom ones really
+;;    * Any of the doom ones really
+;;  * Habamax Theme - a little plain
+;;  * Also hydanatantantatna-theme
 (require 'use-package)
 (load-theme 'doom-one-light)
 ;; (add-to-list 'custom-theme-load-path "~/.emacs.d/themes/")
@@ -158,7 +160,7 @@
 ;; iosevka, consolas, source code pro, Fira Code, dejavu, IBM 3270
 (setq lp/default-font "IBM 3270")
 
-(setq lp/default-font-size 10)
+(setq lp/default-font-size 14)
 
 (setq lp/current-font-size lp/default-font-size)
 
