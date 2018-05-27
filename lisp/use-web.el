@@ -6,6 +6,16 @@
 (use-package web-mode
   :ensure t
   :diminish web-mode
+  :mode (("\\.html\\'" . web-mode)
+         ("\\.phtml\\'"      . web-mode)
+         ("\\.tpl\\.php\\'"  . web-mode)
+         ("\\.jsp\\'"        . web-mode)
+         ("\\.as[cp]x\\'"    . web-mode)
+         ("\\.erb\\'"        . web-mode)
+         ("\\.mustache\\'"   . web-mode)
+         ("\\.djhtml\\'"     . web-mode)
+         ("\\.html?\\'"      . web-mode)
+         ("\\.hbs\\'"        . web-mode))
   :config
   (setq web-mode-markup-indent-offset 2)
   (setq web-mode-code-indent-offset 2)
@@ -15,16 +25,17 @@
           ("html" . (ac-source-words-in-buffer ac-source-abbrev))))
   (define-key web-mode-map (kbd "<backtab>") 'web-mode-fold-or-unfold)
 
-  ;; Make sure that these lovely templating languages use web-mode
-  (add-to-list 'auto-mode-alist '("\\.phtml\\'" . web-mode))
-  (add-to-list 'auto-mode-alist '("\\.tpl\\.php\\'" . web-mode))
-  (add-to-list 'auto-mode-alist '("\\.jsp\\'" . web-mode))
-  (add-to-list 'auto-mode-alist '("\\.as[cp]x\\'" . web-mode))
-  (add-to-list 'auto-mode-alist '("\\.erb\\'" . web-mode))
-  (add-to-list 'auto-mode-alist '("\\.mustache\\'" . web-mode))
-  (add-to-list 'auto-mode-alist '("\\.djhtml\\'" . web-mode))
-  (add-to-list 'auto-mode-alist '("\\.html?\\'" . web-mode))
-  (add-to-list 'auto-mode-alist '("\\.hbs\\'" . web-mode)))
+  ;; ;; Make sure that these lovely templating languages use web-mode
+  ;; (add-to-list 'auto-mode-alist ')
+  ;; (add-to-list 'auto-mode-alist ')
+  ;; (add-to-list 'auto-mode-alist ')
+  ;; (add-to-list 'auto-mode-alist ')
+  ;; (add-to-list 'auto-mode-alist ')
+  ;; (add-to-list 'auto-mode-alist ')
+  ;; (add-to-list 'auto-mode-alist ')
+  ;; (add-to-list 'auto-mode-alist ')
+  ;; (add-to-list 'auto-mode-alist ')
+  )
 
 (use-package emmet-mode
   :ensure t
@@ -39,18 +50,6 @@
   (add-hook 'emmet-mode-hook (lambda () (setq emmet-indent-after-insert nil)))
   (setq emmet-move-cursor-between-quotes t))
 
-;; more info here https://github.com/skeeto/skewer-mode
-;; check it out https://github.com/smihica/emmet-mode
-;; C-x C-e: Evaluate the form before the point and display the result in the minibuffer. If given a prefix argument, insert the result into the current buffer.
-;; C-M-x: Evaluate the top-level form around the point.
-;; C-c C-k: Load the current buffer.
-;; C-c C-z: Select the REPL buffer.
-(use-package skewer-mode
-  :ensure t
-  :config
-  (add-hook 'js2-mode-hook 'skewer-mode)
-  (add-hook 'css-mode-hook 'skewer-css-mode)
-  (add-hook 'html-mode-hook 'skewer-html-mode))
 
 (use-package impatient-mode
   :defer t
@@ -81,6 +80,7 @@
 
 (use-package js2-mode
   :ensure t
+  :diminish (js-mode . "js")
   :mode "\\.js$"
   :config
   (progn
@@ -104,6 +104,20 @@
                   '("$" "unsafeWindow" "localStorage" "jQuery"
                     "setTimeout" "setInterval" "location" "skewer"
                     "console" "phantom"))))
+
+;; more info here https://github.com/skeeto/skewer-mode
+;; check it out https://github.com/smihica/emmet-mode
+;; C-x C-e: Evaluate the form before the point and display the result in the minibuffer. If given a prefix argument, insert the result into the current buffer.
+;; C-M-x: Evaluate the top-level form around the point.
+;; C-c C-k: Load the current buffer.
+;; C-c C-z: Select the REPL buffer.
+(use-package skewer-mode
+  :ensure t
+  :diminish (skewer-mode . "sk")
+  :config
+  (add-hook 'js2-mode-hook 'skewer-mode)
+  (add-hook 'css-mode-hook 'skewer-css-mode)
+  (add-hook 'html-mode-hook 'skewer-html-mode))
 
 
 (provide 'use-web)
