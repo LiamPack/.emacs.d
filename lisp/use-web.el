@@ -50,8 +50,24 @@
   (add-hook 'emmet-mode-hook (lambda () (setq emmet-indent-after-insert nil)))
   (setq emmet-move-cursor-between-quotes t))
 
+<<<<<<< HEAD
+=======
+;; more info here https://github.com/skeeto/skewer-mode
+;; check it out https://github.com/smihica/emmet-mode
+;; C-x C-e: Evaluate the form before the point and display the result in the minibuffer. If given a prefix argument, insert the result into the current buffer.
+;; C-M-x: Evaluate the top-level form around the point.
+;; C-c C-k: Load the current buffer.
+;; C-c C-z: Select the REPL buffer.
+(use-package skewer-mode ; interactive repl for javascript / web dev
+  :ensure t
+  :config
+  (add-hook 'js2-mode-hook 'skewer-mode)
+  (add-hook 'css-mode-hook 'skewer-css-mode)
+  (add-hook 'html-mode-hook 'skewer-html-mode))
+>>>>>>> 161bc3434b2e767f8993a39d31d76bd4771379c6
 
-(use-package impatient-mode
+(use-package impatient-mode ; auto-update browser without having to
+                            ; reload when editing web stuff
   :defer t
   :ensure t
   :config
@@ -62,7 +78,7 @@
   (push (cons 'markdown-mode #'imp-markdown-filter)
         imp-default-user-filters))
 
-(use-package simple-httpd
+(use-package simple-httpd ; httpd stuff
   :ensure t
   :defer t
   :functions httpd-send-header
@@ -78,7 +94,7 @@
         (when httpd-process
           (set-process-query-on-exit-flag httpd-process nil))))))
 
-(use-package js2-mode
+(use-package js2-mode ; javascript editing 
   :ensure t
   :diminish (js-mode . "js")
   :mode "\\.js$"
@@ -105,6 +121,7 @@
                     "setTimeout" "setInterval" "location" "skewer"
                     "console" "phantom"))))
 
+<<<<<<< HEAD
 ;; more info here https://github.com/skeeto/skewer-mode
 ;; check it out https://github.com/smihica/emmet-mode
 ;; C-x C-e: Evaluate the form before the point and display the result in the minibuffer. If given a prefix argument, insert the result into the current buffer.
@@ -119,5 +136,7 @@
   (add-hook 'css-mode-hook 'skewer-css-mode)
   (add-hook 'html-mode-hook 'skewer-html-mode))
 
+(use-package request
+  :ensure t)
 
 (provide 'use-web)
