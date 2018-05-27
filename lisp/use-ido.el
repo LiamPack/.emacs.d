@@ -1,4 +1,5 @@
 (require 'use-package)
+
 ;; Ido configuration
 (use-package flx-ido
   :disabled
@@ -15,4 +16,5 @@
 
 (use-package ido-completing-read+
   :ensure t)
+
 (provide 'use-ido)
