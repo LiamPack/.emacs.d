@@ -4,7 +4,7 @@
   :defer t
   :config
   ;; Turn flycheck on everywhere
-  (global-flycheck-mode t)
+  ;; (global-flycheck-mode t)
   ;; There are issues with company mode and flycheck in terminal mode.
   ;; This is outlined at:
   ;; https://github.com/abingham/emacs-ycmd

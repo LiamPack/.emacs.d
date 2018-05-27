@@ -69,6 +69,7 @@
 (global-set-key (kbd "<f5>")  #'revert-buffer)
 (global-set-key (kbd "C-;") 'comment-or-uncomment-region)
 (global-set-key (kbd "C-@") 'align-regexp)
+(global-set-key (kbd "C-c e") 'eval-and-replace) ; this one is pretty cool. 
 (global-set-key (kbd "C-x p") 'pop-to-mark-command)
 (setq set-mark-command-repeat-pop t)
 

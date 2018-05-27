@@ -338,7 +338,7 @@ last month with the Category Foo."
                   ((org-agenda-overriding-header "Things to Learn")
                    (orgs-tags-match-list-sublevels nil)
                    (org-agenda-files (list (org-file-path "to-read.org")))))
-       (tags-todo "books-learning/!-DONE-HOLD"
+       (tags-todo "books-learning/!-DONE-HOLD-WAITING"
                   ((org-agenda-overriding-header "Books")
                    (orgs-tags-match-list-sublevels nil)
                    (org-agenda-files (list (org-file-path "to-read.org")))))))
