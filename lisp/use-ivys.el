@@ -78,8 +78,8 @@
 
 (use-package avy ; Maybe also look into iy- whatever for this. interesting extension/alternative though
   :ensure t
-  :bind (("M-m" . avy-goto-char)
-         ("M-M" . avy-goto-char-2)
+  :bind (("C-\'" . avy-goto-char)
+         ("C-\"" . avy-goto-char-2)
          ("C-c C-j" . avy-resume))
   :config
   (avy-setup-default))
