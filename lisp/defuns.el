@@ -12,8 +12,8 @@
   (switch-to-buffer (make-temp-name "scratch-"))
   (emacs-lisp-mode))
 
+;; Allow newly created scratch buffers to be elisp mode
 (add-to-list 'auto-mode-alist '("^scratch-.*$" . emacs-lisp-mode))
-
 
 (defun lp/cleanup-buffer-safe ()
   "Perform a bunch of safe operations on whitespace content. Does
@@ -28,6 +28,7 @@
   (lp/cleanup-buffer-safe)
   (indent-region (point-min) (point-max)))
 
+;; TODO - find a use for this
 (defun lp/org-open-point ()
   "Open org mode heading in another window, expand it, and narrow it"
   (interactive)
@@ -49,6 +50,8 @@
   (tab)) ;; It basically just narrows right where you are.
 
 (global-set-key (kbd "C-c o") 'lp/org-open-point)
+
+
 ;; Always killcurrent buffer
 (global-set-key (kbd "C-x k") 'lp/kill-current-buffer)
 
@@ -60,7 +63,7 @@
 
 (global-set-key (kbd "M-/") 'hippie-expand)
 (global-set-key (kbd "M-TAB") 'hippie-expand)
-(global-set-key (kbd "C-j") 'join-line)
+(global-set-key (kbd "C-j") 'join-line) ; note that paredit binds this to (paredit-newline)
 (global-set-key (kbd "M-g") 'goto-line)
 (global-set-key (kbd "C-c n") 'lp/cleanup-buffer)
 (global-set-key (kbd "<f12>") 'lp/generate-scratch-buffer)

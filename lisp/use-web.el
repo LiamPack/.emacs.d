@@ -50,7 +50,6 @@
   (add-hook 'emmet-mode-hook (lambda () (setq emmet-indent-after-insert nil)))
   (setq emmet-move-cursor-between-quotes t))
 
-
 (use-package impatient-mode ; auto-update browser without having to
                             ; reload when editing web stuff
   :defer t

@@ -107,13 +107,6 @@ after `multiple-cursors-mode' is quit.")
   :bind (("M-z" . zop-to-char)
          ("M-Z" . zop-up-to-char)))
 
-(use-package avy ; Maybe also look into iy- whatever for this. interesting extension/alternative though
-  :ensure t
-  :bind (("M-m" . avy-goto-char)
-         ("M-M" . avy-goto-char-2)
-         ("C-c C-j" . avy-resume))
-  :config
-  (avy-setup-default))
 
 (use-package undo-tree                  ; Branching undo
   :disabled t

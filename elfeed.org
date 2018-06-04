@@ -38,3 +38,7 @@
 * podcast                                                            :elfeed:
 ** roguelike :roguelike:
 *** http://feeds.feedburner.com/RoguelikeRadio
+** cpp :cpp:
+*** http://cppcast.libsyn.com/rss
+** ai :ai:
+*** http://feeds.feedburner.com/twimlai

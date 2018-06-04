@@ -2,10 +2,10 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 (require 'use-package)
 ;; pdf-tools init
-(use-package pdf-tools
-  :ensure t
-  :config
-  (pdf-tools-install))
+;; (use-package pdf-tools
+;;   :ensure t
+;;   :config
+;;   (pdf-tools-install))
 
 ;; org-ref
 (use-package bibtex-utils

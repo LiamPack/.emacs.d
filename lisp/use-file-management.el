@@ -10,8 +10,9 @@
 ;; disable ls by default
 (setq dired-use-ls-dired nil)
 
-(use-package recentf                    ; Save recently visited files
+ (use-package recentf                    ; Save recently visited files
   :init (recentf-mode)
+  :diminish recentf-mode
   :config
   (setq
    recentf-max-saved-items 200
@@ -61,14 +62,5 @@
   :ensure t
   :config
   (require 'vlf-setup))
-
-
-(use-package recentf
-  :ensure t
-  :diminish recentf-mode
-  :config
-  (recentf-mode 1)
-  (setq recentf-max-menu-items 25))
-
-
+ 
 (provide 'use-recentf)

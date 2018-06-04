@@ -1,6 +1,6 @@
 (require 'use-package)
 
-;; Mark TODOs as red n stuff
+;; Mark TODOs , FIXME, BUG as red in src code
 (add-hook 'prog-mode-hook
           (lambda ()
             (font-lock-add-keywords nil
