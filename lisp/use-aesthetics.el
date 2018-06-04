@@ -141,6 +141,7 @@
 
 ;; time on modeline is cool
 (use-package time                       ; Show current time
+  :ensure t
   :bind (("C-c w t" . display-time-world))
   :config
   (setq display-time-world-time-format "%H:%M %Z, %d. %b"
@@ -153,7 +154,7 @@
   (setf display-time-default-load-average nil
         display-time-use-mail-icon t
         display-time-24hr-format t)
-  (display-time-mode t))
+  (display-time-mode))
 
 
 ;; Font functionality
