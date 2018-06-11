@@ -62,6 +62,12 @@
       scroll-preserve-screen-position t)
                                         ;(global-set-key (kbd "M-n") (kbd "C-u 1 C-v"))
 (global-set-key (kbd "M-p") (kbd "C-u 1 M-v"))
+(global-set-key (kbd "C-S-p") (lambda ()
+                                (interactive)
+                                (previous-line 3)))
+(global-set-key (kbd "C-S-n") (lambda ()
+                                (interactive)
+                                (next-line 3)))
 
 ;; fill-column at 80 is the CS dept standard
 ;; Fill column + always show column

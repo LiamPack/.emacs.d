@@ -292,6 +292,7 @@ last month with the Category Foo."
       (jtc-org-tasks-closed-in-month
        for-month for-year "+TODO=\"DONE\"")))
 
+  ;; AGENDA
   (setq-default
    org-agenda-custom-commands
    '(("n" "Agenda"
@@ -302,7 +303,7 @@ last month with the Category Foo."
                   ((org-agenda-overriding-header "To-File Files (index.org)")
                    (org-tags-match-list-sublevels nil)
                    (org-agenda-files (list org-index-file))))
-       (tags "cs73|cs87"
+       (tags "cs73|cs87|research"
              ((org-agenda-overriding-header "CS Work")
               (org-tags-match-list-sublevels nil)
               (org-agenda-files (list org-school-file))))

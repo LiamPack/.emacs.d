@@ -41,19 +41,18 @@
   :diminish counsel-mode
   :init (counsel-mode)
   :bind (([remap execute-extended-command]  . counsel-M-x)
-          ([remap find-file]                . counsel-find-file)
-          ([remap describe-function]        . counsel-describe-function)
-          ([remap describe-variable]        . counsel-describe-variable)
-          ([remap info-lookup-symbol]       . counsel-info-lookup-symbol)
-          ([remap completion-at-point]      . counsel-company)
-          ("C-c f L"                        . counsel-load-library)
-          ("C-c f r"                        . counsel-recentf)
-          ;;("C-c i 8"                        . counsel-unicode-char)
-          ("C-c f a"                        . counsel-ag)
-          ("C-c f m"                        . counsel-imenu)
-          ("C-x p" . 'pop-to-mark-command))
+         ([remap find-file]                . counsel-find-file)
+         ([remap describe-function]        . counsel-describe-function)
+         ([remap describe-variable]        . counsel-describe-variable)
+         ([remap info-lookup-symbol]       . counsel-info-lookup-symbol)
+         ([remap completion-at-point]      . counsel-company)
+         ("C-c f L"                        . counsel-load-library)
+         ("C-c f r"                        . counsel-recentf)
+         ;;("C-c i 8"                        . counsel-unicode-char)
+         ("C-c f a"                        . counsel-ag)
+         ("C-c f m"                        . counsel-imenu))
   :config
-  (setq counsel-find-file-at-point t))
+  (global-set-key (kbd "C-x p") 'pop-to-mark-command))
 
 (use-package swiper ; don't really use this one much. maybe better than isearch?
   :ensure t

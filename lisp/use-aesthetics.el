@@ -21,6 +21,7 @@
 ;;    * sulphurpool-light
 ;;    * heath-light
 ;;    * cave-light
+;;    * classic-{dark,light}
 ;; * avk-daylight
 ;;
 ;;* actual good themes
@@ -31,7 +32,7 @@
 ;;  * Habamax Theme - a little plain
 ;;  * Also hydanatantantatna-theme
 (require 'use-package)
-(load-theme 'doom-one-light)
+(load-theme 'leuven)
 ;; (add-to-list 'custom-theme-load-path "~/.emacs.d/themes/")
 ;; (add-to-list 'custom-theme-load-path "~/.emacs.d/themes/modern-themes")
 
@@ -158,10 +159,12 @@
 
 
 ;; Font functionality
-;; iosevka, consolas, source code pro, Fira Code, dejavu, IBM 3270
-(setq lp/default-font "IBM 3270")
 
-(setq lp/default-font-size 14)
+;; iosevka, consolas, source code pro, Fira Code, dejavu, IBM 3270,
+;; Fantasque Sans Mono
+(setq lp/default-font "Fantasque Sans Mono")
+
+(setq lp/default-font-size 16)
 
 (setq lp/current-font-size lp/default-font-size)
 

@@ -19,6 +19,17 @@
 ;; More badword highlighting! -
 
 
+;; these two are used to make org mode look hella nice.
+(use-package visual-fill-column
+  :ensure t)
+
+(use-package writeroom-mode ; TODO make a bind for this mode in org-mode
+  :ensure t
+  :defer t
+  :after visual-fill-column
+  :diminish writeroom-mode)
+
+
                                         ; toy areas of computer
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 (defun lp/open-challenges-notes ()
