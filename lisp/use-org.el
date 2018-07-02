@@ -13,6 +13,8 @@
          ("\C-cl" . org-store-link)
          ("\C-cb" . org-iswitchb))
   :config
+  (unbind-key "C-," org-mode-map)
+  (unbind-key "C-'" org-mode-map)
   (add-hook 'org-mode-hook
             (lambda ()
               (org-bullets-mode t)))
@@ -297,7 +299,10 @@ last month with the Category Foo."
    org-agenda-custom-commands
    '(("n" "Agenda"
       ((agenda ""
-               ((org-agenda-files (list org-index-file org-personal-file org-school-file org-projects-file org-notes-file org-journal-file org-monthly-file))
+               ((org-agenda-files (list org-index-file
+               org-personal-file org-school-file
+               org-projects-file org-notes-file org-journal-file
+               org-monthly-file))
                 (org-agenda-skip-scheduled-if-deadline-is-shown t)))
        (tags-todo "-REFILE-CANCELLED-WAITING-HOLD/!-DONE-HOLD"
                   ((org-agenda-overriding-header "To-File Files (index.org)")

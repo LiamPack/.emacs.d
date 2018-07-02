@@ -32,7 +32,7 @@
 ;;  * Habamax Theme - a little plain
 ;;  * Also hydanatantantatna-theme
 (require 'use-package)
-(load-theme 'leuven)
+(load-theme 'base16-material-darker)
 ;; (add-to-list 'custom-theme-load-path "~/.emacs.d/themes/")
 ;; (add-to-list 'custom-theme-load-path "~/.emacs.d/themes/modern-themes")
 
@@ -161,10 +161,10 @@
 ;; Font functionality
 
 ;; iosevka, consolas, source code pro, Fira Code, dejavu, IBM 3270,
-;; Fantasque Sans Mono
-(setq lp/default-font "Fantasque Sans Mono")
+;; Fantasque Sans Mono, Terminus
+(setq lp/default-font "Dejavu Sans Mono")
 
-(setq lp/default-font-size 16)
+(setq lp/default-font-size 12)
 
 (setq lp/current-font-size lp/default-font-size)
 

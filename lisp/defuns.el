@@ -84,6 +84,9 @@
 (global-set-key (kbd "C-s") 'isearch-forward-regexp)
 (global-set-key (kbd "C-r") 'isearch-backward-regexp)
 
+(use-package which-key
+  :ensure t
+  :config (which-key-mode 1))
 
 ;; pop to the last command mark! its cool.
 

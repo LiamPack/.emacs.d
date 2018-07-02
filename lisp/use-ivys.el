@@ -52,7 +52,10 @@
          ("C-c f a"                        . counsel-ag)
          ("C-c f m"                        . counsel-imenu))
   :config
-  (global-set-key (kbd "C-x p") 'pop-to-mark-command))
+  
+  (progn
+    (unbind-key "C-x p" counsel-mode-map)
+    (global-set-key (kbd "C-x p") 'pop-to-mark-command)))
 
 (use-package swiper ; don't really use this one much. maybe better than isearch?
   :ensure t
