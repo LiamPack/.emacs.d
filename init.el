@@ -17,11 +17,6 @@
       ;; work around package.el bug in Emacs 25
       package--init-file-ensured t)
 (package-initialize)
-;; some things to not forget about when using emacs!  For those who
-;; don’t know: C-u 1 C-y is equivalent to plain C-y, but C-u 2 C-y (or
-;; just C-2 C-y) inserts the previous killed text (much like C-y M-y),
-;; and also marks it as the current one. With higher arguments, it
-;; inserts earlier kills.
 
                                         ; general setup
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
