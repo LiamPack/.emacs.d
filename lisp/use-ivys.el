@@ -52,7 +52,7 @@
          ("C-c f a"                        . counsel-ag)
          ("C-c f m"                        . counsel-imenu))
   :config
-  
+
   (progn
     (unbind-key "C-x p" counsel-mode-map)
     (global-set-key (kbd "C-x p") 'pop-to-mark-command)))
@@ -65,7 +65,8 @@
   :bind (("C-c C-r" . swiper)
          ("C-c C-s" . counsel-grep-or-swiper)))
 
-(use-package flx ; flex searching (fuzzy)
+
+(use-package flx                        ; flex searching (fuzzy)
   :ensure t)
 
 (use-package swiper
@@ -81,7 +82,7 @@
 (use-package avy ; Maybe also look into iy- whatever for this. interesting extension/alternative though
   :ensure t
   :bind (("C-\'" . avy-goto-char)
-         ("M-\'" . avy-goto-char-2)
+         ("C-\"" . avy-goto-char-timer)
          ("C-c C-j" . avy-resume))
   :config
   (avy-setup-default))

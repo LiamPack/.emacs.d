@@ -10,7 +10,7 @@
   (setq yas-fallback-behavior 'return-nil)
   (setq yas-triggers-in-field t)
   (setq yas-verbosity 0)
-  (setq yas-snippet-dirs (list "~/.emacs.d/snippets/" "~/.emacs.d/elpa/yasnippet-20170923.1646/snippets/"))
+  (setq yas-snippet-dirs (list "~/.emacs.d/snippets/" "~/.emacs.d/elpa/yasnippet-snippets-20180616.1005/snippets"))
   (yas-reload-all))
 
 (use-package yasnippet-snippets

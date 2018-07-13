@@ -30,11 +30,16 @@
 
 
 ;; More info here: [[https://github.com/syohex/emacs-git-gutter]]
-(use-package git-gutter ; TODO - git gutter keybinds, going to different hunks and staging only certain portions! 
+(use-package git-gutter ; TODO - git gutter keybinds, going to different hunks and staging only certain portions!
   :ensure t
   :diminish git-gutter-mode
   :config
   (global-git-gutter-mode +1))
+
+(use-package aggressive-indent
+  :ensure t
+  :diminish aggressive-indent-mode
+  :hook ((emacs-lisp-mode css-mode c-mode c++-mode sh-mode) . aggressive-indent-mode))
 
 (use-package poporg ; pop-out org mode window to edit comments. opposite of the embedding of source blocks
   :bind (("C-c /" . poporg-dwim)))

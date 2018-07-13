@@ -32,7 +32,8 @@
 ;;  * Habamax Theme - a little plain
 ;;  * Also hydanatantantatna-theme
 (require 'use-package)
-(load-theme 'base16-material-darker)
+(load-theme 'base16-atelier-lakeside-light)
+
 ;; (add-to-list 'custom-theme-load-path "~/.emacs.d/themes/")
 ;; (add-to-list 'custom-theme-load-path "~/.emacs.d/themes/modern-themes")
 
@@ -128,11 +129,7 @@
                                         ;(setq moe-theme-highlight-buffer-id t)
   )
 
-;; wrap visual lines! it helps.
-(global-visual-line-mode 1)
 
-;; Fancy lambdas
-(global-prettify-symbols-mode t)
 
 ;; screw the bell
 (setq ring-bell-function 'ignore)
@@ -162,7 +159,7 @@
 
 ;; iosevka, consolas, source code pro, Fira Code, dejavu, IBM 3270,
 ;; Fantasque Sans Mono, Terminus
-(setq lp/default-font "Dejavu Sans Mono")
+(setq lp/default-font "Courier New")
 
 (setq lp/default-font-size 12)
 

@@ -13,8 +13,8 @@
          ("\C-cl" . org-store-link)
          ("\C-cb" . org-iswitchb))
   :config
-  (unbind-key "C-," org-mode-map)
-  (unbind-key "C-'" org-mode-map)
+  (unbind-key "C-," org-mode-map) ;expand-region
+  (unbind-key "C-m" org-mode-map) ;avy
   (add-hook 'org-mode-hook
             (lambda ()
               (org-bullets-mode t)))
@@ -54,7 +54,6 @@
   (setq org-personal-file (org-file-path "personal.org"))
   (setq org-school-file (org-file-path "school.org"))
   (setq org-projects-file (org-file-path "projects.org"))
-  (setq org-notes-file (org-file-path "notes.org"))
   (setq org-journal-file (org-file-path "journal.org"))
   (setq org-monthly-file (org-file-path "monthly.org"))
   (setq org-archive-location
@@ -63,9 +62,9 @@
   ;; I keep all of my todos in =~/Dropbox/org/index.org= so I derive my
   ;; agenda from there
   (setq org-agenda-files
-        (list org-index-file org-personal-file org-school-file org-projects-file org-notes-file org-journal-file (org-file-path "to-read.org")))
+        (list org-index-file org-personal-file org-school-file org-projects-file org-journal-file (org-file-path "to-read.org")))
   (setq all-org-files
-        (list org-index-file org-personal-file org-school-file org-projects-file org-notes-file org-journal-file (org-file-path "to-read.org")))
+        (list org-index-file org-personal-file org-school-file org-projects-file org-journal-file (org-file-path "to-read.org")))
 
   ;; refiling!
   ;; refiling
@@ -300,9 +299,9 @@ last month with the Category Foo."
    '(("n" "Agenda"
       ((agenda ""
                ((org-agenda-files (list org-index-file
-               org-personal-file org-school-file
-               org-projects-file org-notes-file org-journal-file
-               org-monthly-file))
+                                        org-personal-file org-school-file
+                                        org-projects-file org-journal-file
+                                        org-monthly-file))
                 (org-agenda-skip-scheduled-if-deadline-is-shown t)))
        (tags-todo "-REFILE-CANCELLED-WAITING-HOLD/!-DONE-HOLD"
                   ((org-agenda-overriding-header "To-File Files (index.org)")

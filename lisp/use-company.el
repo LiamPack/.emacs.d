@@ -2,6 +2,7 @@
 
 (use-package company
   :ensure t
+  :disabled
   :config
   ;; Zero delay when pressing tab
   (setq company-idle-delay 0)
@@ -43,4 +44,5 @@
   (add-to-list 'company-backends 'company-math-symbols-unicode)
   (add-to-list 'company-backends 'company-math-symbols-latex))
 
-(provide 'use-company)
+;;(provide 'use-company)
+
