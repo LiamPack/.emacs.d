@@ -38,6 +38,7 @@ see how I like it.
   (require 'use-package)
   (setq use-package-verbose t)
   (setq use-package-always-ensure t)
+  (add-to-list 'load-path "/Users/sb/.emacs.d/diredp/")
   #+END_SRC
 
 * Annoying Defaults
@@ -115,55 +116,8 @@ see how I like it.
   (setq fci-rule-column 80)
   (setq column-number-mode t)
 
-  ;; fuck cursor lagging on moving
-  (setq auto-window-vscroll nil)
-
-  #+END_SRC
-
-  I like to have paren-mode matching as 'parenthesis value. Also
-  compilation configuration
-  #+BEGIN_SRC emacs-lisp
-  ;; paren mode matching
-  (show-paren-mode t)
-  (setq show-paren-style 'parenthesis)
-
-  ;; I'd prefer that compilation output goes to *compilation buffer*
-  ;; Rarely have the window selected, so the output disappears past the
-  ;; bottom of the window
-  (setq compilation-scroll-output t)
-  (setq compilation-window-height 15)
-  #+END_SRC
-
-  archaic default storage values are dissapointing as defaults
-  too. Time to waste space it's the future
-  #+BEGIN_SRC emacs-lisp
-  ;; quicktramp setup
-  (setq tramp-default-method "ssh")
-  (setq enable-recursive-minibuffers t)
-
-
-    ;; Create own directory for ~ backup file clutter
-    (setq backup-directory-alist '(("." . "~/.emacs.d/backups")))
-
-    ;; Disk space is cheap. Save lots.
-    (setq delete-old-versions -1)
-    (setq version-control t)
-    (setq vc-make-backup-files t)
-    (setq auto-save-file-name-transforms '((".*" "~/.emacs.d/auto-save-list/" t)))
-
-    ;; we don't live in the past. bump that memory up.
-    (setq gc-cons-threshold 50000000)
-  #+END_SRC
-
-  Also look for executables in bins
-  #+BEGIN_SRC emacs-lisp
-  (setq exec-path (append exec-path '("/user/local/bin" "~/bin")))
-
-  #+END_SRC
-
-  I hate tabs and lets actually indent whenever we do a newline. Cmon
-  bruh
-  #+BEGIN_SRC emacs-lisp
+  ;;
+ emacs-lisp
   (setq-default indent-tabs-mode nil)
   (delete-selection-mode)
   (global-set-key (kbd "RET") 'newline-and-indent)
@@ -365,7 +319,7 @@ see how I like it.
    ;; Fantasque Sans Mono, Terminus
    (setq lp/default-font "Courier New")
 
-   (setq lp/default-font-size 12)
+   (setq lp/default-font-size 16)
 
    (setq lp/current-font-size lp/default-font-size)
 
@@ -444,9 +398,25 @@ see how I like it.
 ** Theme
    gotta get a good theme
    #+BEGIN_SRC emacs-lisp
-     (use-package zenburn-theme
-       :ensure t)
-     (load-theme 'zenburn t)
+   (use-package dracula-theme
+     :ensure t)
+   (load-theme 'dracula t)
+   #+END_SRC
+** Dashboard
+   It's actually nice to have a little something that appears on
+   startup that isn't the scratch buffer so here we go
+   #+BEGIN_SRC emacs-lisp
+    (use-package dashboard
+      :disabled t
+      :ensure t
+      :config
+      (when (window-system)
+        (setq dashboard-banner-logo-title (concat "GNU Emacs " emacs-version " kernel " (car (split-string (shell-command-to-string "uname -r") "-"))  " x86_"))
+        ;; Set the banner
+        (setq dashboard-startup-banner "~/Downloads/melee_char_select.png")
+        (dashboard-setup-startup-hook)
+        (setq dashboard-page-separator "\n\f\f\n")
+        (setq dashboard-items '((recents . 15)))))
    #+END_SRC
 * Navigation
 ** Buffers
@@ -459,7 +429,6 @@ see how I like it.
 
     always use ibuffer in another window
     #+BEGIN_SRC emacs-lisp
-   ;; GROUP: Convenience -> Ibuffer
    (setq ibuffer-use-other-window t) ;; always display ibuffer in another window
     #+END_SRC
 
@@ -610,7 +579,7 @@ see how I like it.
       :config (volatile-highlights-mode t))
     #+END_SRC
 
-*** Smartparens
+*** TODO Smartparens - change for better hooking
     Trying this out for a little. It isn't quite paredit, but we don't
     really want paredit for when we want smartparens so that's a thing
     I guess.
@@ -622,7 +591,12 @@ see how I like it.
       (setq sp-base-key-bindings 'paredit)
       (setq sp-autoskip-closing-pair 'always)
       (setq sp-hybrid-kill-entire-symbol nil)
-      (sp-use-paredit-bindings))
+      (sp-use-paredit-bindings)
+      (add-hook 'c-mode #'smartparens-mode)
+      (add-hook 'c++-mode #'smartparens-mode)
+      (add-hook 'awk-mode #'smartparens-mode)
+      (add-hook 'sh-mode #'smartparens-mode))
+
     #+END_SRC
 *** Yasnippet
     Yasnippet is good shit. I like it. Let's keep it poppin
@@ -682,13 +656,13 @@ see how I like it.
        try-complete-lisp-symbol) ;; Try to complete word as an Emacs Lisp symbol.
      )
     #+END_SRC
-*** indenting
+
 *** expand-region
     #+BEGIN_SRC emacs-lisp
-      (use-package expand-region
-        :ensure t
-        :config
-        (global-set-key (kbd "C-c n") 'er/expand-region))
+    (use-package expand-region
+      :ensure t
+      :config
+      (global-set-key (kbd "C-,") 'er/expand-region))
     #+END_SRC
 *** misc
     Kill region kills only a line if nothing active. acts as ~dd~ from
@@ -702,16 +676,13 @@ see how I like it.
          (list (line-beginning-position)
                (line-beginning-position 2)))))
     #+END_SRC
+
 * Files
 ** Dired  
 *** wdired
 *** dired+
     dired+ has a LOT of extra features that we will not be going into
     here. just the faces are a good addition.
-
-
-    (require dired+)
-
 
 *** recentf
     recentf is good stuff. we'll need it
@@ -726,7 +697,6 @@ see how I like it.
          recentf-auto-cleanup 300
             recentf-exclude (list "/\\.git/.*\\'"     ; Git contents
                                "/elpa/.*\\'"       ; Package files
-                               "/itsalltext/"      ; It's all text temp files
                                ;; And all other kinds of boring files
                                #'ignoramus-boring-p)))
     #+END_SRC
@@ -853,8 +823,6 @@ see how I like it.
           gdb-show-main t)          ; Non-nil means display source file containing the main routine at startup
   #+END_SRC
 
-  
-
 ** python
 *** elpy
    #+BEGIN_SRC emacs-lisp
@@ -871,7 +839,7 @@ see how I like it.
         :interpreter ("python" . python-mode)
         :config
         (elpy-enable)
-        (setq python-indent-offsett 2))
+        (setq python-indent-offsett 4))
     #+END_SRC
 *** company-jedi
     #+BEGIN_SRC emacs-lisp
