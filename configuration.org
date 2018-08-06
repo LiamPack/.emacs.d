@@ -20,6 +20,8 @@ see how I like it.
 (package-initialize)
   #+END_SRC
 
+  #+RESULTS:
+
   #+BEGIN_SRC emacs-lisp
   ;; chicken before the
   (unless (package-installed-p 'use-package)
@@ -117,7 +119,6 @@ see how I like it.
   (setq column-number-mode t)
 
   ;;
- emacs-lisp
   (setq-default indent-tabs-mode nil)
   (delete-selection-mode)
   (global-set-key (kbd "RET") 'newline-and-indent)
@@ -1458,6 +1459,9 @@ see how I like it.
 
    #+END_SRC
 
+   #+RESULTS:
+   : t
+
 *** TODO research in org - organize - also pdftools
     #+BEGIN_SRC emacs-lisp
       ;; pdf-tools init
@@ -1591,6 +1595,7 @@ see how I like it.
 
      (use-package tex
        :defer t
+       :disabled
        :ensure auctex
        :mode ("\\.tex\\'" . TeX-latex-mode)
        :config
