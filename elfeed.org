@@ -10,7 +10,7 @@
 *** https://us18.campaign-archive.com/feed?u=ab0f46cf302c0ed836e0bf0ad&id=56b5f64c5f :engineering:
 ** emacs                                                        :emacs:
 *** entry-title: \(emacs\|org-mode\) :orgmode:
-*** http://www.reddit.com/r/emacs/.rss
+*** http://www.reddit.com/r/emacs/.rss :ignore:
 *** http://planet.emacsen.org/atom.xml
 *** http://feeds.feedburner.com/XahsEmacsBlog
 *** http://pragmaticemacs.com/feed/
@@ -24,8 +24,8 @@
 ** roguelike :roguelike:
 *** http://www.goldenkronehotel.com/wordpress/feed/
 *** http://www.terminally-incoherent.com/blog/feed
-*** https://www.reddit.com/r/roguelikedev.rss :dev:
-*** https://www.reddit.com/r/roguelikes.rss
+*** https://www.reddit.com/r/roguelikedev.rss :dev:ignore:
+*** https://www.reddit.com/r/roguelikes.rss :ignore:
 *** http://rodneylives.blogspot.com/
 ** art :art:
 *** http://inconvergent.net/atom.xml :inconvergent:
