@@ -312,11 +312,11 @@ see how I like it.
    A bunch of font functionality to give that doesn't really exist in
    vanilla emacs afaik.
    #+BEGIN_SRC emacs-lisp
-   ;; iosevka, consolas, source code pro, Fira Code, dejavu, IBM 3270,
+   ;; iosevka term light, consolas, source code pro, Fira Code, dejavu, IBM 3270,
    ;; Fantasque Sans Mono, Terminus
-   (setq lp/default-font "Courier New")
+   (setq lp/default-font "iosevka term light")
 
-   (setq lp/default-font-size 16)
+   (setq lp/default-font-size 24)
 
    (setq lp/current-font-size lp/default-font-size)
 
@@ -353,7 +353,9 @@ see how I like it.
 
    (lp/reset-font-size)
    #+END_SRC
-   
+
+   #+RESULTS:
+
 ** Diminish
    Diminish a bunch of default modes that clutter the modeline.
    #+BEGIN_SRC emacs-lisp
@@ -396,10 +398,17 @@ see how I like it.
    gotta get a good theme. Currently using darcula because it's a nice
    aesthetic purple theme
    #+BEGIN_SRC emacs-lisp
-   (use-package dracula-theme
-     :ensure t)
-   (load-theme 'dracula t)
+     (use-package dracula-theme
+       :disabled t
+       :ensure t)
+     (use-package gruber-darker-theme
+       :ensure t)
+     (load-theme 'gruber-darker t)
    #+END_SRC
+
+   #+RESULTS:
+   : t
+
 * Navigation
 ** Buffers
 *** ibuffer
@@ -875,12 +884,13 @@ see how I like it.
 
    and also git-gutter to know what we haven't committed yet
    #+BEGIN_SRC emacs-lisp
-     ;; More info here: [[https://github.com/syohex/emacs-git-gutter]]
-     (use-package git-gutter ; TODO - git gutter keybinds, going to different hunks and staging only certain portions!
-       :ensure t
-       :diminish git-gutter-mode
-       :config
-       (global-git-gutter-mode +1))
+   ;; More info here: [[https://github.com/syohex/emacs-git-gutter]]
+   (use-package git-gutter ; TODO - git gutter keybinds, going to different hunks and staging only certain portions!
+     :ensure t
+     :disabled t
+     :diminish git-gutter-mode
+     :config
+     (global-git-gutter-mode +1))
    #+END_SRC
 
 ** flycheck
@@ -1115,7 +1125,7 @@ see how I like it.
          'org-babel-load-languages
          '((C . t)
            (python . t)
-           (shell . t)
+           (sh . t)
            (emacs-lisp . t)
            (gnuplot . t)
            (R . t)))
@@ -1571,54 +1581,54 @@ see how I like it.
 
 *** TODO research in org - organize - also pdftools
     #+BEGIN_SRC emacs-lisp
-      ;; pdf-tools init
-      ;; (use-package pdf-tools
-      ;;   :ensure t
-      ;;   :config
-      ;;   (pdf-tools-install))
+    ;;pdf-tools init
+    (use-package pdf-tools
+      :ensure t
+      :config
+      (pdf-tools-install))
 
-      ;; org-ref
-      (use-package bibtex-utils
-        :ensure t)
+    ;; org-ref
+    (use-package bibtex-utils
+      :ensure t)
 
-      (use-package biblio
-        :ensure t)
+    (use-package biblio
+      :ensure t)
 
-      (use-package interleave
-        :ensure t)
-      ;;(require 'pubmed)
-      ;;(require 'arxiv)
-      ;;(require 'sci-id)
+    (use-package interleave
+      :ensure t)
+    ;;(require 'pubmed)
+    ;;(require 'arxiv)
+    ;;(require 'sci-id)
 
-      (autoload 'helm-bibtex "helm-bibtex" "" t)
+    (autoload 'helm-bibtex "helm-bibtex" "" t)
 
-      (use-package org-ref
+    (use-package org-ref
 
-        :ensure t
-        :config
-        (require 'doi-utils)
-        (setq org-ref-notes-directory "~/Dropbox/res"
-              org-ref-bibliography-notes "~/Dropbox/res/notes.org"
-              org-ref-default-bibliography '("~/Dropbox/res/index.bib")
-              org-ref-pdf-directory "~/Dropbox/res/lib/"))
+      :ensure t
+      :config
+      (require 'doi-utils)
+      (setq org-ref-notes-directory "~/Dropbox/res"
+            org-ref-bibliography-notes "~/Dropbox/res/notes.org"
+            org-ref-default-bibliography '("~/Dropbox/res/index.bib")
+            org-ref-pdf-directory "~/Dropbox/res/lib/"))
 
-      (use-package helm-bibtex
+    (use-package helm-bibtex
 
-        :ensure t
-        :config
-        (setq helm-bibtex-bibliography "~/Dropbox/res/index.bib" ;; where your references are stored
-              helm-bibtex-library-path "~/Dropbox/res/lib/"
-              bibtex-completion-library-path '("~/Dropbox/res/lib/") ;; where your pdfs etc are stored
-              helm-bibtex-notes-path "~/Dropbox/res/notes.org" ;; where your notes are stored
-              bibtex-completion-bibliography "~/Dropbox/res/index.bib" ;; completion
-              bibtex-completion-notes-path "~/Dropbox/res/notes.org"))
+      :ensure t
+      :config
+      (setq helm-bibtex-bibliography "~/Dropbox/res/index.bib" ;; where your references are stored
+            helm-bibtex-library-path "~/Dropbox/res/lib/"
+            bibtex-completion-library-path '("~/Dropbox/res/lib/") ;; where your pdfs etc are stored
+            helm-bibtex-notes-path "~/Dropbox/res/notes.org" ;; where your notes are stored
+            bibtex-completion-bibliography "~/Dropbox/res/index.bib" ;; completion
+            bibtex-completion-notes-path "~/Dropbox/res/notes.org"))
 
-      (defun lp/open-paper-notes ()
-        "Open the org TODO list."
-        (interactive)
-        (find-file "~/Dropbox/res/notes.org")
-        (flycheck-mode -1))
-      (global-set-key  (kbd "C-c r") 'lp/open-paper-notes)
+    (defun lp/open-paper-notes ()
+      "Open the org TODO list."
+      (interactive)
+      (find-file "~/Dropbox/res/notes.org")
+      (flycheck-mode -1))
+    (global-set-key  (kbd "C-c r") 'lp/open-paper-notes)
     #+END_SRC
 ** TODO elfeed - organize
  #+BEGIN_SRC emacs-lisp
@@ -1713,85 +1723,83 @@ see how I like it.
 ** TODO tex - organize
 
    #+BEGIN_SRC emacs-lisp
-     (use-package tex-site                   ; AUCTeX initialization
-       :ensure auctex)
+   (use-package tex-site                   ; AUCTeX initialization
+     :ensure auctex)
 
-     (use-package tex
-       :defer t
-       :disabled
-       :ensure auctex
-       :mode ("\\.tex\\'" . TeX-latex-mode)
-       :config
-       (setq TeX-PDF-mode t)
+   (use-package tex
+     :defer t
+     :ensure auctex
+     :mode ("\\.tex\\'" . TeX-latex-mode)
+     :config
+     (setq TeX-PDF-mode t)
+     (set-default 'preview-scale-function 2.0)
 
-       (set-default 'preview-scale-function 2.0)
+     ;; revert pdf-view after compilation
+     (add-hook 'TeX-after-compilation-finished-functions #'TeX-revert-document-buffer)
+     (setq TeX-view-program-selection '((output-pdf "PDF Tools"))
+           TeX-source-correlate-start-server t
+           TeX-source-correlate-mode t
+           TeX-source-correlate-method 'synctex)
+     (setq reftex-plug-into-AUCTeX t)
+     (setq TeX-auto-save t)
+     (setq TeX-parse-self t)
+     (setq TeX-save-query nil)
+     (setq TeX-view-program-list
+           '(("Evince" "evince --page-index=%(outpage) %o")))
+     (setq TeX-view-program-selection '((output-pdf "Evince")))
+     (add-hook 'LaTeX-mode-hook 'TeX-source-correlate-mode)
+     (add-hook 'LaTeX-mode-hook 'auto-fill-mode)
+     (add-hook 'LaTeX-mode-hook 'turn-on-reftex))
 
-       ;; revert pdf-view after compilation
-       (add-hook 'TeX-after-compilation-finished-functions #'TeX-revert-document-buffer)
-       (setq TeX-view-program-selection '((output-pdf "PDF Tools"))
-             TeX-source-correlate-start-server t
-             TeX-source-correlate-mode t
-             TeX-source-correlate-method 'synctex)
-       (setq reftex-plug-into-AUCTeX t)
-       (setq TeX-auto-save t)
-       (setq TeX-parse-self t)
-       (setq TeX-save-query nil)
-       (setq TeX-view-program-list
-             '(("Evince" "evince --page-index=%(outpage) %o")))
-       (setq TeX-view-program-selection '((output-pdf "Evince")))
-       (add-hook 'LaTeX-mode-hook 'TeX-source-correlate-mode)
-       (add-hook 'LaTeX-mode-hook 'auto-fill-mode)
-       (add-hook 'LaTeX-mode-hook 'turn-on-reftex))
+   (use-package tex-style                  ; TeX style
+     :ensure auctex
+     :defer t
+     :config
+     ;; Enable support for csquotes
+     (setq LaTeX-csquotes-close-quote "}"
+           LaTeX-csquotes-open-quote "\\enquote{"))
 
-     (use-package tex-style                  ; TeX style
-       :ensure auctex
-       :defer t
-       :config
-       ;; Enable support for csquotes
-       (setq LaTeX-csquotes-close-quote "}"
-             LaTeX-csquotes-open-quote "\\enquote{"))
+   (use-package tex-fold                   ; TeX folding
+     :ensure auctex
+     :defer t
+     :init (add-hook 'TeX-mode-hook #'TeX-fold-mode))
 
-     (use-package tex-fold                   ; TeX folding
-       :ensure auctex
-       :defer t
-       :init (add-hook 'TeX-mode-hook #'TeX-fold-mode))
+   (use-package reftex                     ; TeX/BibTeX cross-reference management
+     :defer t
+     :init (add-hook 'LaTeX-mode-hook #'reftex-mode)
+     :config
+     ;; Plug into AUCTeX
+     (setq reftex-plug-into-AUCTeX t
+           ;; Automatically derive labels, and prompt for confirmation
+           reftex-insert-label-flags '(t t)
+           reftex-label-alist
+           '(
+             ;; Additional label definitions for RefTeX.
+             ("definition" ?d "def:" "~\\ref{%s}"
+              lunaryorn-reftex-find-ams-environment-caption
+              ("definition" "def.") -3)
+             ("theorem" ?h "thm:" "~\\ref{%s}"
+              lunaryorn-reftex-find-ams-environment-caption
+              ("theorem" "th.") -3)
+             ("example" ?x "ex:" "~\\ref{%s}"
+              lunaryorn-reftex-find-ams-environment-caption
+              ("example" "ex") -3)
+             ;; Algorithms package
+             ("algorithm" ?a "alg:" "~\\ref{%s}"
+              "\\\\caption[[{]" ("algorithm" "alg") -3)))
 
-     (use-package reftex                     ; TeX/BibTeX cross-reference management
-       :defer t
-       :init (add-hook 'LaTeX-mode-hook #'reftex-mode)
-       :config
-       ;; Plug into AUCTeX
-       (setq reftex-plug-into-AUCTeX t
-             ;; Automatically derive labels, and prompt for confirmation
-             reftex-insert-label-flags '(t t)
-             reftex-label-alist
-             '(
-               ;; Additional label definitions for RefTeX.
-               ("definition" ?d "def:" "~\\ref{%s}"
-                lunaryorn-reftex-find-ams-environment-caption
-                ("definition" "def.") -3)
-               ("theorem" ?h "thm:" "~\\ref{%s}"
-                lunaryorn-reftex-find-ams-environment-caption
-                ("theorem" "th.") -3)
-               ("example" ?x "ex:" "~\\ref{%s}"
-                lunaryorn-reftex-find-ams-environment-caption
-                ("example" "ex") -3)
-               ;; Algorithms package
-               ("algorithm" ?a "alg:" "~\\ref{%s}"
-                "\\\\caption[[{]" ("algorithm" "alg") -3)))
-
-       ;; Provide basic RefTeX support for biblatex
-       (unless (assq 'biblatex reftex-cite-format-builtin)
-         (add-to-list 'reftex-cite-format-builtin
-                      '(biblatex "The biblatex package"
-                                 ((?\C-m . "\\cite[]{%l}")
-                                  (?t . "\\textcite{%l}")
-                                  (?a . "\\autocite[]{%l}")
-                                  (?p . "\\parencite{%l}")
-                                  (?f . "\\footcite[][]{%l}")
-                                  (?F . "\\fullcite[]{%l}")
-                                  (?x . "[]{%l}")
-                                  (?X . "{%l}"))))
-         (setq reftex-cite-format 'biblatex))
-       :diminish reftex-mode)
+     ;; Provide basic RefTeX support for biblatex
+     (unless (assq 'biblatex reftex-cite-format-builtin)
+       (add-to-list 'reftex-cite-format-builtin
+                    '(biblatex "The biblatex package"
+                               ((?\C-m . "\\cite[]{%l}")
+                                (?t . "\\textcite{%l}")
+                                (?a . "\\autocite[]{%l}")
+                                (?p . "\\parencite{%l}")
+                                (?f . "\\footcite[][]{%l}")
+                                (?F . "\\fullcite[]{%l}")
+                                (?x . "[]{%l}")
+                                (?X . "{%l}"))))
+       (setq reftex-cite-format 'biblatex))
+     :diminish reftex-mode)
    #+END_SRC
