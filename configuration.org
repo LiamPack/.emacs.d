@@ -697,6 +697,7 @@ see how I like it.
            ("\C-cl" . org-store-link)
            ("\C-cb" . org-iswitchb))
     :config
+    (require 'org-habit)
     (unbind-key "C-," org-mode-map)       ;expand-region
     (unbind-key "C-m" org-mode-map)       ;avy
     (setq org-startup-with-inline-images t)
@@ -717,7 +718,7 @@ see how I like it.
      'org-babel-load-languages
      '((C . t)
        (python . t)
-       (shell . t)
+       (sh . t)
        (emacs-lisp . t)
        (gnuplot . t)
        (R . t)))
@@ -1143,6 +1144,10 @@ see how I like it.
     ;; with C-c q
     (global-set-key (kbd "C-c q") 'auto-fill-mode))
   #+END_SRC
+
+  #+RESULTS:
+  : org-iswitchb
+
 ** TODO  research in org - organize - also pdftools
    #+BEGIN_SRC emacs-lisp
    ;; pdf-tools init
@@ -1839,7 +1844,6 @@ q<<<<<<< variant A
         ;; NOTE(nox): Get different latex fragments for different themes
                                               ; agenda stuff
       ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-        (setq org-agenda-tags-column 80)
         ;; Do not dim blocked tasks
         (setq org-agenda-dim-blocked-tasks nil)
         ;; Compact the block agenda view
