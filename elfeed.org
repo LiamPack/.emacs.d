@@ -2,43 +2,45 @@
 ** entry-title: \(linux\|linus\|ubuntu\|kde\|gnome\)                  :linux:
 ** dev                                                                  :dev:
 *** https://www.bennee.com/~alex/blog/feed/
-** daily                                                        :daily:
+** daily                                                              :daily:
 *** http://telescoper.wordpress.com/feed/
-*** http://timharford.com/feed/
+*** http://timharford.com/feed/                                        :econ:
 *** http://understandinguncertainty.org/rss.xml
-*** https://www.reddit.com/r/dailyprogrammer/.rss :dp:
+*** https://www.reddit.com/r/dailyprogrammer/.rss                        :dp:
 *** https://us18.campaign-archive.com/feed?u=ab0f46cf302c0ed836e0bf0ad&id=56b5f64c5f :engineering:
-** emacs                                                        :emacs:
-*** entry-title: \(emacs\|org-mode\) :orgmode:
-*** http://www.reddit.com/r/emacs/.rss :ignore:
+** emacs                                                              :emacs:
+*** entry-title: \(emacs\|org-mode\)                                :orgmode:
+*** http://www.reddit.com/r/emacs/.rss                               :ignore:
 *** http://planet.emacsen.org/atom.xml
 *** http://feeds.feedburner.com/XahsEmacsBlog
 *** http://pragmaticemacs.com/feed/
 *** https://oremacs.com/atom.xml
 *** http://cestlaz.github.io/rss.xm/
-*** [[http://emacs.stackexchange.com/feeds][SX]] :ignore:
-** ai :ai:
+*** [[http://emacs.stackexchange.com/feeds][SX]]                     :ignore:
+** ai                                                                    :ai:
 *** https://jack-clark.net/feed/
-** hackernews :hn:
+** hackernews                                                            :hn:
 *** https://hnrss.org/newest?points=100
-** roguelike :roguelike:
+** roguelike                                                      :roguelike:
 *** http://www.goldenkronehotel.com/wordpress/feed/
 *** http://www.terminally-incoherent.com/blog/feed
-*** https://www.reddit.com/r/roguelikedev.rss :dev:ignore:
-*** https://www.reddit.com/r/roguelikes.rss :ignore:
+*** https://www.reddit.com/r/roguelikedev.rss                    :dev:ignore:
+*** https://www.reddit.com/r/roguelikes.rss                          :ignore:
 *** http://rodneylives.blogspot.com/
-** art :art:
-*** http://inconvergent.net/atom.xml :inconvergent:
+** art                                                                  :art:
+*** http://inconvergent.net/atom.xml                           :inconvergent:
 ** http://nullprogram.com/feed/
-** http://feeds.feedburner.com/datacolada/                  :statistics:cog:
-** melee :melee:
+** http://feeds.feedburner.com/datacolada/                   :statistics:cog:
+** melee                                                              :melee:
 *** https://supersmash.blog/feed/
+** math                                                                :math:
+*** https://terrytao.wordpress.com/feed/
 * webcomic                                                           :elfeed:
 ** http://xkcd.com/rss.xml
 * podcast                                                            :elfeed:
-** roguelike :roguelike:
+** roguelike                                                      :roguelike:
 *** http://feeds.feedburner.com/RoguelikeRadio
-** cpp :cpp:
+** cpp                                                                  :cpp:
 *** http://cppcast.libsyn.com/rss
-** ai :ai:
+** ai                                                                    :ai:
 *** http://feeds.feedburner.com/twimlai

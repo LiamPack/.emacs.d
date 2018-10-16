@@ -6,22 +6,22 @@ see how I like it.
 
 * Melpa + usepackage
   Going to need melpa so lets just get that out of the way
+
   #+BEGIN_SRC emacs-lisp
   (require 'package)
   (let* ((no-ssl (and (memq system-type '(windows-nt ms-dos))
-                    (not (gnutls-available-p))))
-       (proto (if no-ssl "http" "https")))
-  ;; Comment/uncomment these two lines to enable/disable MELPA and MELPA Stable as desired
-  (add-to-list 'package-archives (cons "melpa" (concat proto "://melpa.org/packages/")) t)
-  ;;(add-to-list 'package-archives (cons "melpa-stable" (concat proto "://stable.melpa.org/packages/")) t)
-  (when (< emacs-major-version 24)
-    ;; For important compatibility libraries like cl-lib
-    (add-to-list 'package-archives '("gnu" . (concat proto "://elpa.gnu.org/packages/")))))
-(package-initialize)
+                      (not (gnutls-available-p))))
+         (proto (if no-ssl "http" "https")))
+    ;; Comment/uncomment these two lines to enable/disable MELPA and MELPA Stable as desired
+    (add-to-list 'package-archives (cons "melpa" (concat proto "://melpa.org/packages/")) t)
+    ;;(add-to-list 'package-archives (cons "melpa-stable" (concat proto "://stable.melpa.org/packages/")) t)
+    (when (< emacs-major-version 24)
+      ;; For important compatibility libraries like cl-lib
+      (add-to-list 'package-archives '("gnu" . (concat proto "://elpa.gnu.org/packages/")))))
+  (package-initialize)
   #+END_SRC
 
-  #+RESULTS:
-
+  We'll also need to boostrap use-package
   #+BEGIN_SRC emacs-lisp
   ;; chicken before the
   (unless (package-installed-p 'use-package)
@@ -46,11 +46,12 @@ see how I like it.
 * Annoying Defaults
   Going to just go ahead and do the following switches
 
-  * turn of backups
+  * turn off backups
   * turn off autosaves + change its directory
   * inhibit startup
   * get rid of scratch message
   * ... idk more shit
+
   #+BEGIN_SRC emacs-lisp
   (setf backup-inhibited t
         auto-save-default nil
@@ -129,6 +130,7 @@ see how I like it.
 *** Misc
     I don't really want emacs telling me I'm killing the current
     buffer. I know I am. It's kind of hard to do by accident.
+
     #+BEGIN_SRC emacs-lisp
     (defun lp/kill-current-buffer ()
       "Just kill the gd buffer"
@@ -166,9 +168,12 @@ see how I like it.
 
     This one adjusts a window width to the perfect column 80! WOw.
     #+BEGIN_SRC emacs-lisp
+    (defun set-window-width (n)
+      "Set the selected window's width."
+      (adjust-window-trailing-edge (selected-window) (- n (window-width)) t))
     (defun set-80-columns ()
       "Set the selected window to 80 columns. If given a prefix
-    argument, set so that number of columns instead."
+        argument, set so that number of columns instead."
       (interactive)
       (set-window-width (or current-prefix-arg 80)))
 
@@ -186,7 +191,6 @@ see how I like it.
         (buffer-string)))
 
     ;; Quick switch to scratch buffers
-
     (defmacro scratch-key (key buffer-name mode)
       `(global-set-key ,key (lambda ()
                               (interactive)
@@ -197,15 +201,14 @@ see how I like it.
     (declare-function js2-mode nil)
     (declare-function clojure-mode nil)
     (scratch-key (kbd "C-c s") "*scratch*"    emacs-lisp-mode)
-    (scratch-key (kbd "C-c j") "*javascript*" js2-mode)
-    (scratch-key (kbd "C-c x") "*css*"        css-mode)
-    (scratch-key (kbd "C-c h") "*html*"       html-mode)
+    ;;    (scratch-key (kbd "C-c j") "*javascript*" js2-mode)
+    ;;    (scratch-key (kbd "C-c x") "*css*"        css-mode)
+    ;;    (scratch-key (kbd "C-c h") "*html*"       html-mode)
     #+END_SRC
 
 
     This one opens all files and sub-dirs below the given directory.
     #+BEGIN_SRC emacs-lisp
-    ;; ID: 72dc0a9e-c41c-31f8-c8f5-d9db8482de1e
     (defun find-all-files (dir)
       "Open all files and sub-directories below the given directory."
       (interactive "DBase directory: ")
@@ -274,6 +277,7 @@ see how I like it.
    Hippe expand is nice, im a fan. I also like having eval-buffer
    ready on a keybind to make things easier. Need to find a better
    command for compile, but this is here too.
+
    #+BEGIN_SRC emacs-lisp
    (global-set-key (kbd "M-/") 'hippie-expand)
    (global-set-key (kbd "C-c C-k") #'eval-buffer)
@@ -286,6 +290,7 @@ see how I like it.
     #+BEGIN_SRC emacs-lisp
     (use-package which-key
       :ensure t
+      :disabled t
       :config (which-key-mode 1))
     #+END_SRC
 * Aesthetics
@@ -297,29 +302,24 @@ see how I like it.
 
    ;; Fancy lambdas
    (global-prettify-symbols-mode t)
-
-   ;; screw the bell
-   (setq ring-bell-function 'ignore)
    #+END_SRC
-   
+
    Soft highlight of the line since it's nice.
    #+BEGIN_SRC emacs-lisp
    (when window-system
      (global-hl-line-mode))
    #+END_SRC
-   
+
 ** Fonts
    A bunch of font functionality to give that doesn't really exist in
    vanilla emacs afaik.
    #+BEGIN_SRC emacs-lisp
    ;; iosevka term light, consolas, source code pro, Fira Code, dejavu, IBM 3270,
    ;; Fantasque Sans Mono, Terminus
-   (setq lp/default-font "iosevka term light")
-
-   (setq lp/default-font-size 24)
-
+   (setq lp/default-font "iosevka term")
+   (setq lp/default-font-size 16)
    (setq lp/current-font-size lp/default-font-size)
-
+1
    ;; Define the factor that we should go by when increasing/decreasing
    (setq lp/font-change-increment 1.1)
 
@@ -359,8 +359,8 @@ see how I like it.
 ** Diminish
    Diminish a bunch of default modes that clutter the modeline.
    #+BEGIN_SRC emacs-lisp
-   ;;; Hide a whole bunch of stuff on the modeline. It's a bit annoying.
-   ;;; Using the =diminish= package for this.
+   ;; Hide a whole bunch of stuff on the modeline. It's a bit annoying.
+   ;; Using the =diminish= package for this.
    (use-package diminish
      :ensure t
      :config
@@ -402,12 +402,16 @@ see how I like it.
        :disabled t
        :ensure t)
      (use-package gruber-darker-theme
+       :disabled t
        :ensure t)
-     (load-theme 'gruber-darker t)
-   #+END_SRC
 
-   #+RESULTS:
-   : t
+     (add-to-list 'custom-theme-load-path "~/.emacs.d/themes")
+     ;;(load-theme 'default-black)
+     (use-package moe-theme
+       :ensure t
+       :config
+       (moe-light))
+   #+END_SRC
 
 * Navigation
 ** Buffers
@@ -416,38 +420,12 @@ see how I like it.
     helpful annotation and information viewed
     #+BEGIN_SRC emacs-lisp
     (defalias 'list-buffers 'ibuffer) ; always use ibuffer
-
     #+END_SRC
-    
+
     Also always use ibuffer in another window
     #+BEGIN_SRC emacs-lisp
     (setq ibuffer-use-other-window t) ;; always display ibuffer in another window
     #+END_SRC
-    
-**** ibuffer-vc
-     
-     I don't even know what this does tbh but let's do it
-     #+BEGIN_SRC emacs-lisp
-     (use-package ibuffer-vc
-       :ensure t)
-     (add-hook 'ibuffer-hook
-               (lambda ()
-                 (ibuffer-vc-set-filter-groups-by-vc-root)
-                 (unless (eq ibuffer-sorting-mode 'alphabetic)
-                   (ibuffer-do-sort-by-alphabetic))))
-
-     (setq ibuffer-formats
-           '((mark modified read-only vc-status-mini " "
-                   (name 18 18 :left :elide)
-                   " "
-                   (size 9 -1 :right)
-                   " "
-                   (mode 16 16 :left :elide)
-                   " "
-                   (vc-status 16 16 :left)
-                   " "
-                   filename-and-process)))
-     #+END_SRC
 ** windows
    A more intuitive configuration for how windows are layed out in
    combination with splitting+moving rather than just splitting. If
@@ -487,7 +465,7 @@ see how I like it.
     garbage. Cycling through gets tedious with more than 3 windows
     #+BEGIN_SRC emacs-lisp
       ;; ace-window stuff
-      ;; You can also start by calling ace-window and then decide to switch the action to delete or swap etc. By default the bindings are:
+      ;; You can also start by calling ace-window and then decide to switch the action to delete or swap etc. By default the bindings:
       ;;     x - delete window
       ;;     m - swap windows
       ;;     M - move window
@@ -507,17 +485,29 @@ see how I like it.
         (setq  aw-keys '(?a ?s ?d ?f ?g ?h ?j ?k ?l)))
     #+END_SRC
 
+** workgroups
+   Because sometimes I just want to go around and use different spaces
+   for different things. It's hard opening more than one Emacs. Also I
+   have a hard time getting desktops to actually work between
+   exits/startups. Maybe I should fix that.
+
+   #+BEGIN_SRC emacs-lisp
+   (use-package workgroups2
+     :ensure t)
+   #+END_SRC
+
 * Development
 ** Helm (trying this out now)
    holy helm its godlike.
-   
+
    An incredibly well-made package to enhance the interface and
    general functionality of things. It's like having a toolbelt that's
    been shrunk but when u grab an item it gets bigger again so you can
    use it. Some inspector gadget shit.
-   #+BEGIN_SRC emacs-lisp
+
    (use-package helm
      :ensure t
+     :disabled t
      :config
      (require 'helm-config)
      (global-set-key (kbd "C-c h") 'helm-command-prefix)
@@ -528,39 +518,82 @@ see how I like it.
            helm-scroll-amount                    8 ; scroll 8 lines other window using M-<next>/M-<prior>
            helm-ff-file-name-history-use-recentf t
            helm-echo-input-in-header-line t)
-     
+
      ;; helm is a little much for me
      (setq helm-autoresize-max-height 0)
      (setq helm-autoresize-min-height 20)
      (helm-autoresize-mode 1)
-     
+
      (helm-mode 1)
-     
+
      ;; going to want to use M-x with helm's powerful interface
      (global-set-key (kbd "M-x") 'helm-M-x)
-     
+
      ;; We also are going to want to use the kill-ring feature
      (global-set-key (kbd "M-y") 'helm-show-kill-ring)
-     
+
      ;; helm also has a great interface to a number of
      ;; different buffers and stuff like that
      (global-set-key (kbd "C-x b") 'helm-mini)
-     
+
      ;; Another place to stick helm in. fuzzy matching,
      (global-set-key (kbd "C-x C-f") 'helm-find-files)
-     
+
      ;; We also want helm-occur to not be on a horrible keybind
      (global-set-key (kbd "C-c h o") 'helm-occur)
-     
+
      ;; REGISTERS!
      (global-set-key (kbd "C-c h x") 'helm-register)
      )
-   #+END_SRC
+
 *** helm tramp??
-    #+BEGIN_SRC emacs-lisp
+
     (use-package helm-tramp
       :ensure t)
-    #+END_SRC
+
+** Helm Alternative
+   Ivy as a completion framework, coupled with the later packages
+   company and swiper (I don't really use swiper though).
+   #+BEGIN_SRC emacs-lisp
+      (use-package ivy
+        :ensure t
+        :config
+        (ivy-mode 1)
+        (setq ivy-use-virtual-buffers t)
+        (setq enable-recursive-minibuffers t)
+        (global-set-key (kbd "C-c C-r") 'ivy-resume)
+        (global-set-key (kbd "<f6>") 'ivy-resume)
+   )
+      (use-package counsel
+        :ensure t
+        :config
+             (global-set-key (kbd "M-x") 'counsel-M-x)
+        (global-set-key (kbd "C-x C-f") 'counsel-find-file)
+        (global-set-key (kbd "C-h f") 'counsel-describe-function)
+        (global-set-key (kbd "C-h v") 'counsel-describe-variable)
+        (global-set-key (kbd "C-h l") 'counsel-find-library)
+        (global-set-key (kbd "C-h i") 'counsel-info-lookup-symbol)
+        (global-set-key (kbd "C-h u") 'counsel-unicode-char)
+        (global-set-key (kbd "C-c g") 'counsel-git)
+        (global-set-key (kbd "C-c j") 'counsel-git-grep)
+        (global-set-key (kbd "C-c k") 'counsel-ag)
+        (global-set-key (kbd "C-x l") 'counsel-locate)
+        (global-set-key (kbd "C-S-o") 'counsel-rhythmbox)
+        (define-key minibuffer-local-map (kbd "C-r") 'counsel-minibuffer-history))
+   #+END_SRC
+
+   Continuing on the abo-abo train, avy is a great way to jump around
+   the page. So we're doin that now.
+   #+BEGIN_SRC emacs-lisp
+   (use-package avy
+     :ensure t
+     :config
+     (avy-setup-default)
+     (global-set-key (kbd "C-c C-j") 'avy-resume)
+     (global-set-key (kbd "C-'") 'avy-goto-char)
+     (global-set-key (kbd "C-\"") 'avy-goto-char-2))
+   #+END_SRC
+
 ** eldoc
    eldoc helps to look whatever with emacs lisp shit
    #+BEGIN_SRC emacs-lisp
@@ -577,6 +610,7 @@ see how I like it.
     #+BEGIN_SRC emacs-lisp
     (use-package volatile-highlights
       :ensure t
+      :diminish volatile-highlights-mode
       :config (volatile-highlights-mode t))
     #+END_SRC
 
@@ -682,467 +716,447 @@ see how I like it.
 ** Base Org
   To-file later!
   #+BEGIN_SRC emacs-lisp
-  (require 'use-package)
-                                          ; org-mode
-                                          ; TODO speed-keys?
-  ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-  (use-package org-bullets
-    :ensure t
-    :config
-    (setq org-ellipsis "⤵"))
+    (require 'use-package)
+                                            ; org-mode
+                                            ; TODO speed-keys?
+    ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+    (use-package org-bullets
+      :ensure t
+      :config
+      (setq org-ellipsis "⤵"))
 
-  (use-package org
-    :ensure t
-    :bind (("\C-cl" . org-store-link)
-           ("\C-cl" . org-store-link)
-           ("\C-cb" . org-iswitchb))
-    :config
-    (require 'org-habit)
-    (unbind-key "C-," org-mode-map)       ;expand-region
-    (unbind-key "C-m" org-mode-map)       ;avy
-    (setq org-startup-with-inline-images t)
-    (setq org-pretty-entities t)
-    (add-hook 'org-babel-after-execute-hook 'org-redisplay-inline-images)
+    (use-package ob-async
+      :ensure t)
 
-    (add-hook 'org-mode-hook
-              (lambda ()
-                (org-bullets-mode t)))
+    (use-package org
+      :ensure t
+      :bind (("\C-cl" . org-store-link)
+             ("\C-cb" . org-iswitchb))
+      :config
+      (require 'org-habit)
+      (unbind-key "C-," org-mode-map)       ;expand-region
+      (unbind-key "C-'" org-mode-map)       ;avy
 
-    ;; use enter to follow links instead of C-c C-o
-    (setq org-return-follows-link t)
-
-    ;; NOTE: If this isn't working, make sure to delete /
-    ;; byte-recompile the /elpa/org/.. directory!
-    ;; enable language compiles
-    (org-babel-do-load-languages
-     'org-babel-load-languages
-     '((C . t)
-       (python . t)
-       (sh . t)
-       (emacs-lisp . t)
-       (gnuplot . t)
-       (R . t)))
-    (setq org-confirm-babel-evaluate nil)
-    (setq org-M-RET-may-split-line nil)
-    (setq org-src-fontify-natively t)
-    (setq org-src-tab-acts-natively t)
-    (setq org-edit-src-content-indentation 0)
-    (setq org-src-window-setup 'current-window)
+      (add-hook 'org-mode-hook '(lambda () (org-bullets-mode)) )
 
 
-  ;;;;;;;; file directory setup
-    ;; Org-capture management + Tasks
-    (setq org-directory "~/Dropbox/org/")
+      (setq org-startup-with-inline-images t)
+      (setq org-pretty-entities t)
+      (add-hook 'org-babel-after-execute-hook 'org-redisplay-inline-images)
+      (setq org-use-speed-commands t)
+      ;; NOTE: If this isn't working, make sure to delete /
+      ;; byte-recompile the /elpa/org/.. directory!
+      ;; enable language compiles
+      (org-babel-do-load-languages
+       'org-babel-load-languages
+       '((C . t)
+         (python . t)
+         (sh . t)
+         (emacs-lisp . t)
+         (gnuplot . t)
+         (ipython . t)
+         (R . t)))
+      (setq org-confirm-babel-evaluate nil)
+      (setq org-M-RET-may-split-line nil)
+      (setq org-src-fontify-natively t)
+      (setq org-src-tab-acts-natively t)
+      (setq org-edit-src-content-indentation 0)
+      (set-face-attribute 'org-block nil :background
+                          (color-darken-name
+                           (face-attribute 'default :background) 3))
+      (setq org-src-window-setup 'current-window)
+      (setq ob-async-no-async-languages-alist '("ipython"))
 
-    (defun org-file-path (filename)
-      "Return absolute address of an org file give its relative name."
-      (concat (file-name-as-directory org-directory) filename))
+      ;;;  file directory setup
+      ;; Org-capture management + Tasks
+      (setq org-directory "~/Dropbox/org/")
 
-    (setq org-inbox-file "~/Dropbox/inbox.org")
-    (setq org-index-file (org-file-path "index.org"))
-    (setq org-personal-file (org-file-path "personal.org"))
-    (setq org-school-file (org-file-path "school.org"))
-    (setq org-projects-file (org-file-path "projects.org"))
-    (setq org-journal-file (org-file-path "journal.org"))
-    (setq org-monthly-file (org-file-path "monthly.org"))
-    (setq org-groceries-file (org-file-path "groceries.org"))
-    (setq org-archive-location
-          (concat (org-file-path "archive.org") "::* From %s"))
+      (defun org-file-path (filename)
+        "Return absolute address of an org file give its relative name."
+        (concat (file-name-as-directory org-directory) filename))
 
-    ;; I keep all of my todos in =~/Dropbox/org/index.org= so I derive my
-    ;; agenda from there
-    (setq org-agenda-files
-          (list org-index-file org-personal-file org-school-file
-                org-projects-file
-                org-journal-file (org-file-path "to-read.org")
-                org-monthly-file org-groceries-file))
-    (setq all-org-files
-          (list org-index-file org-personal-file org-school-file
-                org-projects-file org-journal-file
-                org-monthly-file (org-file-path "to-read.org")
-                org-groceries-file))
+      (setq org-inbox-file "~/Dropbox/inbox.org")
+      (setq org-index-file (org-file-path "index.org"))
+      (setq org-personal-file (org-file-path "personal.org"))
+      (setq org-school-file (org-file-path "school.org"))
+      (setq org-projects-file (org-file-path "projects.org"))
+      (setq org-journal-file (org-file-path "journal.org"))
+      (setq org-monthly-file (org-file-path "monthly.org"))
+      (setq org-groceries-file (org-file-path "groceries.org"))
+      (setq org-archive-location
+            (concat (org-file-path "archive.org") "::* From %s"))
 
-    ;; refiling!
-    ;; I like to look at pretty much just up to 3 levels of targets
-    (setq org-refile-targets '((all-org-files :maxlevel . 3)))
+      ;; I keep all of my todos in =~/Dropbox/org/index.org= so I derive my
+      ;; agenda from there
+      (setq org-agenda-files
+            (list org-index-file org-personal-file org-school-file
+                  org-projects-file
+                  org-journal-file (org-file-path "to-read.org")
+                  org-monthly-file org-groceries-file))
+      (setq all-org-files
+            (list org-index-file org-personal-file org-school-file
+                  org-projects-file org-journal-file
+                  org-monthly-file (org-file-path "to-read.org")
+                  org-groceries-file))
 
-    ;; only look at top level headings. Since org-mode represents
-    ;; these as files, this also means that the highest level heading
-    ;; will be the first "file" so to speak
-    (setq org-refile-use-outline-path 'file)
-    (setq org-outline-path-complete-in-steps nil)
+      ;; refiling!
+      ;; I like to look at pretty much just up to 3 levels of targets
+      (setq org-refile-targets '((all-org-files :maxlevel . 3)))
 
-    ;; allow creating new parents on refile
-    (setq org-refile-allow-creating-parent-nodes 'confirm)
-                                          ; todo stuff
-  ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-    (setq org-todo-keywords
-          (quote ((sequence "TODO(t)" "NEXT(n)" "|" "DONE(d)")
-                  (sequence "WAITING(w@/!)" "HOLD(h@/!)" "|" "CANCELLED(c@/!)" "PHONE" "MEETING"))))
+      ;; only look at top level headings. Since org-mode represents
+      ;; these as files, this also means that the highest level heading
+      ;; will be the first "file" so to speak
+      (setq org-refile-use-outline-path 'file)
+      (setq org-outline-path-complete-in-steps nil)
 
-    (setq org-todo-keyword-faces
-          (quote (("TODO" :foreground "red" :weight bold)
-                  ("NEXT" :foreground "DeepSkyBlue1" :weight bold)
-                  ("DONE" :foreground "forest green" :weight bold)
-                  ("WAITING" :foreground "orange" :weight bold)
-                  ("HOLD" :foreground "magenta" :weight bold)
-                  ("CANCELLED" :foreground "forest green" :weight bold)
-                  ("MEETING" :foreground "forest green" :weight bold)
-                  ("PHONE" :foreground "forest green" :weight bold))))
-
-    (setq org-todo-state-tags-triggers
-          (quote (("CANCELLED" ("CANCELLED" . t))
-                  ("WAITING" ("WAITING" . t))
-                  ("HOLD" ("WAITING") ("HOLD" . t))
-                  (done ("WAITING") ("HOLD"))
-                  ("TODO" ("WAITING") ("CANCELLED") ("HOLD"))
-                  ("NEXT" ("WAITING") ("CANCELLED") ("HOLD"))
-                  ("DONE" ("WAITING") ("CANCELLED") ("HOLD")))))
-
-    ;; Place tags close to the right-hand side of the window
-    (add-hook 'org-finalize-agenda-hook 'place-agenda-tags)
-    (defun place-agenda-tags ()
-      "Put the agenda tags by the right border of the agenda window."
-      (setq org-agenda-tags-column (- 4 (window-width)))
-      (org-agenda-align-tags))
-
-    ;; Changing a task state is done with C-c C-t KEY
-    ;; where KEY is the appropriate fast todo state selection key as defined in org-todo-keywords.
-    ;; The setting
-    (setq org-use-fast-todo-selection t)
-
-    ;; allows changing todo states with S-left and S-right skipping all of
-    ;; the normal processing when entering or leaving a todo state. This
-    ;; cycles through the todo states but skips setting timestamps and
-    ;; entering notes which is very convenient when all you want to do is
-    ;; fix up the status of an entry.
-    (setq org-treat-S-cursor-todo-selection-as-state-change nil)
-    (setq to-read-tags '(":learning:" ":books:" ":emacs:" ":research:" ":manga:" ":anime:"
-                         ":ml:" ":sites:" ":games:" ":music:"))
-    (defun lp/refile-to (file headline)
-      "refile to specific spot (headline) in file"
-      (let ((pos (save-excursion
-                   (find-file file)
-                   (org-find-exact-headline-in-buffer headline))))
-        (org-refile nil nil (list headline file nil pos))))
-
-    (defun lp/refile-to-file-with-tag (tag file headline)
-      " Helper function to refile a group of tags to a certain file's headline"
-      (while (not (equal nil (search-forward tag nil t)))
-        (beginning-of-visual-line)
-        (lp/refile-to file headline))
-      (switch-to-buffer "index.org"))
-
-    (defun lp/refile-school ()
-      (lp/refile-to-file-with-tag ":school:" org-school-file "inbox"))
-
-    (defun lp/refile-personal ()
-      (lp/refile-to-file-with-tag ":personal:" org-personal-file "inbox"))
-
-    (defun lp/refile-all-in-index ()
-      (interactive)
-      (beginning-of-buffer)
-      (lp/refile-school)
-      (beginning-of-buffer)
-      (lp/refile-personal)
-      (universal-argument) ;; universal argument is the C-u prefix!
-      (save-some-buffers))
-
-    (defun lp/refile-to-read ()
-      " Invoke on headline of inbox in to-read.org. refiles all tagged entries to respective header"
-      (interactive)
-      ;; do for each tag in our "to-read" tags
-      (dotimes (i (length to-read-tags))
-        ;; Search forward until we can't anymore (no more items with this tag
-        (let ((tag (nth i to-read-tags)))
-          (save-excursion
-            (while (not (equal nil (search-forward tag nil t)))
-              (beginning-of-visual-line)
-              (lp/refile-to (org-file-path "to-read.org") (substring tag 1 -1)))))
-        ))
+      ;; allow creating new parents on refile
+      (setq org-refile-allow-creating-parent-nodes 'confirm)
 
 
-    ;;   (setq-default org-preview-latex-default-process 'dvisvgm
-    ;;                 org-latex-packages-alist '(("" "tikz" t)
-    ;;                                            ("american,siunitx,smartlabels" "circuitikz" t)
-    ;;                                            ("" "mathtools" t))
-    ;;                 org-latex-preview-ltxpng-directory (locate-user-emacs-file "Latex Previews/")
-    ;;                 org-format-latex-options
-    ;;                 '(:foreground default :background default :scale 1.7
-    ;;                               :html-foreground "Black" :html-background "Transparent" :html-scale 1.0
-    ;;                               :matchers ("begin" "$1" "$" "$$" "\\(" "\\["))
-    ;;                 org-preview-latex-process-alist
-    ;;                 '((dvisvgm :programs ("latex" "dvisvgm")
-    ;;                            :description "dvi > svg"
-    ;;                            :message "you need to install the programs: latex and dvisvgm."
-    ;;                            :use-xcolor t
-    ;;                            :image-input-type "dvi"
-    ;;                            :image-output-type "svg"
-    ;;                            :image-size-adjust (1.7 . 1.5)
-    ;;                            :latex-compiler ("latex -interaction nonstopmode -output-directory %o %f")
-    ;;                            :image-converter ("dvisvgm %f -n -b 1 -c %S -o %O"))
-    ;;                   (imagemagick :programs ("latex" "convert")
-    ;;                                :description "pdf > png"
-    ;;                                :message "you need to install the programs: latex and imagemagick."
-    ;;                                :use-xcolor t
-    ;;                                :image-input-type "pdf"
-    ;;                                :image-output-type "png"
-    ;;                                :image-size-adjust (1.0 . 1.0)
-    ;;                                :latex-compiler ("pdflatex -interaction nonstopmode -output-directory %o %f")
-    ;;                                :image-converter ("convert -density %D -trim -antialias %f -quality 100 %O"))
-    ;;                   (dvipng :programs ("latex" "dvipng")
-    ;;                           :description "dvi > png"
-    ;;                           :message "you need to install the programs: latex and dvipng."
-    ;;                           :image-input-type "dvi"
-    ;;                           :image-output-type "png"
-    ;;                           :image-size-adjust (1.0 . 1.0)
-    ;;                           :latex-compiler ("latex -interaction nonstopmode -output-directory %o %f")
-    ;;                           :image-converter ("dvipng -fg %F -bg %B -D %D -T tight -o %O %f")))
-    ;;                 org-format-latex-header
-    ;;                 "\\documentclass{article}
-    ;; \\usepackage[usenames]{color}
-    ;; [PACKAGES]
-    ;; [DEFAULT-PACKAGES]
-    ;; \\pagestyle{empty}
-    ;; \\setlength{\\textwidth}{\\paperwidth}
-    ;; \\addtolength{\\textwidth}{-3cm}
-    ;; \\setlength{\\oddsidemargin}{1.5cm}
-    ;; \\addtolength{\\oddsidemargin}{-2.54cm}
-    ;; \\setlength{\\evensidemargin}{\\oddsidemargin}
-    ;; \\setlength{\\textheight}{\\paperheight}
-    ;; \\addtolength{\\textheight}{-\\headheight}
-    ;; \\addtolength{\\textheight}{-\\headsep}
-    ;; \\addtolength{\\textheight}{-\\footskip}
-    ;; \\addtolength{\\textheight}{-3cm}
-    ;; \\setlength{\\topmargin}{1.5cm}
-    ;; \\addtolength{\\topmargin}{-2.54cm}
-    ;; \\tikzset{every picture/.style={color=fg}}")
+      (setq to-read-tags '(":learning:" ":books:" ":emacs:" ":research:" ":manga:" ":anime:"
+                           ":ml:" ":sites:" ":games:" ":music:"))
 
-    ;; NOTE(nox): Get different latex fragments for different themes
-                                          ; agenda stuff
-  ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-    (setq org-agenda-dim-blocked-tasks nil)
-    (setq org-agenda-compact-blocks t) ;; nil為加上分隔線，t為去掉
-    (setq org-agenda-block-separator 45)
+      (defun lp/refile-to (file headline)
+        "refile to specific spot (headline) in file"
+        (let ((pos (save-excursion
+                     (find-file file)
+                     (org-find-exact-headline-in-buffer headline))))
+          (org-refile nil nil (list headline file nil pos))))
 
-  ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; NOX'S SHIT
-    (defun nox/org-agenda-finalize ()
-      ;; NOTE(nox): Reset project hierarchy builder helper variable
-      (setq nox/org-agenda-first-project t)
+      (defun lp/refile-to-file-with-tag (tag file headline)
+        " Helper function to refile a group of tags to a certain file's headline"
+        (while (not (equal nil (search-forward tag nil t)))
+          (beginning-of-visual-line)
+          (lp/refile-to file headline))
+        (switch-to-buffer "index.org"))
 
-      ;; NOTE(nox): Remove empty blocks
-      (save-excursion
-        (goto-char (point-min))
-        (let ((prev (if (get-text-property (point-min) 'org-agenda-structural-header)
-                        (point-min)
-                      (next-single-property-change (point-min) 'org-agenda-structural-header)))
-              next)
-          (while (and prev (/= prev (point-max)))
-            (setq next
-                  (or (next-single-property-change (next-single-property-change prev 'org-agenda-structural-header)
-                                                   'org-agenda-structural-header)
-                      (point-max)))
-            (if (or (and (< next (point-max)) (< (count-lines prev next) 4))
-                    (and (= next (point-max)) (< (count-lines prev next) 2)))
-                (delete-region prev next)
-              (setq prev next)))))
+      (defun lp/refile-school ()
+        (lp/refile-to-file-with-tag ":school:" org-school-file "inbox"))
 
-      ;; NOTE(nox): Turn root projects bold
-      (save-excursion
-        (while (search-forward (char-to-string ?\u200B) nil t)
-          (add-face-text-property (line-beginning-position) (1+ (line-end-position)) '(:weight bold)))))
-    ;; Custom functions to find the tasks that were done in a file for the past month
-    (require 'calendar)
+      (defun lp/refile-personal ()
+        (lp/refile-to-file-with-tag ":personal:" org-personal-file "inbox"))
 
-    (defun jtc-org-tasks-closed-in-month (&optional month year match-string)
-      "Produces an org agenda tags view list of the tasks completed
-  in the specified month and year. Month parameter expects a number
-  from 1 to 12. Year parameter expects a four digit number. Defaults
-  to the current month when arguments are not provided. Additional search
-  criteria can be provided via the optional match-string argument "
-      (interactive)
-      (let* ((today (calendar-current-date))
-             (for-month (or month (calendar-extract-month today)))
-             (for-year  (or year  (calendar-extract-year today))))
-        (org-tags-view nil
-                       (concat
-                        match-string
-                        (format "+CLOSED>=\"[%d-%02d-01]\""
-                                for-year for-month)
-                        (format "+CLOSED<=\"[%d-%02d-%02d]\""
-                                for-year for-month
-                                (calendar-last-day-of-month for-month for-year))))))
+      (defun lp/refile-all-in-index ()
+        (interactive)
+        (beginning-of-buffer)
+        (lp/refile-school)
+        (beginning-of-buffer)
+        (lp/refile-personal)
+        (universal-argument) ;; universal argument is the C-u prefix!
+        (save-some-buffers))
 
-    (defun jtc-foo-tasks-last-month ()
-      "Produces an org agenda tags view list of all the tasks completed
-  last month with the Category Foo."
-      (interactive)
-      (let* ((today (calendar-current-date))
-             (for-month (calendar-extract-month today))
-             (for-year  (calendar-extract-year today)))
-        (calendar-increment-month for-month for-year -1)
-        (jtc-org-tasks-closed-in-month
-         for-month for-year "+TODO=\"DONE\"")))
+      (defun lp/refile-to-read ()
+        " Invoke on headline of inbox in to-read.org. refiles all tagged entries to respective header"
+        (interactive)
+        ;; do for each tag in our "to-read" tags
+        (dotimes (i (length to-read-tags))
+          ;; Search forward until we can't anymore (no more items with this tag
+          (let ((tag (nth i to-read-tags)))
+            (save-excursion
+              (while (not (equal nil (search-forward tag nil t)))
+                (beginning-of-visual-line)
+                (lp/refile-to (org-file-path "to-read.org") (substring tag 1 -1)))))
+          ))
 
-    ;; AGENDA
-    (setq-default
-     org-agenda-custom-commands
-     '(("n" "Agenda"
-        ((agenda ""
-                 ((org-agenda-files (list org-index-file
-                                          org-personal-file org-school-file
-                                          org-projects-file org-journal-file
-                                          org-monthly-file org-groceries-file
-                                          ))
-                  (org-agenda-skip-scheduled-if-deadline-is-shown t)))
-         (tags-todo "-REFILE-CANCELLED-WAITING-HOLD/!-DONE-HOLD"
-                    ((org-agenda-overriding-header "To-File Files (index.org)")
-                     (org-tags-match-list-sublevels nil)
-                     (org-agenda-files (list org-index-file))))
-         (tags "cs73|cs87|research|cs"
-               ((org-agenda-overriding-header "CS Work")
-                (org-tags-match-list-sublevels nil)
-                (org-agenda-files (list org-school-file))))
-         ;; (tags "jpns" ----- rip jpns..
-         ;;       ((org-agenda-overriding-header "JPNS")
-         ;;        (org-tags-match-list-sublevels nil)
-         ;;        (org-agenda-files (list org-school-file))))
-         (tags "Physics"
-               ((org-agenda-overriding-header "physics")
-                (org-tags-match-list-sublevels nil)
-                (org-agenda-files (list org-school-file))))
-         (tags "math"
-               ((org-agenda-overriding-header "Math")
-                (org-tags-match-list-sublevels nil)
-                (org-agenda-files (list org-school-file))))
-         (tags "kizuna|smash|outsiders"
-               ((org-agenda-overriding-header "Clubs")
-                (org-tags-match-list-sublevels nil)
-                (org-agenda-files (list org-school-file))))
-         (tags-todo "-REFILE-CANCELLED-WAITING-HOLD/!-DONE-HOLD"
-                    ((org-agenda-overriding-header "Personal Stuff")
-                     (org-tags-match-list-sublevels nil)
-                     (org-agenda-files (list org-personal-file))))))
+                                            ; todo stuff
+    ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+      (setq org-todo-keywords
+            (quote ((sequence "TODO(t)" "NEXT(n)" "|" "DONE(d)")
+                    (sequence "WAITING(w@/!)" "HOLD(h@/!)" "|" "CANCELLED(c@/!)" "PHONE" "MEETING"))))
 
-       ("t" "To Read Stuff"
-        ((tags-todo "music/!-DONE-HOLD"
-                    ((org-agenda-overriding-header "Music")
-                     (orgs-tags-match-list-sublevels nil)
-                     (org-agenda-files (list (org-file-path "to-read.org")))))
-         (tags-todo "anime/!-DONE-HOLD"
-                    ((org-agenda-overriding-header "Anime")
-                     (orgs-tags-match-list-sublevels nil)
-                     (org-agenda-files (list (org-file-path "to-read.org")))))
-         (tags-todo "sites/!-DONE-HOLD"
-                    ((org-agenda-overriding-header "Sites ")
-                     (orgs-tags-match-list-sublevels nil)
-                     (org-agenda-files (list (org-file-path "to-read.org")))))
-         (tags-todo "research/!-DONE-HOLD"
-                    ((org-agenda-overriding-header "Research Papers")
-                     (orgs-tags-match-list-sublevels nil)
-                     (org-agenda-files (list (org-file-path "to-read.org")))))
-         (tags-todo "manga/!-DONE-HOLD"
-                    ((org-agenda-overriding-header "Manga")
-                     (orgs-tags-match-list-sublevels nil)
-                     (org-agenda-files (list (org-file-path "to-read.org")))))
-         (tags-todo "learning/!-DONE-HOLD"
-                    ((org-agenda-overriding-header "Things to Learn")
-                     (orgs-tags-match-list-sublevels nil)
-                     (org-agenda-files (list (org-file-path "to-read.org")))))
-         (tags-todo "books-learning/!-DONE-HOLD-WAITING"
-                    ((org-agenda-overriding-header "Books")
-                     (orgs-tags-match-list-sublevels nil)
-                     (org-agenda-files (list (org-file-path "to-read.org"))))))))
-     org-agenda-span 'week
-     org-agenda-prefix-format '((agenda . "  %?-12t% s")
-                                (todo   . "  ")
-                                (tags   . "  ")
-                                (search . "  "))
-     org-agenda-skip-deadline-prewarning-if-scheduled 'pre-scheduled
-     org-agenda-tags-todo-honor-ignore-options t
-     org-agenda-clockreport-parameter-plist `(:link t :maxlevel 6 :fileskip0 t :compact t :narrow 100)
-     org-agenda-dim-blocked-tasks nil
-     org-agenda-block-separator ""
-                                          ;   org-agenda-time-grid '((daily today require-timed) nil "......" "----------------")
-     )
-    ;; Custom agenda command definitions
-    (add-hook 'org-finalize-agenda-hook 'nox/org-agenda-finalize)
-    (setq org-tags-match-list-sublevels t)
+      (setq org-todo-keyword-faces
+            (quote (("TODO" :foreground "red" :weight bold)
+                    ("NEXT" :foreground "DeepSkyBlue1" :weight bold)
+                    ("DONE" :foreground "forest green" :weight bold)
+                    ("WAITING" :foreground "orange" :weight bold)
+                    ("HOLD" :foreground "magenta" :weight bold)
+                    ("CANCELLED" :foreground "forest green" :weight bold)
+                    ("MEETING" :foreground "forest green" :weight bold)
+                    ("PHONE" :foreground "forest green" :weight bold))))
 
-    ;; Function to skip tag
-    ;; From http://stackoverflow.com/questions/10074016/org-mode-filter-on-tag-in-agenda-view
+      (setq org-todo-state-tags-triggers
+            (quote (("CANCELLED" ("CANCELLED" . t))
+                    ("WAITING" ("WAITING" . t))
+                    ("HOLD" ("WAITING") ("HOLD" . t))
+                    (done ("WAITING") ("HOLD"))
+                    ("TODO" ("WAITING") ("CANCELLED") ("HOLD"))
+                    ("NEXT" ("WAITING") ("CANCELLED") ("HOLD"))
+                    ("DONE" ("WAITING") ("CANCELLED") ("HOLD")))))
 
-    ;; Bind C-c C-x C-s to mark todo as done and archive it
-    (defun lp/mark-done-and-archive ()
-      "Mark the state of an org-mode item as DONE and archive it"
-      (interactive)
-      (org-todo 'done)
-      (org-archive-subtree))
+      ;; Place tags close to the right-hand side of the window
+      (add-hook 'org-finalize-agenda-hook 'place-agenda-tags)
+      (defun place-agenda-tags ()
+        "Put the agenda tags by the right border of the agenda window."
+        (setq org-agenda-tags-column (- 4 (window-width)))
+        (org-agenda-align-tags))
 
-    (define-key org-mode-map (kbd "C-c C-x C-s") 'lp/mark-done-and-archive)
-    (setq org-log-done 'time)   ; also record when the TODO was archived
+      ;; Changing a task state is done with C-c C-t KEY
+      ;; where KEY is the appropriate fast todo state selection key as defined in org-todo-keywords.
+      ;; The setting
+      (setq org-use-fast-todo-selection t)
 
-    (setq org-capture-templates
-          '(("g" "Groceries"
-             entry
-             (file "~/Dropbox/org/groceries.org")
-             "- [ ] %?\n")
-            ("i" "Ideas"
-             entry
-             (file+headline "~/Dropbox/org/ideas.org" "Project Ideas")
-             "** [#%^{9}] %?\n")
-            ("j" "Journal"
-             entry
-             (file+datetree "~/Dropbox/org/journal.org")
-             "** %U :journal:\n%?\n good things that happened today?\n")
-            ("t" "to-read"
-             entry
-             (file+headline "~/Dropbox/org/to-read.org" "inbox")
-             "** TODO %^{to-read}  %^g\n %U")
-            ("z" "Todo"
-             entry
-             (file+headline org-index-file "Tasks")
-             "* TODO %^{Task} %^G\n %U\n%?")
-            ("p" "Personal todo"
-             entry
-             (file+headline org-personal-file "general")
-             "* TODO %^{Task} %^g\n %?")))
+      ;; allows changing todo states with S-left and S-right skipping all of
+      ;; the normal processing when entering or leaving a todo state. This
+      ;; cycles through the todo states but skips setting timestamps and
+      ;; entering notes which is very convenient when all you want to do is
+      ;; fix up the status of an entry.
+      (setq org-treat-S-cursor-todo-selection-as-state-change nil)
 
-  ;;; Org Keybindings
-    ;; Useful keybinds
-    (define-key global-map (kbd "C-c a") 'org-agenda)
-    (define-key global-map (kbd "C-c c") 'org-capture)
+      ;;   (setq-default org-preview-latex-default-process 'dvisvgm
+      ;;                 org-latex-packages-alist '(("" "tikz" t)
+      ;;                                            ("american,siunitx,smartlabels" "circuitikz" t)
+      ;;                                            ("" "mathtools" t))
+      ;;                 org-latex-preview-ltxpng-directory (locate-user-emacs-file "Latex Previews/")
+      ;;                 org-format-latex-options
+      ;;                 '(:foreground default :background default :scale 1.7
+      ;;                               :html-foreground "Black" :html-background "Transparent" :html-scale 1.0
+      ;;                               :matchers ("begin" "$1" "$" "$$" "\\(" "\\["))
+      ;;                 org-preview-latex-process-alist
+      ;;                 '((dvisvgm :programs ("latex" "dvisvgm")
+      ;;                            :description "dvi > svg"
+      ;;                            :message "you need to install the programs: latex and dvisvgm."
+      ;;                            :use-xcolor t
+      ;;                            :image-input-type "dvi"
+      ;;                            :image-output-type "svg"
+      ;;                            :image-size-adjust (1.7 . 1.5)
+      ;;                            :latex-compiler ("latex -interaction nonstopmode -output-directory %o %f")
+      ;;                            :image-converter ("dvisvgm %f -n -b 1 -c %S -o %O"))
+      ;;                   (imagemagick :programs ("latex" "convert")
+      ;;                                :description "pdf > png"
+      ;;                                :message "you need to install the programs: latex and imagemagick."
+      ;;                                :use-xcolor t
+      ;;                                :image-input-type "pdf"
+      ;;                                :image-output-type "png"
+      ;;                                :image-size-adjust (1.0 . 1.0)
+      ;;                                :latex-compiler ("pdflatex -interaction nonstopmode -output-directory %o %f")
+      ;;                                :image-converter ("convert -density %D -trim -antialias %f -quality 100 %O"))
+      ;;                   (dvipng :programs ("latex" "dvipng")
+      ;;                           :description "dvi > png"
+      ;;                           :message "you need to install the programs: latex and dvipng."
+      ;;                           :image-input-type "dvi"
+      ;;                           :image-output-type "png"
+      ;;                           :image-size-adjust (1.0 . 1.0)
+      ;;                           :latex-compiler ("latex -interaction nonstopmode -output-directory %o %f")
+      ;;                           :image-converter ("dvipng -fg %F -bg %B -D %D -T tight -o %O %f")))
+      ;;                 org-format-latex-header
+      ;;                 "\\documentclass{article}
+      ;; \\usepackage[usenames]{color}
+      ;; [PACKAGES]
+      ;; [DEFAULT-PACKAGES]
+      ;; \\pagestyle{empty}
+      ;; \\setlength{\\textwidth}{\\paperwidth}
+      ;; \\addtolength{\\textwidth}{-3cm}
+      ;; \\setlength{\\oddsidemargin}{1.5cm}
+      ;; \\addtolength{\\oddsidemargin}{-2.54cm}
+      ;; \\setlength{\\evensidemargin}{\\oddsidemargin}
+      ;; \\setlength{\\textheight}{\\paperheight}
+      ;; \\addtolength{\\textheight}{-\\headheight}
+      ;; \\addtolength{\\textheight}{-\\headsep}
+      ;; \\addtolength{\\textheight}{-\\footskip}
+      ;; \\addtolength{\\textheight}{-3cm}
+      ;; \\setlength{\\topmargin}{1.5cm}
+      ;; \\addtolength{\\topmargin}{-2.54cm}
+      ;; \\tikzset{every picture/.style={color=fg}}")
 
-    ;; Hit C-c i to open up my todo list.
-    (defun lp/open-index-file ()
-      "Open the org TODO list."
-      (interactive)
-      (find-file org-index-file)
-      (flycheck-mode -1)
-      (end-of-buffer))
+      ;; NOTE(nox): Get different latex fragments for different themes
+                                            ; agenda stuff
+    ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+      (setq org-agenda-dim-blocked-tasks nil)
+      (setq org-agenda-compact-blocks t)
+      (setq org-agenda-block-separator 45)
+      ;; Check out NOX for stuff
+      (require 'calendar)
 
-    (global-set-key (kbd "C-c i") 'lp/open-index-file)
+      (defun jtc-org-tasks-closed-in-month (&optional month year match-string)
+        "Produces an org agenda tags view list of the tasks completed
+    in the specified month and year. Month parameter expects a number
+    from 1 to 12. Year parameter expects a four digit number. Defaults
+    to the current month when arguments are not provided. Additional search
+    criteria can be provided via the optional match-string argument "
+        (interactive)
+        (let* ((today (calendar-current-date))
+               (for-month (or month (calendar-extract-month today)))
+               (for-year  (or year  (calendar-extract-year today))))
+          (org-tags-view nil
+                         (concat
+                          match-string
+                          (format "+CLOSED>=\"[%d-%02d-01]\""
+                                  for-year for-month)
+                          (format "+CLOSED<=\"[%d-%02d-%02d]\""
+                                  for-year for-month
+                                  (calendar-last-day-of-month for-month for-year))))))
 
-    (defun lp/org-capture-todo ()
-      (interactive)
-      (org-capture :keys "z"))
+      (defun jtc-foo-tasks-last-month ()
+        "Produces an org agenda tags view list of all the tasks completed
+    last month with the Category Foo."
+        (interactive)
+        (let* ((today (calendar-current-date))
+               (for-month (calendar-extract-month today))
+               (for-year  (calendar-extract-year today)))
+          (calendar-increment-month for-month for-year -1)
+          (jtc-org-tasks-closed-in-month
+           for-month for-year "+TODO=\"DONE\"")))
 
-    (defun lp/open-full-agenda()
-      (interactive)
-      (org-agenda :keys "n")
-      (delete-other-windows))
+      ;; AGENDA
+      (setq-default
+       org-agenda-custom-commands
+       '(("n" "Agenda"
+          ((agenda ""
+                   ((org-agenda-files (list org-index-file
+                                            org-personal-file org-school-file
+                                            org-projects-file org-journal-file
+                                            org-monthly-file org-groceries-file
+                                            ))
+                    (org-agenda-skip-scheduled-if-deadline-is-shown t)))
+           (tags-todo "-REFILE-CANCELLED-WAITING-HOLD/!-DONE-HOLD"
+                      ((org-agenda-overriding-header "To-File Files (index.org)")
+                       (org-tags-match-list-sublevels nil)
+                       (org-agenda-files (list org-index-file))))
+           (tags "cs73|cs87|research|cs"
+                 ((org-agenda-overriding-header "CS Work")
+                  (org-tags-match-list-sublevels nil)
+                  (org-agenda-files (list org-school-file))))
+           ;; (tags "jpns" ----- rip jpns..
+           ;;       ((org-agenda-overriding-header "JPNS")
+           ;;        (org-tags-match-list-sublevels nil)
+           ;;        (org-agenda-files (list org-school-file))))
+           (tags "physics"
+                 ((org-agenda-overriding-header "Physics")
+                  (org-tags-match-list-sublevels nil)
+                  (org-agenda-files (list org-school-file))))
+           (tags "math"
+                 ((org-agenda-overriding-header "Math")
+                  (org-tags-match-list-sublevels nil)
+                  (org-agenda-files (list org-school-file))))
+           (tags "kizuna|smash|outsiders"
+                 ((org-agenda-overriding-header "Clubs")
+                  (org-tags-match-list-sublevels nil)
+                  (org-agenda-files (list org-school-file))))
+           (tags-todo "-REFILE-CANCELLED-WAITING-HOLD/!-DONE-HOLD"
+                      ((org-agenda-overriding-header "Personal Stuff")
+                       (org-tags-match-list-sublevels nil)
+                       (org-agenda-files (list org-personal-file))))))
 
-    (global-set-key (kbd "M-n") 'lp/org-capture-todo)
-    (global-set-key (kbd "<f1>") 'lp/open-full-agenda)
+         ("t" "To Read Stuff"
+          ((tags-todo "music/!-DONE-HOLD"
+                      ((org-agenda-overriding-header "Music")
+                       (orgs-tags-match-list-sublevels nil)
+                       (org-agenda-files (list (org-file-path "to-read.org")))))
+           (tags-todo "anime/!-DONE-HOLD"
+                      ((org-agenda-overriding-header "Anime")
+                       (orgs-tags-match-list-sublevels nil)
+                       (org-agenda-files (list (org-file-path "to-read.org")))))
+           (tags-todo "sites/!-DONE-HOLD"
+                      ((org-agenda-overriding-header "Sites ")
+                       (orgs-tags-match-list-sublevels nil)
+                       (org-agenda-files (list (org-file-path "to-read.org")))))
+           (tags-todo "research/!-DONE-HOLD"
+                      ((org-agenda-overriding-header "Research Papers")
+                       (orgs-tags-match-list-sublevels nil)
+                       (org-agenda-files (list (org-file-path "to-read.org")))))
+           (tags-todo "manga/!-DONE-HOLD"
+                      ((org-agenda-overriding-header "Manga")
+                       (orgs-tags-match-list-sublevels nil)
+                       (org-agenda-files (list (org-file-path "to-read.org")))))
+           (tags-todo "learning/!-DONE-HOLD"
+                      ((org-agenda-overriding-header "Things to Learn")
+                       (orgs-tags-match-list-sublevels nil)
+                       (org-agenda-files (list (org-file-path "to-read.org")))))
+           (tags-todo "books-learning/!-DONE-HOLD-WAITING"
+                      ((org-agenda-overriding-header "Books")
+                       (orgs-tags-match-list-sublevels nil)
+                       (org-agenda-files (list (org-file-path "to-read.org"))))))))
+       org-agenda-span 'week
+       org-agenda-prefix-format '((agenda . "  %?-12t% s")
+                                  (todo   . "  ")
+                                  (tags   . "  ")
+                                  (search . "  "))
+       org-agenda-skip-deadline-prewarning-if-scheduled 'pre-scheduled
+       org-agenda-tags-todo-honor-ignore-options t
+       org-agenda-clockreport-parameter-plist `(:link t :maxlevel 6 :fileskip0 t :compact t :narrow 100)
+       org-agenda-dim-blocked-tasks nil
+       org-agenda-block-separator ""
+                                            ;org-agenda-time-grid '((daily today require-timed) nil "......" "----------------")
+       )
+      ;; Custom agenda command definitions
+      (setq org-tags-match-list-sublevels t)
+
+      ;; Function to skip tag
+      ;; From http://stackoverflow.com/questions/10074016/org-mode-filter-on-tag-in-agenda-view
+
+      ;; Bind C-c C-x C-s to mark todo as done and archive it
+      (defun lp/mark-done-and-archive ()
+        "Mark the state of an org-mode item as DONE and archive it"
+        (interactive)
+        (org-todo 'done)
+        (org-archive-subtree))
+
+      (define-key org-mode-map (kbd "C-c C-x C-s") 'lp/mark-done-and-archive)
+      (setq org-log-done 'time)   ; also record when the TODO was archived
+
+      (setq org-capture-templates
+            '(("g" "Groceries"
+               entry
+               (file "~/Dropbox/org/groceries.org")
+               "- [ ] %?\n")
+              ("i" "Ideas"
+               entry
+               (file+headline "~/Dropbox/org/ideas.org" "Project Ideas")
+               "** [#%^{9}] %?\n")
+              ("j" "Journal"
+               entry
+               (file+datetree "~/Dropbox/org/journal.org")
+               "** %U :journal:\n%?\n good things that happened today?\n")
+              ("t" "to-read"
+               entry
+               (file+headline "~/Dropbox/org/to-read.org" "inbox")
+               "** TODO %^{to-read}  %^g\n %U")
+              ("z" "Todo"
+               entry
+               (file+headline org-index-file "Tasks")
+               "* TODO %^{Task} %^G\n %U\n%?")
+              ("p" "Personal todo"
+               entry
+               (file+headline org-personal-file "general")
+               "* TODO %^{Task} %^g\n %?")))
+
+    ;;; Org Keybindings
+      ;; Useful keybinds
+      (define-key global-map (kbd "C-c a") 'org-agenda)
+      (define-key global-map (kbd "C-c c") 'org-capture)
 
 
-    ;; Auto wrap paragraphs in some modes (auto-fill-mode)
-    (add-hook 'text-mode-hook 'turn-on-auto-fill)
-    (add-hook 'org-mode-hook 'turn-on-auto-fill)
 
-    ;; sometimes i don't want to wrap text though, so we will toggle
-    ;; with C-c q
-    (global-set-key (kbd "C-c q") 'auto-fill-mode))
+      (defun lp/org-capture-todo ()
+        (interactive)
+        (org-capture :keys "z"))
+
+      (defun lp/open-full-agenda()
+        (interactive)
+        (org-agenda :keys "n")
+        (delete-other-windows))
+
+      (global-set-key (kbd "M-n") 'lp/org-capture-todo)
+      (global-set-key (kbd "<f1>") 'lp/open-full-agenda)
+
+
+      ;; Auto wrap paragraphs in some modes (auto-fill-mode)
+      (add-hook 'text-mode-hook 'turn-on-auto-fill)
+      (add-hook 'org-mode-hook 'turn-on-auto-fill)
+
+      ;; sometimes i don't want to wrap text though, so we will toggle
+      ;; with C-c q
+      (global-set-key (kbd "C-c q") 'auto-fill-mode)
+
+      ;; Hit C-c i to open up my todo list.
+      (defun lp/open-index-file ()
+        "Open the org TODO list."
+        (interactive)
+        (find-file org-index-file)
+        (flycheck-mode -1)
+        (end-of-buffer))
+
+      (global-set-key (kbd "C-c i") 'lp/open-index-file))
   #+END_SRC
 
   #+RESULTS:
@@ -1151,10 +1165,10 @@ see how I like it.
 ** TODO  research in org - organize - also pdftools
    #+BEGIN_SRC emacs-lisp
    ;; pdf-tools init
-   ;; (use-package pdf-tools
-   ;;   :ensure t
-   ;;   :config
-   ;;   (pdf-tools-install))
+    (use-package pdf-tools
+      :ensure t
+      :config
+      (pdf-tools-install))
 
    ;; org-ref
    (use-package bibtex-utils
@@ -1204,40 +1218,41 @@ see how I like it.
 *** dired+
     Currently have no idea on how to get dired+ working. Left here as
     a reminder to do that.
-*** recentf
-    recentf is good stuff. Stores the recently visited files, etc and
-    allows them to be selected in the buffer ("C-x b, C-x C-b") menu.
-    #+BEGIN_SRC emacs-lisp
-      (use-package recentf
-        :ensure t
-        :config
-        (recentf-mode)
-        (setq
-         recentf-max-menu-items 15
-         recentf-max-saved-items 200
-         recentf-auto-cleanup 300
-            recentf-exclude (list "/\\.git/.*\\'"     ; Git contents
-                               "/elpa/.*\\'"       ; Package files
-                               ;; And all other kinds of boring files
-                               #'ignoramus-boring-p)))
-    #+END_SRC
-*** ztree
-    cute tree navigation of file systems. Dangerous to change
-    something into ztree mode.. Don't do it
-    #+BEGIN_SRC emacs-lisp
-      (use-package ztree
-        :ensure t)
-    #+END_SRC
-*** vlf
-    very large files. dangerous. we'll need help with that. helps for
-    handling massive shit.
-    #+BEGIN_SRC emacs-lisp
-      (use-package vlf
-        :ensure t
-        :config
-        (setq vlf-application 'dont-ask) ; please don't ask wehn you open a big file
-        )
-    #+END_SRC
+** recentf
+   recentf is good stuff. Stores the recently visited files, etc and
+   allows them to be selected in the buffer ("C-x b, C-x C-b") menu.
+   #+BEGIN_SRC emacs-lisp
+     (use-package recentf
+       :ensure t
+       :config
+       (recentf-mode)
+       (setq
+        recentf-max-menu-items 15
+        recentf-max-saved-items 200
+        recentf-auto-cleanup 300
+           recentf-exclude (list "/\\.git/.*\\'"     ; Git contents
+                              "/elpa/.*\\'"       ; Package files
+                              ;; And all other kinds of boring files
+                              #'ignoramus-boring-p)))
+   #+END_SRC
+** vlf
+   very large files. dangerous. we'll need help with that. helps for
+   handling massive shit.
+   #+BEGIN_SRC emacs-lisp
+     (use-package vlf
+       :ensure t
+       :config
+       (setq vlf-application 'dont-ask) ; please don't ask wehn you open a big file
+       )
+   #+END_SRC
+** ediff
+   ediff is good. self explanatory. Should probably learn how to use
+   this at some ponit though..
+   #+BEGIN_SRC emacs-lisp
+     (setq ediff-diff-options "-w"
+           ediff-split-window-function 'split-window-horizontally
+           ediff-window-setup-function 'ediff-setup-windows-plain)
+   #+END_SRC
 * External
 ** Flyspell
    flyspell to make sure we're actually spelling things correctly. can
@@ -1301,7 +1316,7 @@ see how I like it.
        (interactive)
        (let ((is-term (string= "term-mode" major-mode))
              (is-running (term-check-proc (buffer-name)))
-             (term-cmd "/bin/zsh")
+             (term-cmd "/bin/sh")
              (anon-term (get-buffer "*ansi-term*")))
          (if is-term
              (if is-running
@@ -1322,26 +1337,28 @@ see how I like it.
 
      (global-set-key (kbd "<f2>") 'visit-ansi-term)
    #+END_SRC
+
 * Programming
 ** C/C++
    some basic setup for C mode stuff. There are number of different
    styles we can choose from for the default, so we'll be using linux
    one.
    #+BEGIN_SRC emacs-lisp
-    ;; Available C style:
-    ;; “gnu”: The default style for GNU projects
-    ;; “k&r”: What Kernighan and Ritchie, the authors of C used in their book
-    ;; “bsd”: What BSD developers use, aka “Allman style” after Eric Allman.
-    ;; “whitesmith”: Popularized by the examples that came with Whitesmiths C, an early commercial C compiler.
-    ;; “stroustrup”: What Stroustrup, the author of C++ used in his book
-    ;; “ellemtel”: Popular C++ coding standards as defined by “Programming in C++, Rules and Recommendations,” Erik Nyquist and Mats Henricson, Ellemtel
-    ;; “linux”: What the Linux developers use for kernel development
-    ;; “python”: What Python developers use for extension modules
-    ;; “java”: The default style for java-mode (see below)
-    ;; “user”: When you want to define your own style
-    (setq c-default-style "linux" ; set style to "linux"
-          c-basic-offset 4)
-    (add-hook 'c-mode-common-hook 'hs-minor-mode)
+   ;; Available C style:
+   ;; “gnu”: The default style for GNU projects
+   ;; “k&r”: What Kernighan and Ritchie, the authors of C used in their book
+   ;; “bsd”: What BSD developers use, aka “Allman style” after Eric Allman.
+   ;; “whitesmith”: Popularized by the examples that came with Whitesmiths C, an early commercial C compiler.
+   ;; “stroustrup”: What Stroustrup, the author of C++ used in his book
+   ;; “ellemtel”: Popular C++ coding standards as defined by “Programming in C++, Rules and Recommendations,” Erik Nyquist and Mats Henricson, Ellemtel
+   ;; “linux”: What the Linux developers use for kernel development
+   ;; “python”: What Python developers use for extension modules
+   ;; “java”: The default style for java-mode (see below)
+   ;; “user”: When you want to define your own style
+   (setq c-default-style "linux" ; set style to "linux"
+         c-basic-offset 4)
+
+   (add-hook 'c-mode-common-hook 'hs-minor-mode)
   #+END_SRC
 
 
@@ -1358,73 +1375,69 @@ see how I like it.
    things. It may slow things down though so we'll see if I end up
    keeping it or not. I assume that elpy provides a lot of the
    expected useful editing features that we would want with this kind
-   of language 
+   of language
 *** elpy
-   #+BEGIN_SRC emacs-lisp
-     (use-package elpy
-       :ensure t
-       :defer t)
-   #+END_SRC
+    #+BEGIN_SRC emacs-lisp
+    (use-package elpy
+      :ensure t
+      :defer t)
+    #+END_SRC
+
 *** standard python setup
     #+BEGIN_SRC emacs-lisp
-      (use-package python
-        :ensure t
-        :defer t
-        :mode ("\\.py\\'" . python-mode)
-        :interpreter ("python" . python-mode)
-        :config
-        (elpy-enable)
-        (setq python-indent-offset 4))
+    (use-package python
+      :ensure t
+      :defer t
+      :mode ("\\.py\\'" . python-mode)
+      :interpreter ("python" . python-mode)
+      :config
+      (elpy-enable)
+      (setq python-indent-offset 4)
+      (setq python-shell-interpreter "ipython"
+            python-shell-interpreter-args "-i --simple-prompt"))
     #+END_SRC
-*** company-jedi
+*** company-jedi - DISABLED!!
     #+BEGIN_SRC emacs-lisp
-      (use-package company-jedi
-        :ensure t
-        :after python
-        :init
-        (defun my/python-mode-hook ()
-          (add-to-list 'company-backends 'company-jedi))
-        (add-hook 'python-mode-hook 'my/python-mode-hook)
-        )
-
+    (use-package company-jedi
+      :ensure t
+      :disabled t
+      :after python
+      :init
+      (defun my/python-mode-hook ()
+        (add-to-list 'company-backends 'company-jedi))
+      (add-hook 'python-mode-hook 'my/python-mode-hook))
     #+END_SRC
-** ediff
-   ediff is good. self explanatory. Should probably learn how to use
-   this at some ponit though..
-   #+BEGIN_SRC emacs-lisp
-     (setq ediff-diff-options "-w"
-           ediff-split-window-function 'split-window-horizontally
-           ediff-window-setup-function 'ediff-setup-windows-plain)
-   #+END_SRC
-** magit
-   Magit's the best. Keep it rolling.
-   #+BEGIN_SRC emacs-lisp
-     (use-package magit
-       :ensure t)
-   #+END_SRC
+*** pyenv
+    #+BEGIN_SRC emacs-lisp
+    (use-package pyenv-mode
+      :ensure t)
+    #+END_SRC
+** haskell
 
-   and also git-gutter to know what we haven't committed yet
    #+BEGIN_SRC emacs-lisp
-   ;; More info here: [[https://github.com/syohex/emacs-git-gutter]]
-   (use-package git-gutter ; TODO - git gutter keybinds, going to different hunks and staging only certain portions!
-     :ensure t
-     :disabled t
-     :diminish git-gutter-mode
-     :config
-     (global-git-gutter-mode +1))
+   (use-package haskell-mode
+        :ensure t
+        :hook (haskell-mode . #'hident-mode))
    #+END_SRC
 
 ** flycheck
    flycheck helps to catch easy to find errors.
    #+BEGIN_SRC emacs-lisp
    (use-package flycheck
-     :ensure ;TODO: 
+     :ensure ;TODO:
      :config
      (add-hook 'after-init-hook #'global-flycheck-mode))
 
    (use-package flycheck-tip
      :ensure t)
-
+   #+END_SRC
+** magit
+   Magit's the best. Keep it rolling.
+   #+BEGIN_SRC emacs-lisp
+   (use-package magit
+     :ensure t
+     :config
+     (global-set-key (kbd "C-x g") 'magit))
    #+END_SRC
 ** lisps
 *** paredit
@@ -1435,6 +1448,7 @@ see how I like it.
    (use-package paredit
      :ensure t)
    #+END_SRC
+
 *** rainbow delimiters
     In case you couldn't tell which parenthesis/whatever were matched
     with what, here they are color coated! How nice.
@@ -1442,8 +1456,8 @@ see how I like it.
     (use-package rainbow-delimiters
       :ensure t)
     #+END_SRC
+
 *** hooks into pared+rainbows
-    Hooks to add paredit/rainbow-delimiters to lispy modes.
     #+BEGIN_SRC emacs-lisp
       ;; We want all lispy languages to use =paredit-mode= and =rainbow-delimiters
       (setq lisp-mode-hooks
@@ -1457,6 +1471,7 @@ see how I like it.
                          (paredit-mode)
                          (rainbow-delimiters-mode))))
     #+END_SRC
+    Hooks to add paredit/rainbow-delimiters to lispy modes.
 
 ** iedit
    Better MC editing. Allows for batch editing of any highlighted text
@@ -1466,32 +1481,6 @@ see how I like it.
    (use-package iedit
      :ensure t
      :config
-     (defun ap/iedit-or-flyspell ()
-       "Call `iedit-mode' or correct misspelling with flyspell, depending..."
-       (interactive)
-       (if (or iedit-mode
-               (and (derived-mode-p 'prog-mode)
-                    (not (or (nth 4 (syntax-ppss))
-                             (nth 3 (syntax-ppss))))))
-           ;; prog-mode is active and point is in a comment, string, or
-           ;; already in iedit-mode
-           (call-interactively #'ap/iedit-mode)
-         ;; Not prog-mode or not in comment or string
-         (if (not (equal flyspell-previous-command this-command))
-             ;; FIXME: This mostly works, but if there are two words on the
-             ;; same line that are misspelled, it doesn't work quite right
-             ;; when correcting the earlier word after correcting the later
-             ;; one
-
-             ;; First correction; autocorrect
-             (call-interactively 'flyspell-auto-correct-previous-word)
-           ;; First correction was not wanted; use popup to choose
-           (progn
-             (save-excursion
-               (undo)) ; This doesn't move point, which I think may be the problem.
-             (flyspell-region (line-beginning-position) (line-end-position))
-             (call-interactively 'flyspell-correct-previous-word-generic)))))
-
      (defun ap/iedit-mode (orig-fn)
        "Call `iedit-mode' with function-local scope by default, or global scope if called with a universal prefix."
        (interactive)
@@ -1503,21 +1492,22 @@ see how I like it.
      ;; Override default `iedit-mode' function with advice.
      (advice-add #'iedit-mode :around #'ap/iedit-mode)
 
-     (global-set-key (kbd "C-:") #'iedit-mode)
-     )
+     (global-set-key (kbd "C-:") #'iedit-mode))
    #+END_SRC
-** aggressive-indent
+** aggressive-indent - DISABLED
    sometimes you want the indent to fight back. Keep everything in
    line you know. This does it.
 
    It's a little finicky with python in my experiences but who knows
    if that's just my fault.
    #+BEGIN_SRC emacs-lisp
-     (use-package aggressive-indent
-       :ensure t
-       :diminish aggressive-indent-mode
-       :hook ((emacs-lisp-mode css-mode c-mode c++-mode sh-mode) . aggressive-indent-mode))
+   (use-package aggressive-indent
+     :ensure t
+     :disabled t
+     :diminish aggressive-indent-mode
+     :hook ((emacs-lisp-mode css-mode c-mode c++-mode sh-mode) . aggressive-indent-mode))
    #+END_SRC
+
 * eshell
   Eshell is a really nice shell that leverages the lispyness that
   you'd want from emacs and all that. Work very well with tramp which
@@ -1560,24 +1550,16 @@ see how I like it.
    Not very good at working with projectile, but maybe that's because
    I don't have many projects. Will start to leverage this when I have
    a reasonable basis of projects to work with.
-   #+BEGIN_SRC emacs-lisp
-     (use-package projectile
-       :ensure t
-       :config
-       (projectile-global-mode)
-       (setq projectile-completion-system 'helm)
-       (setq projectile-switch-project-action 'helm-projectile-find-file)
-       (setq projectile-switch-project-action 'helm-projectile)
-       (setq projectile-enable-caching t))
-   #+END_SRC
 ** Company
    Autocompletion framework. Trying out this configuration since it
    seems to succesfully incorporate the functionality of ignoring the
    autocomplete at hand. Usually I have to fight with it even if I
    don't want to autocomplete something..
+
    #+BEGIN_SRC emacs-lisp
    (use-package company
      :ensure t
+     :disabled t
      :init
      (setq company-minimum-prefix-length 3)
      (setq company-auto-complete nil)
@@ -1608,622 +1590,6 @@ see how I like it.
 
    #+END_SRC
 q<<<<<<< variant A
-* refiles
-** TODO org - organize
-   To-file later!
-   #+BEGIN_SRC emacs-lisp
-      (require 'use-package)
-                                              ; org-mode
-                                              ; TODO speed-keys?
-      ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-      (use-package org-bullets
-        :ensure t
-        :config
-        (setq org-ellipsis "⤵"))
-
-      (use-package org
-        :ensure t
-        :bind (("\C-cl" . org-store-link)
-               ("\C-cl" . org-store-link)
-               ("\C-cb" . org-iswitchb))
-        :config
-        (unbind-key "C-," org-mode-map) ;expand-region
-        (unbind-key "C-m" org-mode-map) ;avy
-        (setq org-startup-with-inline-images t)
-        (setq org-pretty-entities t)
-        (add-hook 'org-babel-after-execute-hook 'org-redisplay-inline-images)
-
-        (add-hook 'org-mode-hook
-                  (lambda ()
-                    (org-bullets-mode t)))
-
-        ;; use enter to follow links instead of C-c C-o
-        (setq org-return-follows-link t)
-
-        ;; NOTE: If this isn't working, make sure to delete /
-        ;; byte-recompile the /elpa/org/.. directory!
-        ;; enable language compiles
-        (org-babel-do-load-languages
-         'org-babel-load-languages
-         '((C . t)
-           (python . t)
-           (sh . t)
-           (emacs-lisp . t)
-           (gnuplot . t)
-           (R . t)))
-        (setq org-confirm-babel-evaluate nil)
-        (setq org-M-RET-may-split-line nil)
-        (setq org-src-fontify-natively t)
-        (setq org-src-tab-acts-natively t)
-        (setq org-edit-src-content-indentation 0)
-        (setq org-src-window-setup 'current-window)
-
-
-      ;;;;;;;; file directory setup
-        ;; Org-capture management + Tasks
-        (setq org-directory "~/Dropbox/org/")
-
-        (defun org-file-path (filename)
-          "Return absolute address of an org file give its relative name."
-          (concat (file-name-as-directory org-directory) filename))
-
-        (setq org-inbox-file "~/Dropbox/inbox.org")
-        (setq org-index-file (org-file-path "index.org"))
-        (setq org-personal-file (org-file-path "personal.org"))
-        (setq org-school-file (org-file-path "school.org"))
-        (setq org-projects-file (org-file-path "projects.org"))
-        (setq org-journal-file (org-file-path "journal.org"))
-        (setq org-monthly-file (org-file-path "monthly.org"))
-        (setq org-archive-location
-              (concat (org-file-path "archive.org") "::* From %s"))
-
-        ;; I keep all of my todos in =~/Dropbox/org/index.org= so I derive my
-        ;; agenda from there
-        (setq org-agenda-files
-              (list org-index-file org-personal-file org-school-file org-projects-file org-journal-file (org-file-path "to-read.org")))
-        (setq all-org-files
-              (list org-index-file org-personal-file org-school-file org-projects-file org-journal-file (org-file-path "to-read.org")))
-
-        ;; refiling!
-        ;; refiling
-        ;; I like to look at pretty much just up to 3 levels of targets
-        (setq org-refile-targets '((all-org-files :maxlevel . 3)))
-
-        ;; only look at top level headings. Since org-mode represents
-        ;; these as files, this also means that the highest level heading
-        ;; will be the first "file" so to speak
-        (setq org-refile-use-outline-path 'file)
-        (setq org-outline-path-complete-in-steps nil)
-
-        ;; allow creating new parents on refile
-        (setq org-refile-allow-creating-parent-nodes 'confirm)
-                                              ; todo stuff
-      ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-        (setq org-todo-keywords
-              (quote ((sequence "TODO(t)" "NEXT(n)" "|" "DONE(d)")
-                      (sequence "WAITING(w@/!)" "HOLD(h@/!)" "|" "CANCELLED(c@/!)" "PHONE" "MEETING"))))
-
-        (setq org-todo-keyword-faces
-              (quote (("TODO" :foreground "red" :weight bold)
-                      ("NEXT" :foreground "DeepSkyBlue1" :weight bold)
-                      ("DONE" :foreground "forest green" :weight bold)
-                      ("WAITING" :foreground "orange" :weight bold)
-                      ("HOLD" :foreground "magenta" :weight bold)
-                      ("CANCELLED" :foreground "forest green" :weight bold)
-                      ("MEETING" :foreground "forest green" :weight bold)
-                      ("PHONE" :foreground "forest green" :weight bold))))
-
-        (setq org-todo-state-tags-triggers
-              (quote (("CANCELLED" ("CANCELLED" . t))
-                      ("WAITING" ("WAITING" . t))
-                      ("HOLD" ("WAITING") ("HOLD" . t))
-                      (done ("WAITING") ("HOLD"))
-                      ("TODO" ("WAITING") ("CANCELLED") ("HOLD"))
-                      ("NEXT" ("WAITING") ("CANCELLED") ("HOLD"))
-                      ("DONE" ("WAITING") ("CANCELLED") ("HOLD")))))
-
-        ;; Place tags close to the right-hand side of the window
-        (add-hook 'org-finalize-agenda-hook 'place-agenda-tags)
-        (defun place-agenda-tags ()
-          "Put the agenda tags by the right border of the agenda window."
-          (setq org-agenda-tags-column (- 4 (window-width)))
-          (org-agenda-align-tags))
-        ;; Changing a task state is done with C-c C-t KEY
-        ;; where KEY is the appropriate fast todo state selection key as defined in org-todo-keywords.
-        ;; The setting
-
-        (setq org-use-fast-todo-selection t)
-
-        ;; allows changing todo states with S-left and S-right skipping all of
-        ;; the normal processing when entering or leaving a todo state. This
-        ;; cycles through the todo states but skips setting timestamps and
-        ;; entering notes which is very convenient when all you want to do is
-        ;; fix up the status of an entry.
-        (setq org-treat-S-cursor-todo-selection-as-state-change nil)
-        (setq to-read-tags '(":learning:" ":books:" ":emacs:" ":research:" ":manga:" ":anime:"
-                             ":ml:" ":sites:" ":games:" ":music:"))
-        (defun lp/refile-to (file headline)
-          "refile to specific spot (headline) in file"
-          (let ((pos (save-excursion
-                       (find-file file)
-                       (org-find-exact-headline-in-buffer headline))))
-            (org-refile nil nil (list headline file nil pos))))
-
-        (defun lp/refile-to-file-with-tag (tag file headline)
-          " Helper function to refile a group of tags to a certain file's headline"
-          (while (not (equal nil (search-forward tag nil t)))
-            (beginning-of-visual-line)
-            (lp/refile-to file headline))
-          (switch-to-buffer "index.org"))
-
-        (defun lp/refile-school ()
-          (lp/refile-to-file-with-tag ":school:" org-school-file "inbox"))
-
-        (defun lp/refile-personal ()
-          (lp/refile-to-file-with-tag ":personal:" org-personal-file "inbox"))
-
-        (defun lp/refile-all-in-index ()
-          (interactive)
-          (beginning-of-buffer)
-          (lp/refile-school)
-          (beginning-of-buffer)
-          (lp/refile-personal)
-          (universal-argument) ;; universal argument is the C-u prefix!
-          (save-some-buffers))
-
-        (defun lp/refile-to-read ()
-          " Invoke on headline of inbox in to-read.org. refiles all tagged entries to respective header"
-          (interactive)
-          ;; do for each tag in our "to-read" tags
-          (dotimes (i (length to-read-tags))
-            ;; Search forward until we can't anymore (no more items with this tag
-            (let ((tag (nth i to-read-tags)))
-              (save-excursion
-                (while (not (equal nil (search-forward tag nil t)))
-                  (beginning-of-visual-line)
-                  (lp/refile-to (org-file-path "to-read.org") (substring tag 1 -1)))))
-            ))
-
-
-        ;;   (setq-default org-preview-latex-default-process 'dvisvgm
-        ;;                 org-latex-packages-alist '(("" "tikz" t)
-        ;;                                            ("american,siunitx,smartlabels" "circuitikz" t)
-        ;;                                            ("" "mathtools" t))
-        ;;                 org-latex-preview-ltxpng-directory (locate-user-emacs-file "Latex Previews/")
-        ;;                 org-format-latex-options
-        ;;                 '(:foreground default :background default :scale 1.7
-        ;;                               :html-foreground "Black" :html-background "Transparent" :html-scale 1.0
-        ;;                               :matchers ("begin" "$1" "$" "$$" "\\(" "\\["))
-        ;;                 org-preview-latex-process-alist
-        ;;                 '((dvisvgm :programs ("latex" "dvisvgm")
-        ;;                            :description "dvi > svg"
-        ;;                            :message "you need to install the programs: latex and dvisvgm."
-        ;;                            :use-xcolor t
-        ;;                            :image-input-type "dvi"
-        ;;                            :image-output-type "svg"
-        ;;                            :image-size-adjust (1.7 . 1.5)
-        ;;                            :latex-compiler ("latex -interaction nonstopmode -output-directory %o %f")
-        ;;                            :image-converter ("dvisvgm %f -n -b 1 -c %S -o %O"))
-        ;;                   (imagemagick :programs ("latex" "convert")
-        ;;                                :description "pdf > png"
-        ;;                                :message "you need to install the programs: latex and imagemagick."
-        ;;                                :use-xcolor t
-        ;;                                :image-input-type "pdf"
-        ;;                                :image-output-type "png"
-        ;;                                :image-size-adjust (1.0 . 1.0)
-        ;;                                :latex-compiler ("pdflatex -interaction nonstopmode -output-directory %o %f")
-        ;;                                :image-converter ("convert -density %D -trim -antialias %f -quality 100 %O"))
-        ;;                   (dvipng :programs ("latex" "dvipng")
-        ;;                           :description "dvi > png"
-        ;;                           :message "you need to install the programs: latex and dvipng."
-        ;;                           :image-input-type "dvi"
-        ;;                           :image-output-type "png"
-        ;;                           :image-size-adjust (1.0 . 1.0)
-        ;;                           :latex-compiler ("latex -interaction nonstopmode -output-directory %o %f")
-        ;;                           :image-converter ("dvipng -fg %F -bg %B -D %D -T tight -o %O %f")))
-        ;;                 org-format-latex-header
-        ;;                 "\\documentclass{article}
-        ;; \\usepackage[usenames]{color}
-        ;; [PACKAGES]
-        ;; [DEFAULT-PACKAGES]
-        ;; \\pagestyle{empty}
-        ;; \\setlength{\\textwidth}{\\paperwidth}
-        ;; \\addtolength{\\textwidth}{-3cm}
-        ;; \\setlength{\\oddsidemargin}{1.5cm}
-        ;; \\addtolength{\\oddsidemargin}{-2.54cm}
-        ;; \\setlength{\\evensidemargin}{\\oddsidemargin}
-        ;; \\setlength{\\textheight}{\\paperheight}
-        ;; \\addtolength{\\textheight}{-\\headheight}
-        ;; \\addtolength{\\textheight}{-\\headsep}
-        ;; \\addtolength{\\textheight}{-\\footskip}
-        ;; \\addtolength{\\textheight}{-3cm}
-        ;; \\setlength{\\topmargin}{1.5cm}
-        ;; \\addtolength{\\topmargin}{-2.54cm}
-        ;; \\tikzset{every picture/.style={color=fg}}")
-
-        ;; NOTE(nox): Get different latex fragments for different themes
-                                              ; agenda stuff
-      ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-        ;; Do not dim blocked tasks
-        (setq org-agenda-dim-blocked-tasks nil)
-        ;; Compact the block agenda view
-        (setq org-agenda-compact-blocks t) ;; nil為加上分隔線，t為去掉
-        ;; 用describe-char來查你想要的seperator char code
-        (setq org-agenda-block-separator 45)
-
-      ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; NOX'S SHIT
-        (defun nox/org-agenda-finalize ()
-          ;; NOTE(nox): Reset project hierarchy builder helper variable
-          (setq nox/org-agenda-first-project t)
-
-          ;; NOTE(nox): Remove empty blocks
-          (save-excursion
-            (goto-char (point-min))
-            (let ((prev (if (get-text-property (point-min) 'org-agenda-structural-header)
-                            (point-min)
-                          (next-single-property-change (point-min) 'org-agenda-structural-header)))
-                  next)
-              (while (and prev (/= prev (point-max)))
-                (setq next
-                      (or (next-single-property-change (next-single-property-change prev 'org-agenda-structural-header)
-                                                       'org-agenda-structural-header)
-                          (point-max)))
-                (if (or (and (< next (point-max)) (< (count-lines prev next) 4))
-                        (and (= next (point-max)) (< (count-lines prev next) 2)))
-                    (delete-region prev next)
-                  (setq prev next)))))
-
-          ;; NOTE(nox): Turn root projects bold
-          (save-excursion
-            (while (search-forward (char-to-string ?\u200B) nil t)
-              (add-face-text-property (line-beginning-position) (1+ (line-end-position)) '(:weight bold)))))
-        ;; Custom functions to find the tasks that were done in a file for the past month
-        (require 'calendar)
-
-        (defun jtc-org-tasks-closed-in-month (&optional month year match-string)
-          "Produces an org agenda tags view list of the tasks completed
-      in the specified month and year. Month parameter expects a number
-      from 1 to 12. Year parameter expects a four digit number. Defaults
-      to the current month when arguments are not provided. Additional search
-      criteria can be provided via the optional match-string argument "
-          (interactive)
-          (let* ((today (calendar-current-date))
-                 (for-month (or month (calendar-extract-month today)))
-                 (for-year  (or year  (calendar-extract-year today))))
-            (org-tags-view nil
-                           (concat
-                            match-string
-                            (format "+CLOSED>=\"[%d-%02d-01]\""
-                                    for-year for-month)
-                            (format "+CLOSED<=\"[%d-%02d-%02d]\""
-                                    for-year for-month
-                                    (calendar-last-day-of-month for-month for-year))))))
-
-        (defun jtc-foo-tasks-last-month ()
-          "Produces an org agenda tags view list of all the tasks completed
-      last month with the Category Foo."
-          (interactive)
-          (let* ((today (calendar-current-date))
-                 (for-month (calendar-extract-month today))
-                 (for-year  (calendar-extract-year today)))
-            (calendar-increment-month for-month for-year -1)
-            (jtc-org-tasks-closed-in-month
-             for-month for-year "+TODO=\"DONE\"")))
-
-        ;; AGENDA
-        (setq-default
-         org-agenda-custom-commands
-         '(("n" "Agenda"
-            ((agenda ""
-                     ((org-agenda-files (list org-index-file
-                                              org-personal-file org-school-file
-                                              org-projects-file org-journal-file
-                                              org-monthly-file))
-                      (org-agenda-skip-scheduled-if-deadline-is-shown t)))
-             (tags-todo "-REFILE-CANCELLED-WAITING-HOLD/!-DONE-HOLD"
-                        ((org-agenda-overriding-header "To-File Files (index.org)")
-                         (org-tags-match-list-sublevels nil)
-                         (org-agenda-files (list org-index-file))))
-             (tags "cs73|cs87|research"
-                   ((org-agenda-overriding-header "CS Work")
-                    (org-tags-match-list-sublevels nil)
-                    (org-agenda-files (list org-school-file))))
-             (tags "jpns"
-                   ((org-agenda-overriding-header "JPNS")
-                    (org-tags-match-list-sublevels nil)
-                    (org-agenda-files (list org-school-file))))
-             (tags "kizuna|smash|outsiders"
-                   ((org-agenda-overriding-header "Clubs")
-                    (org-tags-match-list-sublevels nil)
-                    (org-agenda-files (list org-school-file))))
-             (tags-todo "-REFILE-CANCELLED-WAITING-HOLD/!-DONE-HOLD"
-                        ((org-agenda-overriding-header "Personal Stuff")
-                         (org-tags-match-list-sublevels nil)
-                         (org-agenda-files (list org-personal-file))))))
-           ("t" "To Read Stuff"
-            ((tags-todo "music/!-DONE-HOLD"
-                        ((org-agenda-overriding-header "Music")
-                         (orgs-tags-match-list-sublevels nil)
-                         (org-agenda-files (list (org-file-path "to-read.org")))))
-             (tags-todo "anime/!-DONE-HOLD"
-                        ((org-agenda-overriding-header "Anime")
-                         (orgs-tags-match-list-sublevels nil)
-                         (org-agenda-files (list (org-file-path "to-read.org")))))
-             (tags-todo "sites/!-DONE-HOLD"
-                        ((org-agenda-overriding-header "Sites ")
-                         (orgs-tags-match-list-sublevels nil)
-                         (org-agenda-files (list (org-file-path "to-read.org")))))
-             (tags-todo "research/!-DONE-HOLD"
-                        ((org-agenda-overriding-header "Research Papers")
-                         (orgs-tags-match-list-sublevels nil)
-                         (org-agenda-files (list (org-file-path "to-read.org")))))
-             (tags-todo "manga/!-DONE-HOLD"
-                        ((org-agenda-overriding-header "Manga")
-                         (orgs-tags-match-list-sublevels nil)
-                         (org-agenda-files (list (org-file-path "to-read.org")))))
-             (tags-todo "learning/!-DONE-HOLD"
-                        ((org-agenda-overriding-header "Things to Learn")
-                         (orgs-tags-match-list-sublevels nil)
-                         (org-agenda-files (list (org-file-path "to-read.org")))))
-             (tags-todo "books-learning/!-DONE-HOLD-WAITING"
-                        ((org-agenda-overriding-header "Books")
-                         (orgs-tags-match-list-sublevels nil)
-                         (org-agenda-files (list (org-file-path "to-read.org"))))))))
-         org-agenda-span 'week
-         org-agenda-prefix-format '((agenda . "  %?-12t% s")
-                                    (todo   . "  ")
-                                    (tags   . "  ")
-                                    (search . "  "))
-         org-agenda-skip-deadline-prewarning-if-scheduled 'pre-scheduled
-         org-agenda-tags-todo-honor-ignore-options t
-         org-agenda-clockreport-parameter-plist `(:link t :maxlevel 6 :fileskip0 t :compact t :narrow 100)
-         org-agenda-dim-blocked-tasks nil
-         org-agenda-block-separator ""
-                                              ;   org-agenda-time-grid '((daily today require-timed) nil "......" "----------------")
-         )
-        ;; Custom agenda command definitions
-                                              ; ((org-agenda-finalize-hook 'nox/org-agenda-finalize))
-        (setq org-tags-match-list-sublevels t)
-
-
-
-        ;; Function to skip tag
-        ;; From http://stackoverflow.com/questions/10074016/org-mode-filter-on-tag-in-agenda-view
-
-        ;; Bind C-c C-x C-s to mark todo as done and archive it
-        (defun lp/mark-done-and-archive ()
-          "Mark the state of an org-mode item as DONE and archive it"
-          (interactive)
-          (org-todo 'done)
-          (org-archive-subtree))
-
-
-        (define-key org-mode-map (kbd "C-c C-x C-s") 'lp/mark-done-and-archive)
-        (setq org-log-done 'time)             ; also record when the TODO was archived
-
-        (setq org-capture-templates
-              '(("g" "Groceries"
-                 entry
-                 (file "~/Dropbox/org/groceries.org")
-                 "- [ ] %?\n")
-                ("i" "Ideas"
-                 entry
-                 (file+headline "~/Dropbox/org/ideas.org" "Project Ideas")
-                 "** [#%^{9}] %?\n")
-                ("j" "Journal"
-                 entry
-                 (file+datetree "~/Dropbox/org/journal.org")
-                 "** %U :journal:\n%?")
-                ("t" "to-read"
-                 entry
-                 (file+headline "~/Dropbox/org/to-read.org" "inbox")
-                 "** TODO %^{to-read}  %^g\n %U")
-                ("z" "Todo"
-                 entry
-                 (file+headline org-index-file "Tasks")
-                 "* TODO %^{Task} %^G\n %U\n%?")
-                ("p" "Personal todo"
-                 entry
-                 (file+headline org-personal-file "general")
-                 "* TODO %^{Task} %^g\n %?")))
-
-      ;;; Org Keybindings
-        ;; Useful keybinds
-        (define-key global-map (kbd "C-c a") 'org-agenda)
-        (define-key global-map (kbd "C-c c") 'org-capture)
-
-        ;; Hit C-c i to open up my todo list.
-        (defun lp/open-index-file ()
-          "Open the org TODO list."
-          (interactive)
-          (find-file org-index-file)
-          (flycheck-mode -1)
-          (end-of-buffer))
-
-        (global-set-key (kbd "C-c i") 'lp/open-index-file)
-
-        (defun lp/org-capture-todo ()
-          (interactive)
-          (org-capture :keys "z"))
-
-        (defun lp/open-full-agenda()
-          (interactive)
-          (org-agenda :keys "n")
-          (delete-other-windows))
-
-        (global-set-key (kbd "M-n") 'lp/org-capture-todo)
-        (global-set-key (kbd "<f1>") 'lp/open-full-agenda)
-
-
-        ;; Auto wrap paragraphs in some modes (auto-fill-mode)
-        (add-hook 'text-mode-hook 'turn-on-auto-fill)
-        (add-hook 'org-mode-hook 'turn-on-auto-fill)
-
-        ;; sometimes i don't want to wrap text though, so we will toggle
-        ;; with C-c q
-        (global-set-key (kbd "C-c q") 'auto-fill-mode))
-                                              ; clocking!
-      ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-                                              ; setup helpers
-
-                                              ; ok back to clocking
-      ;;;;;;;;;;;;;;;;;;;;
-
-      ;; Resume clocking task when emacs is restarted
-      (org-clock-persistence-insinuate)
-      ;;
-      ;; Show lot of clocking history so it's easy to pick items off the C-F11 list
-      (setq org-clock-history-length 23)
-      ;; Resume clocking task on clock-in if the clock is open
-      (setq org-clock-in-resume t)
-      ;; Change tasks to NEXT when clocking in
-      (setq org-clock-in-switch-to-state 'bh/clock-in-to-next)
-      ;; Separate drawers for clocking and logs
-      (setq org-drawers (quote ("PROPERTIES" "LOGBOOK")))
-      ;; Save clock data and state changes and notes in the LOGBOOK drawer
-      (setq org-clock-into-drawer t)
-      ;; Sometimes I change tasks I'm clocking quickly - this removes clocked tasks with 0:00 duration
-      (setq org-clock-out-remove-zero-time-clocks t)
-      ;; Clock out when moving task to a done state
-      (setq org-clock-out-when-done t)
-      ;; Save the running clock and all clock history when exiting Emacs, load it on startup
-      (setq org-clock-persist t)
-      ;; Do not prompt to resume an active clock
-      (setq org-clock-persist-query-resume nil)
-      ;; Enable auto clock resolution for finding open clocks
-      (setq org-clock-auto-clock-resolution (quote when-no-clock-is-running))
-      ;; Include current clocking task in clock reports
-      (setq org-clock-report-include-clocking-task t)
-
-   #+END_SRC
-
-   #+RESULTS:
-   : t
-
-*** TODO research in org - organize - also pdftools
-    #+BEGIN_SRC emacs-lisp
-    ;;pdf-tools init
-    (use-package pdf-tools
-      :ensure t
-      :config
-      (pdf-tools-install))
-
-    ;; org-ref
-    (use-package bibtex-utils
-      :ensure t)
-
-    (use-package biblio
-      :ensure t)
-
-    (use-package interleave
-      :ensure t)
-    ;;(require 'pubmed)
-    ;;(require 'arxiv)
-    ;;(require 'sci-id)
-
-    (autoload 'helm-bibtex "helm-bibtex" "" t)
-
-    (use-package org-ref
-
-      :ensure t
-      :config
-      (require 'doi-utils)
-      (setq org-ref-notes-directory "~/Dropbox/res"
-            org-ref-bibliography-notes "~/Dropbox/res/notes.org"
-            org-ref-default-bibliography '("~/Dropbox/res/index.bib")
-            org-ref-pdf-directory "~/Dropbox/res/lib/"))
-
-    (use-package helm-bibtex
-
-      :ensure t
-      :config
-      (setq helm-bibtex-bibliography "~/Dropbox/res/index.bib" ;; where your references are stored
-            helm-bibtex-library-path "~/Dropbox/res/lib/"
-            bibtex-completion-library-path '("~/Dropbox/res/lib/") ;; where your pdfs etc are stored
-            helm-bibtex-notes-path "~/Dropbox/res/notes.org" ;; where your notes are stored
-            bibtex-completion-bibliography "~/Dropbox/res/index.bib" ;; completion
-            bibtex-completion-notes-path "~/Dropbox/res/notes.org"))
-
-    (defun lp/open-paper-notes ()
-      "Open the org TODO list."
-      (interactive)
-      (find-file "~/Dropbox/res/notes.org")
-      (flycheck-mode -1))
-    (global-set-key  (kbd "C-c r") 'lp/open-paper-notes)
-    #+END_SRC
-** TODO elfeed - organize
- #+BEGIN_SRC emacs-lisp
-   (use-package elfeed
-     :ensure t
-     :defer t
-     :config
-     (global-set-key (kbd "C-x w") 'elfeed)
-     (setq shr-width 80)
-
-     (setq-default elfeed-search-filter "@2-weeks-ago +unread ")
-
-     (defun lp/elfeed-show-all ()
-       (interactive)
-       (bookmark-maybe-load-default-file)
-       (bookmark-jump "elfeed-all"))
-     (defun lp/elfeed-show-emacs ()
-       (interactive)
-       (bookmark-maybe-load-default-file)
-       (bookmark-jump "elfeed-emacs"))
-     (defun lp/elfeed-show-daily ()
-       (interactive)
-       (bookmark-maybe-load-default-file)
-       (bookmark-jump "elfeed-daily"))
-
-     ;; Entries older than 2 weeks are marked as readn
-     (add-hook 'elfeed-new-entry-hook
-               (elfeed-make-tagger :before "2 weeks ago"
-                                   :remove 'unread))
-
-
-     ;; code to add and remove a starred tag to elfeed article
-     ;; based on http://matt.hackinghistory.ca/2015/11/22/elfeed/
-
-     ;; add a star
-     (defun bjm/elfeed-star ()
-       "Apply starred to all selected entries."
-       (interactive )
-       (let* ((entries (elfeed-search-selected))
-              (tag (intern "starred")))
-
-         (cl-loop for entry in entries do (elfeed-tag entry tag))
-         (mapc #'elfeed-search-update-entry entries)
-         (unless (use-region-p) (forward-line))))
-
-     ;; remove a start
-     (defun bjm/elfeed-unstar ()
-       "Remove starred tag from all selected entries."
-       (interactive )
-       (let* ((entries (elfeed-search-selected))
-              (tag (intern "starred")))
-
-         (cl-loop for entry in entries do (elfeed-untag entry tag))
-         (mapc #'elfeed-search-update-entry entries)
-         (unless (use-region-p) (forward-line))))
-
-     ;; face for starred articles
-     (defface elfeed-search-starred-title-face
-       '((t :foreground "#f77"))
-       "Marks a starred Elfeed entry.")
-
-     (push '(starred elfeed-search-starred-title-face) elfeed-search-face-alist)
-     (eval-after-load 'elfeed-search
-       '(define-key elfeed-search-mode-map (kbd "*") 'bjm/elfeed-star))
-     (eval-after-load 'elfeed-search
-       '(define-key elfeed-search-mode-map (kbd "8") 'bjm/elfeed-unstar)))
-
-   (use-package elfeed-org
-     :ensure t
-     :config
-     (elfeed-org)
-     (setq rmh-elfeed-org-files (list "~/.emacs.d/elfeed.org")))
- #+END_SRC
-** TODO hydra
 * writing
 ** Writeroom mode
    A package to emulate the beloved writeroom of Mac OS. Gives
@@ -2239,10 +1605,9 @@ q<<<<<<< variant A
      :defer t
      :after visual-fill-column
      :diminish writeroom-mode)
-
    #+END_SRC
-** TODO tex - organize
 
+** TODO tex - organize
    #+BEGIN_SRC emacs-lisp
    (use-package tex-site                   ; AUCTeX initialization
      :ensure auctex)
@@ -2288,6 +1653,7 @@ q<<<<<<< variant A
    (use-package reftex                     ; TeX/BibTeX cross-reference management
      :defer t
      :init (add-hook 'LaTeX-mode-hook #'reftex-mode)
+     :diminish reftex-mode
      :config
      ;; Plug into AUCTeX
      (setq reftex-plug-into-AUCTeX t
@@ -2321,8 +1687,10 @@ q<<<<<<< variant A
                                 (?F . "\\fullcite[]{%l}")
                                 (?x . "[]{%l}")
                                 (?X . "{%l}"))))
-       (setq reftex-cite-format 'biblatex))
-     :diminish reftex-mode)
+       (setq reftex-cite-format 'biblatex)))
+   (use-package cdlatex
+     :ensure t
+     :init (add-hook 'LaTeX-mode-hook #'cdlatex-mode))
    #+END_SRC
 * refiles
 ** TODO elfeed - organize
