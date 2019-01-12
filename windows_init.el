@@ -3,10 +3,10 @@
                     (not (gnutls-available-p))))
        (proto (if no-ssl "http" "https")))
   ;; Comment/uncomment these two lines to enable/disable MELPA and MELPA Stable as desired
-(setq package-archives
-      '(("melpa" . "https://melpa.org/packages/")
-        ("gnu" . "https://elpa.gnu.org/packages/")
-        ("org" . "http://orgmode.org/elpa/")))
+  (setq package-archives
+        '(("melpa" . "https://melpa.org/packages/")
+          ("gnu" . "https://elpa.gnu.org/packages/")
+          ("org" . "http://orgmode.org/elpa/")))
   ;;(add-to-list 'package-archives (cons "melpa" (concat proto "://melpa.org/packages/")) t)
 
   ;;(add-to-list 'package-archives (cons "melpa-stable" (concat proto "://stable.melpa.org/packages/")) t)
@@ -176,16 +176,15 @@
 (defun indent-region-or-buffer ()
   "Indent a region if selected, otherwise the whole buffer."
   (interactive)
-  (unless (member major-mode prelude-indent-sensitive-modes)
-    (save-excursion
-      (if (region-active-p)
-          (progn
-            (indent-region (region-beginning) (region-end))
-            (message "Indented selected region."))
+  (save-excursion
+    (if (region-active-p)
         (progn
-          (indent-buffer)
-          (message "Indented buffer.")))
-      (whitespace-cleanup))))
+          (indent-region (region-beginning) (region-end))
+          (message "Indented selected region."))
+      (progn
+        (indent-buffer)
+        (message "Indented buffer.")))
+    (whitespace-cleanup)))
 
 (global-set-key (kbd "C-c n") 'indent-region-or-buffer)
 
@@ -293,7 +292,6 @@
   (diminish-major-mode 'lisp-interaction-mode-hook "λ")
   (diminish-major-mode 'python-mode-hook "Py"))
 
-(load-theme 'leuven)
 (add-to-list 'custom-theme-load-path "~/.emacs.d/themes")
 ;;(load-theme 'default-black)
 (use-package color-theme
@@ -302,18 +300,37 @@
 (use-package color-theme-modern
   :after color-theme
   :ensure t
-  ;; :config
-  ;;   (load-theme 'midnight))
-  )
+  :config
+  (load-theme 'midnight))
 
-(use-package smart-mode-line
+;; (use-package smart-mode-line
+;;   :ensure t
+;;   :config
+;;   (setq mode-line-format (delq 'mode-line-position mode-line-format))
+;;   (sml/setup)
+;;   (sml/apply-theme 'light)
+;;   (remove-hook 'display-time-hook 'sml/propertize-time-string)
+;;   (setq sml/no-confirm-load-theme t))
+
+;; Some minor modes menu thing? Not sure what it does.
+(use-package minions
   :ensure t
   :config
-  (setq mode-line-format (delq 'mode-line-position mode-line-format))
-  (sml/setup)
-  (sml/apply-theme 'light)
-  (remove-hook 'display-time-hook 'sml/propertize-time-string)
-  (setq sml/no-confirm-load-theme t))
+  (minions-mode))
+
+(use-package moody
+  :ensure t
+  :config
+  (setq x-underline-at-descent-line t)
+  (moody-replace-mode-line-buffer-identification)
+  (moody-replace-vc-mode))
+
+
+
+(use-package dumb-jump
+  :config
+  (global-set-key (kbd "M-.") 'dumb-jump-go)
+  (setq dumb-jump-selector 'ivy))
 
 (defalias 'list-buffers 'ibuffer) ; always use ibuffer
 
@@ -1057,7 +1074,7 @@ last month with the Category Foo."
     (if (> (length p-lst) 2)
         (concat
          (mapconcat (lambda (elm) (if (zerop (length elm)) ""
-                                    (substring elm 0 1)))
+                               (substring elm 0 1)))
                     (butlast p-lst 2)
                     "/")
          "/"
@@ -1264,7 +1281,7 @@ last month with the Category Foo."
 
 (define-key emacs-lisp-mode-map (kbd "C-x r")   #'ert-all)
 (define-key emacs-lisp-mode-map (kbd "C-c C-z") #'ielm-repl)
-(define-key emacs-lisp-mode-map (kbd "C-c C-k") #'eval-buffer*)
+;;(define-key emacs-lisp-mode-map (kbd "C-c C-k") #'eval-buffer*)
 (defalias 'lisp-interaction-mode 'emacs-lisp-mode)
 
 (font-lock-add-keywords
