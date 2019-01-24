@@ -79,13 +79,7 @@
 (setq auto-window-vscroll nil)
 
 (setq initial-scratch-message (format
-                               ";;
-;; I am about to tread the very path that has been walked by the Buddha and by his great and holy disciples.
-;; An indolent person cannot follow that path.
-;; May my energy prevail.
-;; May I succeed.
-;;
-"  ))
+                               ""  ))
 
 ;; paren mode matching
 (show-paren-mode t)
@@ -110,6 +104,13 @@
 
 ;; we don't live in the past. bump that memory up.
 (setq gc-cons-threshold 50000000)
+(defadvice kill-region (before slick-cut activate compile)
+  "When called interactively with no active region, kill a single
+line instead."
+  (interactive
+   (if mark-active (list (region-beginning) (region-end))
+     (list (line-beginning-position)
+           (line-beginning-position 2)))))
 
 (provide 'unannoy)
 

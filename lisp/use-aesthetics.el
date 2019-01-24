@@ -32,7 +32,6 @@
 ;;  * Habamax Theme - a little plain
 ;;  * Also hydanatantantatna-theme
 (require 'use-package)
-(load-theme 'base16-atelier-lakeside-light)
 
 ;; (add-to-list 'custom-theme-load-path "~/.emacs.d/themes/")
 ;; (add-to-list 'custom-theme-load-path "~/.emacs.d/themes/modern-themes")
@@ -54,6 +53,7 @@
 
 ;; powerline theme where the modes are on the right side.
 (use-package powerline
+  :disabled
   :ensure t
   :config
   (defun powerline-right-theme ()
@@ -109,6 +109,17 @@
                                (powerline-render rhs)))))))
   (powerline-right-theme))
 
+(use-package minions
+  :ensure t
+  :config
+  (minions-mode))
+
+(use-package moody
+  :ensure t
+  :config
+  (setq x-underline-at-descent-line t)
+  (moody-replace-mode-line-buffer-identification)
+  (moody-replace-vc-mode))
 
 
 (defadvice load-theme (before clear-previous-themes activate)
@@ -116,7 +127,6 @@
   (mapc #'disable-theme custom-enabled-themes))
 
 (use-package moe-theme
-  :disabled
   :ensure t
   :config
   (setq moe-light-pure-white-background-in-terminal t)
@@ -126,9 +136,33 @@
   (setq moe-theme-resize-org-title '(2.2 1.8 1.6 1.4 1.2 1.0 1.0 1.0 1.0))
   (setq moe-theme-resize-rst-title '(2.0 1.7 1.5 1.3 1.1 1.0))
   (require 'moe-theme-switcher)
-                                        ;(setq moe-theme-highlight-buffer-id t)
-  )
+  (let ((line (face-attribute 'mode-line :underline)))
+    (set-face-attribute 'mode-line          nil :overline   line)
+    (set-face-attribute 'mode-line-inactive nil :overline   line)
+    (set-face-attribute 'mode-line-inactive nil :underline  line)
+    (set-face-attribute 'mode-line          nil :box        nil)
+    (set-face-attribute 'mode-line-inactive nil :box        nil)
+    (set-face-attribute 'mode-line-inactive nil :background "#f9f2d9"))
+  (setq moe-theme-highlight-buffer-id t)
+  (moe-light))
 
+(use-package color-theme
+  :ensure t
+  :disabled)
+
+(use-package color-theme-modern
+  :after color-theme
+  :disabled
+  :ensure t
+  :config
+  (load-theme 'midnight)
+  (let ((line (face-attribute 'mode-line :underline)))
+    (set-face-attribute 'mode-line          nil :overline   line)
+    (set-face-attribute 'mode-line-inactive nil :overline   line)
+    (set-face-attribute 'mode-line-inactive nil :underline  line)
+    (set-face-attribute 'mode-line          nil :box        nil)
+    (set-face-attribute 'mode-line-inactive nil :box        nil)
+    (set-face-attribute 'mode-line-inactive nil :background "#f9f2d9")))
 
 
 ;; screw the bell
@@ -158,8 +192,8 @@
 ;; Font functionality
 
 ;; iosevka, consolas, source code pro, Fira Code, dejavu, IBM 3270,
-;; Fantasque Sans Mono, Terminus
-(setq lp/default-font "Courier New")
+;; Fantasque Sans Mono, Terminus, overpass mono
+(setq lp/default-font "overpass mono")
 
 (setq lp/default-font-size 12)
 

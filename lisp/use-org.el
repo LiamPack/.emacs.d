@@ -10,18 +10,19 @@
 (use-package org
   :ensure t
   :bind (("\C-cl" . org-store-link)
-         ("\C-cl" . org-store-link)
          ("\C-cb" . org-iswitchb))
   :config
-  (unbind-key "C-," org-mode-map) ;expand-region
-  (unbind-key "C-m" org-mode-map) ;avy
-  (add-hook 'org-mode-hook
-            (lambda ()
-              (org-bullets-mode t)))
+  (require 'org-habit)
+  (unbind-key "C-," org-mode-map)       ;expand-region
+  (unbind-key "C-'" org-mode-map)       ;avy
 
-  ;; use enter to follow links instead of C-c C-o
-  (setq org-return-follows-link t)
+  (add-hook 'org-mode-hook '(lambda () (org-bullets-mode)) )
 
+
+  (setq org-startup-with-inline-images t)
+  (setq org-pretty-entities t)
+  (add-hook 'org-babel-after-execute-hook 'org-redisplay-inline-images)
+  (setq org-use-speed-commands t)
   ;; NOTE: If this isn't working, make sure to delete /
   ;; byte-recompile the /elpa/org/.. directory!
   ;; enable language compiles
@@ -29,45 +30,57 @@
    'org-babel-load-languages
    '((C . t)
      (python . t)
-     (shell . t)
+     (sh . t)
      (emacs-lisp . t)
      (gnuplot . t)
+     ;;(ipython . t)
      (R . t)))
   (setq org-confirm-babel-evaluate nil)
   (setq org-M-RET-may-split-line nil)
   (setq org-src-fontify-natively t)
   (setq org-src-tab-acts-natively t)
   (setq org-edit-src-content-indentation 0)
+  (set-face-attribute 'org-block nil :background
+                      (color-darken-name
+                       (face-attribute 'default :background) 3))
   (setq org-src-window-setup 'current-window)
+  ;;(setq ob-async-no-async-languages-alist '("ipython"))
 
-
-;;;;;;;; file directory setup
+  ;;;  file directory setup
   ;; Org-capture management + Tasks
-  (setq org-directory "~/Dropbox/org/")
+  (setq org-directory "~/Dropbox/Org/")
 
   (defun org-file-path (filename)
     "Return absolute address of an org file give its relative name."
     (concat (file-name-as-directory org-directory) filename))
 
-  (setq org-inbox-file "~/Dropbox/inbox.org")
+  ;; I'm pretty sure there's a better way to do this. probably just slap them in
+  ;; a list and reduce from there
   (setq org-index-file (org-file-path "index.org"))
   (setq org-personal-file (org-file-path "personal.org"))
   (setq org-school-file (org-file-path "school.org"))
   (setq org-projects-file (org-file-path "projects.org"))
   (setq org-journal-file (org-file-path "journal.org"))
   (setq org-monthly-file (org-file-path "monthly.org"))
+  (setq org-groceries-file (org-file-path "groceries.org"))
   (setq org-archive-location
         (concat (org-file-path "archive.org") "::* From %s"))
 
   ;; I keep all of my todos in =~/Dropbox/org/index.org= so I derive my
   ;; agenda from there
+
   (setq org-agenda-files
-        (list org-index-file org-personal-file org-school-file org-projects-file org-journal-file (org-file-path "to-read.org")))
+        (list org-index-file org-personal-file org-school-file
+              org-projects-file
+              org-journal-file (org-file-path "to-read.org")
+              org-monthly-file org-groceries-file))
   (setq all-org-files
-        (list org-index-file org-personal-file org-school-file org-projects-file org-journal-file (org-file-path "to-read.org")))
+        (list org-index-file org-personal-file org-school-file
+              org-projects-file org-journal-file
+              org-monthly-file (org-file-path "to-read.org")
+              org-groceries-file))
 
   ;; refiling!
-  ;; refiling
   ;; I like to look at pretty much just up to 3 levels of targets
   (setq org-refile-targets '((all-org-files :maxlevel . 3)))
 
@@ -79,51 +92,11 @@
 
   ;; allow creating new parents on refile
   (setq org-refile-allow-creating-parent-nodes 'confirm)
-                                        ; todo stuff
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-  (setq org-todo-keywords
-        (quote ((sequence "TODO(t)" "NEXT(n)" "|" "DONE(d)")
-                (sequence "WAITING(w@/!)" "HOLD(h@/!)" "|" "CANCELLED(c@/!)" "PHONE" "MEETING"))))
 
-  (setq org-todo-keyword-faces
-        (quote (("TODO" :foreground "red" :weight bold)
-                ("NEXT" :foreground "DeepSkyBlue1" :weight bold)
-                ("DONE" :foreground "forest green" :weight bold)
-                ("WAITING" :foreground "orange" :weight bold)
-                ("HOLD" :foreground "magenta" :weight bold)
-                ("CANCELLED" :foreground "forest green" :weight bold)
-                ("MEETING" :foreground "forest green" :weight bold)
-                ("PHONE" :foreground "forest green" :weight bold))))
 
-  (setq org-todo-state-tags-triggers
-        (quote (("CANCELLED" ("CANCELLED" . t))
-                ("WAITING" ("WAITING" . t))
-                ("HOLD" ("WAITING") ("HOLD" . t))
-                (done ("WAITING") ("HOLD"))
-                ("TODO" ("WAITING") ("CANCELLED") ("HOLD"))
-                ("NEXT" ("WAITING") ("CANCELLED") ("HOLD"))
-                ("DONE" ("WAITING") ("CANCELLED") ("HOLD")))))
-
-  ;; Place tags close to the right-hand side of the window
-  (add-hook 'org-finalize-agenda-hook 'place-agenda-tags)
-  (defun place-agenda-tags ()
-    "Put the agenda tags by the right border of the agenda window."
-    (setq org-agenda-tags-column (- 4 (window-width)))
-    (org-agenda-align-tags))
-  ;; Changing a task state is done with C-c C-t KEY
-  ;; where KEY is the appropriate fast todo state selection key as defined in org-todo-keywords.
-  ;; The setting
-
-  (setq org-use-fast-todo-selection t)
-
-  ;; allows changing todo states with S-left and S-right skipping all of
-  ;; the normal processing when entering or leaving a todo state. This
-  ;; cycles through the todo states but skips setting timestamps and
-  ;; entering notes which is very convenient when all you want to do is
-  ;; fix up the status of an entry.
-  (setq org-treat-S-cursor-todo-selection-as-state-change nil)
   (setq to-read-tags '(":learning:" ":books:" ":emacs:" ":research:" ":manga:" ":anime:"
-                       ":ml:" ":sites:" ":games:" ":music:"))
+                       ":ml:" ":sites:" ":games:" ":music:" ":math:"))
+
   (defun lp/refile-to (file headline)
     "refile to specific spot (headline) in file"
     (let ((pos (save-excursion
@@ -166,101 +139,57 @@
             (lp/refile-to (org-file-path "to-read.org") (substring tag 1 -1)))))
       ))
 
+                                        ; todo stuff
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+  (setq org-todo-keywords
+        (quote ((sequence "TODO(t)" "NEXT(n)" "|" "DONE(d)")
+                (sequence "WAITING(w@/!)" "HOLD(h@/!)" "|" "CANCELLED(c@/!)" "PHONE" "MEETING"))))
 
-  ;;   (setq-default org-preview-latex-default-process 'dvisvgm
-  ;;                 org-latex-packages-alist '(("" "tikz" t)
-  ;;                                            ("american,siunitx,smartlabels" "circuitikz" t)
-  ;;                                            ("" "mathtools" t))
-  ;;                 org-latex-preview-ltxpng-directory (locate-user-emacs-file "Latex Previews/")
-  ;;                 org-format-latex-options
-  ;;                 '(:foreground default :background default :scale 1.7
-  ;;                               :html-foreground "Black" :html-background "Transparent" :html-scale 1.0
-  ;;                               :matchers ("begin" "$1" "$" "$$" "\\(" "\\["))
-  ;;                 org-preview-latex-process-alist
-  ;;                 '((dvisvgm :programs ("latex" "dvisvgm")
-  ;;                            :description "dvi > svg"
-  ;;                            :message "you need to install the programs: latex and dvisvgm."
-  ;;                            :use-xcolor t
-  ;;                            :image-input-type "dvi"
-  ;;                            :image-output-type "svg"
-  ;;                            :image-size-adjust (1.7 . 1.5)
-  ;;                            :latex-compiler ("latex -interaction nonstopmode -output-directory %o %f")
-  ;;                            :image-converter ("dvisvgm %f -n -b 1 -c %S -o %O"))
-  ;;                   (imagemagick :programs ("latex" "convert")
-  ;;                                :description "pdf > png"
-  ;;                                :message "you need to install the programs: latex and imagemagick."
-  ;;                                :use-xcolor t
-  ;;                                :image-input-type "pdf"
-  ;;                                :image-output-type "png"
-  ;;                                :image-size-adjust (1.0 . 1.0)
-  ;;                                :latex-compiler ("pdflatex -interaction nonstopmode -output-directory %o %f")
-  ;;                                :image-converter ("convert -density %D -trim -antialias %f -quality 100 %O"))
-  ;;                   (dvipng :programs ("latex" "dvipng")
-  ;;                           :description "dvi > png"
-  ;;                           :message "you need to install the programs: latex and dvipng."
-  ;;                           :image-input-type "dvi"
-  ;;                           :image-output-type "png"
-  ;;                           :image-size-adjust (1.0 . 1.0)
-  ;;                           :latex-compiler ("latex -interaction nonstopmode -output-directory %o %f")
-  ;;                           :image-converter ("dvipng -fg %F -bg %B -D %D -T tight -o %O %f")))
-  ;;                 org-format-latex-header
-  ;;                 "\\documentclass{article}
-  ;; \\usepackage[usenames]{color}
-  ;; [PACKAGES]
-  ;; [DEFAULT-PACKAGES]
-  ;; \\pagestyle{empty}
-  ;; \\setlength{\\textwidth}{\\paperwidth}
-  ;; \\addtolength{\\textwidth}{-3cm}
-  ;; \\setlength{\\oddsidemargin}{1.5cm}
-  ;; \\addtolength{\\oddsidemargin}{-2.54cm}
-  ;; \\setlength{\\evensidemargin}{\\oddsidemargin}
-  ;; \\setlength{\\textheight}{\\paperheight}
-  ;; \\addtolength{\\textheight}{-\\headheight}
-  ;; \\addtolength{\\textheight}{-\\headsep}
-  ;; \\addtolength{\\textheight}{-\\footskip}
-  ;; \\addtolength{\\textheight}{-3cm}
-  ;; \\setlength{\\topmargin}{1.5cm}
-  ;; \\addtolength{\\topmargin}{-2.54cm}
-  ;; \\tikzset{every picture/.style={color=fg}}")
+  (setq org-todo-keyword-faces
+        (quote (("TODO" :foreground "red" :weight bold)
+                ("NEXT" :foreground "DeepSkyBlue1" :weight bold)
+                ("DONE" :foreground "forest green" :weight bold)
+                ("WAITING" :foreground "orange" :weight bold)
+                ("HOLD" :foreground "magenta" :weight bold)
+                ("CANCELLED" :foreground "forest green" :weight bold)
+                ("MEETING" :foreground "forest green" :weight bold)
+                ("PHONE" :foreground "forest green" :weight bold))))
 
-  ;; NOTE(nox): Get different latex fragments for different themes
+  (setq org-todo-state-tags-triggers
+        (quote (("CANCELLED" ("CANCELLED" . t))
+                ("WAITING" ("WAITING" . t))
+                ("HOLD" ("WAITING") ("HOLD" . t))
+                (done ("WAITING") ("HOLD"))
+                ("TODO" ("WAITING") ("CANCELLED") ("HOLD"))
+                ("NEXT" ("WAITING") ("CANCELLED") ("HOLD"))
+                ("DONE" ("WAITING") ("CANCELLED") ("HOLD")))))
+
+  ;; Place tags close to the right-hand side of the window
+  (defun place-agenda-tags ()
+    "Put the agenda tags by the right border of the agenda window."
+    (setq org-agenda-tags-column (- 4 (window-width)))
+    (org-agenda-align-tags))
+  (add-hook 'org-finalize-agenda-hook 'place-agenda-tags)
+
+
+  ;; Changing a task state is done with C-c C-t KEY
+  ;; where KEY is the appropriate fast todo state selection key as defined in org-todo-keywords.
+  ;; The setting
+  (setq org-use-fast-todo-selection t)
+
+  ;; allows changing todo states with S-left and S-right skipping all of
+  ;; the normal processing when entering or leaving a todo state. This
+  ;; cycles through the todo states but skips setting timestamps and
+  ;; entering notes which is very convenient when all you want to do is
+  ;; fix up the status of an entry.
+  (setq org-treat-S-cursor-todo-selection-as-state-change nil)
+
                                         ; agenda stuff
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-  (setq org-agenda-tags-column 80)
-  ;; Do not dim blocked tasks
   (setq org-agenda-dim-blocked-tasks nil)
-  ;; Compact the block agenda view
-  (setq org-agenda-compact-blocks t) ;; nil為加上分隔線，t為去掉
-  ;; 用describe-char來查你想要的seperator char code
+  (setq org-agenda-compact-blocks t)
   (setq org-agenda-block-separator 45)
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; NOX'S SHIT
-  (defun nox/org-agenda-finalize ()
-    ;; NOTE(nox): Reset project hierarchy builder helper variable
-    (setq nox/org-agenda-first-project t)
-
-    ;; NOTE(nox): Remove empty blocks
-    (save-excursion
-      (goto-char (point-min))
-      (let ((prev (if (get-text-property (point-min) 'org-agenda-structural-header)
-                      (point-min)
-                    (next-single-property-change (point-min) 'org-agenda-structural-header)))
-            next)
-        (while (and prev (/= prev (point-max)))
-          (setq next
-                (or (next-single-property-change (next-single-property-change prev 'org-agenda-structural-header)
-                                                 'org-agenda-structural-header)
-                    (point-max)))
-          (if (or (and (< next (point-max)) (< (count-lines prev next) 4))
-                  (and (= next (point-max)) (< (count-lines prev next) 2)))
-              (delete-region prev next)
-            (setq prev next)))))
-
-    ;; NOTE(nox): Turn root projects bold
-    (save-excursion
-      (while (search-forward (char-to-string ?\u200B) nil t)
-        (add-face-text-property (line-beginning-position) (1+ (line-end-position)) '(:weight bold)))))
-  ;; Custom functions to find the tasks that were done in a file for the past month
+  ;; Check out NOX for stuff
   (require 'calendar)
 
   (defun jtc-org-tasks-closed-in-month (&optional month year match-string)
@@ -301,18 +230,27 @@ last month with the Category Foo."
                ((org-agenda-files (list org-index-file
                                         org-personal-file org-school-file
                                         org-projects-file org-journal-file
-                                        org-monthly-file))
+                                        org-monthly-file org-groceries-file
+                                        ))
                 (org-agenda-skip-scheduled-if-deadline-is-shown t)))
        (tags-todo "-REFILE-CANCELLED-WAITING-HOLD/!-DONE-HOLD"
                   ((org-agenda-overriding-header "To-File Files (index.org)")
                    (org-tags-match-list-sublevels nil)
                    (org-agenda-files (list org-index-file))))
-       (tags "cs73|cs87|research"
+       (tags "cs73|cs87|research|cs"
              ((org-agenda-overriding-header "CS Work")
               (org-tags-match-list-sublevels nil)
               (org-agenda-files (list org-school-file))))
-       (tags "jpns"
-             ((org-agenda-overriding-header "JPNS")
+       ;; (tags "jpns" ----- rip jpns..
+       ;;       ((org-agenda-overriding-header "JPNS")
+       ;;        (org-tags-match-list-sublevels nil)
+       ;;        (org-agenda-files (list org-school-file))))
+       (tags "physics"
+             ((org-agenda-overriding-header "Physics")
+              (org-tags-match-list-sublevels nil)
+              (org-agenda-files (list org-school-file))))
+       (tags "math"
+             ((org-agenda-overriding-header "Math")
               (org-tags-match-list-sublevels nil)
               (org-agenda-files (list org-school-file))))
        (tags "kizuna|smash|outsiders"
@@ -323,6 +261,7 @@ last month with the Category Foo."
                   ((org-agenda-overriding-header "Personal Stuff")
                    (org-tags-match-list-sublevels nil)
                    (org-agenda-files (list org-personal-file))))))
+
      ("t" "To Read Stuff"
       ((tags-todo "music/!-DONE-HOLD"
                   ((org-agenda-overriding-header "Music")
@@ -362,13 +301,10 @@ last month with the Category Foo."
    org-agenda-clockreport-parameter-plist `(:link t :maxlevel 6 :fileskip0 t :compact t :narrow 100)
    org-agenda-dim-blocked-tasks nil
    org-agenda-block-separator ""
-                                        ;   org-agenda-time-grid '((daily today require-timed) nil "......" "----------------")
+                                        ;org-agenda-time-grid '((daily today require-timed) nil "......" "----------------")
    )
   ;; Custom agenda command definitions
-                                        ; ((org-agenda-finalize-hook 'nox/org-agenda-finalize))
   (setq org-tags-match-list-sublevels t)
-
-
 
   ;; Function to skip tag
   ;; From http://stackoverflow.com/questions/10074016/org-mode-filter-on-tag-in-agenda-view
@@ -380,9 +316,8 @@ last month with the Category Foo."
     (org-todo 'done)
     (org-archive-subtree))
 
-
   (define-key org-mode-map (kbd "C-c C-x C-s") 'lp/mark-done-and-archive)
-  (setq org-log-done 'time)             ; also record when the TODO was archived
+  (setq org-log-done 'time)   ; also record when the TODO was archived
 
   (setq org-capture-templates
         '(("g" "Groceries"
@@ -396,7 +331,7 @@ last month with the Category Foo."
           ("j" "Journal"
            entry
            (file+datetree "~/Dropbox/org/journal.org")
-           "** %U :journal:\n%?")
+           "** %U :journal:\n%?\n good things that happened today?\n")
           ("t" "to-read"
            entry
            (file+headline "~/Dropbox/org/to-read.org" "inbox")
@@ -410,20 +345,10 @@ last month with the Category Foo."
            (file+headline org-personal-file "general")
            "* TODO %^{Task} %^g\n %?")))
 
-;;; Org Keybindings
+  ;;; Org Keybindings
   ;; Useful keybinds
   (define-key global-map (kbd "C-c a") 'org-agenda)
   (define-key global-map (kbd "C-c c") 'org-capture)
-
-  ;; Hit C-c i to open up my todo list.
-  (defun lp/open-index-file ()
-    "Open the org TODO list."
-    (interactive)
-    (find-file org-index-file)
-    (flycheck-mode -1)
-    (end-of-buffer))
-
-  (global-set-key (kbd "C-c i") 'lp/open-index-file)
 
   (defun lp/org-capture-todo ()
     (interactive)
@@ -437,50 +362,54 @@ last month with the Category Foo."
   (global-set-key (kbd "M-n") 'lp/org-capture-todo)
   (global-set-key (kbd "<f1>") 'lp/open-full-agenda)
 
-
   ;; Auto wrap paragraphs in some modes (auto-fill-mode)
   (add-hook 'text-mode-hook 'turn-on-auto-fill)
   (add-hook 'org-mode-hook 'turn-on-auto-fill)
 
   ;; sometimes i don't want to wrap text though, so we will toggle
   ;; with C-c q
-  (global-set-key (kbd "C-c q") 'auto-fill-mode))
+  (global-set-key (kbd "C-c q") 'auto-fill-mode)
+
+  ;; Hit C-c i to open up my todo list.
+  (defun lp/open-index-file ()
+    "Open the org TODO list."
+    (interactive)
+    (find-file org-index-file)
+    (flycheck-mode -1)
+    (end-of-buffer))
+
+  (global-set-key (kbd "C-c i") 'lp/open-index-file))
                                         ; clocking!
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-                                        ; setup helpers
-
                                         ; ok back to clocking
 ;;;;;;;;;;;;;;;;;;;;
 
 ;; Resume clocking task when emacs is restarted
 (org-clock-persistence-insinuate)
 ;;
-;; Show lot of clocking history so it's easy to pick items off the C-F11 list
-(setq org-clock-history-length 23)
-;; Resume clocking task on clock-in if the clock is open
-(setq org-clock-in-resume t)
-;; Change tasks to NEXT when clocking in
-(setq org-clock-in-switch-to-state 'bh/clock-in-to-next)
-;; Separate drawers for clocking and logs
-(setq org-drawers (quote ("PROPERTIES" "LOGBOOK")))
-;; Save clock data and state changes and notes in the LOGBOOK drawer
-(setq org-clock-into-drawer t)
-;; Sometimes I change tasks I'm clocking quickly - this removes clocked tasks with 0:00 duration
-(setq org-clock-out-remove-zero-time-clocks t)
-;; Clock out when moving task to a done state
-(setq org-clock-out-when-done t)
-;; Save the running clock and all clock history when exiting Emacs, load it on startup
-(setq org-clock-persist t)
-;; Do not prompt to resume an active clock
-(setq org-clock-persist-query-resume nil)
-;; Enable auto clock resolution for finding open clocks
-(setq org-clock-auto-clock-resolution (quote when-no-clock-is-running))
-;; Include current clocking task in clock reports
-(setq org-clock-report-include-clocking-task t)
+;; ;; Show lot of clocking history so it's easy to pick items off the C-F11 list
+;; (setq org-clock-history-length 23)
+;; ;; Resume clocking task on clock-in if the clock is open
+;; (setq org-clock-in-resume t)
+;; ;; Change tasks to NEXT when clocking in
+;; (setq org-clock-in-switch-to-state 'bh/clock-in-to-next)
+;; ;; Separate drawers for clocking and logs
+;; (setq org-drawers (quote ("PROPERTIES" "LOGBOOK")))
+;; ;; Save clock data and state changes and notes in the LOGBOOK drawer
+;; (setq org-clock-into-drawer t)
+;; ;; Sometimes I change tasks I'm clocking quickly - this removes clocked tasks with 0:00 duration
+;; (setq org-clock-out-remove-zero-time-clocks t)
+;; ;; Clock out when moving task to a done state
+;; (setq org-clock-out-when-done t)
+;; ;; Save the running clock and all clock history when exiting Emacs, load it on startup
+;; (setq org-clock-persist t)
+;; ;; Do not prompt to resume an active clock
+;; (setq org-clock-persist-query-resume nil)
+;; ;; Enable auto clock resolution for finding open clocks
+;; (setq org-clock-auto-clock-resolution (quote when-no-clock-is-running))
+;; ;; Include current clocking task in clock reports
+;; (setq org-clock-report-include-clocking-task t)
 
-;; hugo because why not
-
-(use-package ox-hugo
-  :ensure t)
+;; ox-hugo because why not
 
 (provide 'use-org)

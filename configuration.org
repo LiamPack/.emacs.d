@@ -1,5 +1,6 @@
 #+TITLE: Emacs Configuration
 #+AUTHOR: Liam Packer
+#+PROPERTY: header-args :tangle big_init.el
 
 So this is the config. Trying out an org-babel-load'ed config now to
 see how I like it.
