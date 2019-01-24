@@ -314,9 +314,9 @@ see how I like it.
    A bunch of font functionality to give that doesn't really exist in
    vanilla emacs afaik.
    #+BEGIN_SRC emacs-lisp
-   ;; iosevka term light, consolas, source code pro, Fira Code, dejavu, IBM 3270,
+   ;; iosevka term light, consolas, source code pro, Fira Code light, dejavu, IBM 3270,
    ;; Fantasque Sans Mono, Terminus
-   (setq lp/default-font "iosevka term")
+   (setq lp/default-font "fira code light")
    (setq lp/default-font-size 16)
    (setq lp/current-font-size lp/default-font-size)
 1
@@ -408,13 +408,42 @@ see how I like it.
    (add-to-list 'custom-theme-load-path "~/.emacs.d/themes")
    ;;(load-theme 'default-black)
    (use-package moe-theme
-     :ensure t)
-   (use-package paganini-theme
      :ensure t
-     :config (load-theme 'paganini-theme))
+     :after powerline
+     :config
+     ;; Show highlighted buffer-id as decoration. (Default: nil)
+     (setq moe-theme-highlight-buffer-id t)
+
+     ;; Resize titles (optional).
+     (setq moe-theme-resize-markdown-title '(1.5 1.4 1.3 1.2 1.0 1.0))
+     (setq moe-theme-resize-org-title '(1.5 1.4 1.3 1.2 1.1 1.0 1.0 1.0 1.0))
+     (setq moe-theme-resize-rst-title '(1.5 1.4 1.3 1.2 1.1 1.0))
+
+     ;; Choose a color for mode-line.(Default: blue)
+     ;; Finally, apply moe-theme now.
+     ;; Choose what you like, (moe-light) or (moe-dark)
+     (powerline-moe-theme)
+     (moe-theme-set-color 'magenta)
+     (moe-dark))
+   (use-package paganini-theme
+     :disabled t
+     :ensure t
+     :config (load-theme 'paganini))
    #+END_SRC
 
    #+RESULTS:
+
+** Modeline
+   #+BEGIN_SRC emacs-lisp
+   (use-package doom-modeline
+     :ensure t
+     :disabled
+     :defer t
+     :hook (after-init . doom-modeline-init))
+
+   (use-package powerline
+     :ensure t)
+   #+END_SRC
 
 * Navigation
 ** Buffers
