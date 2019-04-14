@@ -1,11 +1,7 @@
                                         ; research with org-mode!
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 (require 'use-package)
-;; pdf-tools init
-;; (use-package pdf-tools
-;;   :ensure t
-;;   :config
-;;   (pdf-tools-install))
+
 
 ;; org-ref
 (use-package bibtex-utils
@@ -49,5 +45,9 @@
   (find-file "~/Dropbox/res/notes.org")
   (flycheck-mode -1))
 (global-set-key  (kbd "C-c r") 'lp/open-paper-notes)
+
+
+(use-package org-noter
+  :ensure t)
 
 (provide 'use-res)

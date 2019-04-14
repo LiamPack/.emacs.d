@@ -5,6 +5,7 @@
 ;; highlights bad word choices and does stuff
 (use-package writegood-mode
   :ensure t
+  :disabled t
   :defer t
   :hook text-mode
   :diminish writegood-mode

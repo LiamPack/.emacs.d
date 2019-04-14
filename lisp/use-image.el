@@ -29,5 +29,15 @@
                  ("S" imagex-sticky-save-image "save file")
                  ("r" imagex-sticky-rotate-right "rotate right")
                  ("l" imagex-sticky-rotate-left "rotate left"))))
-
+(use-package pdf-tools
+  :ensure t
+  :config
+  (pdf-tools-install)
+  (setq pdf-view-resize-factor 1.1)
+  (define-key pdf-view-mode-map (kbd "h") 'pdf-annot-add-highlight-markup-annotation)
+  (define-key pdf-view-mode-map (kbd "t") 'pdf-annot-add-text-annotation)
+  (define-key pdf-view-mode-map (kbd "D") 'pdf-annot-delete)
+  (define-key pdf-view-mode-map (kbd "C-s") 'isearch-forward)
+  (setq-default pdf-view-display-size 'fit-page)
+  )
 (provide 'use-image)

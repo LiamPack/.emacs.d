@@ -38,6 +38,7 @@
 
 (use-package aggressive-indent
   :ensure t
+  :disabled t
   :diminish aggressive-indent-mode
   :hook ((emacs-lisp-mode css-mode c-mode c++-mode sh-mode) . aggressive-indent-mode))
 
