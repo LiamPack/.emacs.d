@@ -31,6 +31,9 @@
 ;;    * Any of the doom ones really
 ;;  * Habamax Theme - a little plain
 ;;  * Also hydanatantantatna-theme
+;;  * gruvbox
+;;  * tsdh-light
+;;  * tron theme https://github.com/ianpan870102/Emacs-Tron-Legacy-Theme
 (require 'use-package)
 
 ;; (add-to-list 'custom-theme-load-path "~/.emacs.d/themes/")
@@ -127,9 +130,14 @@
 
 
 ;;(load-theme 'kaolin-eclipse)
-(load-theme 'gruvbox)
+(load-theme 'tsdh-light)
+;;(load-theme 'manoj-dark t)
+(set-face-attribute 'mode-line nil :background "NavajoWhite")
+(set-face-attribute 'mode-line-inactive nil :background "#FAFAFA")
+
 (use-package moe-theme
   :ensure t
+  :disabled t
   ;; :config
   ;; (setq moe-light-pure-white-background-in-terminal t)
   ;; (moe-theme-set-color 'purple)
@@ -151,11 +159,10 @@
 
 (use-package color-theme
   :ensure t
-  :disabled)
+)
 
 (use-package color-theme-modern
   :after color-theme
-  :disabled
   :ensure t
   :config
   (load-theme 'midnight)

@@ -16,6 +16,7 @@
 (use-package image+
   :ensure t
   :defer t
+  :disabled t
                                         ;    :load-path "~/elisp/Emacs-imagex"
   :commands (imagex-global-sticky-mode imagex-auto-adjust-mode)
   :init (progn (imagex-global-sticky-mode)
@@ -33,11 +34,43 @@
   :ensure t
   :config
   (pdf-tools-install)
-  (setq pdf-view-resize-factor 1.1)
+  (setq pdf-view-resize-factor 1.05)
   (define-key pdf-view-mode-map (kbd "h") 'pdf-annot-add-highlight-markup-annotation)
   (define-key pdf-view-mode-map (kbd "t") 'pdf-annot-add-text-annotation)
   (define-key pdf-view-mode-map (kbd "D") 'pdf-annot-delete)
   (define-key pdf-view-mode-map (kbd "C-s") 'isearch-forward)
+  (add-hook 'pdf-view-mode-hook #'pdf-links-minor-mode)
   (setq-default pdf-view-display-size 'fit-page)
+
+  ;; (global-unset-key (kbd "<double-down-mouse-4>"))
+  ;; (global-unset-key (kbd "<double-down-mouse-5>"))
+  ;; (global-unset-key (kbd "<double-down-mouse-6>"))
+  ;; (global-unset-key (kbd "<double-down-mouse-7>"))
+  ;; (global-unset-key (kbd "<down-mouse-4>"))
+  ;; (global-unset-key (kbd "<down-mouse-5>"))
+  ;; (global-unset-key (kbd "<down-mouse-6>"))
+  ;; (global-unset-key (kbd "<down-mouse-7>"))
+  ;; (global-unset-key (kbd "<mouse-4>"))
+  ;; (global-unset-key (kbd "<mouse-5>"))
+  ;; (global-unset-key (kbd "<mouse-6>"))
+  ;; (global-unset-key (kbd "<mouse-7>"))
+
+  (define-key pdf-view-mode-map (kbd "<double-mouse-7>") 'image-forward-hscroll)
+  (define-key pdf-view-mode-map (kbd "<double-mouse-6>") 'image-backward-hscroll)
+  (define-key pdf-view-mode-map (kbd "C-S-n") (lambda ()  (interactive) (pdf-view-next-line-or-next-page 3)))
+  (define-key pdf-view-mode-map (kbd "C-S-p") (lambda ()  (interactive) (pdf-view-previous-line-or-previous-page 3)))
+  ;; (defun up-one () (interactive) (scroll-up 1))
+  ;; (defun down-one () (interactive) (scroll-down 1))
+  ;; (defun left-one () (interactive) (scroll-left 1))
+  ;; (defun right-one () (interactive) (scroll-right 1))
+  ;; (global-set-key (kbd "<mouse-4>") 'down-one)
+  ;; (global-set-key (kbd "<mouse-5>") 'up-one)
+  ;; (global-set-key (kbd "<down-mouse-4>") 'down-one)
+  ;; (global-set-key (kbd "<down-mouse-5>") 'up-one)
+  ;; (global-set-key (kbd "<double-mouse-4>") 'down-one)
+  ;; (global-set-key (kbd "<double-mouse-5>") 'up-one)
+  ;; (global-set-key (kbd "<double-down-mouse-4>") 'down-one)
+  ;; (global-set-key (kbd "<double-down-mouse-5>") 'up-one)
+
   )
 (provide 'use-image)

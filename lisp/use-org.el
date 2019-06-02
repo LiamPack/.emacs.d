@@ -52,7 +52,7 @@
                  ("\\section{%s}" . "\\section*{%s}")
                  ("\\subsection{%s}" . "\\subsection*{%s}")
                  ("\\subsubsection{%s}" . "\\subsubsection*{%s}")
-                 ("\\paragraph{%s}" . "\\paragraph*{%s}")))  ;; NOTE: If this isn't working, make sure to delete /
+                 ("\\paragraph{%s}" . "\\paragraph*{%s}"))) ;; NOTE: If this isn't working, make sure to delete /
   ;; byte-recompile the /elpa/org/.. directory!
   ;; enable language compiles
   (org-babel-do-load-languages
@@ -62,7 +62,7 @@
      ;;     (sh . t)
      (emacs-lisp . t)
      (gnuplot . t)
-     ;;(ipython . t)
+     (ipython . t)
      (R . t)))
   (setq org-confirm-babel-evaluate nil)
   (setq org-M-RET-may-split-line nil)
@@ -75,7 +75,7 @@
   (setq org-src-window-setup 'current-window)
   ;;(setq ob-async-no-async-languages-alist '("ipython"))
 
-  ;;;  file directory setup
+;;;  file directory setup
   ;; Org-capture management + Tasks
   (setq org-directory "~/Dropbox/Org/")
 
@@ -124,7 +124,7 @@
 
 
   (setq to-read-tags '(":learning:" ":books:" ":emacs:" ":research:" ":manga:" ":anime:"
-                       ":ml:" ":sites:" ":games:" ":music:" ":math:"))
+                       ":ml:" ":sites:" ":games:" ":music:" ":math:" ":podcasts:" ":videos:" ":papers:" ":movies:"))
 
   (defun lp/refile-to (file headline)
     "refile to specific spot (headline) in file"
@@ -372,12 +372,22 @@ last month with the Category Foo."
           ("p" "Personal todo"
            entry
            (file+headline org-personal-file "general")
-           "* TODO %^{Task} %^g\n %?")))
+           "* TODO %^{Task} %^g\n %?")
+          ("a" "anki basic" entry (file+headline "~/Dropbox/Org/logs/added_anki.org" "Basic")
+           "* all :deck: \n** Item :note: \n\t:PROPERTIES:\n\t:ANKI_DECK: all\n\t:ANKI_NOTE_TYPE: basic\n\t:ANKI_TAGS: %^{tags} \n\t:END:\n*** Front\n \n*** Back\n%?")))
 
-  ;;; Org Keybindings
+;;; Org Keybindings
   ;; Useful keybinds
   (define-key global-map (kbd "C-c a") 'org-agenda)
   (define-key global-map (kbd "C-c c") 'org-capture)
+
+
+  (define-key global-map (kbd "C-c k") (lambda () (interactive) (find-file "~/anki/all_anki.csv")))
+  ;; (defun anki-hook ()
+  ;;   (when (string= "a" (plist-get org-capture-plist :key))
+  ;;     (anki-editor-push-notes)))
+
+  ;; (add-hook 'org-capture-mode-hook #'ank-hook)
 
   (defun lp/org-capture-todo ()
     (interactive)
@@ -467,7 +477,7 @@ last month with the Category Foo."
    `(org-level-1 ((t (,@headline ,@variable-tuple :height 1.75))))
    `(org-document-title ((t (,@headline ,@variable-tuple :height 2.0 :underline nil))))))
 
-(add-hook 'org-mode-hook 'variable-pitch-mode)
+;;(add-hook 'org-mode-hook 'variable-pitch-mode)
 (add-hook 'org-mode-hook 'visual-line-mode)
 
 (custom-theme-set-faces
@@ -482,5 +492,6 @@ last month with the Category Foo."
  '(org-tag                   ((t (:inherit (shadow fixed-pitch) :weight bold :height 0.8))))
  '(org-verbatim              ((t (:inherit (shadow fixed-pitch)))))
  '(org-indent                ((t (:inherit (org-hide fixed-pitch))))))
+
 
 (provide 'use-org)

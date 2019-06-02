@@ -25,6 +25,7 @@
 (unless (assoc-default "org" package-archives)
   (add-to-list 'package-archives '("org" . "http://orgmode.org/elpa/") t))
 
+(setq gc-cons-threshold 100000000)
 ;; chicken before the
 (unless (package-installed-p 'use-package)
   (package-install 'use-package))
@@ -36,7 +37,6 @@
 (require 'unannoy)
 (require 'extras)
 (require 'utility)
-
 
 ;;; Time to load everything from the lisp/ directory
 (setq active-directory-files (list "~/.emacs.d/lisp/"))

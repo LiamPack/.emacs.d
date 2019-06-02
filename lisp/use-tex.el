@@ -9,9 +9,10 @@
   :ensure t
   :config
   (add-hook 'latex-mode-hook 'magic-latex-buffer)
-  (setq magic-latex-enable-block-highlight nil
-        magic-latex-enable-suscript        t
-        magic-latex-enable-pretty-symbols  t))
+  ;; (setq magic-latex-enable-block-highlight nil
+  ;;       magic-latex-enable-suscript        t
+  ;;       magic-latex-enable-pretty-symbols  t)
+  )
 
 (use-package tex
   :defer t
@@ -19,9 +20,8 @@
   :mode ("\\.tex\\'" . TeX-latex-mode)
   :config
   (setq TeX-PDF-mode t)
-
-  ;; (set-default 'preview-scale-function 2.0)
-
+  ;; The damn text is too tiny on the preview.
+  (set-default 'preview-scale-function 3.0)
 
   ;; revert pdf-view after compilation
   (add-hook 'TeX-after-compilation-finished-functions #'TeX-revert-document-buffer)
@@ -134,6 +134,7 @@
   :diminish reftex-mode)
 
 (use-package cdlatex
+  :disabled
   :ensure t
   :init (add-hook 'LaTeX-mode-hook #'cdlatex-mode))
 

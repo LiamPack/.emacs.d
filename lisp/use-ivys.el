@@ -9,7 +9,6 @@
 
 (use-package ivy
   :ensure t
-  :disabled t
   :diminish ivy-mode
   :init  (with-eval-after-load 'ido
            (ido-mode -1)
@@ -23,7 +22,6 @@
 
 (use-package ivy-hydra                  ; Hydra bindings for ivy buffer
   :ensure t
-  :disabled t
   :after ivy
   :bind (:map ivy-minibuffer-map
               ("C-o" . hydra-ivy/body)))
@@ -41,7 +39,6 @@
 
 (use-package counsel                    ; Ivy-powered commands
   :ensure t
-  :disabled t
   :diminish counsel-mode
   :init (counsel-mode)
   :bind (([remap execute-extended-command]  . counsel-M-x)
@@ -76,7 +73,6 @@
 
 (use-package swiper
   :ensure t
-  :disabled t
   :init (ivy-mode 1)
   :config
   (setf ivy-wrap t
@@ -95,6 +91,7 @@
 
 (use-package helm
   :ensure t
+  :disabled t
   :config
   (require 'helm-config)
   (global-set-key (kbd "C-c h") 'helm-command-prefix)

@@ -45,8 +45,8 @@
   (narrow-to-region goal-point (point))
   (goto-char goal-point)
   (fset 'tab
-	(lambda (&optional arg) "Keyboard macro." (interactive "p")
-	  (kmacro-exec-ring-item (quote ([tab] 0 "%d")) arg)))
+        (lambda (&optional arg) "Keyboard macro." (interactive "p")
+          (kmacro-exec-ring-item (quote ([tab] 0 "%d")) arg)))
   (tab)) ;; It basically just narrows right where you are.
 
 (global-set-key (kbd "C-c o") 'lp/org-open-point)
@@ -72,10 +72,20 @@
 (global-set-key (kbd "<f5>")  #'revert-buffer)
 (global-set-key (kbd "C-;") 'comment-or-uncomment-region)
 (global-set-key (kbd "C-@") 'align-regexp)
-(global-set-key (kbd "C-c e") 'eval-and-replace) ; this one is pretty cool. 
+(global-set-key (kbd "C-c e") 'eval-and-replace) ; this one is pretty cool.
 (global-set-key (kbd "C-x p") 'pop-to-mark-command)
 (setq set-mark-command-repeat-pop t)
-
+;; When popping the mark, continue popping until the cursor actually
+;; moves Also, if the last command was a copy - skip past all the
+;; expand-region cruft.
+(defadvice pop-to-mark-command (around ensure-new-position activate)
+  (let ((p (point)))
+    (when (eq last-command 'save-region-or-current-line)
+      ad-do-it
+      ad-do-it
+      ad-do-it)
+    (dotimes (i 10)
+      (when (= p (point)) ad-do-it))))
 ;; backspace change!
 ;;(global-set-key (kbd "C-h") 'delete-backward-char)?
 (global-set-key (kbd "M-h") 'backward-kill-word)
