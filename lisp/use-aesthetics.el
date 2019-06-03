@@ -31,6 +31,9 @@
 ;;    * Any of the doom ones really
 ;;  * Habamax Theme - a little plain
 ;;  * Also hydanatantantatna-theme
+;;  * gruvbox
+;;  * tsdh-light
+;;  * tron theme https://github.com/ianpan870102/Emacs-Tron-Legacy-Theme
 (require 'use-package)
 
 ;; (add-to-list 'custom-theme-load-path "~/.emacs.d/themes/")
@@ -49,7 +52,6 @@
 ;; also fonts
 (set-locale-environment "UTF-8")
 ;;; API
-
 
 ;; powerline theme where the modes are on the right side.
 (use-package powerline
@@ -114,45 +116,53 @@
   :config
   (minions-mode))
 
-(use-package moody
-  :ensure t
-  :config
-  (setq x-underline-at-descent-line t)
-  (moody-replace-mode-line-buffer-identification)
-  (moody-replace-vc-mode))
+;; (use-package moody
+;;   :ensure t
+;;   :config
+;;   (setq x-underline-at-descent-line t)
+;;   (moody-replace-mode-line-buffer-identification)
+;;   (moody-replace-vc-mode))
 
 
 (defadvice load-theme (before clear-previous-themes activate)
   "Clear existing theme settings instead of layering them"
   (mapc #'disable-theme custom-enabled-themes))
 
+
+;;(load-theme 'kaolin-eclipse)
+(load-theme 'tsdh-light)
+;;(load-theme 'manoj-dark t)
+(set-face-attribute 'mode-line nil :background "NavajoWhite")
+(set-face-attribute 'mode-line-inactive nil :background "#FAFAFA")
+
 (use-package moe-theme
   :ensure t
-  :config
-  (setq moe-light-pure-white-background-in-terminal t)
-  (moe-theme-set-color 'purple)
-  ;; Resize titles
-  (setq moe-theme-resize-markdown-title '(2.0 1.7 1.5 1.3 1.0 1.0))
-  (setq moe-theme-resize-org-title '(2.2 1.8 1.6 1.4 1.2 1.0 1.0 1.0 1.0))
-  (setq moe-theme-resize-rst-title '(2.0 1.7 1.5 1.3 1.1 1.0))
-  (require 'moe-theme-switcher)
-  (let ((line (face-attribute 'mode-line :underline)))
-    (set-face-attribute 'mode-line          nil :overline   line)
-    (set-face-attribute 'mode-line-inactive nil :overline   line)
-    (set-face-attribute 'mode-line-inactive nil :underline  line)
-    (set-face-attribute 'mode-line          nil :box        nil)
-    (set-face-attribute 'mode-line-inactive nil :box        nil)
-    (set-face-attribute 'mode-line-inactive nil :background "#f9f2d9"))
-  (setq moe-theme-highlight-buffer-id t)
-  (moe-light))
+  :disabled t
+  ;; :config
+  ;; (setq moe-light-pure-white-background-in-terminal t)
+  ;; (moe-theme-set-color 'purple)
+  ;; ;; Resize titles
+  ;; (setq moe-theme-resize-markdown-title '(2.0 1.7 1.5 1.3 1.0 1.0))
+  ;; (setq moe-theme-resize-org-title '(2.2 1.8 1.6 1.4 1.2 1.0 1.0 1.0 1.0))
+  ;; (setq moe-theme-resize-rst-title '(2.0 1.7 1.5 1.3 1.1 1.0))
+  ;; (require 'moe-theme-switcher)
+  ;; (let ((line (face-attribute 'mode-line :underline)))
+  ;;   (set-face-attribute 'mode-line          nil :overline   line)
+  ;;   (set-face-attribute 'mode-line-inactive nil :overline   line)
+  ;;   (set-face-attribute 'mode-line-inactive nil :underline  line)
+  ;;   (set-face-attribute 'mode-line          nil :box        nil)
+  ;;   (set-face-attribute 'mode-line-inactive nil :box        nil)
+  ;;   (set-face-attribute 'mode-line-inactive nil :background "#f9f2d9"))
+  ;; (setq moe-theme-highlight-buffer-id t)
+  ;; (moe-light)
+  )
 
 (use-package color-theme
   :ensure t
-  :disabled)
+)
 
 (use-package color-theme-modern
   :after color-theme
-  :disabled
   :ensure t
   :config
   (load-theme 'midnight)
@@ -193,7 +203,7 @@
 
 ;; iosevka, consolas, source code pro, Fira Code, dejavu, IBM 3270,
 ;; Fantasque Sans Mono, Terminus, overpass mono
-(setq lp/default-font "overpass mono")
+(setq lp/default-font "DejaVu Sans mono")
 
 (setq lp/default-font-size 12)
 
@@ -212,6 +222,7 @@
   (interactive)
   (setq lp/current-font-size lp/default-font-size)
   (lp/set-font-size))
+
 
 (defun lp/increase-font-size ()
   "increase current font size by a factor of 'lp/font-change-increment'."

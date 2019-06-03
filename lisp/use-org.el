@@ -18,22 +18,51 @@
 
   (add-hook 'org-mode-hook '(lambda () (org-bullets-mode)) )
 
+  ;; Some latex stuff in org
+  (setq org-format-latex-options (plist-put org-format-latex-options :scale 3.0))
+  (setq org-latex-create-formula-image-program 'dvipng)
+  (setq-default org-highlight-latex-and-related '(latex script entities))
+  (setq org-latex-listings 'minted)
 
+  ;; Evaluates latex fragments behind the $ after pressing $, <SPC>
+  (defun krofna-hack ()
+    (when (looking-back (rx "$ "))
+      (save-excursion
+        (backward-char 1)
+        (org-toggle-latex-fragment))))
+
+  (add-hook 'org-mode-hook
+            (lambda ()
+              (org-cdlatex-mode)
+              (add-hook 'post-self-insert-hook #'krofna-hack 'append 'local)))
+
+  ;; Some nice latex pretty-entites!
   (setq org-startup-with-inline-images t)
   (setq org-pretty-entities t)
+  (setq org-pretty-entities-include-sub-superscripts t)
   (add-hook 'org-babel-after-execute-hook 'org-redisplay-inline-images)
   (setq org-use-speed-commands t)
-  ;; NOTE: If this isn't working, make sure to delete /
+
+
+  ;; More latex classes on export
+  (require 'ox-latex)
+  (add-to-list 'org-latex-classes
+               '("IEEEtran"
+                 "\\documentclass{IEEEtran}"
+                 ("\\section{%s}" . "\\section*{%s}")
+                 ("\\subsection{%s}" . "\\subsection*{%s}")
+                 ("\\subsubsection{%s}" . "\\subsubsection*{%s}")
+                 ("\\paragraph{%s}" . "\\paragraph*{%s}"))) ;; NOTE: If this isn't working, make sure to delete /
   ;; byte-recompile the /elpa/org/.. directory!
   ;; enable language compiles
   (org-babel-do-load-languages
    'org-babel-load-languages
    '((C . t)
      (python . t)
-     (sh . t)
+     ;;     (sh . t)
      (emacs-lisp . t)
      (gnuplot . t)
-     ;;(ipython . t)
+     (ipython . t)
      (R . t)))
   (setq org-confirm-babel-evaluate nil)
   (setq org-M-RET-may-split-line nil)
@@ -46,7 +75,7 @@
   (setq org-src-window-setup 'current-window)
   ;;(setq ob-async-no-async-languages-alist '("ipython"))
 
-  ;;;  file directory setup
+;;;  file directory setup
   ;; Org-capture management + Tasks
   (setq org-directory "~/Dropbox/Org/")
 
@@ -95,7 +124,7 @@
 
 
   (setq to-read-tags '(":learning:" ":books:" ":emacs:" ":research:" ":manga:" ":anime:"
-                       ":ml:" ":sites:" ":games:" ":music:" ":math:"))
+                       ":ml:" ":sites:" ":games:" ":music:" ":math:" ":podcasts:" ":videos:" ":papers:" ":movies:"))
 
   (defun lp/refile-to (file headline)
     "refile to specific spot (headline) in file"
@@ -322,19 +351,19 @@ last month with the Category Foo."
   (setq org-capture-templates
         '(("g" "Groceries"
            entry
-           (file "~/Dropbox/org/groceries.org")
+           (file "~/Dropbox/Org/groceries.org")
            "- [ ] %?\n")
           ("i" "Ideas"
            entry
-           (file+headline "~/Dropbox/org/ideas.org" "Project Ideas")
+           (file+headline "~/Dropbox/Org/ideas.org" "Project Ideas")
            "** [#%^{9}] %?\n")
           ("j" "Journal"
            entry
-           (file+datetree "~/Dropbox/org/journal.org")
+           (file+datetree "~/Dropbox/Org/journal.org")
            "** %U :journal:\n%?\n good things that happened today?\n")
           ("t" "to-read"
            entry
-           (file+headline "~/Dropbox/org/to-read.org" "inbox")
+           (file+headline "~/Dropbox/Org/to-read.org" "inbox")
            "** TODO %^{to-read}  %^g\n %U")
           ("z" "Todo"
            entry
@@ -343,12 +372,22 @@ last month with the Category Foo."
           ("p" "Personal todo"
            entry
            (file+headline org-personal-file "general")
-           "* TODO %^{Task} %^g\n %?")))
+           "* TODO %^{Task} %^g\n %?")
+          ("a" "anki basic" entry (file+headline "~/Dropbox/Org/logs/added_anki.org" "Basic")
+           "* all :deck: \n** Item :note: \n\t:PROPERTIES:\n\t:ANKI_DECK: all\n\t:ANKI_NOTE_TYPE: basic\n\t:ANKI_TAGS: %^{tags} \n\t:END:\n*** Front\n \n*** Back\n%?")))
 
-  ;;; Org Keybindings
+;;; Org Keybindings
   ;; Useful keybinds
   (define-key global-map (kbd "C-c a") 'org-agenda)
   (define-key global-map (kbd "C-c c") 'org-capture)
+
+
+  (define-key global-map (kbd "C-c k") (lambda () (interactive) (find-file "~/anki/all_anki.csv")))
+  ;; (defun anki-hook ()
+  ;;   (when (string= "a" (plist-get org-capture-plist :key))
+  ;;     (anki-editor-push-notes)))
+
+  ;; (add-hook 'org-capture-mode-hook #'ank-hook)
 
   (defun lp/org-capture-todo ()
     (interactive)
@@ -411,5 +450,48 @@ last month with the Category Foo."
 ;; (setq org-clock-report-include-clocking-task t)
 
 ;; ox-hugo because why not
+
+;; random org stuff now
+(setq org-hide-emphasis-markers t)
+(font-lock-add-keywords 'org-mode
+                        '(("^ *\\([-]\\) "
+                           (0 (prog1 () (compose-region (match-beginning 1) (match-end 1) "•"))))))
+(let* ((variable-tuple
+        (cond ((x-list-fonts "DejaVu Sans") '(:font "DejaVu Sans"))
+              ;; ((x-list-fonts "Lucida Grande")   '(:font "Lucida Grande"))
+              ;; ((x-list-fonts "Verdana")         '(:font "Verdana"))
+              ;; ((x-family-fonts "Sans Serif")    '(:family "Sans Serif"))
+              (nil (warn "Cannot find a Sans Serif Font.  Install Source Sans Pro."))))
+       (base-font-color     (face-foreground 'default nil 'default))
+       (headline           `(:inherit default :weight bold :foreground ,base-font-color)))
+
+  (custom-theme-set-faces
+   'user
+   `(org-level-8 ((t (,@headline ,@variable-tuple))))
+   `(org-level-7 ((t (,@headline ,@variable-tuple))))
+   `(org-level-6 ((t (,@headline ,@variable-tuple))))
+   `(org-level-5 ((t (,@headline ,@variable-tuple))))
+   `(org-level-4 ((t (,@headline ,@variable-tuple :height 1.1))))
+   `(org-level-3 ((t (,@headline ,@variable-tuple :height 1.25))))
+   `(org-level-2 ((t (,@headline ,@variable-tuple :height 1.5))))
+   `(org-level-1 ((t (,@headline ,@variable-tuple :height 1.75))))
+   `(org-document-title ((t (,@headline ,@variable-tuple :height 2.0 :underline nil))))))
+
+;;(add-hook 'org-mode-hook 'variable-pitch-mode)
+(add-hook 'org-mode-hook 'visual-line-mode)
+
+(custom-theme-set-faces
+ 'user
+ '(org-block                 ((t (:inherit fixed-pitch))))
+ '(org-document-info         ((t (:foreground "dark orange"))))
+ '(org-document-info-keyword ((t (:inherit (shadow fixed-pitch)))))
+ '(org-link                  ((t (:foreground "royal blue" :underline t))))
+ '(org-meta-line             ((t (:inherit (font-lock-comment-face fixed-pitch)))))
+ '(org-property-value        ((t (:inherit fixed-pitch))) t)
+ '(org-special-keyword       ((t (:inherit (font-lock-comment-face fixed-pitch)))))
+ '(org-tag                   ((t (:inherit (shadow fixed-pitch) :weight bold :height 0.8))))
+ '(org-verbatim              ((t (:inherit (shadow fixed-pitch)))))
+ '(org-indent                ((t (:inherit (org-hide fixed-pitch))))))
+
 
 (provide 'use-org)

@@ -5,6 +5,7 @@
 ;; highlights bad word choices and does stuff
 (use-package writegood-mode
   :ensure t
+  :disabled t
   :defer t
   :hook text-mode
   :diminish writegood-mode
@@ -35,7 +36,7 @@
 (defun lp/open-challenges-notes ()
   "Open the org TODO list."
   (interactive)
-  (find-file "~/Dropbox/org/dailies.org")
+  (find-file "~/Dropbox/Org/dailies.org")
   (flycheck-mode -1))
 
 (global-set-key  (kbd "C-c y") 'lp/open-challenges-notes)
