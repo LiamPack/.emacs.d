@@ -40,10 +40,6 @@
 (set-terminal-coding-system 'utf-8)
 (set-keyboard-coding-system 'utf-8)
 
-
-
-
-
 ;; Insert key is stupid
 (define-key global-map [(insert)] nil)
 (define-key global-map [(control insert)] 'overwrite-mode)

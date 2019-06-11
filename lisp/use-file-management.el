@@ -6,11 +6,19 @@
 ;; clean up permissions and owners, less noisy
 (add-hook 'dired-mode-hook
           (lambda ()
-            (dired-hide-details-mode 1)))
+            (dired-hide-details-mode 1)
+            (require 'dired-x)
+            (dired-dotfiles-toggle)))
+
+(use-package all-the-icons-dired
+  :ensure t
+  :config
+  (add-hook 'dired-mode-hook 'all-the-icons-dired-mode))
+
 ;; disable ls by default
 (setq dired-use-ls-dired nil)
 
- (use-package recentf                    ; Save recently visited files
+(use-package recentf                    ; Save recently visited files
   :init (recentf-mode)
   :diminish recentf-mode
   :config
@@ -62,5 +70,18 @@
   :ensure t
   :config
   (require 'vlf-setup))
- 
+
+(defun dired-dotfiles-toggle ()
+  "Show/hide dot-files"
+  (interactive)
+  (when (equal major-mode 'dired-mode)
+    (if (or (not (boundp 'dired-dotfiles-show-p)) dired-dotfiles-show-p) ; if currently showing
+        (progn
+          (set (make-local-variable 'dired-dotfiles-show-p) nil)
+          (message "h")
+          (dired-mark-files-regexp "^\\\.")
+          (dired-do-kill-lines))
+      (progn (revert-buffer) ; otherwise just revert to re-show
+             (set (make-local-variable 'dired-dotfiles-show-p) t)))))
+
 (provide 'use-recentf)

@@ -4,6 +4,7 @@
 
 (use-package iedit
   :ensure t
+  :bind (("C-:" . #'iedit-mode))
   :config
   (defun ap/iedit-or-flyspell ()
     "Call `iedit-mode' or correct misspelling with flyspell, depending..."
