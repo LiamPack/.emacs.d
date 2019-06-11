@@ -133,7 +133,7 @@
 (global-set-key (kbd "C-<f7>") 'compile)
 (global-set-key (kbd "<f5>")  #'revert-buffer)
 (global-set-key (kbd "C-;") 'comment-or-uncomment-region)
-(global-set-key (kbd "C-@") 'align-regexp)
+;;(global-set-key (kbd "C-@") 'align-regexp)
 (global-set-key (kbd "C-c e") 'eval-and-replace) ; this one is pretty cool.
 (global-set-key (kbd "C-x p") 'pop-to-mark-command)
 (setq set-mark-command-repeat-pop t)
@@ -425,6 +425,34 @@
   (defun my/python-mode-hook ()
     (add-to-list 'company-backends 'company-jedi))
   (add-hook 'python-mode-hook 'my/python-mode-hook))
+
+;;;; ein / ipython / jupyter -- https://github.com/millejoh/emacs-ipython-notebook
+;;;
+;;; This is a _full featured_ jupyter notebook that happens in emacs
+;;; rather than a process that communicates with the jupyter process
+;;; via zmq sockets like the package /jupyter/. 
+;;;
+;;; ein aims to be the main frontend between the user and jupyter,
+;;; effectively adding a layer between the user and the kernel.
+;;;
+;;; necessary dependency of ein for some reason. used to render latex fragments?
+(use-package px
+  :unless (string= (system-name) "Lucrio")
+  :ensure t)
+
+(use-package ein
+  :unless (string= (system-name) "Lucrio")
+  :ensure t
+  :after px
+  :init
+  (require 'px))
+
+;;; Does NOT work with emacs versions <26
+;; (use-package jupyter
+;;   :unless (string= (system-name) "Lucrio")
+;;   :ensure t
+;;   :config )
+
 
 ;;;; Haskell
 (use-package haskell-mode               ; Haskell major mode
@@ -742,7 +770,6 @@
   :diminish reftex-mode)
 
 (use-package cdlatex
-  :disabled
   :ensure t
   :init (add-hook 'LaTeX-mode-hook #'cdlatex-mode))
 
@@ -1088,11 +1115,19 @@
 
 
 ;;;;;;;;;;;;;;;;;;;; Fancy Navigation
+
+;;;; avy
+(use-package avy
+  :ensure t
+  :config
+  (setq avy-style 'words) ; Makes the avy jump characters real words! wow.
+  (global-set-key (kbd "C-'") 'avy-goto-char-2))
+
 ;;;; anzu
 ;;; Interactive searching and regexp replacing to help see what goes down
 (use-package anzu                       ; Position/matches count for isearch
   :ensure t
-  :defer 1
+  :defer 3
   :diminish anzu-mode
   :bind
   (([remap query-replace] . anzu-query-replace)
@@ -1111,7 +1146,6 @@
    '(anzu-search-threshold 1000)
    '(anzu-replace-threshold 50)
    '(anzu-replace-to-string-separator " => ")))
-
 
 ;;;; Counsel / Ivy / Swiper
 (use-package counsel                    ; Ivy-powered commands
@@ -1147,6 +1181,53 @@
   (setq ivy-initial-inputs-alist nil)
   (setq enable-recursive-minibuffers t)
   (setq ivy-count-format "%d/%d "))
+
+
+;;;; Helm Stuff (in case it was needed)
+(use-package helm
+  :ensure t
+  :disabled t
+  :config
+  (require 'helm-config)
+  (global-set-key (kbd "C-c h") 'helm-command-prefix)
+  (global-unset-key (kbd "C-x c"))
+  (setq helm-split-window-in-side-p           t ; open helm buffer inside current window, not occupy whole other window
+        helm-move-to-line-cycle-in-source     t ; move to end or beginning of source when reaching top or bottom of source.
+        helm-ff-search-library-in-sexp        t ; search for library in `require' and `declare-function' sexp.
+        helm-scroll-amount                    8 ; scroll 8 lines other window using M-<next>/M-<prior>
+        helm-ff-file-name-history-use-recentf t
+        helm-echo-input-in-header-line t)
+
+  ;; helm is a little much for me
+  (setq helm-autoresize-max-height 0)
+  (setq helm-autoresize-min-height 20)
+  (helm-autoresize-mode 1)
+
+  (helm-mode 1)
+
+  ;; going to want to use M-x with helm's powerful interface
+  (global-set-key (kbd "M-x") 'helm-M-x)
+
+  ;; We also are going to want to use the kill-ring feature
+  (global-set-key (kbd "M-y") 'helm-show-kill-ring)
+
+  ;; helm also has a great interface to a number of
+  ;; different buffers and stuff like that
+  (global-set-key (kbd "C-x b") 'helm-mini)
+
+  ;; Another place to stick helm in. fuzzy matching,
+  (global-set-key (kbd "C-x C-f") 'helm-find-files)
+
+  ;; We also want helm-occur to not be on a horrible keybind
+  (global-set-key (kbd "C-c h o") 'helm-occur)
+
+  ;; REGISTERS!
+  (global-set-key (kbd "C-c h x") 'helm-register)
+  (with-eval-after-load 'helm
+    (setq helm-always-two-windows nil)
+    (setq helm-display-buffer-default-height 15)
+    (setq helm-default-display-buffer-functions '(display-buffer-in-side-window)))
+  )
 
 
 ;;;; iedit
@@ -1710,7 +1791,7 @@ directory to make multiple eshell windows easier."
   (unbind-key "C-," org-mode-map)       ;expand-region
   (unbind-key "C-'" org-mode-map)       ;avy
 
-  (add-hook 'org-mode-hook '(lambda () (org-bullets-mode)) )
+  (add-hook 'org-mode-hook (lambda () (org-bullets-mode)))
 
   ;; Some latex stuff in org
   (setq org-format-latex-options (plist-put org-format-latex-options :scale 3.0))
@@ -1746,17 +1827,22 @@ directory to make multiple eshell windows easier."
                  ("\\section{%s}" . "\\section*{%s}")
                  ("\\subsection{%s}" . "\\subsection*{%s}")
                  ("\\subsubsection{%s}" . "\\subsubsection*{%s}")
-                 ("\\paragraph{%s}" . "\\paragraph*{%s}"))) ;; NOTE: If this isn't working, make sure to delete /
-  ;; byte-recompile the /elpa/org/.. directory!
-  ;; enable language compiles
+                 ("\\paragraph{%s}" . "\\paragraph*{%s}")))
+
+  ;; NOTE: If this isn't working, make sure to delete / byte-recompile
+  ;; the /elpa/org/.. directory!  enable language compiles
+  (use-package ob-ipython
+    :ensure t
+    :config
+    (org-babel-do-load-languages
+     'org-babel-load-languages
+     '((ipython . t))))
   (org-babel-do-load-languages
    'org-babel-load-languages
    '((C . t)
      (python . t)
-     ;;     (sh . t)
      (emacs-lisp . t)
      (gnuplot . t)
-     (ipython . t)
      (R . t)))
   (setq org-confirm-babel-evaluate nil)
   (setq org-M-RET-may-split-line nil)
@@ -2075,8 +2161,6 @@ last month with the Category Foo."
   (define-key global-map (kbd "C-c a") 'org-agenda)
   (define-key global-map (kbd "C-c c") 'org-capture)
 
-
-  (define-key global-map (kbd "C-c k") (lambda () (interactive) (find-file "~/anki/all_anki.csv")))
   ;; (defun anki-hook ()
   ;;   (when (string= "a" (plist-get org-capture-plist :key))
   ;;     (anki-editor-push-notes)))
@@ -2150,42 +2234,42 @@ last month with the Category Foo."
 (font-lock-add-keywords 'org-mode
                         '(("^ *\\([-]\\) "
                            (0 (prog1 () (compose-region (match-beginning 1) (match-end 1) "•"))))))
-(let* ((variable-tuple
-        (cond ((x-list-fonts "DejaVu Sans") '(:font "DejaVu Sans"))
-              ;; ((x-list-fonts "Lucida Grande")   '(:font "Lucida Grande"))
-              ;; ((x-list-fonts "Verdana")         '(:font "Verdana"))
-              ;; ((x-family-fonts "Sans Serif")    '(:family "Sans Serif"))
-              (nil (warn "Cannot find a Sans Serif Font.  Install Source Sans Pro."))))
-       (base-font-color     (face-foreground 'default nil 'default))
-       (headline           `(:inherit default :weight bold :foreground ,base-font-color)))
+;; (let* ((variable-tuple
+;;         (cond ((x-list-fonts "DejaVu Sans") '(:font "DejaVu Sans"))
+;;               ;; ((x-list-fonts "Lucida Grande")   '(:font "Lucida Grande"))
+;;               ;; ((x-list-fonts "Verdana")         '(:font "Verdana"))
+;;               ;; ((x-family-fonts "Sans Serif")    '(:family "Sans Serif"))
+;;               (nil (warn "Cannot find a Sans Serif Font.  Install Source Sans Pro."))))
+;;        (base-font-color     (face-foreground 'default nil 'default))
+;;        (headline           `(:inherit default :weight bold :foreground ,base-font-color)))
 
-  (custom-theme-set-faces
-   'user
-   `(org-level-8 ((t (,@headline ,@variable-tuple))))
-   `(org-level-7 ((t (,@headline ,@variable-tuple))))
-   `(org-level-6 ((t (,@headline ,@variable-tuple))))
-   `(org-level-5 ((t (,@headline ,@variable-tuple))))
-   `(org-level-4 ((t (,@headline ,@variable-tuple :height 1.1))))
-   `(org-level-3 ((t (,@headline ,@variable-tuple :height 1.25))))
-   `(org-level-2 ((t (,@headline ,@variable-tuple :height 1.5))))
-   `(org-level-1 ((t (,@headline ,@variable-tuple :height 1.75))))
-   `(org-document-title ((t (,@headline ,@variable-tuple :height 2.0 :underline nil))))))
+;;   (custom-theme-set-faces
+;;    'user
+;;    `(org-level-8 ((t (,@headline ,@variable-tuple))))
+;;    `(org-level-7 ((t (,@headline ,@variable-tuple))))
+;;    `(org-level-6 ((t (,@headline ,@variable-tuple))))
+;;    `(org-level-5 ((t (,@headline ,@variable-tuple))))
+;;    `(org-level-4 ((t (,@headline ,@variable-tuple :height 1.1))))
+;;    `(org-level-3 ((t (,@headline ,@variable-tuple :height 1.25))))
+;;    `(org-level-2 ((t (,@headline ,@variable-tuple :height 1.5))))
+;;    `(org-level-1 ((t (,@headline ,@variable-tuple :height 1.75))))
+;;    `(org-document-title ((t (,@headline ,@variable-tuple :height 2.0 :underline nil))))))
 
-;;(add-hook 'org-mode-hook 'variable-pitch-mode)
+;; ;;(add-hook 'org-mode-hook 'variable-pitch-mode)
 (add-hook 'org-mode-hook 'visual-line-mode)
 
-(custom-theme-set-faces
- 'user
- '(org-block                 ((t (:inherit fixed-pitch))))
- '(org-document-info         ((t (:foreground "dark orange"))))
- '(org-document-info-keyword ((t (:inherit (shadow fixed-pitch)))))
- '(org-link                  ((t (:foreground "royal blue" :underline t))))
- '(org-meta-line             ((t (:inherit (font-lock-comment-face fixed-pitch)))))
- '(org-property-value        ((t (:inherit fixed-pitch))) t)
- '(org-special-keyword       ((t (:inherit (font-lock-comment-face fixed-pitch)))))
- '(org-tag                   ((t (:inherit (shadow fixed-pitch) :weight bold :height 0.8))))
- '(org-verbatim              ((t (:inherit (shadow fixed-pitch)))))
- '(org-indent                ((t (:inherit (org-hide fixed-pitch))))))
+;; (custom-theme-set-faces
+;;  'user
+;;  '(org-block                 ((t (:inherit fixed-pitch))))
+;;  '(org-document-info         ((t (:foreground "dark orange"))))
+;;  '(org-document-info-keyword ((t (:inherit (shadow fixed-pitch)))))
+;;  '(org-link                  ((t (:foreground "royal blue" :underline t))))
+;;  '(org-meta-line             ((t (:inherit (font-lock-comment-face fixed-pitch)))))
+;;  '(org-property-value        ((t (:inherit fixed-pitch))) t)
+;;  '(org-special-keyword       ((t (:inherit (font-lock-comment-face fixed-pitch)))))
+;;  '(org-tag                   ((t (:inherit (shadow fixed-pitch) :weight bold :height 0.8))))
+;;  '(org-verbatim              ((t (:inherit (shadow fixed-pitch)))))
+;;  '(org-indent                ((t (:inherit (org-hide fixed-pitch))))))
 
 ;;;;;;;;;;;;;;;;;;;; Research Books org-ref
 
@@ -2205,7 +2289,7 @@ last month with the Category Foo."
 (autoload 'helm-bibtex "helm-bibtex" "" t)
 
 (use-package org-ref
-
+  :when (string= (system-name) "Lucrio")
   :ensure t
   :config
   (require 'doi-utils)
@@ -2265,6 +2349,7 @@ last month with the Category Foo."
                  ("r" imagex-sticky-rotate-right "rotate right")
                  ("l" imagex-sticky-rotate-left "rotate left"))))
 (use-package pdf-tools
+  :when (string= (system-name) "Lucrio")
   :ensure t
   :config
   (pdf-tools-install)
