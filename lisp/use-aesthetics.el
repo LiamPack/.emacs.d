@@ -25,7 +25,7 @@
 ;; * avk-daylight
 ;;
 ;;* actual good themes
-;;  * leuven
+;;  * leuven / parchment (https://github.com/ajgrf/parchment)
 ;;  * porple
 ;;  * doom-tomorrow-night
 ;;    * Any of the doom ones really
@@ -34,6 +34,8 @@
 ;;  * gruvbox
 ;;  * tsdh-light
 ;;  * tron theme https://github.com/ianpan870102/Emacs-Tron-Legacy-Theme
+;;  * Naysayer-theme https://github.com/nickav/naysayer-theme.el
+;;  * That one black theme i'm using right now (6/15/19)
 (require 'use-package)
 
 ;; (add-to-list 'custom-theme-load-path "~/.emacs.d/themes/")
@@ -198,7 +200,8 @@
 
 ;; iosevka, consolas, source code pro, Fira Code, dejavu, IBM 3270,
 ;; Fantasque Sans Mono, Terminus, overpass mono
-(setq lp/default-font "DejaVu Sans mono")
+;; meslo LG / menlo
+(setq lp/default-font "Overpass Mono")
 
 (setq lp/default-font-size 12)
 
