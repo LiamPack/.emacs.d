@@ -40,7 +40,6 @@
 (require 'diminish)                ;; if you use :diminish
 (require 'bind-key)                ;; if you use any :bind variant
 
-(require 'ctags)
 
 ;;; Time to load everything from the lisp/ directory
 ;; (setq active-directory-files (list "~/.emacs.d/lisp/"))
@@ -120,6 +119,40 @@
 (global-set-key (kbd "C-r") 'isearch-backward-regexp)
 (global-set-key (kbd "C-m") 'newline-and-indent)
 (setq set-mark-command-repeat-pop t)
+
+;; Automatically indent yanked code
+;; Thanks to magnars
+(defvar yank-indent-modes '(php-mode js2-mode c-mode emacs-lisp-mode)
+  "Modes in which to indent regions that are yanked (or yank-popped)")
+
+(defvar yank-advised-indent-threshold 1000
+  "Threshold (# chars) over which indentation does not automatically occur.")
+
+(defun yank-advised-indent-function (beg end)
+  "Do indentation, as long as the region isn't too large."
+  (if (<= (- end beg) yank-advised-indent-threshold)
+      (indent-region beg end nil)))
+
+(defadvice yank (after yank-indent activate)
+  "If current mode is one of 'yank-indent-modes, indent yanked text (with prefix arg don't indent)."
+  (if (and (not (ad-get-arg 0))
+           (--any? (derived-mode-p it) yank-indent-modes))
+      (let ((transient-mark-mode nil))
+        (yank-advised-indent-function (region-beginning) (region-end)))))
+
+(defadvice yank-pop (after yank-pop-indent activate)
+  "If current mode is one of 'yank-indent-modes, indent yanked text (with prefix arg don't indent)."
+  (if (and (not (ad-get-arg 0))
+           (member major-mode yank-indent-modes))
+      (let ((transient-mark-mode nil))
+        (yank-advised-indent-function (region-beginning) (region-end)))))
+
+(defun yank-unindented ()
+  (interactive)
+  (yank 1))
+
+
+
 ;; When popping the mark, continue popping until the cursor actually
 ;; moves Also, if the last command was a copy - skip past all the
 ;; expand-region cruft.
@@ -134,7 +167,6 @@
 
 (use-package which-key
   :ensure t
-  :defer 3
   :config (which-key-mode 1))
 
 
@@ -162,7 +194,6 @@
 
 (use-package recentf                    ; Save recently visited files
   :ensure t
-  :defer 3
   :init (recentf-mode)
   :diminish recentf-mode
   :config
@@ -182,7 +213,6 @@
 ;; handle very large files
 (use-package vlf
   :ensure t
-  :defer 3
   :config
   (require 'vlf-setup))
 
@@ -190,7 +220,6 @@
 ;;; Flycheck stuff
 (use-package flycheck
   :ensure t
-  :defer 3
   :config
   ;; Turn flycheck on everywhere
   ;; (global-flycheck-mode t)
@@ -203,7 +232,6 @@
 ;; Clears up Emacs to only be the frame you're looking at
 (use-package writeroom-mode ; TODO make a bind for this mode in org-mode
   :ensure t
-  :defer 3
   :after visual-fill-column
   :diminish writeroom-mode)
 
@@ -214,7 +242,6 @@
 
 (use-package cc-mode
   :ensure t
-  :defer 3
   :config
   (define-key c++-mode-map (kbd "C-c C-c") 'compile)
   (define-key c++-mode-map (kbd "C-c C-k") 'kill-compilation)
@@ -254,7 +281,6 @@
 ;; slime for our clisp goodness
 (use-package slime
   :ensure t
-  :defer 3
   :config
   (slime-setup '(slime-repl))
   (setq inferior-lisp-program "/usr/bin/sbcl") ; if it exists!
@@ -263,7 +289,6 @@
 ;; eldoc provides minibuffer hints for elisp things. it's super nice
 (use-package eldoc
   :ensure t
-  :defer 3
   :diminish eldoc-mode
   :commands turn-on-eldoc-mode
   :init
@@ -297,10 +322,19 @@
 (use-package ess
   :disabled t
   :ensure t
-  :defer 3
   :config
   (setq-default inferior-S+6-program-name "Splus")
   (setq-default inferior-R-program-name "R"))
+
+;;;; Julia
+(use-package julia-mode
+  :ensure t)
+
+(use-package julia-repl
+  :ensure t
+  :hook (julia-mode . julia-repl-mode))
+
+
 
 ;;;; Python
 (use-package elpy
@@ -309,7 +343,6 @@
 
 (use-package python
   :ensure t
-  :defer 3
   :mode ("\\.py\\'" . python-mode)
   :interpreter ("python" . python-mode)
   :config
@@ -324,7 +357,6 @@
 
 (use-package company-jedi
   :ensure t
-  :defer 3
   :after python
   :init
   (defun my/python-mode-hook ()
@@ -349,8 +381,7 @@
 ;; (use-package ein
 ;;   :unless (string= (system-name) "Lucrio")
 ;;   :ensure t
-;;   :defer 3
-;;   :after px
+;;   ;;   :after px
 ;;   :init
 ;;   (require 'px)
 ;;   ;; So we don't ruin everything..
@@ -365,7 +396,6 @@
 ;;;; Web-mode ( javascript httpd ... )
 (use-package web-mode
   :ensure t
-  :defer 3
   :diminish web-mode
   :mode (("\\.html\\'" . web-mode)
          ("\\.phtml\\'"      . web-mode)
@@ -388,7 +418,6 @@
 
 (use-package emmet-mode
   :ensure t
-  :defer 3
   :mode ("\\.html" . emmet-mode)
   :diminish emmet-mode
   :config
@@ -402,7 +431,6 @@
 
 (use-package impatient-mode ; auto-update browser without having to
                                         ; reload when editing web stuff
-  :defer 3
   :ensure t
   :config
   (defun imp-markdown-filter (in)
@@ -414,7 +442,6 @@
 
 (use-package simple-httpd ; httpd stuff
   :ensure t
-  :defer 3
   :functions httpd-send-header
   :config
   (progn
@@ -430,7 +457,6 @@
 
 (use-package js2-mode ; javascript editing
   :ensure t
-  :defer 3
   :diminish (js-mode . "js")
   :mode "\\.js$"
   :config
@@ -463,7 +489,6 @@
 ;; C-c C-z: Select the REPL buffer.
 (use-package skewer-mode
   :ensure t
-  :defer 3
   :diminish (skewer-mode . "sk")
   :config
   (add-hook 'js2-mode-hook 'skewer-mode)
@@ -480,7 +505,6 @@
 ;;;; Markdown
 (use-package markdown-mode
   :ensure t
-  :defer 3
   :commands (markdown-mode gfm-mode)
   :mode (("README\\.md\\'" . gfm-mode)
          ("\\.md\\'" . markdown-mode)
@@ -490,12 +514,10 @@
 ;;;; LaTeX
 (use-package tex-site                   ; AUCTeX initialization
   :ensure auctex
-  :defer 3
   )
 
 (use-package magic-latex-buffer
   :ensure t
-  :defer 3
   :config
   (add-hook 'latex-mode-hook 'magic-latex-buffer)
   ;; (setq magic-latex-enable-block-highlight nil
@@ -504,7 +526,6 @@
   )
 
 (use-package tex
-  :defer 3
   :ensure auctex
   :mode ("\\.tex\\'" . TeX-latex-mode)
   :config
@@ -572,7 +593,6 @@
 
 (use-package tex-style                  ; TeX style
   :ensure auctex
-  :defer 3
   :config
   ;; Enable support for csquotes
   (setq LaTeX-csquotes-close-quote "}"
@@ -580,11 +600,9 @@
 
 (use-package tex-fold                   ; TeX folding
   :ensure auctex
-  :defer 3
   :init (add-hook 'TeX-mode-hook #'TeX-fold-mode))
 
 (use-package reftex                     ; TeX/BibTeX cross-reference management
-  :defer 3
   :init (add-hook 'LaTeX-mode-hook #'reftex-mode)
   :config
   ;; Plug into AUCTeX
@@ -624,7 +642,6 @@
 
 (use-package cdlatex
   :ensure t
-  :defer 3
   :init (add-hook 'LaTeX-mode-hook #'cdlatex-mode))
 
 
@@ -678,8 +695,14 @@
 ;;  * tron theme https://github.com/ianpan870102/Emacs-Tron-Legacy-Theme
 ;;  * Naysayer-theme https://github.com/nickav/naysayer-theme.el
 ;;  * That one black theme i'm using right now (6/15/19)
+;;
+;;** 8/2/19
+;;  * poet-dark
+;;  * paper
+;;  * nofrills-acme
+;;  * github-modern
 
-(defvar my-themes '(leuven porple doom-tomorrow-night tsdh-light gruvbox tron-theme naysayer))
+(defvar my-themes '(leuven porple doom-tomorrow-night tsdh-light gruvbox tron-theme naysayer poet paper))
 (add-to-list 'custom-theme-load-path "~/.emacs.d/themes/")
 ;; (add-to-list 'custom-theme-load-path "~/.emacs.d/themes/modern-themes")
 
@@ -700,7 +723,6 @@
 ;; The one that looks the least bad imo.
 (use-package minions
   :ensure t
-  :defer 3
   :config
   (minions-mode))
 
@@ -717,13 +739,38 @@
 
 ;;(load-theme 'kaolin-eclipse)
 ;; (load-theme 'manoj-dark t)
-(load-theme 'manoj-dark t)
-(set-face-attribute 'mode-line nil :background "NavajoWhite")
-(set-face-attribute 'mode-line-inactive nil :background "#FAFAFA")
+;; (load-theme 'manoj-dark t)
+;; (load-theme 'chocolate t)
+;; (set-face-attribute 'mode-line nil :background "NavajoWhite")
+;; (set-face-attribute 'mode-line-inactive nil :background "#FAFAFA")
+
+(use-package quasi-monochrome-theme
+  :ensure t
+  :config
+  (load-theme 'quasi-monochrome t)
+  (set-face-background 'mode-line "#ffe46e")
+  (set-face-background 'mode-line-inactive "#e2dae8")
+
+  (setq-default mode-line-format '("%e"
+                                   mode-line-front-space
+                                   " "
+                                   mode-line-modified
+                                   " "
+                                   "%[" mode-line-buffer-identification "%]"
+                                   "   "
+                                   "L%l"
+                                   "  "
+                                   mode-line-modes
+                                   mode-line-misc-info
+                                   projectile-mode-line
+                                   " "
+                                   (:propertize " " display ((space :align-to (- right 14)))) ;; push to the right side
+                                   (vc-mode vc-mode)
+                                   mode-line-end-spaces)))
+
 
 (use-package moe-theme
   :ensure t
-  :defer 3
   :disabled t
   :config
   (setq moe-light-pure-white-background-in-terminal t)
@@ -746,7 +793,6 @@
 
 (use-package color-theme-modern
   :ensure t
-  :defer 3
   :disabled t
   :config
   (let ((line (face-attribute 'mode-line :underline)))
@@ -760,7 +806,6 @@
 ;; time on modeline is cool
 (use-package time                       ; Show current time
   :ensure t
-  :defer 3
   :bind (("C-c w t" . display-time-world))
   :config
   (setq display-time-world-time-format "%H:%M %Z, %d. %b"
@@ -792,7 +837,6 @@
 ;;; Using the =diminish= package for this.
 (use-package diminish
   :ensure t
-  :defer 3
   :config
   (defmacro diminish-minor-mode (filename mode &optional abbrev)
     `(eval-after-load (symbol-name ,filename)
@@ -849,7 +893,6 @@
 ;;;; magit!
 (use-package magit
   :ensure t
-  :defer 3
   :commands magit-status magit-blame
   :init
   (defadvice magit-status (around magit-fullscreen activate)
@@ -870,7 +913,6 @@
 
 (use-package git-gutter ; TODO - git gutter keybinds, going to different hunks and staging only certain portions!
   :ensure t
-  :defer 3
   :disabled t
   :diminish git-gutter-mode
   :config
@@ -879,11 +921,7 @@
 
 ;;;;;;;;;;;;;;;;;;;; Fancy Navigation
 ;; Note this is from the ctags.el from skeeto in packages/ctags.el !
-(global-set-key (kbd "M-.") #'ctags-find)
-(global-set-key (kbd "M-?") #'ctags-find-reference)
-
 (use-package etags
-  :defer 3
   :config
   (defun etags-build (directory)
     (interactive "DDirectory: ")
@@ -904,6 +942,10 @@
       (let ((default-directory directory))
         (apply #'call-process "etags" nil nil nil results)))))
 
+;; (use-package evil
+;;   :ensure t
+;;   :config
+;;   (evil-mode 1))
 (use-package god-mode
   :ensure t
   :diminish god-mode-all
@@ -944,8 +986,8 @@
 
   (define-key god-local-mode-map (kbd "C-x C-r C-b") 'counsel-bookmark)
   (define-key god-local-mode-map (kbd "C-x C-r C-m") 'bookmark-set)
-  
-  
+
+
 
   (global-set-key (kbd "C-x C-1") 'delete-other-windows)
   (global-set-key (kbd "C-x C-2") 'split-window-below)
@@ -956,7 +998,6 @@
 ;;;; states that I would like to use again
 (use-package desktop
   :ensure t
-  :defer 3
   :config
   (desktop-save-mode 1)
   (add-to-list 'desktop-globals-to-save 'register-alist))
@@ -970,7 +1011,6 @@
 ;;;; avy, for fast nav
 (use-package avy
   :ensure t
-  :defer 3
   :config
   (setq avy-style 'words) ; Makes the avy jump characters real words! wow.
   ;;(global-set-key (kbd "C-'") 'avy-goto-char-2)
@@ -980,7 +1020,6 @@
 ;;; Interactive searching and regexp replacing to help see what goes down
 (use-package anzu                       ; Position/matches count for isearch
   :ensure t
-  :defer 3
   :diminish anzu-mode
   :bind
   (([remap query-replace] . anzu-query-replace)
@@ -1002,7 +1041,6 @@
 ;;;; Counsel / Ivy / Swiper
 (use-package counsel                    ; Ivy-powered commands
   :ensure t
-  :defer 3
   :diminish counsel-mode
   :init (counsel-mode)
   :bind (([remap execute-extended-command]  . counsel-M-x)
@@ -1010,7 +1048,8 @@
          ([remap describe-function]        . counsel-describe-function)
          ([remap describe-variable]        . counsel-describe-variable)
          ([remap info-lookup-symbol]       . counsel-info-lookup-symbol)
-         ([remap completion-at-point]      . counsel-company)
+         ;;([remap isearch-backward-regexp]  . swiper-isearch-backward)
+         ([remap isearch-forward-regexp]   . swiper-isearch)
          ("C-c f L"                        . counsel-load-library)
          ("C-c f r"                        . counsel-recentf)
          ;;("C-c i 8"                        . counsel-unicode-char)
@@ -1024,13 +1063,10 @@
   ;; allows reverse-isearch with ivy in the minibuffer and in a
   ;; shell. amazing!
   (define-key minibuffer-local-map
-    (kbd "C-r") 'counsel-minibuffer-history)
-  (define-key shell-mode-map
-    (kbd "C-r") 'counsel-shell-history))
+    (kbd "C-r") 'counsel-minibuffer-history))
 
 (use-package ivy
   :ensure t
-  :defer 3
   :diminish ivy-mode
   :init  (with-eval-after-load 'ido
            (ido-mode -1)
@@ -1079,12 +1115,37 @@
     (setq helm-default-display-buffer-functions '(display-buffer-in-side-window)))
   )
 
+(use-package helm-gtags
+  :ensure t
+  :config
+  (setq
+   helm-gtags-ignore-case t
+   helm-gtags-auto-update t
+   helm-gtags-use-input-at-cursor t
+   helm-gtags-pulse-at-cursor t
+   helm-gtags-prefix-key "\C-cg"
+   helm-gtags-suggested-key-mapping t
+   )
+
+  ;; Enable helm-gtags-mode
+  (add-hook 'dired-mode-hook 'helm-gtags-mode)
+  (add-hook 'eshell-mode-hook 'helm-gtags-mode)
+  (add-hook 'c-mode-hook 'helm-gtags-mode)
+  (add-hook 'c++-mode-hook 'helm-gtags-mode)
+  (add-hook 'asm-mode-hook 'helm-gtags-mode)
+
+  (define-key helm-gtags-mode-map (kbd "C-c g a") 'helm-gtags-tags-in-this-function)
+  (define-key helm-gtags-mode-map (kbd "C-j") 'helm-gtags-select)
+  (define-key helm-gtags-mode-map (kbd "M-.") 'helm-gtags-dwim)
+  (define-key helm-gtags-mode-map (kbd "M-,") 'helm-gtags-pop-stack)
+  (define-key helm-gtags-mode-map (kbd "C-c <") 'helm-gtags-previous-history)
+  (define-key helm-gtags-mode-map (kbd "C-c >") 'helm-gtags-next-history))
+
 
 ;;;; iedit
 ;;; For editing multiple things at the same time
 (use-package iedit
   :ensure t
-  :defer 3
   :bind (("C-:" . #'iedit-mode))
   :config
   (global-set-key (kbd "C-;") 'comment-or-uncomment-region)
@@ -1092,13 +1153,11 @@
 
 (use-package zop-to-char                ; Better zapping
   :ensure t
-  :defer 3
   :bind (("M-z" . zop-to-char)
          ("M-Z" . zop-up-to-char)))
 
 (use-package undo-tree                  ; Branching undo
   :disabled t
-  :defer 3
   :ensure t
   :init (global-undo-tree-mode)
   :diminish undo-tree-mode)
@@ -1185,18 +1244,15 @@
 
 (use-package focus-autosave-mode        ; Save buffers when focus is lost
   :ensure t
-  :defer 3
   :init (focus-autosave-mode)
   :diminish focus-autosave-mode)
 
 (use-package ibuffer                    ; Better buffer list
   :ensure t
-  :defer 3
   :bind (([remap list-buffers] . ibuffer)))
 
 (use-package ibuffer-vc                 ; Group buffers by VC project and status
   :ensure t
-  :defer 3
   :init (add-hook 'ibuffer-hook
                   (lambda ()
                     (ibuffer-vc-set-filter-groups-by-vc-root)
@@ -1206,7 +1262,6 @@
 ;;; experimental TODO
 (use-package golden-ratio               ; Automatically resize windows
   :ensure t
-  :defer 3
   :init
   (defun lunaryorn-toggle-golden-ratio ()
     (interactive)
@@ -1221,7 +1276,6 @@
 ;;;;;;;;;;;;;;;;;;;; Company + yasnippet
 (use-package yasnippet
   :ensure t
-  :defer 3
   :functions yas-global-mode yas-expand
   :diminish yas-minor-mode
   :config
@@ -1233,7 +1287,6 @@
 
 (use-package yasnippet-snippets
   :ensure t
-  :defer 3
   :after yasnippet
   :config
   (yas-reload-all))
@@ -1247,8 +1300,8 @@
 ;;   :after (yasnippet))
 
 (use-package company
+  :disabled
   :ensure t
-  :defer 3
   :config
   (use-package company-restclient
     :ensure t)
@@ -1283,14 +1336,14 @@
   )
 
 (use-package company-statistics         ; Sort company candidates by statistics
+  :disabled
   :ensure t
-  :defer 3
   :after company
   :config (company-statistics-mode))
 
 (use-package company-math               ; Completion for Math symbols
+  :disabled
   :ensure t
-  :defer 3
   :after company
   :config
   ;; Add backends for math characters
@@ -1301,7 +1354,6 @@
 ;;;;;;;;;;;;;;;;;;;; Elfeed
 (use-package elfeed
   :ensure t
-  :defer 3
   :config
   (global-set-key (kbd "C-x w") 'elfeed)
   (setq shr-width 80)
@@ -1332,7 +1384,6 @@
 
 (use-package elfeed-org
   :ensure t
-  :defer 3
   :config
   (elfeed-org)
   (setq rmh-elfeed-org-files (list "~/.emacs.d/elfeed.org")))
@@ -1351,7 +1402,6 @@
          (getenv "PATH")))
 (use-package eshell
   :ensure t
-  :defer 3
   :init
   (setq ;; eshell-buffer-shorthand t ...  Can't see Bug#19391
    eshell-scroll-to-bottom-on-input 'all
@@ -1360,6 +1410,7 @@
    eshell-save-history-on-exit t
    eshell-prefer-lisp-functions nil
    eshell-destroy-buffer-when-process-dies t)
+
   (add-hook 'eshell-mode-hook (lambda ()
                                 (eshell/alias "e" "find-file $1")
                                 (eshell/alias "ff" "find-file $1")
@@ -1375,8 +1426,6 @@
                                               "/usr/local/bin/gls"
                                             "/bin/ls")))
                                   (eshell/alias "ll" (concat ls " -AlohG --color=always")))))
-
-  (global-set-key (kbd "C-c s") 'eshell)
 
   (defun eshell-here ()
     "Opens up a new shell in the directory associated with the
@@ -1397,22 +1446,133 @@ directory to make multiple eshell windows easier."
       (eshell-send-input)))
 
   (bind-key "C-!" 'eshell-here)
-  (setq eshell-highlight-prompt nil))
+  (setq eshell-highlight-prompt nil)
+
+  ;; from abrochard
+  (setq eshell-prompt-function
+        (lambda ()
+          (concat
+           (propertize "┌─[" 'face `(:foreground "green"))
+           (propertize (user-login-name) 'face `(:foreground "red"))
+           (propertize "@" 'face `(:foreground "green"))
+           (propertize (system-name) 'face `(:foreground "lightblue"))
+           (propertize "]──[" 'face `(:foreground "green"))
+           (propertize (format-time-string "%H:%M" (current-time)) 'face `(:foreground "yellow"))
+           (propertize "]──[" 'face `(:foreground "green"))
+           (propertize (concat (eshell/pwd)) 'face `(:foreground "white"))
+           (propertize "]\n" 'face `(:foreground "green"))
+           (propertize "└─>" 'face `(:foreground "green"))
+           (propertize (if (= (user-uid) 0) " # " " $ ") 'face `(:foreground "green"))
+           )))
+
+  (setq eshell-visual-commands '("htop" "vi" "screen" "top" "less"
+                                 "more" "lynx" "ncftp" "pine" "tin" "trn" "elm"
+                                 "vim"))
+
+  (setq eshell-visual-subcommands '("git" "log" "diff" "show" "ssh"))
+  (setenv "PAGER" "cat")
+
+  (use-package eshell-autojump)
+
+  (defun eshell/clear ()
+    (let ((inhibit-read-only t))
+      (erase-buffer)))
+  (defun eshell/gst (&rest args)
+    (magit-status (pop args) nil)
+    (eshell/echo))   ;; The echo command suppresses output
+
+  (defun eshell/close ()
+    (delete-window))
+
+  (defun eshell-pop--kill-and-delete-window ()
+    (unless (one-window-p)
+      (delete-window)))
+
+  (add-hook 'eshell-exit-hook 'eshell-pop--kill-and-delete-window)
+  (add-hook 'eshell-mode-hook
+            (lambda ()
+              (define-key eshell-mode-map (kbd "C-M-a") 'eshell-previous-prompt)
+              (define-key eshell-mode-map (kbd "C-M-e") 'eshell-next-prompt)
+              (define-key eshell-mode-map (kbd "M-r") 'helm-eshell-history)))
+
+  ;; from http://www.howardism.org/Technical/Emacs/eshell-present.html
+  (defun eshell/-buffer-as-args (buffer separator command)
+    "Takes the contents of BUFFER, and splits it on SEPARATOR, and
+runs the COMMAND with the contents as arguments. Use an argument
+`%' to substitute the contents at a particular point, otherwise,
+they are appended."
+    (let* ((lines (with-current-buffer buffer
+                    (split-string
+                     (buffer-substring-no-properties (point-min) (point-max))
+                     separator)))
+           (subcmd (if (-contains? command "%")
+                       (-flatten (-replace "%" lines command))
+                     (-concat command lines)))
+           (cmd-str  (string-join subcmd " ")))
+      (message cmd-str)
+      (eshell-command-result cmd-str)))
+
+  (defun eshell/bargs (buffer &rest command)
+    "Passes the lines from BUFFER as arguments to COMMAND."
+    (eshell/-buffer-as-args buffer "\n" command))
+
+  (defun eshell/sargs (buffer &rest command)
+    "Passes the words from BUFFER as arguments to COMMAND."
+    (eshell/-buffer-as-args buffer nil command))
+
+
+
+  ;; hosts!
+
+
+  (defvar eshell-fav-hosts (make-hash-table :test 'equal)
+    "Table of host aliases for IPs or other actual references.")
+
+  (puthash "fiji" "amybug@fiji.physics.upenn.edu" eshell-fav-hosts)
+  (puthash "spinach" "lpacker1@spinach.cs.swarthmore.edu" eshell-fav-hosts)
+  (puthash "sccs" "lpacker@sccs.cs.swarthmore.edu" eshell-fav-hosts)
+  ;; ...
+
+  (defun eshell-favorite (hostname &optional dir root)
+    "Start an shell experience on HOSTNAME, that can be an alias to
+a virtual machine from my 'cloud' server. With prefix command,
+opens the shell as the root user account."
+    (interactive
+     (list
+      (ido-completing-read "Hostname: "
+                           (hash-table-keys eshell-fav-hosts))))
+
+    (when (equal current-prefix-arg '(4))
+      (setq root t))
+    (when (not dir)
+      (setq dir ""))
+
+    (let* ((ipaddr (gethash hostname eshell-fav-hosts hostname))
+           (trampy (if (not root)
+                       (format "/ssh:%s:%s"       ipaddr dir)
+                     (format "/ssh:%s|sudo:%s:%s" ipaddr ipaddr dir)))
+           (default-directory trampy))
+      (eshell)))
+  (global-set-key (kbd "C-c s") 'eshell-favorite)
+  (global-set-key (kbd "C-c j") '(lambda () (interactive) (eshell-favorite "fiji" "/data1/swat/Summer2019/Liam2019/working"))))
+
 
 
 ;;;;;;;;;;;;;;;;;;;; Misc Packages
+(use-package keyfreq
+  :config
+  (keyfreq-mode 1)
+  (keyfreq-autosave-mode 1))
 
 ;;;; emacs calc
 (use-package calc
   :ensure t
-  :defer 3
   :bind ("C-c =" . calc)
   :config (setf calc-display-trail nil))
 
 ;;;; ediff
 ;;; diff, but in emacs!
 (use-package ediff
-  :defer 3
   :config
   (setq-default ediff-window-setup-function 'ediff-setup-windows-plain
                 ediff-diff-options "-w")
@@ -1442,12 +1602,10 @@ directory to make multiple eshell windows easier."
 ;;;;;;;;;;;;;;;;;;;; Org
 (use-package org-bullets
   :ensure t
-  :defer 3
   :config
   (setq org-ellipsis "⤵"))
 
 (use-package poporg ; pop-out org mode window to edit comments. opposite of the embedding of source blocks
-  :defer 3
   :bind (("C-c /" . poporg-dwim)))
 
 (use-package org
@@ -1502,12 +1660,16 @@ directory to make multiple eshell windows easier."
 
   ;; NOTE: If this isn't working, make sure to delete / byte-recompile
   ;; the /elpa/org/.. directory!  enable language compiles
-  ;; (use-package ob-ipython
-  ;;   :ensure t
-  ;;   :config
-  ;;   (org-babel-do-load-languages
-  ;;    'org-babel-load-languages
-  ;;    '((ipython . t))))
+  (use-package ob-ipython
+    :ensure t
+    :config
+    (org-babel-do-load-languages
+     'org-babel-load-languages
+     '((ipython . t))))
+  (use-package ob-restclient
+    :ensure t)
+  (use-package jupyter
+    :ensure t)
   (org-babel-do-load-languages
    'org-babel-load-languages
    '((C . t)
@@ -1517,6 +1679,7 @@ directory to make multiple eshell windows easier."
      (eshell . t)
      (shell . t)
      (restclient . t)
+     (jupyter . t)
      ;;(R . t)
      ))
   (setq org-confirm-babel-evaluate nil)
@@ -1910,7 +2073,7 @@ last month with the Category Foo."
            :sitemap-title "Blog"
            :sitemap-sort-files anti-chronologically
            ;;:sitemap-style list
-           :makeindex t)
+           )
           ;; Define any other projects here...
           ("blog-static"
            :base-directory "~/personal/website/org/"
@@ -1969,17 +2132,14 @@ last month with the Category Foo."
 ;; org-ref
 (use-package bibtex-utils
   :ensure t
-  :defer 3
   )
 
 (use-package biblio
   :ensure t
-  :defer 3
   )
 
 (use-package interleave
   :ensure t
-  :defer 3
   )
 ;;(require 'pubmed)
 ;;(require 'arxiv)
@@ -1990,7 +2150,6 @@ last month with the Category Foo."
 (use-package org-ref
   :when (string= (system-name) "Lucrio")
   :ensure t
-  :defer 3
   :config
   (require 'doi-utils)
   (setq org-ref-notes-directory "~/Dropbox/res"
@@ -1999,7 +2158,6 @@ last month with the Category Foo."
         org-ref-pdf-directory "~/Dropbox/res/lib/"))
 
 (use-package helm-bibtex
-  :defer 3
   :ensure t
   :config
   (setq helm-bibtex-bibliography "~/Dropbox/res/index.bib" ;; where your references are stored
@@ -2011,14 +2169,12 @@ last month with the Category Foo."
 
 (use-package org-noter
   :ensure t
-  :defer 3
   )
 
 
 ;;;;;;;;;;;;;;;;;;;; Images and image manipulation
 (use-package pdf-tools
   :ensure t
-  :defer 3
   :config
   (pdf-tools-install)
   (setq pdf-view-resize-factor 1.05)
