@@ -129,14 +129,16 @@
   "Threshold (# chars) over which indentation does not automatically occur.")
 
 (defun yank-advised-indent-function (beg end)
-  "Do indentation, as long as the region isn't too large."
+  "Do indentation, as long as the region isn't too large.
+BEG: beginning of function
+END: end of function"
   (if (<= (- end beg) yank-advised-indent-threshold)
       (indent-region beg end nil)))
 
 (defadvice yank (after yank-indent activate)
   "If current mode is one of 'yank-indent-modes, indent yanked text (with prefix arg don't indent)."
   (if (and (not (ad-get-arg 0))
-           (--any? (derived-mode-p it) yank-indent-modes))
+           (--any? (derived-mode-p yank-indent-modes)))
       (let ((transient-mark-mode nil))
         (yank-advised-indent-function (region-beginning) (region-end)))))
 
@@ -148,10 +150,9 @@
         (yank-advised-indent-function (region-beginning) (region-end)))))
 
 (defun yank-unindented ()
+  "Yank it up without indenting please."
   (interactive)
   (yank 1))
-
-
 
 ;; When popping the mark, continue popping until the cursor actually
 ;; moves Also, if the last command was a copy - skip past all the
@@ -167,7 +168,9 @@
 
 (use-package which-key
   :ensure t
-  :config (which-key-mode 1))
+  :after evil
+  :config (which-key-mode 1)
+  (setf which-key-allow-evil-operators t))
 
 
 ;;;;;;;;;;;;;;;;;;;; File Management
@@ -220,12 +223,14 @@
 ;;; Flycheck stuff
 (use-package flycheck
   :ensure t
+  :init (global-flycheck-mode)
   :config
   ;; Turn flycheck on everywhere
   ;; (global-flycheck-mode t)
   ;; There are issues with company mode and flycheck in terminal mode.
   ;; This is outlined at:
   ;; https://github.com/abingham/emacs-ycmd
+  (setf flycheck-display-errors-delay 0.3)
   (when (not (display-graphic-p))
     (setq flycheck-indication-mode nil)))
 
@@ -238,6 +243,7 @@
 ;;;;;;;;;;;;;;;;;;;; Programming Environment / Languages
 ;;;; C
 ;; also gdb is cool
+
 (setq gdb-many-windows 't)
 
 (use-package cc-mode
@@ -250,6 +256,14 @@
 ;; Enable hide/show of code blocks
 (add-hook 'c-mode-common-hook 'hs-minor-mode)
 
+
+;;;; Go
+(use-package go-mode
+  :ensure t
+  :config
+  (add-hook 'before-save-hook 'gofmt-before-save)
+  (local-set-key (kbd "M-.") 'godef-jump)
+  (local-set-key (kbd "M-,") 'pop-tag-mark))
 ;;;; Lisps
 ;; Make some functions to call to bring up the ELISP repl or to
 ;; evaluate and run smoe code
@@ -282,9 +296,11 @@
 (use-package slime
   :ensure t
   :config
+  ;;(load (expand-file-name "~/.quicklisp/slime-helper.el"))
   (slime-setup '(slime-repl))
-  (setq inferior-lisp-program "/usr/bin/sbcl") ; if it exists!
+  (setq inferior-lisp-program "sbcl") ; if it exists!
   (setq slime-contribs '(slime-fancy)))
+
 
 ;; eldoc provides minibuffer hints for elisp things. it's super nice
 (use-package eldoc
@@ -296,14 +312,24 @@
   (add-hook 'lisp-interaction-mode-hook 'turn-on-eldoc-mode)
   (add-hook 'ielm-mode-hook 'turn-on-eldoc-mode))
 
-;; paren stuff
-(use-package paredit
+;; paren stuff, aggressive indenting
+(use-package smartparens
   :ensure t
-  :defer 3)
+  :hook ((c-mode . smartparens-mode)
+         (c++-mode . smartparens-mode)
+         (python-mode . smartparens-mode)
+         (js-mode . smartparens-mode)
+         (julia-mode . smartparens-mode)))
+
+;; maybe check out parexedit mode or whatever too..
+(use-package paredit
+  :ensure t)
 
 (use-package rainbow-delimiters
-  :ensure t
-  :defer 3)
+  :ensure t)
+
+(use-package aggressive-indent
+  :ensure t)
 
 ;; We want all lispy languages to use =paredit-mode= and =rainbow-delimiters
 (setq lisp-mode-hooks
@@ -315,7 +341,16 @@
 (dolist (hook lisp-mode-hooks)
   (add-hook hook (lambda ()
                    (paredit-mode)
-                   (rainbow-delimiters-mode))))
+                   (rainbow-delimiters-mode)
+                   (aggressive-indent-mode))))
+
+;;;; OCaml stuff
+(setq opam-share (substring (shell-command-to-string "opam config var share 2> /dev/null") 0 -1))
+(add-to-list 'load-path (concat opam-share "/emacs/site-lisp"))
+(use-package merlin
+  :ensure t)
+(use-package ocp-indent
+  :ensure t)
 
 ;;;; R / ess
 ;;; Statistics and R in emacs. Need to have R installed
@@ -339,7 +374,10 @@
 ;;;; Python
 (use-package elpy
   :ensure t
-  :defer 3)
+  :config
+  (setenv "IPY_TEST_SIMPLE_PROMPT" "1")
+  (setq python-shell-interpreter "ipython3"
+        python-shell-interpreter-args "-i"))
 
 (use-package python
   :ensure t
@@ -348,6 +386,7 @@
   :config
   (elpy-enable)
   (setq python-indent-offset 4)
+
   ;; (setq python-shell-interpreter "jupyter"
   ;;       python-shell-interpreter-args "console --simple-prompt"
   ;;       python-shell-prompt-detect-failure-warning nil)
@@ -367,7 +406,7 @@
 ;;;
 ;;; This is a _full featured_ jupyter notebook that happens in emacs
 ;;; rather than a process that communicates with the jupyter process
-;;; via zmq sockets like the package /jupyter/.
+;;; viazmq sockets like the package /jupyter/.
 ;;;
 ;;; ein aims to be the main frontend between the user and jupyter,
 ;;; effectively adding a layer between the user and the kernel.
@@ -376,7 +415,7 @@
 ;; (use-package px
 ;;   :unless (string= (system-name) "Lucrio")
 ;;   :ensure t
-;;   :defer 3)
+;;   )
 
 ;; (use-package ein
 ;;   :unless (string= (system-name) "Lucrio")
@@ -498,8 +537,7 @@
 
 
 (use-package restclient ; for some HTTP shenanigens!
-  :ensure t
-  :defer 3)
+  :ensure t)
 
 
 ;;;; Markdown
@@ -715,9 +753,9 @@
 
 ;; also fonts
 ;; iosevka, consolas, source code pro, Fira Code, dejavu, IBM 3270,
-;; Fantasque Sans Mono, Terminus, overpass mono
+;; Fantasque Sans Mono, Terminus, overpass mono, IBM Plex Mono
 (set-locale-environment "UTF-8")
-(add-to-list 'default-frame-alist '(font . "Fira Code"))
+(add-to-list 'default-frame-alist '(font . "IBM Plex Mono"))
 
 ;; Yet another mode-line package to clean things up
 ;; The one that looks the least bad imo.
@@ -741,11 +779,13 @@
 ;; (load-theme 'manoj-dark t)
 ;; (load-theme 'manoj-dark t)
 ;; (load-theme 'chocolate t)
+(load-theme 'paper t)
 ;; (set-face-attribute 'mode-line nil :background "NavajoWhite")
 ;; (set-face-attribute 'mode-line-inactive nil :background "#FAFAFA")
 
 (use-package quasi-monochrome-theme
   :ensure t
+  :disabled t
   :config
   (load-theme 'quasi-monochrome t)
   (set-face-background 'mode-line "#ffe46e")
@@ -895,10 +935,10 @@
   :ensure t
   :commands magit-status magit-blame
   :init
-  (defadvice magit-status (around magit-fullscreen activate)
-    (window-configuration-to-register :magit-fullscreen)
-    ad-do-it
-    (delete-other-windows))
+  ;; (defadvice magit-status (around magit-fullscreen activate)
+  ;;   (window-configuration-to-register :magit-fullscreen)
+  ;;   ad-do-it
+  ;;   (delete-other-windows))
   :config
   (setq magit-branch-arguments nil
         ;; use ido to look for branches
@@ -942,12 +982,33 @@
       (let ((default-directory directory))
         (apply #'call-process "etags" nil nil nil results)))))
 
-;; (use-package evil
-;;   :ensure t
-;;   :config
-;;   (evil-mode 1))
+(use-package evil
+  ;;:init
+  ;;(setf evil-want-C-u-scroll t)
+  :config
+  (evil-mode)
+  (setf evil-ex-search-highlight-all nil)
+  ;;(add-hook 'with-editor-mode-hook 'evil-insert-state)
+  ;;Exit insert mode by pressing j and then j quickly
+  (key-chord-mode 1)
+  (setq key-chord-two-keys-delay 0.5)
+  (key-chord-define evil-insert-state-map "jj" 'evil-normal-state)
+  )
+
+(use-package evil-smartparens
+  :defer t
+  :init
+  (add-hook 'smartparens-enabled-hook #'evil-smartparens-mode)
+  (add-hook 'emacs-lisp-mode-hook #'smartparens-strict-mode)
+  :config
+  (sp-local-pair '(emacs-lisp-mode) "'" "'" :actions nil)
+  (sp-local-pair '(emacs-lisp-mode) "`" "`" :actions nil)
+  (sp-use-paredit-bindings))
+
+
 (use-package god-mode
   :ensure t
+  :disabled t
   :diminish god-mode-all
   :init
   ;; Want to look like vim? Can do chief
@@ -999,21 +1060,18 @@
 (use-package desktop
   :ensure t
   :config
-  (desktop-save-mode 1)
   (add-to-list 'desktop-globals-to-save 'register-alist))
 
 ;;;;
 (use-package bookmark
   :ensure t)
 
-
-
 ;;;; avy, for fast nav
 (use-package avy
   :ensure t
   :config
   (setq avy-style 'words) ; Makes the avy jump characters real words! wow.
-  ;;(global-set-key (kbd "C-'") 'avy-goto-char-2)
+  (global-set-key (kbd "C-'") 'avy-goto-char-2)
   )
 
 ;;;; anzu
@@ -1300,7 +1358,6 @@
 ;;   :after (yasnippet))
 
 (use-package company
-  :disabled
   :ensure t
   :config
   (use-package company-restclient
@@ -1642,9 +1699,9 @@ opens the shell as the root user account."
   (setq org-pretty-entities t)
   (setq org-src-preserve-indentation t)
   (setq org-agenda-start-with-follow-mode t)
+  (setq org-agenda-show-future-repeats nil)
   (setq org-pretty-entities-include-sub-superscripts t)
-  (add-hook 'org-babel-after-execute-hook 'org-redisplay-inline-images
-            )
+  (add-hook 'org-babel-after-execute-hook 'org-redisplay-inline-images)
   (setq org-use-speed-commands t)
 
 
@@ -1668,8 +1725,6 @@ opens the shell as the root user account."
      '((ipython . t))))
   (use-package ob-restclient
     :ensure t)
-  (use-package jupyter
-    :ensure t)
   (org-babel-do-load-languages
    'org-babel-load-languages
    '((C . t)
@@ -1679,7 +1734,6 @@ opens the shell as the root user account."
      (eshell . t)
      (shell . t)
      (restclient . t)
-     (jupyter . t)
      ;;(R . t)
      ))
   (setq org-confirm-babel-evaluate nil)
@@ -1743,7 +1797,8 @@ opens the shell as the root user account."
 
 
   (setq to-read-tags '(":learning:" ":books:" ":emacs:" ":research:" ":manga:" ":anime:"
-                       ":ml:" ":sites:" ":games:" ":music:" ":math:" ":podcasts:" ":videos:" ":papers:" ":movies:"))
+                       ":ml:" ":sites:" ":games:" ":music:" ":math:" ":podcasts:" ":videos:"
+                       ":papers:" ":movies:" ":textbooks:" ":TV:" ":blogs:"))
 
   (defun lp/refile-to (file headline)
     "refile to specific spot (headline) in file"
@@ -1881,31 +1936,33 @@ last month with the Category Foo."
                                         org-monthly-file org-groceries-file
                                         research-notes-file-2019))
                 (org-agenda-skip-scheduled-if-deadline-is-shown t)))
-       (tags-todo "-REFILE-CANCELLED-WAITING-HOLD/!-DONE-HOLD"
-                  ((org-agenda-overriding-header "To-File Files (index.org)")
-                   (org-tags-match-list-sublevels nil)
-                   (org-agenda-files (list org-index-file))))
-       (tags "cs73|cs87|tia|cs"
-             ((org-agenda-overriding-header "CS Work")
-              (org-tags-match-list-sublevels nil)
-              (org-agenda-files (list org-school-file))))
-       ;; (tags "jpns" ----- rip jpns..
-       ;;       ((org-agenda-overriding-header "JPNS")
-       ;;        (org-tags-match-list-sublevels nil)
-       ;;        (org-agenda-files (list org-school-file))))
        (tags-todo "physics|amy/!-DONE-HOLD"
                   ((org-agenda-overriding-header "Physics")
                    (org-tags-match-list-sublevels 'indented)
                    (org-agenda-sorting-strategy '(priority-down effort-down))
-                   (org-agenda-files (list org-school-file research-notes-file-2019))))
+                   (org-agenda-files (list org-school-file org-index-file research-notes-file-2019))))
        (tags "math"
              ((org-agenda-overriding-header "Math")
               (org-tags-match-list-sublevels nil)
-              (org-agenda-files (list org-school-file))))
+              (org-agenda-files (list org-school-file org-index-file))))
+
+       (tags "cs73|cs87|tia|cs"
+             ((org-agenda-overriding-header "CS Work")
+              (org-tags-match-list-sublevels nil)
+              (org-agenda-files (list org-school-file org-index-file))))
+       ;; (tags "jpns" ----- rip jpns..
+       ;;       ((org-agenda-overriding-header "JPNS")
+       ;;        (org-tags-match-list-sublevels nil)
+       ;;        (org-agenda-files (list org-school-file org-index-file))))
+
        (tags "kizuna|smash|outsiders"
              ((org-agenda-overriding-header "Clubs")
               (org-tags-match-list-sublevels nil)
-              (org-agenda-files (list org-school-file))))
+              (org-agenda-files (list org-school-file org-index-file))))
+       (tags-todo "-REFILE-CANCELLED-WAITING-HOLD/!-DONE-HOLD"
+                  ((org-agenda-overriding-header "To-File Files (index.org)")
+                   (org-tags-match-list-sublevels nil)
+                   (org-agenda-files (list org-index-file))))
        (tags-todo "-REFILE-CANCELLED-WAITING-HOLD/!-DONE-HOLD"
                   ((org-agenda-overriding-header "Personal Stuff")
                    (org-tags-match-list-sublevels nil)
@@ -2050,7 +2107,18 @@ last month with the Category Foo."
       (insert-file-contents my-blog-footer-file)
       (buffer-string)))
 
+  (defun website-style ()
+    (interactive)
+    (let ((current-theme (car custom-enabled-themes)))
+      (load-theme 'leuven t)
+      (org-publish "blog")
+      (load-theme current-theme)))
 
+  (global-set-key (kbd "C-c <f8>") 'website-style)
+  ;; Posts that helped to set this up
+  ;; Blogging with Emacs -- https://bastibe.de/2013-11-13-blogging-with-emacs.html
+  ;; Some guy's blog config -- https://github.com/DiegoVicen/my-emacs#my-blog-publishing-configuration
+  ;; CSS theme from here https://gongzhitaao.org/orgcss/
   (setq org-publish-project-alist
         '(("blog-notes"
            :base-directory "~/personal/website/org"
@@ -2065,19 +2133,58 @@ last month with the Category Foo."
            :html-head nil
            :html-head-include-default-style nil
            :html-head-include-scripts nil
-           :html-preamble my-blog-header
-           :html-postamble my-blog-footer
+           ;; From https://bastibe.de/
+           :html-head-extra
+           "
+          <title>LPac's Pages</title>
+          <meta http-equiv=\"content-type\" content=\"application/xhtml+xml; charset=UTF-8\" />
+          "
+
+           :html-preamble
+           "<link rel=\"stylesheet\" type=\"text/css\" href=\"css/org.css\"/>
+            <div class=\"header\">
+              <div class=\"title\"><a href=\"/\">LPac's Pages</a></div>
+              <div class=\"sitelinks\">
+                  <a href=\"/\">home</a>  | <a href=\"http://github.com/lucrio\">Github</a> | <a href=\"archive.html\">Other posts</a>
+              </div>
+          </div>"
+           :html-postamble
+           (lambda (info)
+             "Do not show disqus for Archive and Recent Posts"
+             (cond ((string= (car (plist-get info :title)) "Archive") "")
+                   ((string= (car (plist-get info :title)) "Recent Posts")
+                    "<div id=\"archive\"><a href=\"archive.html\">Other posts</a></div>")
+                   (t
+                    "<div id=\"archive\"><a href=\"archive.html\">Other posts</a></div>
+              <div id=\"disqus_thread\"></div>
+              <script type=\"text/javascript\">
+              /* * * CONFIGURATION VARIABLES: EDIT BEFORE PASTING INTO YOUR WEBPAGE * * */
+              var disqus_shortname = 'Lucrio';
+              /* * * DON'T EDIT BELOW THIS LINE * * */
+              (function() {
+                var dsq = document.createElement('script');
+                dsq.type = 'text/javascript';
+                dsq.async = true;
+                dsq.src = 'http://' + disqus_shortname + '.disqus.com/embed.js';
+                (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+                  })();
+              </script>
+              <noscript>Please enable JavaScript to view the
+                  <a href=\"http://disqus.com/?ref_noscript\">comments powered by Disqus.</a></noscript>
+              <a href=\"http://disqus.com\" class=\"dsq-brlink\">comments powered by <span class=\"logo-disqus\">Disqus</span></a>")))
+
            ;; sitemap - list of blog articles
            :auto-sitemap t
-           :sitemap-filename "blog.org"
-           :sitemap-title "Blog"
+           :sitemap-filename "archive.org"
+           :sitemap-title "archive"
            :sitemap-sort-files anti-chronologically
-           ;;:sitemap-style list
+           :sitemap-style list
+           :makeindex t
            )
           ;; Define any other projects here...
           ("blog-static"
-           :base-directory "~/personal/website/org/"
-           :base-extension "css\\|js\\|png\\|jpg\\|gif\\|pdf\\|mp3\\|ogg\\|swf"
+           :base-directory "~/personal/website/org"
+           :base-extension "css\\|js\\|png\\|jpg\\|gif\\|pdf\\|mp3\\|ogg\\|swf\\|mp4"
            :publishing-directory "~/personal/website/public/"
            :recursive t
            :publishing-function org-publish-attachment
