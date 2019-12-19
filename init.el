@@ -1,5 +1,5 @@
 ;;; init.el --- -*- lexical-binding: t; -*-
-(add-to-list 'load-path "~/.emacs.d/lisp")
+;; (add-to-list 'load-path "~/.emacs.d/lisp")
 (add-to-list 'load-path "~/.emacs.d/etc")
 (add-to-list 'load-path "~/.emacs.d/packages")
 
@@ -122,37 +122,37 @@
 
 ;; Automatically indent yanked code
 ;; Thanks to magnars
-(defvar yank-indent-modes '(php-mode js2-mode c-mode emacs-lisp-mode)
-  "Modes in which to indent regions that are yanked (or yank-popped)")
+;; (defvar yank-indent-modes '(php-mode js2-mode c-mode emacs-lisp-mode)
+;;   "Modes in which to indent regions that are yanked (or yank-popped)")
 
-(defvar yank-advised-indent-threshold 1000
-  "Threshold (# chars) over which indentation does not automatically occur.")
+;; (defvar yank-advised-indent-threshold 1000
+;;   "Threshold (# chars) over which indentation does not automatically occur.")
 
-(defun yank-advised-indent-function (beg end)
-  "Do indentation, as long as the region isn't too large.
-BEG: beginning of function
-END: end of function"
-  (if (<= (- end beg) yank-advised-indent-threshold)
-      (indent-region beg end nil)))
+;; (defun yank-advised-indent-function (beg end)
+;;   "Do indentation, as long as the region isn't too large.
+;; BEG: beginning of function
+;; END: end of function"
+;;   (if (<= (- end beg) yank-advised-indent-threshold)
+;;       (indent-region beg end nil)))
 
-(defadvice yank (after yank-indent activate)
-  "If current mode is one of 'yank-indent-modes, indent yanked text (with prefix arg don't indent)."
-  (if (and (not (ad-get-arg 0))
-           (--any? (derived-mode-p yank-indent-modes)))
-      (let ((transient-mark-mode nil))
-        (yank-advised-indent-function (region-beginning) (region-end)))))
+;; (defadvice yank (after yank-indent activate)
+;;   "If current mode is one of 'yank-indent-modes, indent yanked text (with prefix arg don't indent)."
+;;   (if (and (not (ad-get-arg 0))
+;;            (--any? (derived-mode-p yank-indent-modes)))
+;;       (let ((transient-mark-mode nil))
+;;         (yank-advised-indent-function (region-beginning) (region-end)))))
 
-(defadvice yank-pop (after yank-pop-indent activate)
-  "If current mode is one of 'yank-indent-modes, indent yanked text (with prefix arg don't indent)."
-  (if (and (not (ad-get-arg 0))
-           (member major-mode yank-indent-modes))
-      (let ((transient-mark-mode nil))
-        (yank-advised-indent-function (region-beginning) (region-end)))))
+;; (defadvice yank-pop (after yank-pop-indent activate)
+;;   "If current mode is one of 'yank-indent-modes, indent yanked text (with prefix arg don't indent)."
+;;   (if (and (not (ad-get-arg 0))
+;;            (member major-mode yank-indent-modes))
+;;       (let ((transient-mark-mode nil))
+;;         (yank-advised-indent-function (region-beginning) (region-end)))))
 
-(defun yank-unindented ()
-  "Yank it up without indenting please."
-  (interactive)
-  (yank 1))
+;; (defun yank-unindented ()
+;;   "Yank it up without indenting please."
+;;   (interactive)
+;;   (yank 1))
 
 ;; When popping the mark, continue popping until the cursor actually
 ;; moves Also, if the last command was a copy - skip past all the
@@ -182,6 +182,7 @@ END: end of function"
             (dired-dotfiles-toggle)))
 ;; disable ls by default
 (setq dired-use-ls-dired nil)
+
 (defun dired-dotfiles-toggle ()
   "Show/hide dot-files"
   (interactive)
@@ -197,9 +198,9 @@ END: end of function"
 
 (use-package recentf                    ; Save recently visited files
   :ensure t
-  :init (recentf-mode)
   :diminish recentf-mode
   :config
+  (recentf-mode)
   (setq
    recentf-max-saved-items 200
    recentf-max-menu-items 15
@@ -241,6 +242,35 @@ END: end of function"
   :diminish writeroom-mode)
 
 ;;;;;;;;;;;;;;;;;;;; Programming Environment / Languages
+;;;; lsp-mode and associated
+;;; lsp-mode
+
+
+(use-package lsp-mode
+  :disabled
+  :ensure t
+  :config
+  ;; make sure we have lsp-imenu everywhere we have LSP
+  ;; (require 'lsp-imenu)
+  (add-hook 'lsp-after-open-hook 'lsp-enable-imenu)
+
+  (lsp-register-client
+   (make-lsp-client :new-connection (lsp-stdio-connection "pyls")
+                    :major-modes '(python-mode)
+                    :server-id 'pyls)))
+
+(use-package lsp-ui
+  :disabled
+  :ensure t
+  :config
+  (setq lsp-ui-sideline-ignore-duplicate t)
+  (add-hook 'lsp-mode-hook 'lsp-ui-mode))
+
+(use-package company-lsp
+  :disabled
+  :ensure t
+  :config
+  (push 'company-lsp company-backends))
 ;;;; C
 ;; also gdb is cool
 
@@ -269,6 +299,7 @@ END: end of function"
 ;; evaluate and run smoe code
 (use-package lispy
   :ensure t)
+
 (defun ert-all ()
   (interactive)
   (ert t))
@@ -278,7 +309,7 @@ END: end of function"
   (pop-to-buffer (get-buffer-create "*ielm*"))
   (ielm))
 
-(define-key emacs-lisp-mode-map (kbd "C-x r")   #'ert-all)
+;;(define-key emacs-lisp-mode-map (kbd "C-x r")   #'ert-all)
 (define-key emacs-lisp-mode-map (kbd "C-c C-z") #'ielm-repl)
 (define-key emacs-lisp-mode-map (kbd "C-c C-k") #'eval-buffer*)
 (defalias 'lisp-interaction-mode 'emacs-lisp-mode)
@@ -376,8 +407,7 @@ END: end of function"
   :ensure t
   :config
   (setenv "IPY_TEST_SIMPLE_PROMPT" "1")
-  (setq python-shell-interpreter "ipython3"
-        python-shell-interpreter-args "-i"))
+  )
 
 (use-package python
   :ensure t
@@ -385,6 +415,8 @@ END: end of function"
   :interpreter ("python" . python-mode)
   :config
   (elpy-enable)
+  (setq python-shell-interpreter "ipython3"
+        python-shell-interpreter-args "-i")
   (setq python-indent-offset 4)
 
   ;; (setq python-shell-interpreter "jupyter"
@@ -395,6 +427,7 @@ END: end of function"
   )
 
 (use-package company-jedi
+  :disabled
   :ensure t
   :after python
   :init
@@ -775,13 +808,14 @@ END: end of function"
   "Clear existing theme settings instead of layering them"
   (mapc #'disable-theme custom-enabled-themes))
 
-;;(load-theme 'kaolin-eclipse)
-;; (load-theme 'manoj-dark t)
+;; (load-theme 'kaolin-eclipse)
 ;; (load-theme 'manoj-dark t)
 ;; (load-theme 'chocolate t)
-(load-theme 'paper t)
+;; (load-theme 'paper t)
+;; (load-theme 'darkburn t)
 ;; (set-face-attribute 'mode-line nil :background "NavajoWhite")
-;; (set-face-attribute 'mode-line-inactive nil :background "#FAFAFA")
+
+                                        ; (set-face-attribute 'mode-line-inactive nil :background "#FAFAFA")
 
 (use-package quasi-monochrome-theme
   :ensure t
@@ -811,7 +845,6 @@ END: end of function"
 
 (use-package moe-theme
   :ensure t
-  :disabled t
   :config
   (setq moe-light-pure-white-background-in-terminal t)
   (moe-theme-set-color 'red)
@@ -819,7 +852,7 @@ END: end of function"
   (setq moe-theme-resize-markdown-title '(2.0 1.7 1.5 1.3 1.0 1.0))
   (setq moe-theme-resize-org-title '(2.2 1.8 1.6 1.4 1.2 1.0 1.0 1.0 1.0))
   (setq moe-theme-resize-rst-title '(2.0 1.7 1.5 1.3 1.1 1.0))
-  (require 'moe-theme-switcher)
+  ;; (require 'moe-theme-switcher)
   (let ((line (face-attribute 'mode-line :underline)))
     (set-face-attribute 'mode-line          nil :overline   line)
     (set-face-attribute 'mode-line-inactive nil :overline   line)
@@ -828,7 +861,7 @@ END: end of function"
     (set-face-attribute 'mode-line-inactive nil :box        nil)
     (set-face-attribute 'mode-line-inactive nil :background "#f9f2d9"))
   (setq moe-theme-highlight-buffer-id t)
-  (moe-light)
+  (moe-dark)
   )
 
 (use-package color-theme-modern
@@ -909,11 +942,11 @@ END: end of function"
   (diminish-major-mode 'lisp-interaction-mode-hook "λ")
   (diminish-major-mode 'python-mode-hook "Py"))
 
-;; (set-frame-parameter (selected-frame) 'alpha '(85 50))
-;; (add-to-list 'default-frame-alist '(alpha 85 50))
+(set-frame-parameter (selected-frame) 'alpha '(85 50))
+(add-to-list 'default-frame-alist '(alpha 85 50))
 
-(set-frame-parameter (selected-frame) 'alpha '(100 100))
-(add-to-list 'default-frame-alist '(alpha 100 100))
+;; (set-frame-parameter (selected-frame) 'alpha '(100 100))
+;; (add-to-list 'default-frame-alist '(alpha 100 100))
 
 ;;;; Comint
 ;;; REPL / terminal / minor process interactions
@@ -962,6 +995,7 @@ END: end of function"
 ;;;;;;;;;;;;;;;;;;;; Fancy Navigation
 ;; Note this is from the ctags.el from skeeto in packages/ctags.el !
 (use-package etags
+  :disabled t
   :config
   (defun etags-build (directory)
     (interactive "DDirectory: ")
@@ -982,9 +1016,14 @@ END: end of function"
       (let ((default-directory directory))
         (apply #'call-process "etags" nil nil nil results)))))
 
+;; Needed for automating the prefix map/command creations
+(use-package general
+  :ensure t)
+
 (use-package evil
   ;;:init
   ;;(setf evil-want-C-u-scroll t)
+  :after general
   :config
   (evil-mode)
   (setf evil-ex-search-highlight-all nil)
@@ -993,7 +1032,32 @@ END: end of function"
   (key-chord-mode 1)
   (setq key-chord-two-keys-delay 0.5)
   (key-chord-define evil-insert-state-map "jj" 'evil-normal-state)
-  )
+  (defvar my-leader-map (make-sparse-keymap)
+    "Keymap for \"leader key\" shortcuts.")
+
+  ;; binding ",b"
+
+  ;; change the "leader" key to space
+  (define-key evil-normal-state-map (kbd "SPC") my-leader-map)
+
+  ;; vimify keybinds
+
+  ;; general.el can automate the process of prefix map/command creation
+  ;; "," 'list-buffers
+  (define-key my-leader-map "2" 'lp/split-window-below-and-switch)
+  (define-key my-leader-map "3" 'lp/split-window-right-and-switch)
+  (define-key my-leader-map "0" 'delete-window)
+  (define-key my-leader-map "b" 'ivy-switch-buffer)
+  (define-key my-leader-map "w" #'balance-windows)
+  (define-key my-leader-map "k" #'delete-window)
+  (define-key my-leader-map "m" #'delete-other-windows)
+  (define-key my-leader-map "j" 'join-line) ; note that paredit binds this to (paredit-newline)
+  (define-key my-leader-map "n" 'lp/cleanup-buffer)
+  (define-key my-leader-map ";" 'comment-or-uncomment-region)
+  (define-key my-leader-map "p" 'pop-to-mark-command)
+  (define-key my-leader-map "/" 'undo-tree-undo)
+  (define-key my-leader-map "C-m" 'newline-and-indent))
+
 
 (use-package evil-smartparens
   :defer t
@@ -1112,12 +1176,9 @@ END: end of function"
          ("C-c f r"                        . counsel-recentf)
          ;;("C-c i 8"                        . counsel-unicode-char)
          ("C-c f a"                        . counsel-ag)
-         ("C-c f m"                        . counsel-imenu))
+         ("C-c f m"                        . counsel-imenu)
+         ("C-x r b" . bookmark-jump-other-window))
   :config
-  (unbind-key "C-x p" counsel-mode-map)
-  (global-set-key (kbd "C-x p") 'pop-to-mark-command)
-
-
   ;; allows reverse-isearch with ivy in the minibuffer and in a
   ;; shell. amazing!
   (define-key minibuffer-local-map
@@ -1251,7 +1312,16 @@ END: end of function"
 (bind-key "C-c w =" #'balance-windows)
 (bind-key "C-c w k" #'delete-window)
 (bind-key "C-c w m" #'delete-other-windows)
+(defun set-window-width (n)
+  "Set the selected window's width."
+  (adjust-window-trailing-edge (selected-window) (- n (window-width)) t))
+(defun set-80-columns ()
+  "Set the selected window to 80 columns. If given a prefix
+    argument, set so that number of columns instead."
+  (interactive)
+  (set-window-width (or current-prefix-arg 80)))
 
+(global-set-key (kbd "C-x ~") '(lambda () (interactive) (set-window-width 65)))
 
 ;; ace-window stuff
 ;; You can also start by calling ace-window and then decide to switch the action to delete or swap etc. By default the bindings are:
@@ -1616,10 +1686,6 @@ opens the shell as the root user account."
 
 
 ;;;;;;;;;;;;;;;;;;;; Misc Packages
-(use-package keyfreq
-  :config
-  (keyfreq-mode 1)
-  (keyfreq-autosave-mode 1))
 
 ;;;; emacs calc
 (use-package calc
@@ -1717,6 +1783,8 @@ opens the shell as the root user account."
 
   ;; NOTE: If this isn't working, make sure to delete / byte-recompile
   ;; the /elpa/org/.. directory!  enable language compiles
+  ;; Fix an incompatibility between the ob-async and ob-ipython packages
+  (setq ob-async-no-async-languages-alist '("ipython"))
   (use-package ob-ipython
     :ensure t
     :config
