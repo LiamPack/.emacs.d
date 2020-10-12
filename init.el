@@ -64,14 +64,20 @@ There are two things you can do about this warning:
 (setq use-package-verbose t)
 (setq use-package-always-ensure t)
 
-(require 'diminish)
-(require 'dash)
-(require 's)
-;; ok enough of the use-p setup, time to get -sensible- (thanks hrs)
-(require 'sensible-defaults)
-(sensible-defaults/use-all-keybindings)
-(sensible-defaults/use-all-settings)
 
+;; (require 'cygwin-mount)
+
+(setenv "PATH" (concat "/usr/bin" ";" (getenv "PATH")))
+
+(require 'dash)
+(use-package diminish
+  :ensure t)
+(use-package s
+  :ensure t)
+;; ok enough of the use-p setup, time to get -sensible- (thanks hrs)
+;; (require 'sensible-defaults)
+;; (sensible-defaults/use-all-keybindings)
+;; (sensible-defaults/use-all-settings)
 
 ;; Emacs Server
 (server-start)
@@ -80,7 +86,8 @@ There are two things you can do about this warning:
       auto-save-default nil
       auto-save-list-file-prefix (locate-user-emacs-file "local/saves")
       inhibit-startup-message t
-      initial-scratch-message ";; Present Day"
+      initial-scratch-message ";; Present Day
+"
       wdired-allow-to-change-permissions t
       echo-keystrokes 0.1
       delete-active-region nil
@@ -96,7 +103,8 @@ There are two things you can do about this warning:
 (if (fboundp 'tool-bar-mode) (tool-bar-mode -1))
 (if (fboundp 'scroll-bar-mode) (scroll-bar-mode -1))
 (display-time-mode t)
-(set-frame-font "Fira Code" nil t)
+(set-face-attribute 'default nil :height 180)
+(set-frame-font "JuliaMono" nil t)
 
 ;; Too distracting
 (blink-cursor-mode -1)
@@ -153,7 +161,7 @@ There are two things you can do about this warning:
 (global-set-key (kbd "C-x k")
                 '(lambda () (interactive) (kill-buffer (current-buffer))))
 
-;; Please clean up the buffer
+                                        ; Please clean up the buffer
 (defun lp/cleanup-buffer-safe ()
   "Perform some safe operations to remove garbage whitespace content"
   (interactive)
@@ -205,12 +213,9 @@ There are two things you can do about this warning:
 (global-set-key (kbd "C-x C-3") 'lp/split-window-right-and-switch-other-buffer)
 (global-set-key (kbd "<f5>") #'revert-buffer)
 
-;;
-(set-frame-parameter (selected-frame) 'alpha '(100 50))
-(add-to-list 'default-frame-alist '(alpha 100 50))
-
-
-
+;; transparency
+(set-frame-parameter (selected-frame) 'alpha '(95 95))
+;; (add-to-list 'default-frame-alist '(alpha 100 95))
 
 ;;; --- whichkey mode!
 (use-package which-key
@@ -230,6 +235,7 @@ There are two things you can do about this warning:
   :diminish posframe-mode)
 
 (use-package helm
+  :disabled
   :ensure t
   :bind (("M-x" . helm-M-x)
          ("C-x C-f" . helm-find-files)
@@ -272,19 +278,80 @@ There are two things you can do about this warning:
   ;; way to deal with it is a -defadvice-. Zulu-inuoe foudn that it was the
   ;; bury-buffer in helm.el#L3960. Can fix this I guess.
   (use-package helm-posframe
-    :disabled
     :ensure t
     :config
     (helm-posframe-enable)
     ;; Check posframe.el:L222
-    (setq helm-posframe-poshandler #'posframe-poshandler-frame-bottom-center))
+    (setq helm-posframe-poshandler #'posframe-poshandler-frame-bottom-right-corner))
 
   ;; a surprisingly sick package that I haven't used before. Can multi-search
   ;; all buffers or whatever you're looking for (swoops in).
   ;; TODO => Need to set the variable that favors efficiency over coloring
   (use-package helm-swoop
     :ensure t
-    :bind (("C-c C-s" . helm-swoop))))
+    :bind (("C-c C-s" . helm-swoop)))
+  (use-package helm-ag
+    :ensure t
+    :config
+    (setq helm-ag-base-command "C:/msys64/mingw64/bin/ag --nocolor --nogroup")))
+
+(use-package ivy
+  :ensure t
+  :config
+
+  (use-package ivy-posframe
+    :ensure t
+    :config
+    (require 'ivy-posframe)
+    ;; display at `ivy-posframe-style'
+    ;; (setq ivy-posframe-display-functions-alist '((t . ivy-posframe-display)))
+    ;; (setq ivy-posframe-display-functions-alist '((t . ivy-posframe-display-at-frame-center)))
+    ;; (setq ivy-posframe-display-functions-alist '((t . ivy-posframe-display-at-window-center)))
+    ;; (setq ivy-posframe-display-functions-alist '((t . ivy-posframe-display-at-frame-bottom-left)))
+    ;; (setq ivy-posframe-display-functions-alist '((t . ivy-posframe-display-at-window-bottom-left)))
+    (setq ivy-posframe-display-functions-alist '((t . ivy-posframe-display-at-frame-top-center)))
+    (ivy-posframe-mode 1))
+
+  (use-package counsel
+    :ensure t
+    :config
+    (global-set-key (kbd "M-x") 'counsel-M-x)
+    (global-set-key (kbd "C-x C-f") 'counsel-find-file)
+    (global-set-key (kbd "C-h f") 'counsel-describe-function)
+    (global-set-key (kbd "C-h v") 'counsel-describe-variable)
+    (global-set-key (kbd "C-h o") 'counsel-describe-symbol)
+    (global-set-key (kbd "C-h l") 'counsel-find-library)
+    (global-set-key (kbd "C-h i") 'counsel-info-lookup-symbol)
+    (global-set-key (kbd "C-h u") 'counsel-unicode-char)
+    ;; (global-set-key (kbd "C-c g") 'counsel-git)
+    (global-set-key (kbd "C-c j") 'counsel-git-grep)
+    (global-set-key (kbd "C-c k") 'counsel-ag)
+    (global-set-key (kbd "C-x l") 'counsel-locate)
+    (global-set-key (kbd "C-c g") 'counsel-google)
+    (define-key minibuffer-local-map (kbd "C-r") 'counsel-minibuffer-history)
+    (setq counsel-ag-base-command "/mingw64/bin/ag --vimgrep %s"))
+
+  (use-package swiper
+    :ensure t
+    :config
+    ;; enable this if you want `swiper' to use it
+    ;; (setq search-default-mode #'char-fold-to-regexp)
+    (global-set-key (kbd "C-s") 'swiper-isearch))
+
+
+  (setq ivy-use-virtual-buffers t)
+  (setq enable-recursive-minibuffers t)
+  (global-set-key (kbd "C-c C-r") 'ivy-resume)
+  (global-set-key (kbd "<f6>") 'ivy-resume)
+  (ivy-mode 1)
+  )
+
+
+(use-package wgrep
+  :ensure t
+  :config
+  (define-key grep-mode-map (kbd "C-x C-q") 'wgrep-change-to-wgrep-mode)
+  (define-key grep-mode-map (kbd "C-c C-c") 'wgrep-finish-edit))
 
 
 ;;; --- recentf
@@ -321,6 +388,7 @@ There are two things you can do about this warning:
 (use-package company
   :diminish
   :config
+  (setq company-global-modes '(not eshell-mode))
   (global-company-mode 1)
   (define-key company-active-map (kbd "<backtab>") #'company-complete-selection)
   (define-key company-active-map (kbd "<return>") nil)
@@ -331,15 +399,6 @@ There are two things you can do about this warning:
    ;; Search other buffers for completion candidates
    company-dabbrev-other-buffers t
    company-dabbrev-code-other-buffers t
-
-   ;; Allow (lengthy) numbers to be eligible for completion.
-   company-complete-number t
-
-   ;; M-⟪num⟫ to select an option according to its number.
-   company-show-numbers t
-
-   ;; Edge of the completion list cycles around.
-   company-selection-wrap-around t
 
    ;; Do not downcase completions by default.
    company-dabbrev-downcase nil
@@ -364,7 +423,8 @@ There are two things you can do about this warning:
   (setf evil-ex-search-highlight-all nil)
 
   ;; Make it easier to exit insert-mode
-  (require 'key-chord)
+  (use-package key-chord
+    :ensure t)
   (setq key-chord-two-keys-delay 0.5)
   (key-chord-define evil-insert-state-map "jk" 'evil-normal-state)
   (key-chord-mode 1)
@@ -374,11 +434,17 @@ There are two things you can do about this warning:
     "A quick keymap for vim leader key shortcuts")
   (global-undo-tree-mode -1))
 
+(use-package evil-surround
+  :ensure t
+  :after evil
+  :config
+  (global-evil-surround-mode))
+
 
 ;;; --- aesthetics
 ;; Make sure all other themes are disabled when loading a theme
 (defadvice load-theme (before clear-previous-themes activate)
-  "Clear existing theme settings instead of layering them"
+  "Clear existing theme settings instead of layering them."
   (mapc #'disable-theme custom-enabled-themes))
 
 (setq my-themes '(doom-acario-dark
@@ -387,7 +453,11 @@ There are two things you can do about this warning:
                   solarized-light
                   vscode-dark-plus
                   github-modern
-		  kaolin-eclipse))
+                  kaolin-galaxy
+                  gruber-darker
+                  srcery
+                  modus-operandi
+                  modus-vivendi))
 
 (setq theme-index (1- (length my-themes))) ; start at solarized I guess
 (load-theme (nth theme-index my-themes) t)
@@ -411,22 +481,16 @@ There are two things you can do about this warning:
 (use-package solarized-theme
   :ensure t)
 
+(use-package moody
+  :ensure t
+  :config
+  (setq x-underline-at-descent-line t)
+  (moody-replace-mode-line-buffer-identification)
+  (moody-replace-vc-mode))
+
 
 ;;;; --- programming stuff incoming
 ;;; --- Snippets :) (mostly from https://github.com/alhassy/emacs.d#snippets----template-expansion)
-
-;; Add yasnippet support for all company backends
-(cl-defun my/company-backend-with-yankpad (backend)
-  "There can only be one main completition backend, so let's
-   enable yasnippet/yankpad as a secondary for all completion
-   backends.
-
-   Src: https://emacs.stackexchange.com/a/10520/10352"
-
-  (if (and (listp backend) (member 'company-yankpad backend))
-      backend
-    (append (if (consp backend) backend (list backend))
-            '(:with company-yankpad))))
 
 ;; Yet another snippet extension program
 (use-package yasnippet
@@ -454,14 +518,23 @@ There are two things you can do about this warning:
   (yankpad-reload)
 
   ;; Set company-backend as a secondary completion backend to all existing backends.
-  (setq company-backends (mapcar #'my/company-backend-with-yankpad company-backends)))
+  ;;(setq company-backends (mapcar #'my/company-backend-with-yankpad company-backends))
+  )
 
 
 ;;; --- Version Control (magit stuff :>)
 (use-package magit
   :ensure t
   :bind (("C-x g" . magit-status)))
+(use-package projectile
+  :ensure t
+  :config
 
+  (use-package counsel-projectile
+    :ensure t
+    :config
+    (define-key projectile-mode-map (kbd "C-c p") 'projectile-command-map)
+    (counsel-projectile-mode)))
 
 ;;; --- Julia
 (use-package julia-mode
@@ -471,6 +544,10 @@ There are two things you can do about this warning:
 
 ;;; --- Lisps
 ;; general lisp config
+(use-package flycheck
+  :ensure t
+  :config
+  (flycheck-mode))
 (use-package paredit
   :ensure t
   :diminish paredit-mode)
@@ -495,8 +572,6 @@ There are two things you can do about this warning:
   (setq sly-contribs '(sly-fancy))
   (define-key sly-prefix-map (kbd "M-h") 'sly-documentation-lookup))
 
-
-
 (setq lisp-mode-hooks '(clojure-mode-hook
                         emacs-lisp-mode-hook
                         lisp-mode-hook
@@ -512,7 +587,6 @@ There are two things you can do about this warning:
 
 (define-key emacs-lisp-mode-map (kbd "C-c C-k") #'eval-buffer)
 
-
 ;;; -- Oh boy here comes the org mode
 (use-package org-bullets
   :ensure t
@@ -524,67 +598,61 @@ There are two things you can do about this warning:
   :bind (("C-c c" . org-capture)
          ("C-c l" . org-store-link)
          ("C-c b" . org-iswitchb))
-  :config
-  ;; free up the avy conflict I think
-  (unbind-key "C-'" org-mode-map)       ;avy
-  ;; bullets mode -- TODO => Move this to up :hook keyword
-  (add-hook 'org-mode-hook (lambda ()
-                             (org-bullets-mode)
-                             (auto-fill-mode)))
-
-  (setq org-pretty-entities t ; ligature displaying
-        prety-entities-include-sub-superscripts t
-        org-hide-block-startup t
-        org-list-allow-alphabetical t
-        org-catch-invisible-edits 'show
-        org-use-speed-commands t
-        org-use-fast-todo-selection t ; pops open quick dialogue for selecting state
-        org-treat-S-cursor-todo-selection-as-state-change nil ; using S-left/right
-        org-fontify-quote-and-verse-blocks t
-        org-hide-emphasis-markers t)
-
-  ;; for org math
-  (setq org-highlight-latex-and-related '(latex))
-
-  ;; New keywords and their faces for orgmode
-  (setq org-log-done 'time)
-  (setq org-todo-keywords
-        '((sequence "TODO(t)" "(STARTED(s@/!)" "|" "DONE(d/!)")
-          (sequence "WAITING(w@/!)" "ON_HOLD(h@/!)" "|" "CANCELLED(c@/!)")))
+  :hook ((org-mode . auto-fill-mode)
+         (org-mode . org-bullets-mode))
+  :init
+  (require 'ox-latex)
+  :custom
+  (org-pretty-entities t)               ; ligature displaying
+  (prety-entities-include-sub-superscripts t)
+  (org-hide-block-startup t)
+  (org-list-allow-alphabetical t)
+  (org-catch-invisible-edits 'show)
+  (org-use-speed-commands t)
+  (org-use-fast-todo-selection t) ; pops open quick dialogue for selecting state
+  (org-treat-S-cursor-todo-selection-as-state-change nil) ; using S-left/right
+  (org-fontify-quote-and-verse-blocks t)
+  (org-hide-emphasis-markers t)
+  (org-highlight-latex-and-related '(latex))
+  (org-log-done 'time)
+  (org-todo-keywords
+   '((sequence "TODO(t)" "(STARTED(s@/!)" "|" "DONE(d/!)")
+     (sequence "WAITING(w@/!)" "ON_HOLD(h@/!)" "|" "CANCELLED(c@/!)")))  :config
   (setq org-todo-keyword-faces
         '(("TODO"       :foreground "red"               :weight bold)
           ("STARTED"    :foreground "bold"              :weight bold)
           ("DONE"       :foreground "forest green"      :weight bold)
           ("WAITING"    :foreground "orange"            :weight bold)
           ("ON_HOLD"    :foreground "magenta"           :weight bold)
-          ("CANCELLED"  :foreground "forest green"      :weight bold)))
+          ("CANCELLED"  :foreground "forest green"      :weight bold))) ;; free up the avy conflict I think
+  :config
+  (unbind-key "C-'" org-mode-map)       ;avy
 
-  ;; src blocks
-  (require 'ox-latex)
-  (add-to-list 'org-latex-packages-alist '("" "minted"))
   (setq org-latex-listings 'minted)
-  (setq org-confirm-babel-evaluate nil
-        org-src-preserve-indentation t
-        org-src-fontify-natively t
-        org-src-tab-acts-natively t
-        org-edit-src-content-indentation 0)
+  (setq org-confirm-babel-evaluate nil)
+  (setq org-src-preserve-indentation t)
+  (setq org-src-fontify-natively t)
+  (setq org-src-tab-acts-natively t)
+  (setq org-edit-src-content-indentation 0)
+  (setq org-refile-use-outline-path 'file)
+  (setq org-outline-path-complete-in-steps nil)
+  (setq org-enforce-todo-dependencies t)
+  ;; src blocks
+  (add-to-list 'org-latex-packages-alist '("" "minted"))
   (add-to-list 'org-latex-packages-alist '("" "listingsutf8"))
-
-  (org-babel-do-load-languages
-   'org-babel-load-languages
-   '((python . t)
-     (emacs-lisp . t)
-     (gnuplot . t)
-     (latex , t)))
-
-  (require 'ox-latex)
   (add-to-list 'org-latex-classes
                '("beamer"
                  "\\documentclass\[presentation\]\{beamer\}"
                  ("\\section\{%s\}" . "\\section*\{%s\}")
                  ("\\subsection\{%s\}" . "\\subsection*\{%s\}")
                  ("\\subsubsection\{%s\}" . "\\subsubsection*\{%s\}")))
-  (setq org-latex-listings t)
+
+  (org-babel-do-load-languages
+   'org-babel-load-languages
+   '((python . t)
+     (emacs-lisp . t)
+     (gnuplot . t)
+     (latex . t)))
 
   ;; Setup for org file shenanigans
   (setq org-directory "~/Dropbox/Org")
@@ -592,23 +660,7 @@ There are two things you can do about this warning:
     "Return absolute path of one of my dropbox files from its relative name"
     (concat (file-name-as-directory org-directory) filename))
 
-  ;; I don't really like how this is done right now. It would be nice if I could
-  ;; do this with a loop for the setq forms..
-  ;;
-  ;; I thought about using a hash table. I think it would be a more scalable
-  ;; option if I ended up making more org files in the dropbox, but currently I
-  ;; guess I'll stick with this. Feels bad rewriting things over and over again
-  (setq org-inbox (org-file-path "inbox.org")
-        org-groceries (org-file-path "groceries.org")
-        org-projects (org-file-path "projects-toplevel.org")
-        org-journ (org-file-path "journal.org")
-        org-to-read (org-file-path "to-read.org")
-        org-archive (org-file-path "archive.org")
-        org-cooking (org-file-path "cooking.org")
-	org-my-anki-file (org-file-path "anki.org"))
-  (setq org-archive-location (concat org-archive "::* From %s"))
-  (setq my-org-files (list org-inbox org-groceries org-projects org-journ org-to-read org-archive org-cooking))
-  (setq org-agenda-files (list org-inbox org-groceries org-projects))
+  (setq org-agenda-files '())
 
   ;; Show that agenda man
   (defun show-agenda ()
@@ -616,228 +668,50 @@ There are two things you can do about this warning:
     (org-agenda nil "a"))
   (global-set-key (kbd "<f1>") #'show-agenda)
 
-  ;; Refiling
-  (setq org-refile-targets '((my-org-files :maxlevel . 3)))
-  (setq org-refile-use-outline-path 'file)
-  (setq org-outline-path-complete-in-steps nil)
-
-  ;; Handling the to-read file and its tags
-  (setq to-read-header-tags '(":sites:"
-                              ":blogs:"
-                              ":TV:"
-                              ":articles:"
-                              ":art:"
-                              ":utils:"
-                              ":videos:"
-                              ":movies:"
-                              ":podcasts:"
-                              ":manga:"
-                              ":anime:"
-                              ":papers:"
-                              ":music:"
-                              ":games:"
-                              ":books:"
-                              ":textbooks:"))
-  (defun lp/refile-to-read ()
-    "refiles all tagged entries to respective tag header entry"
-    (interactive)
-    (save-excursion
-      (search-backward "* inbox" nil t)
-      (dolist (tag to-read-header-tags)
-        (save-excursion
-          (while (not (equal nil (search-forward tag nil t)))
-            (beginning-of-visual-line)
-            (lp/refile-to (org-file-path "to-read.org") (substring tag 1 -1)))))))
-
-  (defun lp/refile-to (file headline)
-    (let ((pos (save-excursion
-                 (find-file file)
-                 (org-find-exact-headline-in-buffer headline))))
-      (org-refile nil nil (list headline file nil pos))))
-
-  ;; Capture Templates!
-  (cl-defun my/make/org-capture-template
-      (shortcut heading &optional (no-todo nil) (description heading) (category heading) (scheduled t))
-    "Quickly produce an org-capture-template.
-
-  After adding the result of this function to ‘org-capture-templates’,
-  we will be able perform a capture with “C-c c ‘shortcut’”
-  which will have description ‘description’.
-  It will be added to the tasks file under heading ‘heading’
-  and be marked with category  ‘category’.
-
-  ‘no-todo’ omits the ‘TODO’ tag from the resulting item; e.g.,
-  when it's merely an interesting note that needn't be acted upon.
-  ─Probably a bad idea─
-
-  Defaults for ‘description’ and ‘category’ are set to the same as
-  the ‘heading’. Default for ‘no-todo’ is ‘nil’.
-
-  Scheduled items appear in the agenda; true by default.
-
-  The target is ‘file+headline’ and the type is ‘entry’; to see
-  other possibilities invoke: C-h o RET org-capture-templates.
-  The “%?” indicates the location of the Cursor, in the template,
-  when forming the entry.
-  "
-    `(,shortcut ,description entry
-                (file+headline org-inbox
-                               ,(concat heading "\n#+CATEGORY: " category))
-                , (concat "*" (unless no-todo " TODO") " %^{task} %^g\n"
-                          "%U\n%? ")
-                :empty-lines 1 :time-prompt t))
-
-  (setq org-capture-templates
-        (cl-loop for (shortcut heading)
-                 in (-partition 2 '("t" "Tasks"
-                                    "r" "Research"
-                                    "m" "Email"
-                                    "e" "Emacs (•̀ᴗ•́)و"
-                                    "b" "Blog"
-                                    "a" "to-read stuff"
-                                    "p" "Grocery Lists"))
-                 collect  (my/make/org-capture-template shortcut heading)))
-  (setq org-my-anki-file "~/Dropbox/Org/anki.org")
-  (add-to-list 'org-capture-templates
-               '("k" "Anki basic"
-                 entry
-                 (file+headline org-my-anki-file "Dispatch")
-                 "* %<%H:%M> %^g\n:PROPERTIES:\n:ANKI_NOTE_TYPE: Basic\n:ANKI_DECK: honors\n:END:\n** Front\n%?\n** Back\n"))
-  (add-to-list 'org-capture-templates
-               '("K" "Anki cloze"
-		 entry
-		 (file+headline org-my-anki-file "Dispatch")
-		 "* %<%H:%M> %^g\n:PROPERTIES:\n:ANKI_NOTE_TYPE: Cloze\n:ANKI_DECK: honors\n:END:\n** Text\n** Extra\n"))
-  ;; The default org capture template behavior sucks. Make it so it doesn't kill
-  ;; every window please.
-
-  ;; TODO => org-set-tags sucks, need to fix
-
-
-  (use-package helm-org
+  (use-package doct
     :ensure t
-    :config
-    (add-to-list 'helm-completing-read-handlers-alist '(org-capture . helm-org-completing-read-tags))
-    (add-to-list 'helm-completing-read-handlers-alist '(org-set-tags . helm-org-completing-read-tags))
-    (add-to-list 'helm-completing-read-handlers-alist '(org-set-tags-command . helm-org-completing-read-tags))
-    )
+    :commands (doct))
 
-  (setq org-enforce-todo-dependencies t)
+  (require 'doct)
+  (setq org-capture-templates
+	(doct '(("Inbox" :keys "c"
+		 :file "~/Dropbox/Org/Inbox.org"
+		 :type entry 
+		 :headline "Inbox"
+		 :todo-state "TODO"
+		 :template ("* %{todo-state} %^{Description}"
+			    ":PROPERTIES:"
+			    ":Created: %U"
+			    ":END:"
+			    "%?"))
+		("Project Planning" :keys "p"
+		 :file "~/Dropbox/Org/Project-Planning.org"
+		 :type entry
+		 :headline "Refile"
+		 :todo-state "TODO"
+		 :template ("* %{todo-state} %^{Description} %^g"
+			    ":PROPERTIES:"
+			    ":Created: %U"
+			    ":END:"
+			    "%?"))))))
 
-  (use-package org-journal
-    :ensure
-    :defer t
-    :bind (("C-c C-j" . org-journal-new-entry))
-    :custom
-    (org-journal-dir "~/Dropbox/Org/journal/")
-    :config
-    (defun org-journal-save-entry-and-exit ()
-      "Convenience! Save _and_ close buffer (like org-capture). Idea from org-journal github page"
-      (interactive)
-      (save-buffer)
-      (kill-buffer-and-window))
-    (define-key org-journal-mode-map (kbd "C-x C-s") 'org-journal-save-entry-and-exit))
-
-  ;; Website Stuff TODO => Clean this shit up
- ;;;;;;;;;;;;;;;;;;;; Org publish and the website stuff!
-  (setq my-blog-header-file "~/personal/website/header.html")
-  (setq my-blog-footer-file "~/personal/website/footer.html")
-  (setq org-html-html5-fancy t)
-  (defun my-blog-header (arg)
-    (with-temp-buffer
-      (insert-file-contents my-blog-header-file)
-      (buffer-string)))
-  (defun my-blog-footer (arg)
-    (with-temp-buffer
-      (insert-file-contents my-blog-footer-file)
-      (buffer-string)))
-
-  (defun website-style ()
+(use-package org-journal
+  :ensure t
+  :after org
+  :defer t
+  :bind (("C-c C-j" . org-journal-new-entry))
+  :custom
+  (org-journal-dir "~/Dropbox/Org/journal/")
+  :config
+  (defun org-journal-save-entry-and-exit ()
+    "Convenience! Save _and_ close buffer (like org-capture). Idea from org-journal github page"
     (interactive)
-    (let ((current-theme (car custom-enabled-themes)))
-      (load-theme 'leuven t)
-      (org-publish "blog")
-      (load-theme current-theme)))
-
-  (global-set-key (kbd "C-c <f8>") 'website-style)
-  ;; Posts that helped to set this up
-  ;; Blogging with Emacs -- https://bastibe.de/2013-11-13-blogging-with-emacs.html
-  ;; Some guy's blog config -- https://github.com/DiegoVicen/my-emacs#my-blog-publishing-configuration
-  ;; CSS theme from here https://gongzhitaao.org/orgcss/
-  (setq org-publish-project-alist
-        '(("blog-notes"
-           :base-directory "~/personal/website/org"
-           :base-extension "org"
-           :publishing-directory "~/personal/website/public"
-           :recursive t
-           :publishing-function org-html-publish-to-html
-           :with-toc nil
-           :with-creator nil
-           :headline-levels 4
-           :section-numbers nil
-           :html-head nil
-           :html-head-include-default-style nil
-           :html-head-include-scripts nil
-           ;; From https://bastibe.de/
-           :html-head-extra
-           "
-          <title>LPac's Pages</title>
-          <meta http-equiv=\"content-type\" content=\"application/xhtml+xml; charset=UTF-8\" />
-          "
-
-           :html-preamble
-           "<link rel=\"stylesheet\" type=\"text/css\" href=\"css/org.css\"/>
-            <div class=\"header\">
-              <div class=\"title\"><a href=\"/\">LPac's Pages</a></div>
-              <div class=\"sitelinks\">
-                  <a href=\"/\">home</a>  | <a href=\"http://github.com/lucrio\">Github</a> | <a href=\"archive.html\">Other posts</a>
-              </div>
-          </div>"
-           :html-postamble
-           (lambda (info)
-             "Do not show disqus for Archive and Recent Posts"
-             (cond ((string= (car (plist-get info :title)) "Archive") "")
-                   ((string= (car (plist-get info :title)) "Recent Posts")
-                    "<div id=\"archive\"><a href=\"archive.html\">Other posts</a></div>")
-                   (t
-                    "<div id=\"archive\"><a href=\"archive.html\">Other posts</a></div>
-              <div id=\"disqus_thread\"></div>
-              <script type=\"text/javascript\">
-              /* * * CONFIGURATION VARIABLES: EDIT BEFORE PASTING INTO YOUR WEBPAGE * * */
-              var disqus_shortname = 'Lucrio';
-              /* * * DON'T EDIT BELOW THIS LINE * * */
-              (function() {
-                var dsq = document.createElement('script');
-                dsq.type = 'text/javascript';
-                dsq.async = true;
-                dsq.src = 'http://' + disqus_shortname + '.disqus.com/embed.js';
-                (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
-                  })();
-              </script>
-              <noscript>Please enable JavaScript to view the
-                  <a href=\"http://disqus.com/?ref_noscript\">comments powered by Disqus.</a></noscript>
-              <a href=\"http://disqus.com\" class=\"dsq-brlink\">comments powered by <span class=\"logo-disqus\">Disqus</span></a>")))
-
-           ;; sitemap - list of blog articles
-           :auto-sitemap t
-           :sitemap-filename "archive.org"
-           :sitemap-title "archive"
-           :sitemap-sort-files anti-chronologically
-           :sitemap-style list
-           ;; :makeindex t
-           )
-          ;; Define any other projects here...
-          ("blog-static"
-           :base-directory "~/personal/website/org"
-           :base-extension "css\\|js\\|png\\|jpg\\|gif\\|pdf\\|mp3\\|ogg\\|swf\\|mp4"
-           :publishing-directory "~/personal/website/public/"
-           :recursive t
-           :publishing-function org-publish-attachment
-           )
-          ("blog" :components ("blog-notes" "blog-static")))))
+    (save-buffer)
+    (kill-buffer-and-window))
+  (define-key org-journal-mode-map (kbd "C-x C-s") 'org-journal-save-entry-and-exit))
 
 ;;; --- web based Stuff
-;; impatien mode -- update browser without reloading after editing
+;; update browser without reloading after editing
 (use-package impatient-mode
   :ensure t)
 
@@ -854,7 +728,6 @@ There are two things you can do about this warning:
     (let ((httpd-process (get-process "httpd")))
       (when httpd-process
         (set-process-query-on-exit-flag httpd-process nil)))))
-
 
 ;;; --- Prose and related
 ;; spell checking, definitely needed
@@ -875,13 +748,14 @@ There are two things you can do about this warning:
 (use-package langtool
   :disabled
   :ensure t
+  :custom
+  (langtool-language-tool-jar "C:/Users/LiamP/Applications/LanguageTool-4.8/languagetool-commandline.jar")
   :config
-  (setq langtool-language-tool-jar
-        "~/Applications/LanguageTool-4.8/languagetool-commandline.jar")
   (add-hook 'langtool-error-exists-hook
             (lambda ()
               (langtool-correct-buffer)
               (langtool-check-done)))
+
   (global-set-key (kbd "C-c ^")
                   (lambda ()
                     (interactive)
@@ -893,55 +767,48 @@ There are two things you can do about this warning:
 (use-package magic-latex-buffer
   :ensure t
   :hook latex-mode
-  :config
-  (setq magic-latex-enable-block-highlight nil
-        magic-latex-enable-suscript        t
-        magic-latex-enable-pretty-symbols  t))
+  :custom
+  (magic-latex-enable-block-highlight nil)
+  (magic-latex-enable-suscript        t)
+  (magic-latex-enable-pretty-symbols  t))
 
 (use-package tex
   :ensure auctex
   :mode ("\\.tex\\'" . TeX-latex-mode)
+  :hook ((LaTeX-mode . TeX-source-correlate-mode)
+         (LaTeX-mode . auto-fill-mode)
+         (LaTeX-mode . flyspell-mode)
+         (LaTeX-mode . flyspell-buffer)
+         (LaTeX-mode . turn-on-reftex))
+  :custom
+  (TeX-PDF-mode t)
+  (TeX-auto-save t)
+  (TeX-parse-self t)
+  (reftex-plug-into-AUCTeX t)
+  (TeX-save-query nil)
   :config
-  (add-hook 'LaTeX-mode-hook 'TeX-source-correlate-mode)
-  (add-hook 'LaTeX-mode-hook 'auto-fill-mode)
-  (add-hook 'LaTeX-mode-hook 'flyspell-mode)
-  (add-hook 'LaTeX-mode-hook 'flyspell-buffer)
-  (add-hook 'LaTeX-mode-hook 'turn-on-reftex)
-  (setq TeX-PDF-mode t
-        TeX-auto-save t
-        TeX-parse-self t
-        reftex-plug-into-AUCTeX t
-        TeX-save-query nil
-        ;; TeX-electric-math '("$" . "$")
-        ;; TeX-electric-sub-and-superscript t
-        )
   (setq-default preview-scale-function 3.0
                 TeX-master nil
                 TeX-command-extra-options "--shell-escape"))
 
 (use-package tex-fold
   :ensure auctex
-  :init (add-hook 'TeX-mode-hook #'TeX-fold-mode))
+  :hook (TeX-mode-hook . TeX-fold-mode))
 
 ;; The LaTeX macros available through this mechanism are fully configurable -
 ;; see the variable `cdlatex-math-symbol-alist'.
 (use-package cdlatex
   :ensure t
-  :init
-  (add-hook 'LaTeX-mode-hook #'cdlatex-mode)
-  (add-hook 'org-mode-hook 'turn-on-org-cdlatex)
-  ;; Math stuff to add:
-  ;; - [ ] inverse / preimage (\inv)
-  ;; - [ ]
-  )
+  :hook ((org-mode . turn-on-org-cdlatex)
+         (LaTeX-mode-hook . cdlatex-mode)))
 
 
 ;;; --- PDF viewing and all that
 (use-package pdf-tools
   :ensure t
+  :custom
+  (pdf-view-resize-factor 1.05)
   :config
-  (pdf-tools-install)
-  (setq pdf-view-resize-factor 1.05)
   (setq-default pdf-view-display-size 'fit-page))
 
 ;;; --- Super miscelleneous Stuff
@@ -968,7 +835,6 @@ There are two things you can do about this warning:
 (use-package org-chef
   :disabled
   :ensure t)
-
 
 ;;;;;;;;;;;;;;;;;;;; Anki
 (use-package anki-editor
@@ -1007,13 +873,11 @@ There are two things you can do about this warning:
 
   ;; Allow Emacs to access content from clipboard.
   (setq x-select-enable-clipboard t
-        x-select-enable-primary t)
-  )
+        x-select-enable-primary t))
+
 (use-package org-download
   :ensure t
-  :config
-  ;; Drag-and-drop to `dired`
-  (add-hook 'dired-mode-hook 'org-download-enable))
+  :hook (dired-mode . org-download-enable))
 
 
 ;;;;;;;;;;;;;;;;;;;; shells
@@ -1021,20 +885,18 @@ There are two things you can do about this warning:
         (concat
          "/usr/local/bin:/usr/local/sbin:"
          (getenv "PATH")))
+
 (use-package eshell
   :ensure t
+  :custom
+  (shell-file-name "bash")
+  (shell-command-switch "-ic")
+  (eshell-scroll-to-bottom-on-input 'all)
+  (eshell-hist-ignoredups t)
+  (eshell-save-history-on-exit t)
+  (eshell-prefer-lisp-functions nil)
+  (eshell-destroy-buffer-when-process-dies t)
   :init
-
-  (setq shell-file-name "bash")
-  (setq shell-command-switch "-ic")
-  (setq ;; eshell-buffer-shorthand t ...  Can't see Bug#19391
-   eshell-scroll-to-bottom-on-input 'all
-   eshell-error-if-no-glob nil
-   eshell-hist-ignoredups t
-   eshell-save-history-on-exit t
-   eshell-prefer-lisp-functions nil
-   eshell-destroy-buffer-when-process-dies t)
-
   (add-hook 'eshell-mode-hook (lambda ()
                                 (eshell/alias "e" "find-file $1")
                                 (eshell/alias "ff" "find-file $1")
@@ -1044,12 +906,7 @@ There are two things you can do about this warning:
                                 (eshell/alias "gd" "magit-diff-unstaged")
                                 (eshell/alias "gds" "magit-diff-staged")
                                 (eshell/alias "d" "dired $1")
-
-                                ;; The 'ls' executable requires the Gnu version on the Mac
-                                (let ((ls (if (file-exists-p "/usr/local/bin/gls")
-                                              "/usr/local/bin/gls"
-                                            "/bin/ls")))
-                                  (eshell/alias "ll" (concat ls " -AlohG --color=always")))))
+                                (eshell/alias "ll" "ls -AlohG --color=always")))
 
   (defun eshell-here ()
     "Opens up a new shell in the directory associated with the
@@ -1065,7 +922,6 @@ directory to make multiple eshell windows easier."
       (other-window 1)
       (eshell "new")
       (rename-buffer (concat "*eshell: " name "*"))
-
       (insert (concat "ls"))
       (eshell-send-input)))
 
@@ -1086,8 +942,7 @@ directory to make multiple eshell windows easier."
            (propertize (concat (eshell/pwd)) 'face `(:foreground "white"))
            (propertize "]\n" 'face `(:foreground "green"))
            (propertize "└─>" 'face `(:foreground "green"))
-           (propertize (if (= (user-uid) 0) " # " " $ ") 'face `(:foreground "green"))
-           )))
+           (propertize (if (= (user-uid) 0) " # " " $ ") 'face `(:foreground "green")))))
 
   (setq eshell-visual-commands '("htop" "vi" "screen" "top" "less"
                                  "more" "lynx" "ncftp" "pine" "tin" "trn" "elm"
@@ -1101,7 +956,7 @@ directory to make multiple eshell windows easier."
       (erase-buffer)))
   (defun eshell/gst (&rest args)
     (magit-status (pop args) nil)
-    (eshell/echo))   ;; The echo command suppresses output
+    (eshell/echo)) ;; The echo command suppresses output
 
   (defun eshell/close ()
     (delete-window))
@@ -1140,40 +995,4 @@ they are appended."
 
   (defun eshell/sargs (buffer &rest command)
     "Passes the words from BUFFER as arguments to COMMAND."
-    (eshell/-buffer-as-args buffer nil command))
-
-
-
-  ;; hosts!
-
-
-  (defvar eshell-fav-hosts (make-hash-table :test 'equal)
-    "Table of host aliases for IPs or other actual references.")
-
-  (puthash "fiji" "amybug@fiji.physics.upenn.edu" eshell-fav-hosts)
-  (puthash "spinach" "lpacker1@spinach.cs.swarthmore.edu" eshell-fav-hosts)
-  (puthash "sccs" "lpacker@sccs.cs.swarthmore.edu" eshell-fav-hosts)
-  ;; ...
-
-  (defun eshell-favorite (hostname &optional dir root)
-    "Start an shell experience on HOSTNAME, that can be an alias to
-a virtual machine from my 'cloud' server. With prefix command,
-opens the shell as the root user account."
-    (interactive
-     (list
-      (ido-completing-read "Hostname: "
-                           (hash-table-keys eshell-fav-hosts))))
-
-    (when (equal current-prefix-arg '(4))
-      (setq root t))
-    (when (not dir)
-      (setq dir ""))
-
-    (let* ((ipaddr (gethash hostname eshell-fav-hosts hostname))
-           (trampy (if (not root)
-                       (format "/ssh:%s:%s"       ipaddr dir)
-                     (format "/ssh:%s|sudo:%s:%s" ipaddr ipaddr dir)))
-           (default-directory trampy))
-      (eshell)))
-  (global-set-key (kbd "C-c s") 'eshell-favorite)
-  (global-set-key (kbd "C-c j") '(lambda () (interactive) (eshell-favorite "fiji" "/data1/swat/Summer2019/Liam2019/working"))))
+    (eshell/-buffer-as-args buffer nil command)))
