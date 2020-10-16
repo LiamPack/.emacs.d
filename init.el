@@ -542,12 +542,33 @@ There are two things you can do about this warning:
 (use-package julia-repl
   :ensure t)
 
+;;; --- haskell
+(use-package haskell-mode
+  :ensure t
+  :config
+  (setq haskell-process-type 'cabal-new-repl)
+  (setq haskell-process-log t)
+
+  (add-hook 'haskell-mode-hook 'haskell-indent-mode)
+  (add-hook 'haskell-mode-hook 'interactive-haskell-mode)
+  (add-hook 'haskell-mode-hook 'haskell-doc-mode)
+  (add-hook 'haskell-mode-hook 'hindent-mode))
+
 ;;; --- Lisps
 ;; general lisp config
 (use-package flycheck
   :ensure t
   :config
   (flycheck-mode))
+
+(use-package lsp-haskell
+  :ensure t)
+(use-package lsp-ivy
+  :ensure t)
+(use-package lsp-mode
+  :ensure t
+  :after (lsp-haskell lsp-ivy)
+  :hook (((python-mode haskell-mode cc-mode) . (lambda () (lsp)))))
 (use-package paredit
   :ensure t
   :diminish paredit-mode)
@@ -674,26 +695,26 @@ There are two things you can do about this warning:
 
   (require 'doct)
   (setq org-capture-templates
-	(doct '(("Inbox" :keys "c"
-		 :file "~/Dropbox/Org/Inbox.org"
-		 :type entry 
-		 :headline "Inbox"
-		 :todo-state "TODO"
-		 :template ("* %{todo-state} %^{Description}"
-			    ":PROPERTIES:"
-			    ":Created: %U"
-			    ":END:"
-			    "%?"))
-		("Project Planning" :keys "p"
-		 :file "~/Dropbox/Org/Project-Planning.org"
-		 :type entry
-		 :headline "Refile"
-		 :todo-state "TODO"
-		 :template ("* %{todo-state} %^{Description} %^g"
-			    ":PROPERTIES:"
-			    ":Created: %U"
-			    ":END:"
-			    "%?"))))))
+        (doct '(("Inbox" :keys "c"
+                 :file "~/Dropbox/Org/Inbox.org"
+                 :type entry
+                 :headline "Inbox"
+                 :todo-state "TODO"
+                 :template ("* %{todo-state} %^{Description}"
+                            ":PROPERTIES:"
+                            ":Created: %U"
+                            ":END:"
+                            "%?"))
+                ("Project Planning" :keys "p"
+                 :file "~/Dropbox/Org/Project-Planning.org"
+                 :type entry
+                 :headline "Refile"
+                 :todo-state "TODO"
+                 :template ("* %{todo-state} %^{Description} %^g"
+                            ":PROPERTIES:"
+                            ":Created: %U"
+                            ":END:"
+                            "%?"))))))
 
 (use-package org-journal
   :ensure t
@@ -996,3 +1017,5 @@ they are appended."
   (defun eshell/sargs (buffer &rest command)
     "Passes the words from BUFFER as arguments to COMMAND."
     (eshell/-buffer-as-args buffer nil command)))
+
+(load-file "c:/msys64/home/LiamP/git_garbage/agda/.stack-work/install/c0474cbe/share/x86_64-windows-ghc-8.8.3/Agda-2.6.1/emacs-mode/agda2.el")
