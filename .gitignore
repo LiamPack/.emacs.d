@@ -1,6 +1,5 @@
 tramp
 smex-items
-projectile-*
 kkcrc
 *~
 *.last
@@ -16,3 +15,17 @@ desktops/
 adafruit*
 auto-*
 #*
+.cache/
+.lsp-session-v1
+abbrev_defs
+bash.exe.stackdump
+company-statistics-cache.el
+configuration.el
+cygwin-mount.el
+org-clock-save.el
+projectile-bookmarks.eld
+projectile.cache
+request/
+server/
+setup-cygwin.el
+url/

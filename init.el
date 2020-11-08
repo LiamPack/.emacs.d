@@ -3,36 +3,6 @@
 (add-to-list 'load-path "~/.emacs.d/etc")
 (add-to-list 'custom-theme-load-path "~/.emacs.d/themes/")
 ;; TODOs for the config: (to fix check out github.com/alhassy/emacs.d
-;; - [x] Have a theme-switching keybind
-;; - [-] better mode line (don't super care for now)
-;; - [ ] org stuff
-;;   - [-] org capture stuff (it's ok for now I guess)
-;;   - [ ] org agenda customization
-;;   - [ ] sticky-header!!!
-;;   - [x] website export stuff
-;;   - [x] revamp the journal setup (org-journal)
-;;   - [x] journals for new things learned or ideas (going to just do this in daily journal files with accompanied properties/tags
-;;   - [x] states like TODO and DONE
-;;   - [ ] clocking
-;;   - [-] to-read file revamp : where should DONEs go? what's the structure?
-;;   - [ ] _org-chef_ !!
-;; - [x] startup message / buffer (scratch + agenda?)
-;; - [x] hl-line mode would be nice
-;; - [x] cleanup-buffer function, maybe on save hook
-;; - [ ] pdf-viewing + latex maybe
-;; - [x] getting company to work for once
-;; - [x] flyspell in prose modes
-;; - [ ] flycheck
-;; - [ ] languages
-;;   - [ ] python
-;;   - [ ] lisps
-;;   - [ ] julia?!?
-;; - [ ] gnus
-;; - [x] emacs web browser (eww)
-;; - [x] magit
-;; - [x] ace-window
-;; - [x] snippets
-
 
 (require 'package)
 (let* ((no-ssl (and (memq system-type '(windows-nt ms-dos))
@@ -104,7 +74,7 @@ There are two things you can do about this warning:
 (if (fboundp 'scroll-bar-mode) (scroll-bar-mode -1))
 (display-time-mode t)
 (set-face-attribute 'default nil :height 180)
-(set-frame-font "JuliaMono" nil t)
+(set-frame-font "Input" nil t)
 
 ;; Too distracting
 (blink-cursor-mode -1)
@@ -214,12 +184,13 @@ There are two things you can do about this warning:
 (global-set-key (kbd "<f5>") #'revert-buffer)
 
 ;; transparency
-(set-frame-parameter (selected-frame) 'alpha '(95 95))
+(set-frame-parameter (selected-frame) 'alpha '(100 95))
 ;; (add-to-list 'default-frame-alist '(alpha 100 95))
 
 ;;; --- whichkey mode!
 (use-package which-key
   :ensure t
+  :diminish which-key-mode
   :config
   (which-key-mode))
 
@@ -297,10 +268,11 @@ There are two things you can do about this warning:
 
 (use-package ivy
   :ensure t
+  :diminish ivy-mode
   :config
-
   (use-package ivy-posframe
     :ensure t
+    :diminish ivy-posframe-mode
     :config
     (require 'ivy-posframe)
     ;; display at `ivy-posframe-style'
@@ -336,7 +308,8 @@ There are two things you can do about this warning:
     :config
     ;; enable this if you want `swiper' to use it
     ;; (setq search-default-mode #'char-fold-to-regexp)
-    (global-set-key (kbd "C-s") 'swiper-isearch))
+    (global-set-key (kbd "C-c C-s") 'swiper-isearch)
+    (global-set-key (kbd "C-s") 'isearch-forward-regexp))
 
 
   (setq ivy-use-virtual-buffers t)
@@ -387,12 +360,14 @@ There are two things you can do about this warning:
 ;;; --- company
 (use-package company
   :diminish
+  :after elm
   :config
   (setq company-global-modes '(not eshell-mode))
   (global-company-mode 1)
   (define-key company-active-map (kbd "<backtab>") #'company-complete-selection)
   (define-key company-active-map (kbd "<return>") nil)
   (define-key company-active-map (kbd "RET") nil)
+  (add-to-list 'company-backends 'elm-company)
   (setq ;; Only 2 letters required for completion to activate.
    company-minimum-prefix-length 2
 
@@ -421,7 +396,7 @@ There are two things you can do about this warning:
   :config
   (evil-mode)
   (setf evil-ex-search-highlight-all nil)
-
+  (add-to-list 'evil-normal-state-modes 'sly-db-mode)
   ;; Make it easier to exit insert-mode
   (use-package key-chord
     :ensure t)
@@ -481,14 +456,6 @@ There are two things you can do about this warning:
 (use-package solarized-theme
   :ensure t)
 
-(use-package moody
-  :ensure t
-  :config
-  (setq x-underline-at-descent-line t)
-  (moody-replace-mode-line-buffer-identification)
-  (moody-replace-vc-mode))
-
-
 ;;;; --- programming stuff incoming
 ;;; --- Snippets :) (mostly from https://github.com/alhassy/emacs.d#snippets----template-expansion)
 
@@ -542,6 +509,17 @@ There are two things you can do about this warning:
 (use-package julia-repl
   :ensure t)
 
+;;; --- elm
+(use-package elm-mode
+  :ensure t
+  :hook ((elm-mode . elm-format-on-save-mode))
+  :init
+  (add-hook 'elm-mode-hook 'elm-format-on-save-mode)
+  (setq elm-indent-offset 2)
+
+  )
+
+
 ;;; --- haskell
 (use-package haskell-mode
   :ensure t
@@ -568,7 +546,12 @@ There are two things you can do about this warning:
 (use-package lsp-mode
   :ensure t
   :after (lsp-haskell lsp-ivy)
-  :hook (((python-mode haskell-mode cc-mode) . (lambda () (lsp)))))
+  :hook (((python-mode haskell-mode cc-mode) . (lambda () (lsp))))
+  :config
+  (use-package lsp-ui
+    :ensure t
+    :config)
+  )
 (use-package paredit
   :ensure t
   :diminish paredit-mode)
@@ -580,11 +563,13 @@ There are two things you can do about this warning:
   :diminish aggressive-indent-mode)
 (use-package racket-mode
   :ensure t)
+
 (use-package sly
   :ensure t
+  :bind (:map sly-mode-map
+              ("C-c C-b" . sly-eval-buffer))
   :config
-  (use-package helm-sly
-    :ensure t)
+
   ;; check dpkg -L sbcl-source to find where the source stuff is
   ;; Then you need to add the line
   ;;    (sb-ext:set-sbcl-source-location "/usr/share/sbcl-source/")
@@ -592,6 +577,9 @@ There are two things you can do about this warning:
   (setq inferior-lisp-program "sbcl")
   (setq sly-contribs '(sly-fancy))
   (define-key sly-prefix-map (kbd "M-h") 'sly-documentation-lookup))
+
+(use-package sly-quicklisp
+  :ensure t)
 
 (setq lisp-mode-hooks '(clojure-mode-hook
                         emacs-lisp-mode-hook
@@ -607,6 +595,7 @@ There are two things you can do about this warning:
                    (aggressive-indent-mode))))
 
 (define-key emacs-lisp-mode-map (kbd "C-c C-k") #'eval-buffer)
+(diminish 'eldoc-mode)
 
 ;;; -- Oh boy here comes the org mode
 (use-package org-bullets
@@ -714,7 +703,78 @@ There are two things you can do about this warning:
                             ":PROPERTIES:"
                             ":Created: %U"
                             ":END:"
-                            "%?"))))))
+                            "%?")))))
+
+  (defun website-style ()
+    "docstring"
+    (interactive)
+    (let ((current-theme (car custom-enabled-themes)))
+      (load-theme 'leuven t)
+      (org-publish "blog")
+      (load-theme current-theme)))
+
+  (global-set-key (kbd "C-c <f8>") 'website-style)
+
+  ;; Posts that helped to set this up
+  ;; Blogging with Emacs -- https://bastibe.de/2013-11-13-blogging-with-emacs.html
+  ;; Some guy's blog config -- https://github.com/DiegoVicen/my-emacs#my-blog-publishing-configuration
+  ;; CSS theme from here https://gongzhitaao.org/orgcss/
+  (setq org-publish-project-alist
+        '(("blog-notes"
+           :base-directory "~/projects/website/org"
+           :base-extension "org"
+           :publishing-directory "~/projects/website/public"
+           :recursive t
+           :publishing-function org-html-publish-to-html
+           :with-toc nil
+           :with-creator nil
+           :headline-levels 4
+           :section-numbers nil
+           :html-head nil
+           :html-head-include-default-style nil
+           :html-head-include-scripts nil
+           ;; From https://bastibe.de/
+           :html-head-extra
+           "
+          <title>LPac's Pages</title>
+          <meta http-equiv=\"content-type\" content=\"application/xhtml+xml; charset=UTF-8\" />
+          "
+           :html-preamble
+           "<link rel=\"stylesheet\" type=\"text/css\" href=\"css/org.css\"/>
+           <link rel=\"stylesheet\" type=\"text/css\" href=\"../css/org.css\"/>
+            <div class=\"header\">
+              <div class=\"site-title\"><a href=\"/\">LPac's Pages</a></div>
+              <nav class=\"page-nav\">
+                  <ul>
+<li><a href=\"/\">home</a>  </li>
+<li><a href=\"http://github.com/liampack\">Github</a> </li>
+<li><a href=\"/archive.html\">Other posts</a> </li>
+<li><a href=\"/posts/favorites.html\">favorites</a> </li>
+<li><a href=\"/posts/least-favorites.html\">least favorites</a></li>
+                  </ul>
+              </nav>
+          </div>"
+           :html-postamble
+           "<div id=\"archive\"><a href=\"/archive.html\">Other posts</a></div>"
+           ;; sitemap - list of blog articles
+           :auto-sitemap t
+           :sitemap-filename "archive.org"
+           :sitemap-title "archive"
+           :sitemap-sort-files anti-chronologically
+           :sitemap-style list
+           ;; :makeindex t
+           )
+          ;; Define any other projects here...
+          ("blog-static"
+           :base-directory "~/projects/website/org"
+           :base-extension "scss\\|css\\|js\\|png\\|jpg\\|gif\\|pdf\\|mp3\\|ogg\\|swf\\|mp4"
+           :publishing-directory "~/projects/website/public/"
+           :recursive t
+           :publishing-function org-publish-attachment
+           )
+          ("blog" :components ("blog-notes" "blog-static"))))
+
+  )
 
 (use-package org-journal
   :ensure t
@@ -732,8 +792,39 @@ There are two things you can do about this warning:
   (define-key org-journal-mode-map (kbd "C-x C-s") 'org-journal-save-entry-and-exit))
 
 ;;; --- web based Stuff
+(use-package web-mode
+  :ensure t
+  :custom
+  (web-mode-enable-current-element-highlight t)
+  (web-mode-enable-current-column-highlight t)
+  (web-mode-code-indent-offset 2)
+  (web-mode-markup-indent-offset 2)
+  (web-mode-css-indent-offset 2)
+  :config
+  (add-to-list 'auto-mode-alist '("\\.html\\'" . web-mode))
+  (add-to-list 'auto-mode-alist '("\\.phtml\\'" . web-mode))
+  (add-to-list 'auto-mode-alist '("\\.tpl\\.php\\'" . web-mode))
+  (add-to-list 'auto-mode-alist '("\\.[agj]sp\\'" . web-mode))
+  (add-to-list 'auto-mode-alist '("\\.as[cp]x\\'" . web-mode))
+  (add-to-list 'auto-mode-alist '("\\.erb\\'" . web-mode))
+  (add-to-list 'auto-mode-alist '("\\.mustache\\'" . web-mode))
+  (add-to-list 'auto-mode-alist '("\\.djhtml\\'" . web-mode)))
+
+(use-package rainbow-mode
+  :ensure t)
+(use-package js2-mode
+  :ensure t)
 ;; update browser without reloading after editing
 (use-package impatient-mode
+  :ensure t)
+(use-package emmet-mode
+  :ensure t
+  :hook ((scss-mode-hook . emmet-mode)
+         (css-mode-hook . emmet-mode)
+         (sgml-mode-hook . emmet-mode))
+  :config
+  (setq emmet-move-cursor-between-quotes t))
+(use-package scss-mode
   :ensure t)
 
 (use-package simple-httpd ; easy httpd local Server
@@ -911,7 +1002,7 @@ There are two things you can do about this warning:
   :ensure t
   :custom
   (shell-file-name "bash")
-  (shell-command-switch "-ic")
+  ;; (shell-command-switch "-ic")
   (eshell-scroll-to-bottom-on-input 'all)
   (eshell-hist-ignoredups t)
   (eshell-save-history-on-exit t)
@@ -1018,4 +1109,4 @@ they are appended."
     "Passes the words from BUFFER as arguments to COMMAND."
     (eshell/-buffer-as-args buffer nil command)))
 
-(load-file "c:/msys64/home/LiamP/git_garbage/agda/.stack-work/install/c0474cbe/share/x86_64-windows-ghc-8.8.3/Agda-2.6.1/emacs-mode/agda2.el")
+;; (load-file "c:/msys64/home/LiamP/git_garbage/agda/.stack-work/install/c0474cbe/share/x86_64-windows-ghc-8.8.3/Agda-2.6.1/emacs-mode/agda2.el")

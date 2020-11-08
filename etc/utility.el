@@ -72,8 +72,19 @@ right-associatively."
   "Anaphoric lambda: binds SELF to the anonymous function itself."
   (declare (indent defun))
   `(labels ((self ,params ,@body))
-     #'self))
+	   #'self))
+
+
+;; Present Day
+(defun use-package-list (pkg-list)
+  (let ((return-list '()))
+    (dolist (pkg pkg-list)
+      (setq return-list (append return-list (list `(use-package ,pkg :ensure t)))))
+    (dolist (up-form return-list)
+      (eval up-form))))
+
 
 (provide 'utility)
 
 ;;; utility.el ends here
+
