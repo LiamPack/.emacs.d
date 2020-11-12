@@ -194,7 +194,7 @@ There are two things you can do about this warning:
   :config
   (which-key-mode))
 
-;;; --- Navigation and Window Management (helm + soontobe posframe)
+;;; --- Navigation and Window Management (helm + soontobe posframen)
 ;; Window management
 (use-package ace-window
   :ensure t
@@ -272,6 +272,7 @@ There are two things you can do about this warning:
   :config
   (use-package ivy-posframe
     :ensure t
+    :disabled t
     :diminish ivy-posframe-mode
     :config
     (require 'ivy-posframe)
@@ -281,7 +282,8 @@ There are two things you can do about this warning:
     ;; (setq ivy-posframe-display-functions-alist '((t . ivy-posframe-display-at-window-center)))
     ;; (setq ivy-posframe-display-functions-alist '((t . ivy-posframe-display-at-frame-bottom-left)))
     ;; (setq ivy-posframe-display-functions-alist '((t . ivy-posframe-display-at-window-bottom-left)))
-    (setq ivy-posframe-display-functions-alist '((t . ivy-posframe-display-at-frame-top-center)))
+    (setq ivy-posframe-display-functions-alist '((t . ivy-posframe-display-at-point)))
+    (setq ivy-posframe-display-functions-alist '((t . ivy-posframe-display-at-frame-bottom-window-center)))
     (ivy-posframe-mode 1))
 
   (use-package counsel
@@ -432,7 +434,8 @@ There are two things you can do about this warning:
                   gruber-darker
                   srcery
                   modus-operandi
-                  modus-vivendi))
+                  modus-vivendi
+		  leuven-dark))
 
 (setq theme-index (1- (length my-themes))) ; start at solarized I guess
 (load-theme (nth theme-index my-themes) t)
@@ -713,7 +716,8 @@ There are two things you can do about this warning:
       (org-publish "blog")
       (load-theme current-theme)))
 
-  (global-set-key (kbd "C-c <f8>") 'website-style)
+  (global-set-key (kbd "C-c <f8>") #'(lambda () (interactive) (org-publish "blog" t)))
+  (global-set-key (kbd "<f8>") #'(lambda () (interactive) (org-publish "blog")))
 
   ;; Posts that helped to set this up
   ;; Blogging with Emacs -- https://bastibe.de/2013-11-13-blogging-with-emacs.html
@@ -748,9 +752,9 @@ There are two things you can do about this warning:
                   <ul>
 <li><a href=\"/\">home</a>  </li>
 <li><a href=\"http://github.com/liampack\">Github</a> </li>
-<li><a href=\"/archive.html\">Other posts</a> </li>
+<li><a href=\"/archive.html\">Other-Posts</a> </li>
+<li><a href=\"/notes/index.html\">Notes</a> </li>
 <li><a href=\"/posts/favorites.html\">favorites</a> </li>
-<li><a href=\"/posts/least-favorites.html\">least favorites</a></li>
                   </ul>
               </nav>
           </div>"
@@ -921,7 +925,8 @@ There are two things you can do about this warning:
   :custom
   (pdf-view-resize-factor 1.05)
   :config
-  (setq-default pdf-view-display-size 'fit-page))
+  (setq-default pdf-view-display-size 'fit-page)
+  (pdf-tools-install))
 
 ;;; --- Super miscelleneous Stuff
 ;; Browsing the internet in emacs
@@ -1081,8 +1086,7 @@ directory to make multiple eshell windows easier."
   (add-hook 'eshell-mode-hook
             (lambda ()
               (define-key eshell-mode-map (kbd "C-M-a") 'eshell-previous-prompt)
-              (define-key eshell-mode-map (kbd "C-M-e") 'eshell-next-prompt)
-              (define-key eshell-mode-map (kbd "M-r") 'helm-eshell-history)))
+              (define-key eshell-mode-map (kbd "C-M-e") 'eshell-next-prompt)))
 
   ;; from http://www.howardism.org/Technical/Emacs/eshell-present.html
   (defun eshell/-buffer-as-args (buffer separator command)
