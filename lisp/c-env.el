@@ -27,7 +27,6 @@
   :config
   (define-key c++-mode-map (kbd "C-c C-c") 'compile)
   (define-key c++-mode-map (kbd "C-c C-k") 'kill-compilation)
-  (setq compile-command my:compile-command)
   (use-package google-c-style
     :ensure t
     :config

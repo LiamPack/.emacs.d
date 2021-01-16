@@ -47,6 +47,7 @@
          ([remap describe-variable]        . counsel-describe-variable)
          ([remap info-lookup-symbol]       . counsel-info-lookup-symbol)
          ([remap completion-at-point]      . counsel-company)
+	 ("C-c k"                          . counsel-rg)
          ("C-c f L"                        . counsel-load-library)
          ("C-c f r"                        . counsel-recentf)
          ;;("C-c i 8"                        . counsel-unicode-char)

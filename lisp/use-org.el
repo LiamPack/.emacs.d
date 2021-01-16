@@ -62,7 +62,6 @@
      ;;     (sh . t)
      (emacs-lisp . t)
      (gnuplot . t)
-     (ipython . t)
      (R . t)))
   (setq org-confirm-babel-evaluate nil)
   (setq org-M-RET-may-split-line nil)

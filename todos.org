@@ -1,0 +1,11 @@
+* TODO elisp [0/7]
+  - [ ] window to left goes to size 80 if there's two windows
+  - [ ] keybindings for bookmarks
+  - [ ] terminal-safe avy, terminal-safe mc, terminal-safe swiper
+  - [ ] lsp and clangd (simple setup)
+  - [ ] better keybindings for macro execution
+  - [ ] god mode tc
+  - [ ] write a pseudocode-mode
+* TODO organizational [0/2]
+  - [ ] get rid of garbage folders
+  - [ ] refactor out elisp to separate files
