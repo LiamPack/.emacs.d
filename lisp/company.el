@@ -15,7 +15,7 @@
   (setq company-backends (delete 'company-clang company-backends))
   (setq company-backends (delete 'company-bbdb company-backends))
   (setq company-backends (delete 'company-oddmuse company-backends))
-  (defun mars/company-backend-with-yas (backends) "Add :with company-yasnippet to company BACKENDS. Taken from https://github.com/syl20bnr/spacemacs/pull/179." (if (and (listp backends) (memq 'company-yasnippet backends)) backends (append (if (consp backends) backends (list backends)) '(:with company-yasnippet))))
+  ;;(defun mars/company-backend-with-yas (backends) "Add :with company-yasnippet to company BACKENDS. Taken from https://github.com/syl20bnr/spacemacs/pull/179." (if (and (listp backends) (memq 'company-yasnippet backends)) backends (append (if (consp backends) backends (list backends)) '(:with company-yasnippet))))
 
   ;; (defvar my-company-backends nil
   ;;   "A list of my company backends")
@@ -43,8 +43,8 @@
   ;; (setq company-backends my-company-backends)
 
   ;; add yasnippet to all backends
-  (setq company-backends
-	(mapcar #'mars/company-backend-with-yas company-backends))
+  ;; (setq company-backends
+  ;;       (mapcar #'mars/company-backend-with-yas company-backends))
 
   )
 

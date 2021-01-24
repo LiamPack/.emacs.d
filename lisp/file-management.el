@@ -61,4 +61,11 @@
       (progn (revert-buffer) ; otherwise just revert to re-show
              (set (make-local-variable 'dired-dotfiles-show-p) t)))))
 
+(use-package wgrep
+  :straight t)
+
+(use-package rg
+  :straight t
+  :bind ("C-c k" . #'rg-menu))
+
 (provide 'use-recentf)
