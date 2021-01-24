@@ -57,7 +57,7 @@
 ;;(global-set-key (kbd "M-TAB") 'hippie-expand)
 (global-set-key (kbd "C-j") #'join-line) ; note that paredit binds this to (paredit-newline)
 (global-set-key (kbd "M-g") #'goto-line)
-(global-set-key (kbd "C-c n") #'lp/cleanup-buffer-safe)
+(global-set-key (kbd "C-c n") #'lp/cleanup-buffer)
 (global-set-key (kbd "<f12>") #'lp/generate-scratch-buffer)
 (global-set-key (kbd "C-c C-k") #'eval-buffer)
 (global-set-key (kbd "C-<f7>") #'compile)

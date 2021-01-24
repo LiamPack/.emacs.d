@@ -1,6 +1,7 @@
 (require 'use-package)
 (use-package ivy
   :straight t
+  :disabled t
   :diminish ivy-mode
   :config
   (setq ivy-use-virtual-buffers t)
@@ -10,6 +11,7 @@
 
 (use-package ivy-hydra                  ; Hydra bindings for ivy buffer
   :straight t
+  :disabled
   :after ivy
   :bind (:map ivy-minibuffer-map
               ("C-o" . hydra-ivy/body)))
@@ -27,6 +29,7 @@
 
 (use-package counsel                    ; Ivy-powered commands
   :straight t
+  :disabled
   :after ivy
   :diminish counsel-mode
   :init (counsel-mode)
@@ -50,9 +53,11 @@
     (global-set-key (kbd "C-x p") 'pop-to-mark-command)))
 
 (use-package flx                        ; flex searching (fuzzy)
+  :disabled t
   :straight t)
 
 (use-package avy ; Maybe also look into iy- whatever for this. interesting extension/alternative though
+  :disabled t
   :straight t
   :bind (("C-\'" . avy-goto-char)
          ("C-\"" . avy-goto-char-timer)

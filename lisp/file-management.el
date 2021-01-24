@@ -39,7 +39,8 @@
   :diminish projectile-mode
   :config
   ;; Projectile everywhere obviously
-  (projectile-global-mode))
+  (projectile-global-mode)
+  (define-key projectile-mode-map (kbd "C-c p") 'projectile-command-map))
 
 ;; handle very large files
 (use-package vlf

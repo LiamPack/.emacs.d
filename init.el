@@ -1,3 +1,4 @@
+(add-to-list 'load-path "~/.emacs.d/lisp/packages")
 
 ;; Do not initialise installed packages (I use `straight.el')
 (setq package-enable-at-startup nil)

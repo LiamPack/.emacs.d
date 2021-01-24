@@ -38,7 +38,7 @@
 (use-package paredit
   :straight t
   :diminish paredit-mode
-  :hook ((emacs-lisp-mode-hook scheme-mode-hook lisp-mode-hook prog-mode-hook) . paredit-mode))
+  :hook ((emacs-lisp-mode-hook scheme-mode-hook lisp-mode-hook) . paredit-mode))
 
 (use-package rainbow-delimiters
   :straight t
