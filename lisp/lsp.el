@@ -16,4 +16,4 @@
   :straight t
   :diminish lsp-treemacs-mode)
 
-(provide 'use-lsp)
+(provide 'lp-lsp)
