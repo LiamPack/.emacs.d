@@ -27,5 +27,7 @@ projectile-bookmarks.eld
 projectile.cache
 request/
 server/
-setup-cygwin.el
 url/
+straight/
+session.*
+.emacs.d
