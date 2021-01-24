@@ -50,7 +50,7 @@ changes to take effect."
   :group 'prot-consult
   :type 'list)
 
-(defcustom prot-consult-find-args '("fd" "-i" "-H" "-a" "-c" "never")
+(defcustom prot-consult-find-args '("fdfind" "-i" "-H" "-a" "-c" "never")
   "List of strings with the FD command and its arguments."
   :type 'list
   :group 'prot-consult)

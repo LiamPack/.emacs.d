@@ -14,7 +14,7 @@
   ;; - (handy as self-inserting)
   (modalka-define-kbd "/" "M-.")
   (modalka-define-kbd "." "C-.")
-  (modalka-define-kbd ":" "M-;")
+  (modalka-define-kbd ":" "M-:")
   (modalka-define-kbd ";" "C-;")
   (modalka-define-kbd "?" "M-,")
   (modalka-define-kbd "u" "C-/")
