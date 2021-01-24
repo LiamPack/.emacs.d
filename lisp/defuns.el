@@ -28,7 +28,6 @@
   (lp/cleanup-buffer-safe)
   (indent-region (point-min) (point-max)))
 
-;; TODO - find a use for this
 (defun lp/org-open-point ()
   "Open org mode heading in another window, expand it, and narrow it"
   (interactive)
@@ -47,34 +46,27 @@
   (fset 'tab
         (lambda (&optional arg) "Keyboard macro." (interactive "p")
           (kmacro-exec-ring-item (quote ([tab] 0 "%d")) arg)))
-  (tab)) ;; It basically just narrows right where you are.
+  (tab)) 
 
 (global-set-key (kbd "C-c o") 'lp/org-open-point)
-
 
 ;; Always killcurrent buffer
 (global-set-key (kbd "C-x k") 'lp/kill-current-buffer)
 
-;; Look for executables in bin
-(setq exec-path (append exec-path '("/user/local/bin")))
-
-;; Always use spaces for indentation
-(setq-default indent-tabs-mode nil)
-
-(global-set-key (kbd "M-/") 'hippie-expand)
-(global-set-key (kbd "M-TAB") 'hippie-expand)
-(global-set-key (kbd "C-j") 'join-line) ; note that paredit binds this to (paredit-newline)
-(global-set-key (kbd "M-g") 'goto-line)
-(global-set-key (kbd "C-c n") 'lp/cleanup-buffer)
-(global-set-key (kbd "<f12>") 'lp/generate-scratch-buffer)
+(global-set-key (kbd "M-/") #'hippie-expand)
+;;(global-set-key (kbd "M-TAB") 'hippie-expand)
+(global-set-key (kbd "C-j") #'join-line) ; note that paredit binds this to (paredit-newline)
+(global-set-key (kbd "M-g") #'goto-line)
+(global-set-key (kbd "C-c n") #'lp/cleanup-buffer-safe)
+(global-set-key (kbd "<f12>") #'lp/generate-scratch-buffer)
 (global-set-key (kbd "C-c C-k") #'eval-buffer)
-(global-set-key (kbd "C-<f7>") 'compile)
+(global-set-key (kbd "C-<f7>") #'compile)
 (global-set-key (kbd "<f5>")  #'revert-buffer)
-(global-set-key (kbd "C-;") 'comment-or-uncomment-region)
-(global-set-key (kbd "C-@") 'align-regexp)
-(global-set-key (kbd "C-c e") 'eval-and-replace) ; this one is pretty cool.
-(global-set-key (kbd "C-x p") 'pop-to-mark-command)
+(global-set-key (kbd "C-;") #'comment-or-uncomment-region)
+(global-set-key (kbd "C-c e") #'eval-and-replace) ; this one is pretty cool.
+(global-set-key (kbd "C-x p") #'pop-to-mark-command)
 (setq set-mark-command-repeat-pop t)
+
 ;; When popping the mark, continue popping until the cursor actually
 ;; moves Also, if the last command was a copy - skip past all the
 ;; expand-region cruft.
@@ -86,16 +78,15 @@
       ad-do-it)
     (dotimes (i 10)
       (when (= p (point)) ad-do-it))))
-;; backspace change!
-;;(global-set-key (kbd "C-h") 'delete-backward-char)?
-(global-set-key (kbd "M-h") 'backward-kill-word)
+
 (global-set-key (kbd "C-m") 'newline-and-indent)
 
 (global-set-key (kbd "C-s") 'isearch-forward-regexp)
 (global-set-key (kbd "C-r") 'isearch-backward-regexp)
 
 (use-package which-key
-  :ensure t
+  :straight t
+  :diminish which-key-mode
   :config (which-key-mode 1))
 
 ;; pop to the last command mark! its cool.

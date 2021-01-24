@@ -6,7 +6,6 @@
 (require 'pp)
 
 ;; System
-
 (defun numcores ()
   "Return the number of logical processors on this system."
   (or
@@ -95,7 +94,7 @@ argument, set so that number of columns instead."
   "Insert a random number between 0 and the prefix argument."
   (interactive "P")
   (insert (number-to-string (random n))))
-(global-set-key (kbd "C-c r") 'insert-random)
+;;(global-set-key (kbd "C-c r") 'insert-random)
 
 (cl-defun insert-random-hex (&optional (size 64))
   "Insert a random, SIZE-bit number as hexadecimal."
@@ -132,7 +131,6 @@ prefix argument, the process's buffer is displayed."
 (global-set-key (kbd "s-x") 'launch)
 
 ;; Dictionary lookup
-
 (autoload 'ispell-get-word "ispell")
 
 (defun lookup-word (word)
@@ -158,7 +156,6 @@ prefix argument, the process's buffer is displayed."
     (buffer-string)))
 
 ;; Quick switch to scratch buffers
-
 (defmacro scratch-key (key buffer-name mode)
   `(global-set-key ,key (lambda ()
                           (interactive)
@@ -327,52 +324,5 @@ buffer is not visiting a file."
                 (path (match-string 2 filename)))
             (setf filename (concat drive ":/" path))))))))
 
-;; Civ 5 game search
-
-(defun filthyrobot-playlist (n)
-  (interactive "nGame number: ")
-  (browse-url
-   (format "https://www.youtube.com/results?search_query=filthyrobot+%%22game+%d%%22&filters=playlist" n)))
-
-(provide 'extras)
-
-;; Super-format (string interpolated format)
-
-(defun superf--parts (format)
-  "Return a list of format string parts from FORMAT."
-  (let ((parts ())
-        (start 0)
-        (match nil))
-    (while (setf match (string-match-p "%" format start))
-      (if (not (eql ?% (aref format (1+ match))))
-          ;; interpolation directive
-          (cl-destructuring-bind
-              (value . end) (read-from-string format (1+ match))
-            (when (> match start)
-              (push (substring format start match) parts))
-            (push value parts)
-            (setf start end))
-        ;; literal %
-        (push (substring format start (1+ match)) parts)
-        (setf start (+ 2 match))))
-    (when (< start (length format))
-      (push (substring format start) parts))
-    (nreverse parts)))
-
-(defmacro superf (format)
-  "Formatted output with string interpolation in FORMAT.
-
-The FORMAT argument *must* be a compile-time string because it is
-parsed at macro-expansion time. Lisp expressions following a
-single % are evaluated when the `superf' is evaluated. A double
-%% represents a literal %."
-  (let ((parts (superf--parts format)))
-    `(with-temp-buffer
-       ,@(cl-loop for part in parts
-                  when (stringp part)
-                  collect `(insert ,part)
-                  else
-                  collect `(princ ,part (current-buffer)))
-       (buffer-string))))
 (provide 'extras)
 ;;; extras.el ends here
