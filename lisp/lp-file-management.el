@@ -32,7 +32,7 @@
                          "/elpa/.*\\'"       ; Package files
                          "/itsalltext/"      ; It's all text temp files
                          ;; And all other kinds of boring files
-			 )))
+                         )))
 
 (use-package projectile
   :straight t
@@ -63,9 +63,5 @@
 
 (use-package wgrep
   :straight t)
-
-(use-package rg
-  :straight t
-  :bind ("C-c k" . #'rg-menu))
 
 (provide 'lp-recentf)
