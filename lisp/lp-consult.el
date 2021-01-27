@@ -10,7 +10,7 @@
   ("M-g m" . consult-mark)
   ("M-g k" . consult-global-mark)
   ("M-g e" . consult-error)
-  ("C-c b" . consult-buffer)
+  ("C-x b" . consult-buffer)
   ("C-c k" . consult-ripgrep)
   ("M-K" . consult-keep-lines)
   ("M-X" . consult-mode-command)

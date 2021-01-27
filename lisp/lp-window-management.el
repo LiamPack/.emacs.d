@@ -53,7 +53,7 @@
 (setq frame-resize-pixelwise t               ; Resize by pixels
       frame-title-format
       '(:eval (if (buffer-file-name)
-		  (abbreviate-file-name (buffer-file-name)) "%b"))
+                  (abbreviate-file-name (buffer-file-name)) "%b"))
       ;; Size new windows proportionally wrt other windows
       window-combination-resize t)
 
@@ -103,29 +103,29 @@
 ;; Configure `display-buffer' behaviour for some special buffers.
 (setq display-buffer-alist
       `(
-	;; Put REPLs and error lists into the bottom side window
-	(,(rx bos
+        ;; Put REPLs and error lists into the bottom side window
+        (,(rx bos
               (or "*Help"                         ; Help buffers
-		  "*Warnings*"                    ; Emacs warnings
-		  "*Compile-Log*"                 ; Emacs byte compiler log
-		  "*compilation"                  ; Compilation buffers
-		  "*Flycheck errors*"             ; Flycheck error list
-		  "*shell"                        ; Shell window
-		  "*sbt"                          ; SBT REPL and compilation buffer
-		  "*ensime-update*"               ; Server update from Ensime
-		  "*SQL"                          ; SQL REPL
-		  "*Cargo"                        ; Cargo process buffers
-		  (and (1+ nonl) " output*")      ; AUCTeX command output
-		  ))
-	 (display-buffer-reuse-window
-	  display-buffer-in-side-window)
-	 (side            . bottom)
-	 (reusable-frames . visible)
-	 (window-height   . 0.33))
-	;; Let `display-buffer' reuse visible frames for all buffers.  This must
-	;; be the last entry in `display-buffer-alist', because it overrides any
-	;; later entry with more specific actions.
-	("." nil (reusable-frames . visible))))
+                  "*Warnings*"                    ; Emacs warnings
+                  "*Compile-Log*"                 ; Emacs byte compiler log
+                  "*compilation"                  ; Compilation buffers
+                  "*Flycheck errors*"             ; Flycheck error list
+                  "*shell"                        ; Shell window
+                  "*sbt"                          ; SBT REPL and compilation buffer
+                  "*ensime-update*"               ; Server update from Ensime
+                  "*SQL"                          ; SQL REPL
+                  "*Cargo"                        ; Cargo process buffers
+                  (and (1+ nonl) " output*")      ; AUCTeX command output
+                  ))
+         (display-buffer-reuse-window
+          display-buffer-in-side-window)
+         (side            . bottom)
+         (reusable-frames . visible)
+         (window-height   . 0.33))
+        ;; Let `display-buffer' reuse visible frames for all buffers.  This must
+        ;; be the last entry in `display-buffer-alist', because it overrides any
+        ;; later entry with more specific actions.
+        ("." nil (reusable-frames . visible))))
 
 (use-package focus-autosave-mode        ; Save buffers when focus is lost
   :straight t
@@ -172,41 +172,126 @@
   :defer t
   :init (add-hook 'ibuffer-hook #'ibuffer-projectile-set-filter-groups))
 
-
-;;; experimental TODO
-(use-package golden-ratio               ; Automatically resize windows
-  :straight t
+(use-package tab-bar
   :init
-  (defun lunaryorn-toggle-golden-ratio ()
-    (interactive)
-    (if (bound-and-true-p golden-ratio-mode)
-        (progn
-          (golden-ratio-mode -1)
-          (balance-windows))
-      (golden-ratio-mode)
-      (golden-ratio)))
-  :bind (("C-c t g" . lunaryorn-toggle-golden-ratio))
+  (setq tab-bar-close-button-show nil)
+  (setq tab-bar-close-last-tab-choice 'tab-bar-mode-disable)
+  (setq tab-bar-close-tab-select 'recent)
+  (setq tab-bar-new-tab-choice t)
+  (setq tab-bar-new-tab-to 'right)
+  (setq tab-bar-position nil)
+  (setq tab-bar-show nil)
+  (setq tab-bar-tab-hints nil)
+  (setq tab-bar-tab-name-function 'tab-bar-tab-name-all)
   :config
-  (setq
-   golden-ratio-extra-commands '(windmove-up
-                                 windmove-down
-                                 windmove-left
-                                 windmove-right
-                                 ace-window
-                                 ace-delete-window
-                                 ace-select-window
-                                 ace-swap-window
-                                 ace-maximize-window)
-   ;; Exclude a couple of special modes from golden ratio, namely
-   ;; Flycheck's error list, calc
-   golden-ratio-exclude-modes '(flycheck-error-list-mode
-                                calc-mode
-                                dired-mode
-                                ediff-mode
-                                )
-   golden-ratio-exclude-buffer-regexp
-   `(,(rx bos "*which-key*" eos)
-     ,(rx bos "*NeoTree*" eos)))
-  :diminish (golden-ratio-mode . "ⓖ"))
+  (tab-bar-mode -1)
+  (tab-bar-history-mode -1)
+  :bind (("<prior>" . tab-next)
+         ("<next>" . tab-previous)))
+
+
+(use-package register)
+(use-package desktop
+  :config
+  (setq desktop-auto-save-timeout 300)
+  (setq desktop-path '("~/.emacs.d/"))
+  (setq desktop-base-file-name "desktop")
+  (setq desktop-files-not-to-save nil)
+  (setq desktop-globals-to-clear nil)
+  (setq desktop-load-locked-desktop t)
+  (setq desktop-missing-file-warning nil)
+  (setq desktop-restore-eager 0)
+  (setq desktop-restore-frames nil)
+  (setq desktop-save 'ask-if-new)
+  (desktop-save-mode 1))
+
+(use-package window
+  :init
+  (setq display-buffer-alist
+        '(;; top side window
+          ("\\**prot-elfeed-bongo-queue.*"
+           (display-buffer-reuse-window display-buffer-in-side-window)
+           (window-height . 0.16)
+           (side . top)
+           (slot . -2))
+          ("\\*\\(prot-elfeed-mpv-output\\|world-clock\\).*"
+           (display-buffer-in-side-window)
+           (window-height . 0.16)
+           (side . top)
+           (slot . -1))
+          ("\\*\\(Flymake\\|Package-Lint\\|vc-git :\\).*"
+           (display-buffer-in-side-window)
+           (window-height . 0.16)
+           (side . top)
+           (slot . 0)
+           (window-parameters . ((no-other-window . t))))
+          ("\\*Messages.*"
+           (display-buffer-in-side-window)
+           (window-height . 0.16)
+           (side . top)
+           (slot . 1)
+           (window-parameters . ((no-other-window . t))))
+          ("\\*\\(Backtrace\\|Warnings\\|Compile-Log\\|compilation\\)\\*"
+           (display-buffer-in-side-window)
+           (window-height . 0.16)
+           (side . top)
+           (slot . 2)
+           (window-parameters . ((no-other-window . t))))
+          ;; bottom side window
+          ("\\*\\(Embark\\)?.*Completions.*"
+           (display-buffer-in-side-window)
+           (side . bottom)
+           (slot . 0)
+           (window-parameters . ((no-other-window . t)
+                                 (mode-line-format . none))))
+          ;; left side window
+          ("\\*Help.*"
+           (display-buffer-in-side-window)
+           (window-width . 0.20)       ; See the :hook
+           (side . left)
+           (slot . 0)
+           (window-parameters . ((no-other-window . t))))
+          ;; right side window
+          ("\\*Faces\\*"
+           (display-buffer-in-side-window)
+           (window-width . 0.25)
+           (side . right)
+           (slot . 0)
+           (window-parameters
+            . ((mode-line-format
+                . (" "
+                   mode-line-buffer-identification)))))
+          ("\\*Custom.*"
+           (display-buffer-in-side-window)
+           (window-width . 0.25)
+           (side . right)
+           (slot . 1)
+           (window-parameters . ((no-other-window . t))))
+          ;; bottom buffer (NOT side window)
+          ("\\*\\vc-\\(incoming\\|outgoing\\).*"
+           (display-buffer-at-bottom))
+          ("\\*\\(Output\\|Register Preview\\).*"
+           (display-buffer-at-bottom)
+           (window-parameters . ((no-other-window . t))))
+          ("\\*.*\\([^E]eshell\\|shell\\|v?term\\).*"
+           (display-buffer-reuse-mode-window display-buffer-at-bottom)
+           (window-height . 0.2)
+           ;; (mode . '(eshell-mode shell-mode))
+           )))
+
+  (setq window-combination-resize t)
+  (setq even-window-sizes 'height-only)
+  (setq window-sides-vertical nil)
+  (setq switch-to-buffer-in-dedicated-window 'pop)
+  :hook ((help-mode-hook . visual-line-mode)
+         (custom-mode-hook . visual-line-mode))
+  :bind (("C-x +" . balance-windows-area)
+         ("C-M-q" . window-toggle-side-windows)))
+
+(use-package winner
+  :hook (after-init-hook . winner-mode)
+  :bind (("<right>" . winner-redo)
+         ("<left>" . winner-undo)))
+
 
 (provide 'lp-window-management)

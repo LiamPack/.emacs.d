@@ -1,5 +1,5 @@
-(add-to-list 'load-path "~/.emacs.d/lisp/packages")
-
+(add-to-list 'load-path "~/.emacs.d/lisp/packages/")
+(add-to-list 'load-path "~/.emacs.d/lisp/")
 ;; Do not initialise installed packages (I use `straight.el')
 (setq package-enable-at-startup nil)
 
@@ -50,6 +50,9 @@
 	     :config
 	     (setq vc-follow-symlinks t)) ; Because my dotfiles are managed that way
 (use-package diminish
-  :ensure t)
+  :straight t)
+(use-package server
+  :hook (after-init-hook . server-start))
+
 (dolist (file (directory-files "~/.emacs.d/lisp/" t ".*el$"))
   (load-file file))

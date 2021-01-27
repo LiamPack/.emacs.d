@@ -84,11 +84,29 @@
   (modalka-define-kbd "x r r" "C-x r r")
   (modalka-define-kbd "x r S" "C-x r S")
   (modalka-define-kbd "x r L" "C-x r L")
+  (modalka-define-kbd "x r n" "C-x r n") ;; registers
+  (modalka-define-kbd "x r s" "C-x r s")
+  (modalka-define-kbd "x r r" "C-x r r")
+  (modalka-define-kbd "x r SPC" "C-x r SPC")
+  (modalka-define-kbd "x r w" "C-x r w")
+  (modalka-define-kbd "x r i" "C-x r i")
+  (modalka-define-kbd "x r j" "C-x r j")
+  (modalka-define-kbd "x r +" "C-x r +")
+  (modalka-define-kbd "x r f" "C-x r f")
+  
   (modalka-define-kbd "x s" "C-x C-s")
   ;; macros :)
   (modalka-define-kbd "x k s" "C-x C-k s") ;;start macro
   (modalka-define-kbd "x k k" "C-x C-k C-k") ;;stop macro
   (modalka-define-kbd "x e" "C-x e")
+  (modalka-define-kbd "x t b" "C-x t b") ;; tab buffers
+  (modalka-define-kbd "x t 0" "C-x t 0")
+  (modalka-define-kbd "x t 1" "C-x t 1")
+  (modalka-define-kbd "x t 2" "C-x t 2")
+  (modalka-define-kbd "x t b" "C-x t b")
+  (modalka-define-kbd "x t d" "C-x t d")
+  (modalka-define-kbd "x t f" "C-x t f")
+  (modalka-define-kbd "x t o" "C-x t o")
   (modalka-define-kbd "y" "C-y")
   (modalka-define-kbd "z" "M-z")
 
@@ -115,7 +133,7 @@
   (modalka-define-kbd "S f" "M-s f")
   (modalka-define-kbd "S s" "M-s s")
   (modalka-define-kbd "S l" "M-s l")
-  
+
   (modalka-define-kbd "T" "M-t")
   (modalka-define-kbd "U" "M-u")
   (modalka-define-kbd "V" "M-v")

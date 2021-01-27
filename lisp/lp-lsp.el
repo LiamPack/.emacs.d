@@ -6,7 +6,7 @@
 (use-package lsp-mode
   :diminish lsp-mode
   :straight t
-  :hook ((python-mode-hook cuda-mode-hook c-common-mode-hook julia-mode-hook) . lsp)
+  :hook ((c++-mode-hook python-mode-hook cuda-mode-hook c-common-mode-hook julia-mode-hook) . lsp)
   :bind
   (:map
    lsp-mode-map
@@ -28,6 +28,8 @@
   ;; responses are in 800k - 3M range. Set to 1MB
   (setq read-process-output-max (* 1024 1024))
 
+  (setq lsp-clients-clangd-executable "clangd")
+  (setq lsp-clients-clangd-args '("-j=4" "--clang-tidy"))
   ;; Use flycheck instead of flymake
   (setq lsp-prefer-flymake nil)
 

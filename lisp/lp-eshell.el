@@ -16,7 +16,7 @@
    eshell-prefer-lisp-functions nil
    eshell-destroy-buffer-when-process-dies t))
 
-(global-set-key (kbd "C-c s") 'eshell)
+(global-set-key (kbd "C-c C-s") 'eshell)
 
 ;; Change up some
 (defun curr-dir-git-branch-string (pwd)
