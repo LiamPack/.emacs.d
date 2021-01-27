@@ -180,4 +180,12 @@
 (set-frame-parameter (selected-frame) 'alpha '(85 50))
 (add-to-list 'default-frame-alist '(alpha 85 50))
 
+(use-package doom-modeline
+  :straight t
+  :hook (after-init . doom-modeline-mode))
+
+(use-package all-the-icons
+  :straight t)
+
+
 (provide 'lp-aesthetics)

@@ -2,6 +2,7 @@
 (require 'use-package)
 
 (use-package modalka
+  :disabled 
   :straight t
   :init
   (setq-default
@@ -175,3 +176,4 @@
    )
 
   )
+(provide 'lp-modalka)

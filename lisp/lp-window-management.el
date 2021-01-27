@@ -7,7 +7,7 @@
 ;; iosevka, consolas, source code pro, Fira Code, dejavu, IBM 3270,
 ;; Fantasque Sans Mono, Terminus, overpass mono
 ;; meslo LG / menlo
-(setq lp/default-font "Consolas")
+(setq lp/default-font "Ubuntu Mono")
 (setq lp/default-font-size 12)
 (setq lp/current-font-size lp/default-font-size)
 
