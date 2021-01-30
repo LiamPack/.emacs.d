@@ -46,7 +46,6 @@ There are two things you can do about this warning:
 (if (fboundp 'scroll-bar-mode) (scroll-bar-mode -1))
 (display-time-mode t)
 (set-face-attribute 'default nil :height 180)
-(set-frame-font "Ubuntu Mono" nil t)
 
 ;; Too distracting
 (blink-cursor-mode -1)
