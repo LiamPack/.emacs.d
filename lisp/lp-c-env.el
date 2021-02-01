@@ -70,4 +70,8 @@ With a prefix argument, use comint-mode."
   :mode (("\\.cu\\'" . cuda-mode)
          ("\\.cuh\\'" . cuda-mode)))
 
+(use-package eldoc-cmake
+  :straight t
+  :hook (cmake-mode-hook . eldoc-cmake-enable))
+
 (provide 'lp-c-env)

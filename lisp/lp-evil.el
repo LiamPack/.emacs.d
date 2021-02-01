@@ -59,6 +59,7 @@
     "K" 'consult-ripgrep
 
     "a" 'embark-act
+
     ;;   "M-K" 'consult-keep-lines
     ;;   "M-X" 'consult-mode-command
     ;;"C-c f" 'consult-focus-lines
@@ -96,11 +97,7 @@
 
 
 (use-package evil-surround
-  :diminish
-  :commands (global-evil-surround-mode
-             evil-surround-edit
-             evil-Surround-edit
-             evil-surround-region)
+  :straight t
   :config (global-evil-surround-mode 1))
 
 (provide 'lp-evil)

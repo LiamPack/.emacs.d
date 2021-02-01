@@ -231,7 +231,7 @@
            (side . top)
            (slot . 1)
            (window-parameters . ((no-other-window . t))))
-          ("\\*\\(Backtrace\\|Warnings\\|Compile-Log\\|compilation\\)\\*"
+          ("\\*\\(Backtrace\\|Warnings\\|Compile-Log\\)\\*"
            (display-buffer-in-side-window)
            (window-height . 0.16)
            (side . top)
@@ -245,7 +245,7 @@
            (window-parameters . ((no-other-window . t)
                                  (mode-line-format . none))))
           ;; left side window
-          ("\\*Help.*"
+          ("\\*\\(Help.*\\|compilation\\)\\*"
            (display-buffer-in-side-window)
            (window-width . 0.20)       ; See the :hook
            (side . left)
