@@ -7,8 +7,8 @@
 ;; iosevka, consolas, source code pro, Fira Code, dejavu, IBM 3270,
 ;; Fantasque Sans Mono, Terminus, overpass mono
 ;; meslo LG / menlo
-(setq lp/default-font "Ubuntu Mono")
-(setq lp/default-font-size 12)
+(setq lp/default-font "YaHei consolas hybrid")
+(setq lp/default-font-size 18)
 (setq lp/current-font-size lp/default-font-size)
 
 ;; Define the factor that we should go by when increasing/decreasing

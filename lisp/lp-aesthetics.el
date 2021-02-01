@@ -38,10 +38,14 @@
 ;;  * That one black theme i'm using right now (6/15/19)
 (require 'use-package)
 
+(use-package doom-themes
+  :straight t
+  :config
+(load-theme 'doom-dracula))
 ;; Taken directly from Prot
 (use-package modus-themes
-  :straight (:local-repo "modus-themes" ; Just use :straight t OR :ensure t
-			 :no-byte-compile t)        ; Omit this---only for my dev needs
+  :disabled
+  :straight t 
   :init
   ;; Add all your customizations prior to loading the themes
   ;;
@@ -182,7 +186,8 @@
 
 (use-package doom-modeline
   :straight t
-  :hook (after-init . doom-modeline-mode))
+  :config
+  (doom-modeline-mode))
 
 (use-package all-the-icons
   :straight t)
