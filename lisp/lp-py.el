@@ -13,12 +13,10 @@
   (add-to-list 'python-shell-completion-native-disabled-interpreters
                "jupyter"))
 
-(use-package company-jedi
-  :straight t
-  :after python
-  :init
-  (defun my/python-mode-hook ()
-    (add-to-list 'company-backends 'company-jedi))
-  (add-hook 'python-mode-hook 'my/python-mode-hook))
+(use-package pyvenv
+  :straight t)
+
+(use-package julia-mode
+  :straight t)
 
 (provide 'lp-py)

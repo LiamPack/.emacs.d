@@ -15,8 +15,26 @@
    ("C-c y c" . lsp-disconnect)
    ("C-c f" . lsp-format-region))
   :config
+  (defun lsp--sort-completions (completions)
+    (lsp-completion--sort-completions completions))
+
+  (defun lsp--annotate (item)
+    (lsp-completion--annotate item))
+
+  (defun lsp--resolve-completion (item)
+    (lsp-completion--resolve item))
   (setq lsp-enable-snippet t)
-  (setq lsp-enable-indentation nil)
+  (setq lsp-enable-indentation t)
+  (setq read-process-output-max (* 10 1024 1024))
+  (setq lsp-idle-delay 0.5)
+  (setq lsp-log-io nil)
+  (setq lsp-trace nil)
+  (setq lsp-print-performance nil)
+  (setq lsp-auto-guess-root t)
+  (setq lsp-document-sync-method 'incremental)
+  (setq lsp-response-timeout 5)
+  (setq lsp-eldoc-enable-hover t)
+
   (add-to-list 'lsp-file-watch-ignored "build")
 
   (add-hook 'lsp-after-open-hook 'lsp-enable-imenu)
@@ -76,5 +94,10 @@
 (use-package lsp-treemacs
   :straight t
   :diminish lsp-treemacs-mode)
+
+(use-package lsp-julia
+  :straight t
+  :config
+  (setq lsp-julia-default-environment "~/.julia/environments/v1.5"))
 
 (provide 'lp-lsp)

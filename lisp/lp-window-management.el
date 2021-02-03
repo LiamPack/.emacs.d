@@ -7,43 +7,7 @@
 ;; iosevka, consolas, source code pro, Fira Code, dejavu, IBM 3270,
 ;; Fantasque Sans Mono, Terminus, overpass mono
 ;; meslo LG / menlo
-(setq lp/default-font "YaHei consolas hybrid")
-(setq lp/default-font-size 18)
-(setq lp/current-font-size lp/default-font-size)
-
-;; Define the factor that we should go by when increasing/decreasing
-(setq lp/font-change-increment 1.1)
-
-(defun lp/set-font-size ()
-  "Set the font to 'lp/default-font' at 'lpcurrent-font-size'."
-  (set-frame-font
-   (concat lp/default-font "-" (number-to-string lp/current-font-size))))
-
-(defun lp/reset-font-size ()
-  "Change font back to default size"
-  (interactive)
-  (setq lp/current-font-size lp/default-font-size)
-  (lp/set-font-size))
-
-
-(defun lp/increase-font-size ()
-  "increase current font size by a factor of 'lp/font-change-increment'."
-  (interactive)
-  (setq lp/current-font-size
-        (ceiling (* lp/current-font-size lp/font-change-increment)))
-  (lp/set-font-size))
-
-(defun lp/decrease-font-size ()
-  (interactive)
-  (setq lp/current-font-size
-        (floor (/ lp/current-font-size lp/font-change-increment)))
-  (lp/set-font-size))
-
-(define-key global-map (kbd "C-0") 'lp/reset-font-size)
-(define-key global-map (kbd "C-=") 'lp/increase-font-size)
-(define-key global-map (kbd "C--") 'lp/decrease-font-size)
-
-(lp/reset-font-size)
+(set-frame-font "input mono 18")
 
 ;; global-hl-line-mode softly highlights bg color of line.
 (when window-system

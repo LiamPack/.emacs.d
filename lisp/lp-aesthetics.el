@@ -40,11 +40,9 @@
 
 (use-package doom-themes
   :straight t
-  :config
-(load-theme 'doom-dracula))
+  )
 ;; Taken directly from Prot
 (use-package modus-themes
-  :disabled
   :straight t 
   :init
   ;; Add all your customizations prior to loading the themes

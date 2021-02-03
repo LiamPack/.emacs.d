@@ -10,8 +10,10 @@
   (setq dabbrev-check-other-buffers t)
   (setq dabbrev-eliminate-newlines t)
   (setq dabbrev-upcase-means-case-search t)
-  :bind (("M-/" . dabbrev-expand)
-         ("M-?" . dabbrev-completion)))
+  ;; :bind (("M-/" . dabbrev-expand)
+  ;;        ("M-?" . dabbrev-completion))
+
+  )
 
 (use-package hippie-exp
   :config
@@ -30,6 +32,40 @@
   (setq hippie-expand-dabbrev-skip-space nil)
   (setq hippie-expand-dabbrev-as-symbol t)
   (setq hippie-expand-no-restriction t)
-  :bind ("C-M-_" . hippie-expand))
+  ;; :bind ("C-M-_" . hippie-expand)
+  )
+
+
+(use-package company
+  :straight t
+  :config
+  (setq company-idle-delay 20)
+  (setq company-dabbrev-downcase 0)
+  (setq company-minimum-prefix-length 2)
+  (setq company-dabbrev-downcase nil)
+  (setq company-dabbrev-other-buffers t)
+  (setq company-auto-complete nil)
+  (setq company-dabbrev-code-other-buffers 'all)
+  (setq company-dabbrev-code-everywhere t)
+  (setq company-dabbrev-code-ignore-case t)
+  (global-set-key (kbd "M-/") 'company-complete)
+  ;; (global-set-key (kbd "C-M-_") 'company-complete)
+  ;; (global-set-key (kbd "C-c C-y") 'company-yasnippet)
+  (setq company-backends '(company-files company-keywords
+                                         company-capf company-dabbrev-code company-etags
+                                         company-dabbrev))
+  (global-company-mode 1)
+
+  ;; (add-to-list 'company-backends 'company-capf t)
+  )
+
+(use-package company-lsp
+  :straight t
+  :config
+  (push 'company-lsp company-backends)
+  (setq company-lsp-cache-candidates 'auto)
+  (setq company-lsp-async t)
+  (setq company-lsp-enable-snippet nil)
+  (setq company-lsp-enable-recompletion t))
 
 (provide 'lp-dabbrev)

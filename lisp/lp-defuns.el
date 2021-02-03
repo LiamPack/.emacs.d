@@ -53,7 +53,6 @@
 ;; Always killcurrent buffer
 (global-set-key (kbd "C-x k") 'lp/kill-current-buffer)
 
-(global-set-key (kbd "M-/") #'hippie-expand)
 ;;(global-set-key (kbd "M-TAB") 'hippie-expand)
 (global-set-key (kbd "C-j") #'join-line) ; note that paredit binds this to (paredit-newline)
 (global-set-key (kbd "M-g M-g") #'goto-line)
