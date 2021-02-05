@@ -6,7 +6,8 @@
 (use-package lsp-mode
   :diminish lsp-mode
   :straight t
-  :hook ((c++-mode-hook python-mode-hook cuda-mode-hook c-common-mode-hook julia-mode-hook) . lsp)
+  :hook (((python-mode-hook c++-mode-hook cuda-mode-hook c-common-mode-hook julia-mode-hook) . lsp)
+         )
   :bind
   (:map
    lsp-mode-map
@@ -23,6 +24,7 @@
 
   (defun lsp--resolve-completion (item)
     (lsp-completion--resolve item))
+
   (setq lsp-enable-snippet t)
   (setq lsp-enable-indentation t)
   (setq read-process-output-max (* 10 1024 1024))
@@ -51,6 +53,18 @@
   ;; Use flycheck instead of flymake
   (setq lsp-prefer-flymake nil)
 
+  ;; NB: only required if you prefer flake8 instead of the default
+  ;; send pyls config via lsp-after-initialize-hook -- harmless for
+  ;; other servers due to pyls key, but would prefer only sending this
+  ;; when pyls gets initialised (:initialize function in
+  ;; lsp-define-stdio-client is invoked too early (before server
+  ;; start)) -- cpbotha
+  (defun lsp-set-cfg ()
+    (let ((lsp-cfg `(:pyls (:configurationSources ("flake8")))))
+      ;; TODO: check lsp--cur-workspace here to decide per server / project
+      (lsp--set-configuration lsp-cfg)))
+
+  (add-hook 'lsp-after-initialize-hook 'lsp-set-cfg)
   )
 
 
@@ -89,7 +103,9 @@
    lsp-ui-peek-expand-function (lambda (xs) (mapcar #'car xs)))
   ;; Flycheck
   (setq-default flycheck-disabled-checkers '(c/c++-clang
-                                             c/c++-cppcheck c/c++-gcc)) )
+                                             c/c++-cppcheck c/c++-gcc))
+
+  )
 
 (use-package lsp-treemacs
   :straight t
@@ -99,5 +115,15 @@
   :straight t
   :config
   (setq lsp-julia-default-environment "~/.julia/environments/v1.5"))
+
+
+(use-package company-lsp
+  :straight t
+  :config
+  (push 'company-lsp company-backends)
+  (setq company-lsp-cache-candidates 'auto)
+  (setq company-lsp-async t)
+  (setq company-lsp-enable-snippet nil)
+  (setq company-lsp-enable-recompletion t))
 
 (provide 'lp-lsp)

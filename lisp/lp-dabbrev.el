@@ -59,13 +59,5 @@
   ;; (add-to-list 'company-backends 'company-capf t)
   )
 
-(use-package company-lsp
-  :straight t
-  :config
-  (push 'company-lsp company-backends)
-  (setq company-lsp-cache-candidates 'auto)
-  (setq company-lsp-async t)
-  (setq company-lsp-enable-snippet nil)
-  (setq company-lsp-enable-recompletion t))
 
 (provide 'lp-dabbrev)
