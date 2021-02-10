@@ -14,6 +14,7 @@
    ("C-c y n" . lsp-rename)
    ("C-c y o" . lsp-restart-workspace)
    ("C-c y c" . lsp-disconnect)
+   ("C-c y a" . lsp-execute-code-action)
    ("C-c f" . lsp-format-region))
   :config
   (defun lsp--sort-completions (completions)
@@ -30,10 +31,8 @@
   (setq read-process-output-max (* 10 1024 1024))
   (setq lsp-idle-delay 0.5)
   (setq lsp-log-io nil)
-  (setq lsp-trace nil)
   (setq lsp-print-performance nil)
   (setq lsp-auto-guess-root t)
-  (setq lsp-document-sync-method 'incremental)
   (setq lsp-response-timeout 5)
   (setq lsp-eldoc-enable-hover t)
 
@@ -59,12 +58,12 @@
   ;; when pyls gets initialised (:initialize function in
   ;; lsp-define-stdio-client is invoked too early (before server
   ;; start)) -- cpbotha
-  (defun lsp-set-cfg ()
-    (let ((lsp-cfg `(:pyls (:configurationSources ("flake8")))))
-      ;; TODO: check lsp--cur-workspace here to decide per server / project
-      (lsp--set-configuration lsp-cfg)))
+  ;; (defun lsp-set-cfg ()
+  ;;   (let ((lsp-cfg `(:pyls (:configurationSources ("flake8")))))
+  ;;     ;; TODO: check lsp--cur-workspace here to decide per server / project
+  ;;     (lsp--set-configuration lsp-cfg)))
 
-  (add-hook 'lsp-after-initialize-hook 'lsp-set-cfg)
+  ;; (add-hook 'lsp-after-initialize-hook 'lsp-set-cfg)
   )
 
 

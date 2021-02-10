@@ -15,6 +15,9 @@
   ("M-K" . consult-keep-lines)
   ("M-X" . consult-mode-command)
   ("C-c f" . consult-focus-lines)
+  ("M-#" . consult-register-load)
+  ("M-'" . consult-register-store)
+  
   (:map consult-narrow-map
         ("?" . consult-narrow-help))
   (:map minibuffer-local-map
@@ -37,6 +40,7 @@
   (register-preview-function #'consult-register-preview)
   :config
   (setq consult-line-numbers-widen t)
+  (setq consult-project-root-function #'projectile-project-root)
   (setq completion-in-region-function #'consult-completion-in-region)
   (setq consult-async-min-input 3)
   (setq consult-async-input-debounce 0.5)
@@ -63,8 +67,14 @@
                     (setq-local mode-line-format nil)
                     (setq-local window-min-height 1)
                     (fit-window-to-buffer)))))
+
   (setf (alist-get 'slime-repl-mode consult-mode-histories)
         'slime-repl-input-history))
+
+(use-package consult-flycheck
+  :straight t
+  :bind (:map flycheck-command-map
+              ("!" . consult-flycheck)))
 
 (use-package prot-consult
   :straight (:type built-in)
