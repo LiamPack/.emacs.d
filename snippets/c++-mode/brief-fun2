@@ -1,0 +1,8 @@
+# -*- mode: snippet -*-
+# name: breif function
+# key: \bf
+# --
+/**
+ * \brief $1
+ * \return $2
+ */

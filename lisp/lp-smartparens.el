@@ -27,9 +27,9 @@
   (:map
    smartparens-mode-map
    ("<C-backspace>" . sp-backward-kill-sexp)
-   ("M-b" . sp-backward-sexp)
+   ;;("M-b" . sp-backward-sexp)
    ("M-d" . sp-kill-sexp)
-   ("M-f" . sp-forward-sexp)
+   ;;("M-f" . sp-forward-sexp)
    ("M-h" . sp-select-next-thing)
    ("M-k" . sp-kill-hybrid-sexp)
    ("M-t" . sp-add-to-previous-sexp)))

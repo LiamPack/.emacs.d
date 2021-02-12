@@ -62,6 +62,11 @@
              (set (make-local-variable 'dired-dotfiles-show-p) t)))))
 
 (use-package wgrep
-  :straight t)
+  :straight t
+  :bind
+  (:map grep-mode-map
+        ("C-x C-q" . wgrep-change-to-wgrep-mode)
+        ("C-c C-p" . wgrep-change-to-wgrep-mode)))
 
 (provide 'lp-recentf)
+

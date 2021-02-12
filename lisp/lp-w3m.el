@@ -15,6 +15,7 @@
 ;; v to look at the bookmarks
 ;; s to look through the page history for this session.
 (use-package w3m
+  :disabled t
   :defer t
   :straight t
   :commands w3m-goto-url w3m-search
@@ -31,40 +32,42 @@
   (global-set-key (kbd "C-c w g") 'w3m-search)
 
   :config
+  (defun ha-switch-default-browser ()
+    "Switches the default browser between the internal and external web browser."
+    (interactive)
+    ;;         | Variable                  | Function
+    (if (equal browse-url-browser-function 'browse-url-default-browser)
+        (if (fboundp 'w3m)
+            (setq browse-url-browser-function 'w3m-browse-url)
+          (setq browse-url-browser-function 'eww-browse-url))
+      (setq browse-url-browser-function 'browse-url-default-browser))
+
+    ;; Now we need to display the current setting. The variables are
+    ;; pretty typical and have the goodies, but I just need to get rid
+    ;; of the word "url" or "browser", and the results are pretty close:
+    (cl-flet ((remove-bad-parts (l)
+                                (-filter (lambda (s) (pcase s
+                                                       ("url"     nil)
+                                                       ("browse"  nil)
+                                                       ("browser" nil)
+                                                       (_  t))) l)))
+      (message "Browser set to: %s"
+               (-> (symbol-name browse-url-browser-function)
+                   (split-string "-")
+                   remove-bad-parts
+                   car))))
+
+  (global-set-key (kbd "C-c w d") 'ha-switch-default-browser)
+
+  (defun w3m-skip-in-google ()
+    "For a Google Search, skip to the first result."
+    (beginning-of-buffer)
+    (search-forward-regexp "[0-9, ]+ results")
+    (forward-line 2)
+    (recenter-top-bottom 0))
+
   (define-key w3m-mode-map (kbd "&") 'w3m-view-url-with-external-browser))
 
-(defun ha-switch-default-browser ()
-  "Switches the default browser between the internal and external web browser."
-  (interactive)
-  ;;         | Variable                  | Function
-  (if (equal browse-url-browser-function 'browse-url-default-browser)
-      (if (fboundp 'w3m)
-          (setq browse-url-browser-function 'w3m-browse-url)
-        (setq browse-url-browser-function 'eww-browse-url))
-    (setq browse-url-browser-function 'browse-url-default-browser))
 
-  ;; Now we need to display the current setting. The variables are
-  ;; pretty typical and have the goodies, but I just need to get rid
-  ;; of the word "url" or "browser", and the results are pretty close:
-  (cl-flet ((remove-bad-parts (l)
-                              (-filter (lambda (s) (pcase s
-                                                     ("url"     nil)
-                                                     ("browse"  nil)
-                                                     ("browser" nil)
-                                                     (_  t))) l)))
-    (message "Browser set to: %s"
-             (-> (symbol-name browse-url-browser-function)
-                 (split-string "-")
-                 remove-bad-parts
-                 car))))
-
-(global-set-key (kbd "C-c w d") 'ha-switch-default-browser)
-
-(defun w3m-skip-in-google ()
-  "For a Google Search, skip to the first result."
-  (beginning-of-buffer)
-  (search-forward-regexp "[0-9, ]+ results")
-  (forward-line 2)
-  (recenter-top-bottom 0))
 
 (provide 'lp-w3m)

@@ -1,0 +1,5 @@
+# -*- mode: snippet -*-
+# name: breif param 
+# key: \bp
+# --
+* \param $1: $2

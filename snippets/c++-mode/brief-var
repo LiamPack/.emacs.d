@@ -1,0 +1,8 @@
+# -*- mode: snippet -*-
+# name: breif variable
+# key: \bv
+# --
+/**
+ * \brief $0
+ *
+ */
