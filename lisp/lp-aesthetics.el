@@ -38,10 +38,12 @@
 ;;  * That one black theme i'm using right now (6/15/19)
 (require 'use-package)
 
-(use-package doom-themes
-  :straight t
-  )
+;; (use-package solarized-theme
+;;   :straight t
+;;   :config
+;;   (load-theme 'solarized-wombat-dark))
 ;; Taken directly from Prot
+
 (use-package modus-themes
   :straight t 
   :init
