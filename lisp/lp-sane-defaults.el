@@ -26,7 +26,7 @@ There are two things you can do about this warning:
       initial-scratch-message ";; Present Day
 "
       create-lockfiles nil
-      wdired-allow-to-change-permissions t
+      ;; wdired-allow-to-change-permissions t
       echo-keystrokes 0.1
       delete-active-region nil
       disabled-command-function nil
