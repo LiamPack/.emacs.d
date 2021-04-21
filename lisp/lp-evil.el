@@ -49,9 +49,6 @@
     "w =" 'balance-windows
     "w k" 'lp/kill-current-buffer
     "w m" 'delete-other-windows
-
-    "r w" 'window-configuration-to-register
-    "r j" 'jump-to-register
     
     "1" 'delete-other-windows
     "2" 'lp/split-window-below-and-switch
@@ -72,10 +69,18 @@
     "k" 'consult-ripgrep
     "Y" 'consult-yank-pop
 
+    "r w" 'window-configuration-to-register
+    "r p" 'point-to-register
+    "r f" 'framset-to-register
+    "r s" 'consult-register-store
+    "r l" 'consult-register-load
+    "r j" 'jump-to-register
+
     "e n" 'next-error
     "e p" 'previous-error
     "e d" 'flycheck-display-error-at-point
-    "e l" 'flycheck-list-errors
+    "e l" 'consult-flycheck
+    "e L" 'flycheck-error-list
     "e c" 'flycheck-compile
     "e w" 'flycheck-copy-errors-as-kill
     ;;   "M-K" 'consult-keep-lines
