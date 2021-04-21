@@ -1,3 +1,5 @@
+(require 'use-package)
+
 (use-package prot-orderless
   :straight (:type built-in)
   :demand
@@ -14,20 +16,20 @@
           orderless-strict-leading-initialism
           orderless-regexp)))
 
-;; (use-package prot-minibuffer
-;;   :straight (:type built-in)
-;;   :demand
-;;   :bind (("s-v" . prot-minibuffer-focus-mini-or-completions)
-;;          :map completion-list-mode-map
-;;          ("M-v" . prot-minibuffer-focus-mini)
-;;          ("h" . prot-simple-describe-symbol) ; from `prot-simple.el'
-;;          ;; Those are DE FACTO DEPRECATED generic actions for the
-;;          ;; "*Completions*" buffer.  I normally use `embark' and its own
-;;          ;; buffers.
-;;          ("w" . prot-minibuffer-completions-kill-symbol-at-point)
-;;          ("i" . prot-minibuffer-completions-insert-symbol-at-point)
-;;          ("j" . prot-minibuffer-completions-insert-symbol-at-point-exit))
-;;   :hook (minibuffer-setup-hook . prot-minibuffer-mini-cursor))
+(use-package prot-minibuffer
+  :straight (:type built-in)
+  :demand
+  :bind (("M-V" . prot-minibuffer-focus-mini-or-completions)
+         :map completion-list-mode-map
+         ("M-v" . prot-minibuffer-focus-mini)
+         ("h" . prot-simple-describe-symbol) ; from `prot-simple.el'
+         ;; Those are DE FACTO DEPRECATED generic actions for the
+         ;; "*Completions*" buffer.  I normally use `embark' and its own
+         ;; buffers.
+         ("w" . prot-minibuffer-completions-kill-symbol-at-point)
+         ("i" . prot-minibuffer-completions-insert-symbol-at-point)
+         ("j" . prot-minibuffer-completions-insert-symbol-at-point-exit))
+  :hook (minibuffer-setup-hook . prot-minibuffer-mini-cursor))
 
 
 (use-package orderless
