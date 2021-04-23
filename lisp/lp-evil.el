@@ -33,33 +33,56 @@
   (general-nmap
     :prefix "SPC"
     :prefix-map 'my-leader-map
+    
     "f f" 'find-file
-
-    "s" 'save-buffer
-    "k" 'lp/kill-current-buffer
+    "f o" 'find-file-other-window
 
     "p f" 'projectile-find-file
     "p p" 'projectile-switch-project
+    "p c" 'projectile-compile-project
+    "p j" 'projectile-find-tag
+    "p a" 'projectile-find-other-file
+    "p A" 'projectile-find-other-file-other-window
+    "p x g" 'projectile-run-gdb
+    "p x v" 'projectile-run-vterm
 
     "w =" 'balance-windows
-    "w k" 'delete-window
+    "w k" 'lp/kill-current-buffer
     "w m" 'delete-other-windows
+    
+    "1" 'delete-other-windows
     "2" 'lp/split-window-below-and-switch
     "3" 'lp/split-window-right-and-switch
     "`" '(lambda () (interactive) (switch-to-buffer (other-buffer (current-buffer) 1)))
     "o" 'ace-window
 
-    "b b" 'consult-buffer
-    "Y" 'consult-yank-pop
+    "a" 'embark-act
+    "b" 'consult-buffer
+    "B" 'ibuffer
+    "s" 'save-buffer
+    "F" 'lsp-format-buffer
+
     "l" 'consult-line
     "i" 'consult-imenu
     "O" 'consult-outline
     "m" 'consult-global-mark
-    "e" 'consult-error
-    "K" 'consult-ripgrep
+    "k" 'consult-ripgrep
+    "Y" 'consult-yank-pop
 
-    "a" 'embark-act
+    "r w" 'window-configuration-to-register
+    "r p" 'point-to-register
+    "r f" 'framset-to-register
+    "r s" 'consult-register-store
+    "r l" 'consult-register-load
+    "r j" 'jump-to-register
 
+    "e n" 'next-error
+    "e p" 'previous-error
+    "e d" 'flycheck-display-error-at-point
+    "e l" 'consult-flycheck
+    "e L" 'flycheck-error-list
+    "e c" 'flycheck-compile
+    "e w" 'flycheck-copy-errors-as-kill
     ;;   "M-K" 'consult-keep-lines
     ;;   "M-X" 'consult-mode-command
     ;;"C-c f" 'consult-focus-lines

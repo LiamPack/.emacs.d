@@ -2,42 +2,39 @@
 
 (use-package consult
   :straight t
-  :bind
-  ("M-y" . consult-yank-pop)
-  ("M-g l" . consult-line)    ("M-g M-l" . consult-line)
-  ("M-g i" . consult-imenu)   ("M-g M-i" . consult-imenu)
-  ("M-g o" . consult-outline) ("M-g M-o" . consult-outline)
-  ("M-g m" . consult-mark)
-  ("M-g k" . consult-global-mark)
-  ("M-g e" . consult-error)
-  ("C-x b" . consult-buffer)
-  ("C-c k" . consult-ripgrep)
-  ("M-K" . consult-keep-lines)
-  ("M-X" . consult-mode-command)
-  ("C-c f" . consult-focus-lines)
-  ("M-#" . consult-register-load)
-  ("M-'" . consult-register-store)
+  ;; :bind
+  ;; ("M-y" . consult-yank-pop)
+  ;; ("M-g l" . consult-line)    ("M-g M-l" . consult-line)
+  ;; ("M-g i" . consult-imenu)   ("M-g M-i" . consult-imenu)
+  ;; ("M-g o" . consult-outline) ("M-g M-o" . consult-outline)
+  ;; ("M-g m" . consult-mark)
+  ;; ("M-g k" . consult-global-mark)
+  ;; ("M-g e" . consult-error)
+  ;; ("C-x b" . consult-buffer)
+  ;; ("C-c k" . consult-ripgrep)
+  ;; ("M-K" . consult-keep-lines)
+  ;; ("M-X" . consult-mode-command)
+  ;; ("C-c f" . consult-focus-lines)
+  ;; ("M-#" . consult-register-load)
+  ;; ("M-'" . consult-register-store)
   
-  (:map consult-narrow-map
-        ("?" . consult-narrow-help))
-  (:map minibuffer-local-map
-        ("M-r" . consult-history)
-        ("M-s"))
+  ;; (:map consult-narrow-map
+  ;;       ("?" . consult-narrow-help))
+  ;; (:map minibuffer-local-map
+  ;;       ("M-r" . consult-history)
+  ;;       ("M-s"))
   ;; NOTE: check `embark-consult' for previews that can be used with the
   ;; default minibuffer and Embark collections.
-  :bind (("C-x M-:" . consult-complex-command)
-         ("C-x M-m" . consult-minor-mode-menu)
-         ("C-x M-k" . consult-kmacro)
-         ("M-g g" . consult-goto-line)
-         ("M-g M-g" . consult-goto-line)
+  ;; :bind (("C-x M-:" . consult-complex-command)
+  ;;        ("C-x M-m" . consult-minor-mode-menu)
+  ;;        ("C-x M-k" . consult-kmacro)
+  ;;        ("M-g g" . consult-goto-line)
+  ;;        ("M-g M-g" . consult-goto-line)
 
-         ("M-K" . consult-keep-lines)  ; M-S-k is similar to M-S-5 (M-%)
+  ;;        ("M-K" . consult-keep-lines)  ; M-S-k is similar to M-S-5 (M-%)
 
-         ("M-s m" . consult-mark)
-         )
-  :custom
-  (completion-in-region-function #'consult-completion-in-region)
-  (register-preview-function #'consult-register-preview)
+  ;;        ("M-s m" . consult-mark)
+  ;;        )
   :config
   (setq consult-line-numbers-widen t)
   (setq consult-project-root-function #'projectile-project-root)
@@ -45,7 +42,7 @@
   (setq consult-async-min-input 3)
   (setq consult-async-input-debounce 0.5)
   (setq consult-async-input-throttle 0.8)
-  (setq consult-narrow-key ">")
+  (setq consult-narrow-key "<")
 
   ;; Registers' setup -- From Consult's README
   ;;
@@ -53,11 +50,12 @@
   ;; `consult-register-load', `consult-register-store', and the Emacs
   ;; built-ins.
   (setq register-preview-delay 0
-        register-preview-function #'consult-register-preview)
+        register-preview-function #'consult-register-format)
   ;; Tweak the register preview window.
   ;; * Sort the registers
   ;; * Hide the mode line
   ;; * Resize the window, such that the contents fit exactly
+  ;; (advice-add #'register-preview #'consult-register-window)
   (advice-add #'register-preview :around
               (lambda (fun buffer &optional show-empty)
                 (let ((register-alist (seq-sort #'car-less-than-car register-alist)))

@@ -135,5 +135,10 @@ directory to make multiple eshell windows easier."
     (eshell-send-input)))
 
 (bind-key "C-c s" 'eshell-here)
+(use-package vterm
+  :straight t
+  :bind ("C-c #" . vterm))
+
+
 (provide 'lp-eshell)
 
