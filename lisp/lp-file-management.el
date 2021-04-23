@@ -9,10 +9,10 @@
             (require 'dired-x)
             (dired-dotfiles-toggle)))
 
-(use-package all-the-icons-dired
-  :straight t
-  :config
-  (add-hook 'dired-mode-hook 'all-the-icons-dired-mode))
+;; (use-package all-the-icons-dired
+;;   :straight t
+;;   :config
+;;   (add-hook 'dired-mode-hook 'all-the-icons-dired-mode))
 
 ;; disable ls by default
 (setq dired-use-ls-dired nil)
@@ -69,4 +69,3 @@
         ("C-c C-p" . wgrep-change-to-wgrep-mode)))
 
 (provide 'lp-recentf)
-

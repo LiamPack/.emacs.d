@@ -36,14 +36,25 @@
 
 ;; paren stuff
 ;; USING SMARTPARENS NOW!
-;; (use-package paredit
-;;   :straight t
-;;   :diminish paredit-mode
-;;  :hook ((emacs-lisp-mode-hook scheme-mode-hook lisp-mode-hook) . paredit-mode))
+(use-package paredit
+  :straight t
+  :diminish paredit-mode
+  :hook ((emacs-lisp-mode-hook scheme-mode-hook lisp-mode-hook) . paredit-mode))
 
 (use-package rainbow-delimiters
   :straight t
   :diminish rainbow-delimiters-mode
   :hook ((emacs-lisp-mode-hook scheme-mode-hook lisp-mode-hook prog-mode-hook) . rainbow-delimiters-mode))
+
+(use-package geiser
+  :straight t)
+
+;; (use-package geiser-chez
+;;   :straight t
+;;   :after geiser)
+
+(add-to-list 'auto-mode-alist
+             '("\\.sls\\'" . scheme-mode)
+             '("\\.sc\\'" . scheme-mode))
 
 (provide 'lp-lisp-env)

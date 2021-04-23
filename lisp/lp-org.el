@@ -178,7 +178,7 @@
 ;;;;;;;;;;;;;;;;;;;;
 
 ;; Resume clocking task when emacs is restarted
-(org-clock-persistence-insinuate)
+;; (org-clock-persistence-insinuate)
 ;;
 ;; ;; Show lot of clocking history so it's easy to pick items off the C-F11 list
 ;; (setq org-clock-history-length 23)

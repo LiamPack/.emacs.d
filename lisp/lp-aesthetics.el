@@ -38,22 +38,23 @@
 ;;  * That one black theme i'm using right now (6/15/19)
 (require 'use-package)
 
-;; (use-package solarized-theme
-;;   :straight t
-;;   :config
-;;   (load-theme 'solarized-wombat-dark))
+(use-package solarized-theme
+  :straight t
+  :config
+  (load-theme 'solarized-wombat-dark))
 ;; Taken directly from Prot
 
 (use-package modus-themes
+  :disabled
   :straight t 
   :init
   ;; Add all your customizations prior to loading the themes
   ;;
   ;; NOTE: these are not my preferences!  I am always testing various
   ;; configurations.  Though I still like what I have here.
-  (setq modus-themes-slanted-constructs nil
-	modus-themes-bold-constructs nil
-	modus-themes-fringes nil ; {nil,'subtle,'intense}
+  (setq modus-themes-slanted-constructs t
+	modus-themes-bold-constructs t
+	modus-themes-fringes 'subtle ; {nil,'subtle,'intense}
 	;; Options for `modus-themes-lang-checkers': nil,
 	;; 'straight-underline, 'subtle-foreground,
 	;; 'subtle-foreground-straight-underline, 'intense-foreground,
@@ -73,7 +74,7 @@
 	modus-themes-links 'underline-only
 	modus-themes-no-mixed-fonts nil
 	modus-themes-prompts 'subtle ; {nil,'subtle,'intense}
-	modus-themes-completions 'moderate ; {nil,'moderate,'opinionated}
+	modus-themes-completions 'opinionated ; {nil,'moderate,'opinionated}
 	modus-themes-region 'bg-only-no-extend ; {nil,'no-extend,'bg-only,'bg-only-no-extend}
 	modus-themes-diffs 'bg-only ; {nil,'desaturated,'fg-only,'bg-only}
 	modus-themes-org-blocks nil ; {nil,'grayscale,'rainbow}
@@ -145,17 +146,23 @@
 
   ;; Toggle the minor mode and switch between the themes to see the
   ;; effect.
-  (prot/modus-themes-tinted -1)
+  ;;(prot/modus-themes-tinted -1)
 
   ;; Also check my package declaration for `prot-fonts' because I use
   ;; the `modus-themes-after-load-theme-hook' for some typeface-related
   ;; tweaks (as those are made at the "face" level).
   :hook ((after-init-hook . modus-themes-load-vivendi)
 	 (modus-themes-after-load-theme-hook . prot/modus-themes-custom-faces))
-    :bind ("<f5>" . modus-themes-toggle))
+  :bind ("<f5>" . modus-themes-toggle))
 
 ;; (set-face-attribute 'mode-line nil :background "NavajoWhite")
 ;; (set-face-attribute 'mode-line-inactive nil :background "#FAFAFA")
+
+
+;; (use-package avk-emacs-themes
+;;   :straight t
+;;   :config
+;;   (load-theme 'avk-darkblue-yellow))
 
 ;; time on modeline is cool
 (use-package time                       ; Show current time
@@ -183,14 +190,5 @@
 
 (set-frame-parameter (selected-frame) 'alpha '(85 50))
 (add-to-list 'default-frame-alist '(alpha 85 50))
-
-(use-package doom-modeline
-  :straight t
-  :config
-  (doom-modeline-mode))
-
-(use-package all-the-icons
-  :straight t)
-
 
 (provide 'lp-aesthetics)
