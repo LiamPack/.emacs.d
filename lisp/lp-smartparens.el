@@ -3,6 +3,7 @@
 ;; Yoinked from https://github.com/mrkkrp/dot-emacs/blob/9d2a3a77aa3e06cfd48ebefd53c984bf5cf5d914/mk/mk-packages.el
 (use-package smartparens
   :straight t
+  :disabled
   :demand
   :commands
   (sp-backward-kill-sexp

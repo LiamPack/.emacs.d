@@ -28,10 +28,10 @@
 
 
 ;; auto yas is pretty damn cool
-(use-package auto-yasnippet
-  :straight t
-  :bind ((  "C-1" . aya-create)
-         (  "C-2" . aya-expand)))
+;; (use-package auto-yasnippet
+;;   :straight t
+;;   :bind ((  "C-1" . aya-create)
+;;          (  "C-2" . aya-expand)))
 
 (provide 'lp-yasnippet)
 

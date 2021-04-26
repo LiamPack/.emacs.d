@@ -11,8 +11,10 @@
 
 ;; C-c M-o: Show image image+ have not modified.
 
+(use-package hydra
+  :straight t)
+
 (use-package image+
-  :disabled t
   :straight t
   :defer t
                                         ;    :load-path "~/elisp/Emacs-imagex"
@@ -28,8 +30,8 @@
                  ("S" imagex-sticky-save-image "save file")
                  ("r" imagex-sticky-rotate-right "rotate right")
                  ("l" imagex-sticky-rotate-left "rotate left"))))
+
 (use-package pdf-tools
-  :disabled t
   :straight t
   :config
   (pdf-tools-install)
