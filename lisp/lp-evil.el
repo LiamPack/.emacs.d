@@ -80,7 +80,7 @@
     "e p" 'previous-error
     "e d" 'flycheck-display-error-at-point
     "e l" 'consult-flycheck
-    "e L" 'flycheck-error-list
+    "e L" 'flycheck-list-errors
     "e c" 'flycheck-compile
     "e w" 'flycheck-copy-errors-as-kill
     ;;   "M-K" 'consult-keep-lines

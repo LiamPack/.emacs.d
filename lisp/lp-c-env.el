@@ -44,7 +44,6 @@ With a prefix argument, use comint-mode."
   (setq tab-width 4)
   (setq c-basic-offset 4)
   (setq-default indent-tabs-mode nil)
-  (add-hook 'c-mode-hook #'skeeto/c-hook)
   (add-to-list 'c-default-style '(c-mode . "k&r"))
   (add-to-list 'c-default-style '(c++-mode . "k&r"))
   (add-hook 'c-common-mode-hook (lambda ()
@@ -62,6 +61,9 @@ With a prefix argument, use comint-mode."
   (define-key c++-mode-map (kbd "C-c C-c") 'endless/compile-please)
   (define-key c++-mode-map (kbd "C-c C-k") 'kill-compilation)
   (define-key c++-mode-map (kbd "C-c u") 'clang-format-buffer))
+
+(use-package cmake-mode
+  :straight t)
 
 ;; Load CUDA mode so we get syntax highlighting in .cu files
 (use-package cuda-mode
