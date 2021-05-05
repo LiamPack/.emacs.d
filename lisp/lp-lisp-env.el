@@ -46,8 +46,8 @@
   :diminish rainbow-delimiters-mode
   :hook ((emacs-lisp-mode-hook scheme-mode-hook lisp-mode-hook prog-mode-hook) . rainbow-delimiters-mode))
 
-(use-package geiser
-  :straight t)
+;; (use-package geiser
+;;   :straight t)
 
 ;; (use-package geiser-chez
 ;;   :straight t
