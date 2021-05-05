@@ -6,7 +6,7 @@
 (use-package lsp-mode
   :diminish lsp-mode
   :straight t
-  :hook (((python-mode-hook c++-mode-hook cuda-mode-hook c-common-mode-hook julia-mode-hook rjsx-mode-hook typescript-mode-hook) . lsp)
+  :hook (((python-mode-hook cc-mode-hook c-mode-hook c++-mode-hook cuda-mode-hook c-common-mode-hook julia-mode-hook rjsx-mode-hook typescript-mode-hook) . lsp)
          )
   :bind
   (:map
