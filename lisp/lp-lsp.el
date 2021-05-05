@@ -106,6 +106,32 @@
 
   )
 
+(use-package dap-mode
+  :straight t
+  :commands dap-debug
+  :hook ((python-mode . dap-ui-mode)
+         (python-mode . dap-mode))
+  :config
+  (eval-when-compile
+    (require 'cl))
+
+  (require 'dap-python)
+  (require 'dap-lldb)
+  (setq dap-python-debugger 'ptvsd)
+  (setq dap-python-terminal nil)
+  ;; Eval Buffer with `M-x eval-buffer' to register the newly created template.
+
+  (dap-register-debug-template
+   "Python :: Run go-ask-alice --get_alice_scores"
+   (list :type "python"
+         :request "launch"
+         :cwd "/home/packell1/irads/just-ask-alice/src"
+         :program "main.py"
+         :args ["--get_alice_scores"]
+         :name "Python :: Run go-ask-alice --get_alice_scores"))
+
+  )
+
 (use-package lsp-treemacs
   :straight t
   :diminish lsp-treemacs-mode)
@@ -116,13 +142,12 @@
   (setq lsp-julia-default-environment "~/.julia/environments/v1.5"))
 
 
-(use-package company-lsp
-  :straight t
-  :config
-  (push 'company-lsp company-backends)
-  (setq company-lsp-cache-candidates 'auto)
-  (setq company-lsp-async t)
-  (setq company-lsp-enable-snippet nil)
-  (setq company-lsp-enable-recompletion t))
+;; (use-package company-lsp
+;;   :config
+;;   (push 'company-lsp company-backends)
+;;   (setq company-lsp-cache-candidates 'auto)
+;;   (setq company-lsp-async t)
+;;   (setq company-lsp-enable-snippet nil)
+;;   (setq company-lsp-enable-recompletion t))
 
 (provide 'lp-lsp)
