@@ -39,13 +39,13 @@
 (require 'use-package)
 
 (use-package solarized-theme
+             :disabled
   :straight t
   :config
   (load-theme 'solarized-wombat-dark))
 ;; Taken directly from Prot
 
 (use-package modus-themes
-  :disabled
   :straight t 
   :init
   ;; Add all your customizations prior to loading the themes
