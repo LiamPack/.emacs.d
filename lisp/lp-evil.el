@@ -83,6 +83,17 @@
     "e L" 'flycheck-error-list
     "e c" 'flycheck-compile
     "e w" 'flycheck-copy-errors-as-kill
+
+    "g b" 'gud-break
+    "g <" 'gud-up
+    "g >" 'gud-down
+    "g n" 'gud-next
+    "g s" 'gud-step
+    "g c" 'gud-cont
+    "g p" 'gud-print
+    "g d" 'gud-remove
+    "g l" 'gud-refresh
+    "g e" 'gud-statement
     ;;   "M-K" 'consult-keep-lines
     ;;   "M-X" 'consult-mode-command
     ;;"C-c f" 'consult-focus-lines
