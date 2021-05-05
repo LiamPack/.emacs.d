@@ -1,4 +1,4 @@
-                                        ; file management
+                                       ; file management
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 (require 'use-package)
 
@@ -33,6 +33,16 @@
                          "/itsalltext/"      ; It's all text temp files
                          ;; And all other kinds of boring files
                          )))
+
+(use-package prot-recentf
+  :straight (:type built-in)
+  :after (recentf)
+  :config
+  (add-to-list 'recentf-keep 'prot-recentf-keep-predicate)
+  (let ((map global-map))
+    (define-key map (kbd "s-r") #'prot-recentf-recent-files)
+    (define-key map (kbd "C-x C-r") #'prot-recentf-recent-dirs))
+  )
 
 (use-package projectile
   :straight t

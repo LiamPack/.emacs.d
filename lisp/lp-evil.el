@@ -36,6 +36,8 @@
     
     "f f" 'find-file
     "f o" 'find-file-other-window
+    "f r" 'prot-recentf-recent-files
+    "f d" 'prot-recentf-recent-dirs
 
     "p f" 'projectile-find-file
     "p p" 'projectile-switch-project
