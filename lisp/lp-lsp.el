@@ -62,7 +62,11 @@
   ;;   (let ((lsp-cfg `(:pyls (:configurationSources ("flake8")))))
   ;;     ;; TODO: check lsp--cur-workspace here to decide per server / project
   ;;     (lsp--set-configuration lsp-cfg)))
-
+  (push 'company-lsp company-backends)
+  (setq company-lsp-cache-candidates 'auto)
+  (setq company-lsp-async t)
+  (setq company-lsp-enable-snippet nil)
+  (setq company-lsp-enable-recompletion t)
   ;; (add-hook 'lsp-after-initialize-hook 'lsp-set-cfg)
   )
 
@@ -141,13 +145,5 @@
   :config
   (setq lsp-julia-default-environment "~/.julia/environments/v1.5"))
 
-
-;; (use-package company-lsp
-;;   :config
-;;   (push 'company-lsp company-backends)
-;;   (setq company-lsp-cache-candidates 'auto)
-;;   (setq company-lsp-async t)
-;;   (setq company-lsp-enable-snippet nil)
-;;   (setq company-lsp-enable-recompletion t))
 
 (provide 'lp-lsp)
