@@ -74,25 +74,4 @@
   :bind (:map flycheck-command-map
               ("!" . consult-flycheck)))
 
-(use-package prot-consult
-  :straight (:type built-in)
-  :after (consult)
-  :config
-  (setq consult-project-root-function #'prot-consult-project-root)
-  (setq prot-consult-command-centre-list
-        '(consult-line
-          prot-consult-line
-          consult-mark))
-  (setq prot-consult-command-top-list
-        '(consult-outline
-          consult-imenu
-          prot-consult-outline
-          prot-consult-imenu))
-  (prot-consult-set-up-hooks-mode 1)
-  :bind (("M-s i" . prot-consult-imenu)
-         ("M-s f" . prot-consult-fd)
-         ("M-s s" . prot-consult-outline)    ; M-s o is `occur'
-         ("M-s y" . prot-consult-yank)
-         ("M-s l" . prot-consult-line)))
-
 (provide 'lp-consult)

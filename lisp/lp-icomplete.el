@@ -6,7 +6,6 @@
   :hook
   (icomplete-minibuffer-setup . visual-line-mode)
   :custom
-  ;;  (completion-styles '(partial-completion substring intials flex))
   (read-file-name-completion-ignore-case t)
   (read-buffer-completion-ignore-case t)
   (completion-ignore-case t)
@@ -30,7 +29,6 @@
 (use-package minibuffer
   :demand
   :config
-  (setq completion-styles '(partial-completion substring flex orderless))
   (setq completion-category-defaults nil)
   (setq completion-cycle-threshold 3)
   (setq completion-flex-nospace nil)
@@ -40,12 +38,6 @@
   (setq completion-auto-help nil)
   (setq completion-ignore-case t)
   (setq-default case-fold-search t)   ; For general regexp
-
-  ;; The following two are updated in Emacs 28.  They concern the
-  ;; *Completions* buffer.  Note that I actually do not use that buffer,
-  ;; because I rely on Embark's version of it.
-  ;;(setq completions-format 'one-column)
-  (setq completions-detailed t)
 
   (setq read-buffer-completion-ignore-case t)
   (setq read-file-name-completion-ignore-case t)
@@ -63,13 +55,7 @@
   ;; Super-KEY.  Normally these should go in individual package
   ;; declarations, but their grouping here makes things easier to
   ;; understand.  Besides, they are related to the minibuffer.
-  :bind (("s-b" . switch-to-buffer)
-         ("s-B" . switch-to-buffer-other-window)
-         ("s-f" . find-file)
-         ("s-F" . find-file-other-window)
-         ("s-d" . dired)
-         ("s-D" . dired-other-window)
-         :map minibuffer-local-completion-map
+  :bind (:map minibuffer-local-completion-map
          ("C-j" . exit-minibuffer)
          ("<tab>" . minibuffer-force-complete)
          ;; De facto deprecated as I use Embark and its own completions'
