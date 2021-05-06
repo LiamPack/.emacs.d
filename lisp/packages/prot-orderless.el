@@ -57,21 +57,6 @@ for use on a case-by-case basis, with the help of the function
 `prot-orderless-with-styles'."
   :type 'list
   :group 'prot-orderless)
-
-(defun prot-orderless-literal-dispatcher (pattern _index _total)
-  "Literal style dispatcher using the equals sign as a suffix.
-It matches PATTERN _INDEX and _TOTAL according to how Orderless
-parses its input."
-  (when (string-suffix-p "=" pattern)
-    `(orderless-literal . ,(substring pattern 0 -1))))
-
-(defun prot-orderless-initialism-dispatcher (pattern _index _total)
-  "Leading initialism  dispatcher using the comma suffix.
-It matches PATTERN _INDEX and _TOTAL according to how Orderless
-parses its input."
-  (when (string-suffix-p "," pattern)
-    `(orderless-strict-leading-initialism . ,(substring pattern 0 -1))))
-
 (defvar orderless-matching-styles)
 
 ;;;###autoload
