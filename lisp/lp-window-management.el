@@ -169,6 +169,7 @@
   (setq desktop-save 'ask-if-new)
   (desktop-save-mode 1))
 
+;; Thank you prot (see https://protesilaos.com/dotemacs/#h:c110e399-3f43-4555-8427-b1afe44c0779)
 (use-package window
   :init
   (setq display-buffer-alist
