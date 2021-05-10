@@ -7,7 +7,7 @@
   :straight t
   :after (undo-tree general key-chord)
   :init
-  (setq evil-search-module 'evil-search)
+  (setq evil-search-module 'isearch)
   (setq evil-ex-complete-emacs-commands nil)
   (setq evil-vsplit-window-right t)
   (setq evil-split-window-below t)
@@ -123,9 +123,12 @@
     "t b" 'switch-to-buffer-other-tab
     "t d" 'dired-other-tab
     "t f" 'find-file-other-tab
+    "t n" 'tab-next
+    "t p" 'tab-previous
     "t 0" 'tab-close
     "t 1" 'tab-close-other
     "t 2" 'tab-bar-new-tab
+    "t l" 'tab-list
     ;;   "M-K" 'consult-keep-lines
     ;;   "M-X" 'consult-mode-command
     ;;"C-c f" 'consult-focus-lines
@@ -142,7 +145,7 @@
   :diminish
   :init
   (setq evil-escape-excluded-states '(normal visual multiedit emacs motion)
-        evil-escape-excluded-major-modes '(neotree-mode)
+        evil-escape-excluded-major-modes '(neotree-mode tab-switcher-mode)
         evil-escape-key-sequence "jk"
         evil-escape-delay 0.15)
 
