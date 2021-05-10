@@ -64,32 +64,32 @@
   :config
   (setq  aw-keys '(?a ?s ?d ?f ?g ?h ?j ?k ?l)))
 
-;; Configure `display-buffer' behaviour for some special buffers.
-(setq display-buffer-alist
-      `(
-        ;; Put REPLs and error lists into the bottom side window
-        (,(rx bos
-              (or "*Help"                         ; Help buffers
-                  "*Warnings*"                    ; Emacs warnings
-                  "*Compile-Log*"                 ; Emacs byte compiler log
-                  "*compilation"                  ; Compilation buffers
-                  "*Flycheck errors*"             ; Flycheck error list
-                  "*shell"                        ; Shell window
-                  "*sbt"                          ; SBT REPL and compilation buffer
-                  "*ensime-update*"               ; Server update from Ensime
-                  "*SQL"                          ; SQL REPL
-                  "*Cargo"                        ; Cargo process buffers
-                  (and (1+ nonl) " output*")      ; AUCTeX command output
-                  ))
-         (display-buffer-reuse-window
-          display-buffer-in-side-window)
-         (side            . bottom)
-         (reusable-frames . visible)
-         (window-height   . 0.33))
-        ;; Let `display-buffer' reuse visible frames for all buffers.  This must
-        ;; be the last entry in `display-buffer-alist', because it overrides any
-        ;; later entry with more specific actions.
-        ("." nil (reusable-frames . visible))))
+;; ;; Configure `display-buffer' behaviour for some special buffers.
+;; (setq display-buffer-alist
+;;       `(
+;;         ;; Put REPLs and error lists into the bottom side window
+;;         (,(rx bos
+;;               (or "*Help"                         ; Help buffers
+;;                   "*Warnings*"                    ; Emacs warnings
+;;                   "*Compile-Log*"                 ; Emacs byte compiler log
+;;                   "*compilation"                  ; Compilation buffers
+;;                   "*Flycheck errors*"             ; Flycheck error list
+;;                   "*shell"                        ; Shell window
+;;                   "*sbt"                          ; SBT REPL and compilation buffer
+;;                   "*ensime-update*"               ; Server update from Ensime
+;;                   "*SQL"                          ; SQL REPL
+;;                   "*Cargo"                        ; Cargo process buffers
+;;                   (and (1+ nonl) " output*")      ; AUCTeX command output
+;;                   ))
+;;          (display-buffer-reuse-window
+;;           display-buffer-in-side-window)
+;;          (side            . bottom)
+;;          (reusable-frames . visible)
+;;          (window-height   . 0.33))
+;;         ;; Let `display-buffer' reuse visible frames for all buffers.  This must
+;;         ;; be the last entry in `display-buffer-alist', because it overrides any
+;;         ;; later entry with more specific actions.
+;;         ("." nil (reusable-frames . visible))))
 
 (use-package focus-autosave-mode        ; Save buffers when focus is lost
   :straight t
@@ -172,7 +172,7 @@
 (use-package window
   :init
   (setq display-buffer-alist
-        '(;; top side window
+        `(;; top side window
           ("\\**prot-elfeed-bongo-queue.*"
            (display-buffer-reuse-window display-buffer-in-side-window)
            (window-height . 0.16)
@@ -187,15 +187,13 @@
            (display-buffer-in-side-window)
            (window-height . 0.16)
            (side . top)
-           (slot . 0)
-           (window-parameters . ((no-other-window . t))))
+           (slot . 0))
           ("\\*Messages.*"
            (display-buffer-in-side-window)
            (window-height . 0.16)
            (side . top)
-           (slot . 1)
-           (window-parameters . ((no-other-window . t))))
-          ("\\*\\(Backtrace\\|Warnings\\|Compile-Log\\)\\*"
+           (slot . 1))
+          ("\\*\\(Backtrace\\|Warnings\\|Compile-Log\\|compilation\\)\\*"
            (display-buffer-in-side-window)
            (window-height . 0.16)
            (side . top)
@@ -209,53 +207,64 @@
            (window-parameters . ((no-other-window . t)
                                  (mode-line-format . none))))
           ;; left side window
-          ("\\*\\(Help.*\\|compilation\\)\\*"
+          ("\\*Help.*"
            (display-buffer-in-side-window)
            (window-width . 0.20)       ; See the :hook
            (side . left)
-           (slot . 0)
-           (window-parameters . ((no-other-window . t))))
+           (slot . 0))
           ;; right side window
+          ("\\*keycast\\*"
+           (display-buffer-in-side-window)
+           (dedicated . t)
+           (window-width . 0.25)
+           (side . right)
+           (slot . -1)
+           (window-parameters . ((no-other-window . t)
+                                 (mode-line-format . none))))
           ("\\*Faces\\*"
            (display-buffer-in-side-window)
            (window-width . 0.25)
            (side . right)
-           (slot . 0)
-           (window-parameters
-            . ((mode-line-format
-                . (" "
-                   mode-line-buffer-identification)))))
+           (slot . 0))
           ("\\*Custom.*"
            (display-buffer-in-side-window)
            (window-width . 0.25)
            (side . right)
-           (slot . 1)
-           (window-parameters . ((no-other-window . t))))
+           (slot . 1))
           ;; bottom buffer (NOT side window)
           ("\\*\\vc-\\(incoming\\|outgoing\\).*"
            (display-buffer-at-bottom))
           ("\\*\\(Output\\|Register Preview\\).*"
-           (display-buffer-at-bottom)
-           (window-parameters . ((no-other-window . t))))
-          ("\\*.*\\([^E]eshell\\|shell\\|v?term\\).*"
+           (display-buffer-at-bottom))
+          ("\\*.*\\(e?shell\\|v?term\\).*"
            (display-buffer-reuse-mode-window display-buffer-at-bottom)
-           (window-height . 0.2)
-           ;; (mode . '(eshell-mode shell-mode))
-           )))
-
+           (window-height . 0.2))
+          ;; below currect window
+          ("\\*Calendar.*"
+           (display-buffer-reuse-mode-window display-buffer-below-selected)
+           (window-height . shrink-window-if-larger-than-buffer))))
+  :config
   (setq window-combination-resize t)
   (setq even-window-sizes 'height-only)
   (setq window-sides-vertical nil)
   (setq switch-to-buffer-in-dedicated-window 'pop)
+
+
+  (let ((map global-map))
+    (define-key map (kbd "C-x _") #'balance-windows)      ; underscore
+    (define-key map (kbd "C-x -") #'fit-window-to-buffer) ; hyphen
+    (define-key map (kbd "C-x +") #'balance-windows-area)
+    (define-key map (kbd "s-q") #'window-toggle-side-windows)
+    (define-key map (kbd "C-x }") #'enlarge-window)
+    (define-key map (kbd "C-x {") #'shrink-window)
+    (define-key map (kbd "C-x >") #'enlarge-window-horizontally) ; override `scroll-right'
+    (define-key map (kbd "C-x <") #'shrink-window-horizontally)) ; override `scroll-left'
+  (let ((map resize-window-repeat-map))
+    (define-key map ">" #'enlarge-window-horizontally)
+    (define-key map "<" #'shrink-window-horizontally))
   :hook ((help-mode-hook . visual-line-mode)
          (custom-mode-hook . visual-line-mode))
   :bind (("C-x +" . balance-windows-area)
          ("C-M-q" . window-toggle-side-windows)))
-
-(use-package winner
-  :hook (after-init-hook . winner-mode)
-  :bind (("<right>" . winner-redo)
-         ("<left>" . winner-undo)))
-
 
 (provide 'lp-window-management)

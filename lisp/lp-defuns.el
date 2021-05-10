@@ -80,9 +80,6 @@
 
 (global-set-key (kbd "C-m") 'newline-and-indent)
 
-(global-set-key (kbd "C-s") 'isearch-forward-regexp)
-(global-set-key (kbd "C-r") 'isearch-backward-regexp)
-
 (use-package which-key
   :straight t
   :diminish which-key-mode

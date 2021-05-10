@@ -14,11 +14,10 @@
   (setq lazy-count-suffix-format " (%s/%s)")
   (setq isearch-yank-on-move 'shift)
   (setq isearch-allow-scroll 'unlimited)
-  :bind (:map minibuffer-local-isearch-map
-              ("M-/" . isearch-complete-edit)
-              :map isearch-mode-map
-              ("C-g" . isearch-cancel)       ; instead of `isearch-abort'
-              ("M-/" . isearch-complete)))
+  (define-key minibuffer-local-isearch-map (kbd "M-/") #'isearch-complete-edit)
+  (let ((map isearch-mode-map))
+    (define-key map (kbd "C-g") #'isearch-cancel) ; instead of `isearch-abort'
+    (define-key map (kbd "M-/") #'isearch-complete)))
 
 (use-package replace
   :config
@@ -29,3 +28,5 @@
   :bind (("M-s M-o" . multi-occur)
          :map occur-mode-map
          ("t" . toggle-truncate-lines)))
+
+(provide 'lp-isearch)

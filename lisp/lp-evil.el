@@ -48,10 +48,14 @@
     "p x g" 'projectile-run-gdb
     "p x v" 'projectile-run-vterm
 
-    "w =" 'balance-windows
+    "_" 'balance-windows
+    "-" 'fit-window-to-buffer
+    "+" 'balance-windows-area
+    "q" 'window-toggle-side-windows
     "w k" 'lp/kill-current-buffer
     "w m" 'delete-other-windows
     
+    "0" 'delete-window
     "1" 'delete-other-windows
     "2" 'lp/split-window-below-and-switch
     "3" 'lp/split-window-right-and-switch
@@ -59,10 +63,19 @@
     "o" 'ace-window
 
     "a" 'embark-act
-    "b" 'consult-buffer
+    "b" 'switch-to-buffer
     "B" 'ibuffer
-    "s" 'save-buffer
+    "S" 'save-some-buffers
     "F" 'lsp-format-buffer
+
+
+    "]" 'isearch-forward
+    "[" 'isearch-backward
+    "s ." 'isearch-forward-symbol-at-point 
+    "s h r" 'highlight-regexp
+    "s h u" 'unhighlight-regexp
+    "5" 'query-replace
+    "%" 'query-replace-regexp
 
     "l" 'consult-line
     "i" 'consult-imenu
@@ -96,6 +109,23 @@
     "g d" 'gud-remove
     "g l" 'gud-refresh
     "g e" 'gud-statement
+
+    "d l" 'dap-debug-last
+    "d d" 'dap-debug
+    "d b a" 'dap-breakpoint-add
+    "d b c" 'dap-breakpoint-condition
+    "d b d" 'dap-breakpoint-condition
+    "d c" 'dap-continue
+    "d n" 'dap-next
+    "d s" 'dap-step-in
+    "d r" 'dap-ui-repl
+
+    "t b" 'switch-to-buffer-other-tab
+    "t d" 'dired-other-tab
+    "t f" 'find-file-other-tab
+    "t 0" 'tab-close
+    "t 1" 'tab-close-other
+    "t 2" 'tab-bar-new-tab
     ;;   "M-K" 'consult-keep-lines
     ;;   "M-X" 'consult-mode-command
     ;;"C-c f" 'consult-focus-lines
