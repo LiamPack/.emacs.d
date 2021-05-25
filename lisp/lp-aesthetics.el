@@ -38,15 +38,19 @@
 ;;  * That one black theme i'm using right now (6/15/19)
 (require 'use-package)
 
-(use-package solarized-theme
-             :disabled
+(use-package twilight-bright-theme
   :straight t
   :config
-  (load-theme 'solarized-wombat-dark))
-;; Taken directly from Prot
+  (load-theme 'twilight-bright))
+(use-package twilight-anti-bright-theme
+  :straight t)
+(use-package lenlen-theme
+  :straight t)
 
+;; Taken directly from Prot
 (use-package modus-themes
   :straight t 
+  :disabled
   :init
   ;; Add all your customizations prior to loading the themes
   ;;

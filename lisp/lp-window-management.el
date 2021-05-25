@@ -7,7 +7,7 @@
 ;; iosevka, consolas, source code pro, Fira Code, dejavu, IBM 3270,
 ;; Fantasque Sans Mono, Terminus, overpass mono
 ;; meslo LG / menlo
-(set-frame-font "Deja Vu Sans Mono 12")
+(set-frame-font "Deja Vu Sans Mono 14")
 
 ;; global-hl-line-mode softly highlights bg color of line.
 (when window-system
@@ -259,13 +259,13 @@
     (define-key map (kbd "C-x }") #'enlarge-window)
     (define-key map (kbd "C-x {") #'shrink-window)
     (define-key map (kbd "C-x >") #'enlarge-window-horizontally) ; override `scroll-right'
-    (define-key map (kbd "C-x <") #'shrink-window-horizontally)) ; override `scroll-left'
+    (define-key map (kbd "C-x <") #'shrink-window-horizontally); override `scroll-left'
+    (define-key map (kbd "C-x +") #'balance-windows-area)
+    (define-key map (kbd "C-M-q") #'window-toggle-side-windows))
   (let ((map resize-window-repeat-map))
     (define-key map ">" #'enlarge-window-horizontally)
     (define-key map "<" #'shrink-window-horizontally))
   :hook ((help-mode-hook . visual-line-mode)
-         (custom-mode-hook . visual-line-mode))
-  :bind (("C-x +" . balance-windows-area)
-         ("C-M-q" . window-toggle-side-windows)))
+         (custom-mode-hook . visual-line-mode)))
 
 (provide 'lp-window-management)

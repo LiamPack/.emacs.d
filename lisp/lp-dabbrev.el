@@ -15,6 +15,7 @@
   )
 (use-package company
   :straight t
+  :diminish
   :config
   (setq company-idle-delay 20)
   (setq company-dabbrev-downcase 0)

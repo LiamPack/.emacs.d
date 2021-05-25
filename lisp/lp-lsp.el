@@ -17,15 +17,6 @@
    ("C-c y a" . lsp-execute-code-action)
    ("C-c f" . lsp-format-region))
   :config
-  (defun lsp--sort-completions (completions)
-    (lsp-completion--sort-completions completions))
-
-  (defun lsp--annotate (item)
-    (lsp-completion--annotate item))
-
-  (defun lsp--resolve-completion (item)
-    (lsp-completion--resolve item))
-
   (setq lsp-enable-snippet t)
   (setq lsp-enable-indentation t)
   (setq read-process-output-max (* 10 1024 1024))
@@ -37,6 +28,8 @@
   (setq lsp-eldoc-enable-hover t)
 
   (add-to-list 'lsp-file-watch-ignored "build")
+  (add-to-list 'lsp-file-watch-ignored ".clangd")
+  (add-to-list 'lsp-file-watch-ignored "pyc")
 
   (add-hook 'lsp-after-open-hook 'lsp-enable-imenu)
 
@@ -62,11 +55,11 @@
   ;;   (let ((lsp-cfg `(:pyls (:configurationSources ("flake8")))))
   ;;     ;; TODO: check lsp--cur-workspace here to decide per server / project
   ;;     (lsp--set-configuration lsp-cfg)))
-  (push 'company-lsp company-backends)
-  (setq company-lsp-cache-candidates 'auto)
-  (setq company-lsp-async t)
-  (setq company-lsp-enable-snippet nil)
-  (setq company-lsp-enable-recompletion t)
+  ;; (push 'company-lsp company-backends)
+  ;; (setq company-lsp-cache-candidates 'auto)
+  ;; (setq company-lsp-async t)
+  ;; (setq company-lsp-enable-snippet nil)
+  ;; (setq company-lsp-enable-recompletion t)
   ;; (add-hook 'lsp-after-initialize-hook 'lsp-set-cfg)
   )
 

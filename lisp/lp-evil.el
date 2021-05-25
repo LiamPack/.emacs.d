@@ -68,7 +68,6 @@
     "S" 'save-some-buffers
     "F" 'lsp-format-buffer
 
-
     "]" 'isearch-forward
     "[" 'isearch-backward
     "s ." 'isearch-forward-symbol-at-point 
@@ -86,7 +85,7 @@
 
     "r w" 'window-configuration-to-register
     "r p" 'point-to-register
-    "r f" 'framset-to-register
+    "r f" 'frameset-to-register
     "r s" 'consult-register-store
     "r l" 'consult-register-load
     "r j" 'jump-to-register
@@ -153,7 +152,7 @@
   )
 (use-package evil-snipe
   :straight t
-  :diminish
+  :diminish (evil-snipe-mode evil-snipe-local-mode evil-snipe-override-mode evil-snipe-override-local-mode)
   :init
   (setq evil-snipe-smart-case t
         evil-snipe-scope 'line
@@ -167,6 +166,7 @@
 
 (use-package evil-surround
   :straight t
+  :diminish
   :config (global-evil-surround-mode 1))
 
 (provide 'lp-evil)

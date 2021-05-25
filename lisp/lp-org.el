@@ -5,7 +5,7 @@
 (use-package org-bullets
   :straight t
   :diminish org-bullets-mode
-  :hook ((org-mode-hook . org-bullets-mode-hook))
+  :hook ((org-mode-hook . org-bullets-mode))
   :config
   (setq org-ellipsis "⤵"))
 
