@@ -213,4 +213,17 @@
 
 ;;(add-hook 'org-mode-hook 'variable-pitch-mode)
 (add-hook 'org-mode-hook 'visual-line-mode)
+(use-package org-journal
+  :straight t
+  :custom
+  (org-journal-dir "~/Org/dailies/"))
+
+(use-package org-roam
+  :straight t
+  :custom
+  (org-roam-directory "~/org/roam/")
+  :init
+  (add-hook 'after-init-hook 'org-roam-mode)
+  )
+
 (provide 'lp-org)

@@ -53,8 +53,8 @@
 ;;   :straight t
 ;;   :after geiser)
 
-(add-to-list 'auto-mode-alist
-             '("\\.sls\\'" . scheme-mode)
-             '("\\.sc\\'" . scheme-mode))
+;; (add-to-list 'auto-mode-alist
+;;              '("\\.sls\\'" . scheme-mode)
+;;              '("\\.sc\\'" . scheme-mode))
 
 (provide 'lp-lisp-env)
