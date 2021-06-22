@@ -40,6 +40,7 @@
 
 (use-package twilight-bright-theme
   :straight t
+  :disabled
   :config
   (load-theme 'twilight-bright))
 (use-package twilight-anti-bright-theme
@@ -50,7 +51,6 @@
 ;; Taken directly from Prot
 (use-package modus-themes
   :straight t 
-  :disabled
   :init
   ;; Add all your customizations prior to loading the themes
   ;;

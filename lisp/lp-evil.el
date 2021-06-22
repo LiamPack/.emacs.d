@@ -38,6 +38,7 @@
     "f o" 'find-file-other-window
     "f r" 'prot-recentf-recent-files
     "f d" 'prot-recentf-recent-dirs
+    "j" 'org-journal-new-entry
 
     "p f" 'projectile-find-file
     "p p" 'projectile-switch-project
@@ -65,7 +66,7 @@
     "a" 'embark-act
     "b" 'switch-to-buffer
     "B" 'ibuffer
-    "S" 'save-some-buffers
+    ;;"S" 'save-some-buffers
     "F" 'lsp-format-buffer
 
     "]" 'isearch-forward
@@ -128,6 +129,11 @@
     "t 1" 'tab-close-other
     "t 2" 'tab-bar-new-tab
     "t l" 'tab-list
+
+    "u f" 'org-roam-find-file
+    "u c" 'org-roam-capture
+    "u i" 'org-roam-insert
+    "u r" 'org-roam
     ;;   "M-K" 'consult-keep-lines
     ;;   "M-X" 'consult-mode-command
     ;;"C-c f" 'consult-focus-lines
