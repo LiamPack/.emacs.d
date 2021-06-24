@@ -225,12 +225,12 @@
   :init
   (add-hook 'after-init-hook 'org-roam-mode))
 
-;; (use-package nroam
-;;   :straight '(nroam :host github
-;;                     :branch "master"
-;;                     :repo "NicolasPetton/nroam")
-;;   :after org-roam
-;;   :config
-;;   (add-hook 'org-mode-hook #'nroam-setup-maybe))
+(use-package nroam
+  :straight '(nroam :host github
+                    :branch "master"
+                    :repo "NicolasPetton/nroam")
+  :after org-roam
+  :config
+  (add-hook 'org-mode-hook #'nroam-setup-maybe))
 
 (provide 'lp-org)
