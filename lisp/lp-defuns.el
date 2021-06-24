@@ -28,27 +28,27 @@
   (lp/cleanup-buffer-safe)
   (indent-region (point-min) (point-max)))
 
-(defun lp/org-open-point ()
-  "Open org mode heading in another window, expand it, and narrow it"
-  (interactive)
-  (org-beginning-of-line)
-  (setq goal-point (point))
-  (call-interactively #'clone-indirect-buffer-other-window)
-  (while (not (= goal-point (point)))
-    (goto-char goal-point)
-    (org-beginning-of-line)
-    (org-cycle)
-    (goto-char goal-point)
-    (org-beginning-of-line))
-  (call-interactively #'org-next-visible-heading)
-  (narrow-to-region goal-point (point))
-  (goto-char goal-point)
-  (fset 'tab
-        (lambda (&optional arg) "Keyboard macro." (interactive "p")
-          (kmacro-exec-ring-item (quote ([tab] 0 "%d")) arg)))
-  (tab)) 
+;; (defun lp/org-open-point ()
+;;   "Open org mode heading in another window, expand it, and narrow it"
+;;   (interactive)
+;;   (org-beginning-of-line)
+;;   (setq goal-point (point))
+;;   (call-interactively #'clone-indirect-buffer-other-window)
+;;   (while (not (= goal-point (point)))
+;;     (goto-char goal-point)
+;;     (org-beginning-of-line)
+;;     (org-cycle)
+;;     (goto-char goal-point)
+;;     (org-beginning-of-line))
+;;   (call-interactively #'org-next-visible-heading)
+;;   (narrow-to-region goal-point (point))
+;;   (goto-char goal-point)
+;;   (fset 'tab
+;;         (lambda (&optional arg) "Keyboard macro." (interactive "p")
+;;           (kmacro-exec-ring-item (quote ([tab] 0 "%d")) arg)))
+;;   (tab)) 
 
-(global-set-key (kbd "C-c o") 'lp/org-open-point)
+;; (global-set-key (kbd "C-c o") 'lp/org-open-point)
 
 ;; Always killcurrent buffer
 (global-set-key (kbd "C-x k") 'lp/kill-current-buffer)

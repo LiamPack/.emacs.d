@@ -54,7 +54,7 @@
   (setq org-src-fontify-natively t)
   (setq org-src-tab-acts-natively t)
   (setq org-edit-src-content-indentation 0)
-    (setq org-src-window-setup 'current-window)
+  (setq org-src-window-setup 'current-window)
   ;;(setq ob-async-no-async-languages-alist '("ipython"))
 
 ;;;  file directory setup
@@ -64,7 +64,7 @@
   (defun org-file-path (filename)
     "Return absolute address of an org file give its relative name."
     (concat (file-name-as-directory org-directory) filename))
-  
+
   ;; refiling!
   ;; I like to look at pretty much just up to 3 levels of targets
   (setq org-refile-targets '((all-org-files :maxlevel . 3)))
@@ -171,7 +171,7 @@
   ;; sometimes i don't want to wrap text though, so we will toggle
   ;; with C-c q
   (global-set-key (kbd "C-c q") 'auto-fill-mode)
-)
+  )
                                         ; clocking!
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
                                         ; ok back to clocking
@@ -213,17 +213,24 @@
 
 ;;(add-hook 'org-mode-hook 'variable-pitch-mode)
 (add-hook 'org-mode-hook 'visual-line-mode)
-(use-package org-journal
-  :straight t
-  :custom
-  (org-journal-dir "~/Org/dailies/"))
 
 (use-package org-roam
   :straight t
+  :bind (("\C-c i" . 'org-roam-insert-immediate)
+         ("\C-c j" . 'org-roam-dailies-find-today)
+         ("\C-c o" . 'org-roam-jump-to-index))
   :custom
-  (org-roam-directory "~/org/roam/")
+  (org-roam-directory (file-truename "~/org/roam/"))
+  (org-roam-graph-viewer "display")
   :init
-  (add-hook 'after-init-hook 'org-roam-mode)
-  )
+  (add-hook 'after-init-hook 'org-roam-mode))
+
+;; (use-package nroam
+;;   :straight '(nroam :host github
+;;                     :branch "master"
+;;                     :repo "NicolasPetton/nroam")
+;;   :after org-roam
+;;   :config
+;;   (add-hook 'org-mode-hook #'nroam-setup-maybe))
 
 (provide 'lp-org)

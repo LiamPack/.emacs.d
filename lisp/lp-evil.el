@@ -33,12 +33,12 @@
   (general-nmap
     :prefix "SPC"
     :prefix-map 'my-leader-map
-    
+
     "f f" 'find-file
     "f o" 'find-file-other-window
     "f r" 'prot-recentf-recent-files
     "f d" 'prot-recentf-recent-dirs
-    "j" 'org-journal-new-entry
+    "j" 'org-roam-dailies-find-today
 
     "p f" 'projectile-find-file
     "p p" 'projectile-switch-project
@@ -55,7 +55,7 @@
     "q" 'window-toggle-side-windows
     "w k" 'lp/kill-current-buffer
     "w m" 'delete-other-windows
-    
+
     "0" 'delete-window
     "1" 'delete-other-windows
     "2" 'lp/split-window-below-and-switch
@@ -71,7 +71,7 @@
 
     "]" 'isearch-forward
     "[" 'isearch-backward
-    "s ." 'isearch-forward-symbol-at-point 
+    "s ." 'isearch-forward-symbol-at-point
     "s h r" 'highlight-regexp
     "s h u" 'unhighlight-regexp
     "5" 'query-replace
@@ -134,6 +134,9 @@
     "u c" 'org-roam-capture
     "u i" 'org-roam-insert
     "u r" 'org-roam
+    "u I" 'org-roam-insert-immediate
+    "u g" 'org-roam-graph
+    "u o" 'org-roam-jump-to-index
     ;;   "M-K" 'consult-keep-lines
     ;;   "M-X" 'consult-mode-command
     ;;"C-c f" 'consult-focus-lines

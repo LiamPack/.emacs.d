@@ -36,12 +36,6 @@
         bibtex-completion-bibliography "~/Dropbox/res/index.bib" ;; completion
         bibtex-completion-notes-path "~/Dropbox/res/notes.org"))
 
-(defun lp/open-paper-notes ()
-  "Open the org TODO list."
-  (interactive)
-  (find-file "~/Dropbox/res/notes.org")
-  (flycheck-mode -1))
-(global-set-key  (kbd "C-c r") 'lp/open-paper-notes)
 
 (use-package org-noter
   :straight t)

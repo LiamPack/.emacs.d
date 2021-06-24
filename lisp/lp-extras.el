@@ -166,9 +166,6 @@ prefix argument, the process's buffer is displayed."
 (declare-function js2-mode nil)
 (declare-function clojure-mode nil)
 (scratch-key (kbd "C-c s") "*scratch*"    emacs-lisp-mode)
-(scratch-key (kbd "C-c j") "*javascript*" js2-mode)
-(scratch-key (kbd "C-c x") "*css*"        css-mode)
-(scratch-key (kbd "C-c h") "*html*"       html-mode)
 
 ;; ID: 72dc0a9e-c41c-31f8-c8f5-d9db8482de1e
 (defun find-all-files (dir)

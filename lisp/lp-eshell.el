@@ -9,12 +9,12 @@
   :straight t
   :init
   (setq eshell-buffer-shorthand t
-   eshell-scroll-to-bottom-on-input 'all
-   eshell-error-if-no-glob t
-   eshell-hist-ignoredups t
-   eshell-save-history-on-exit t
-   eshell-prefer-lisp-functions nil
-   eshell-destroy-buffer-when-process-dies t))
+        eshell-scroll-to-bottom-on-input 'all
+        eshell-error-if-no-glob t
+        eshell-hist-ignoredups t
+        eshell-save-history-on-exit t
+        eshell-prefer-lisp-functions nil
+        eshell-destroy-buffer-when-process-dies t))
 
 (global-set-key (kbd "C-c C-s") 'eshell)
 
@@ -139,6 +139,14 @@ directory to make multiple eshell windows easier."
   :straight t
   :bind ("C-c #" . vterm))
 
+(use-package shell-pop
+  :straight t
+  :custom
+  (shell-pop-shell-type
+   (list "eshell" "*eshell*" (lambda () (eshell))
+         ))
+  (shell-pop-window-position "bottom")
+  (shell-pop-universal-key "<f6>"))
+
 
 (provide 'lp-eshell)
-

@@ -1,0 +1,4 @@
+#name : bash for loop
+#key : for
+# --
+for f in ${1:*}; do ${2:echo} $f; done $0
