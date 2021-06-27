@@ -234,12 +234,16 @@
   :straight t
   :bind (("\C-c i" . 'org-roam-insert-immediate)
          ("\C-c j" . 'org-roam-dailies-find-today)
-         ("\C-c o" . 'org-roam-jump-to-index))
+         ("\C-c o" . 'org-roam-jump-to-index)
+         ("\C-c f" . 'org-roam-find-file))
   :custom
   (org-roam-directory (file-truename "~/org/roam/"))
   (org-roam-graph-viewer "display")
+  (org-roam-graph-exclude-matcher '("private" "daily" "index" "Index"))
+  (org-roam-dailies-directory "daily/")
   :init
   (add-hook 'after-init-hook 'org-roam-mode))
+
 
 (use-package nroam
   :straight '(nroam :host github
