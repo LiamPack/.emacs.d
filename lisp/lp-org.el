@@ -2,23 +2,14 @@
                                         ; org-mode
                                         ; TODO speed-keys?
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-(use-package org-bullets
-  :straight t
-  :diminish org-bullets-mode
-  :hook ((org-mode-hook . org-bullets-mode))
-  :config
-  (setq org-ellipsis "⤵"))
-
-(use-package cdlatex
-  :straight t
-  :diminish org-cdlatex-mode
-  :hook (org-modeook . org-cdlatex-mode))
 
 (use-package org
-  :straight t
+  :ensure t
   :bind (("\C-cl" . org-store-link)
          ("\C-cb" . org-iswitchb))
   :config
+  (setq org-priority-highest org-highest-priority)
+  (setq org-priority-lowest org-lowest-priority)
   (require 'org-habit)
   (unbind-key "C-," org-mode-map)       ;expand-region
   (unbind-key "C-'" org-mode-map)       ;avy
@@ -161,8 +152,19 @@
 
 ;;; Org Keybindings
   ;; Useful keybinds
+  (setq org-agenda-files '("~/org/inbox.org"))
   (define-key global-map (kbd "C-c a") 'org-agenda)
   (define-key global-map (kbd "C-c c") 'org-capture)
+  (setq org-inbox-directory "~/org/")
+  (setq org-capture-templates
+        `(("i" "inbox" entry (file ,(concat org-inbox-directory "inbox.org"))
+           "* TODO %^{Task} %^g\n%t\n %?")
+          ("h" "habit" entry (file ,(concat org-inbox-directory "inbox.org"))
+           "* %^{Habit} %^g\n %?")
+          ("b" "book" entry (file+headline ,(concat org-inbox-directory "books.org") "backlog")
+           "* %? \n  %U")
+          ("t" "textbook" entry (file+headline ,(concat org-inbox-directory "books.org") "textbook backlog")
+           "* %? \n  %U")))
 
   ;; Auto wrap paragraphs in some modes (auto-fill-mode)
   (add-hook 'text-mode-hook 'turn-on-auto-fill)
@@ -172,6 +174,20 @@
   ;; with C-c q
   (global-set-key (kbd "C-c q") 'auto-fill-mode)
   )
+
+(use-package org-bullets
+  :straight t
+  :diminish org-bullets-mode
+  :hook ((org-mode-hook . org-bullets-mode))
+  :config
+  (setq org-ellipsis "⤵"))
+
+(use-package cdlatex
+  :straight t
+  :diminish org-cdlatex-mode
+  :hook (org-mode-hook . org-cdlatex-mode))
+
+
                                         ; clocking!
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
                                         ; ok back to clocking
@@ -218,12 +234,16 @@
   :straight t
   :bind (("\C-c i" . 'org-roam-insert-immediate)
          ("\C-c j" . 'org-roam-dailies-find-today)
-         ("\C-c o" . 'org-roam-jump-to-index))
+         ("\C-c o" . 'org-roam-jump-to-index)
+         ("\C-c f" . 'org-roam-find-file))
   :custom
   (org-roam-directory (file-truename "~/org/roam/"))
   (org-roam-graph-viewer "display")
+  (org-roam-graph-exclude-matcher '("private" "daily" "index" "Index"))
+  (org-roam-dailies-directory "daily/")
   :init
   (add-hook 'after-init-hook 'org-roam-mode))
+
 
 (use-package nroam
   :straight '(nroam :host github

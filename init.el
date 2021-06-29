@@ -19,9 +19,9 @@
       (bootstrap-version 5))
   (unless (file-exists-p bootstrap-file)
     (with-current-buffer
-	(url-retrieve-synchronously
-	 "https://raw.githubusercontent.com/raxod502/straight.el/develop/install.el"
-	 'silent 'inhibit-cookies)
+        (url-retrieve-synchronously
+         "https://raw.githubusercontent.com/raxod502/straight.el/develop/install.el"
+         'silent 'inhibit-cookies)
       (goto-char (point-max))
       (eval-print-last-sexp)))
   (load bootstrap-file nil 'nomessage))
@@ -47,12 +47,13 @@
 (use-package straight-x)
 
 (use-package vc
-	     :config
-	     (setq vc-follow-symlinks t)) ; Because my dotfiles are managed that way
+  :config
+  (setq vc-follow-symlinks t)) ; Because my dotfiles are managed that way
 (use-package diminish
   :straight t)
 (use-package server
   :hook (after-init-hook . server-start))
+
 
 (dolist (file (directory-files "~/.emacs.d/lisp/" t ".*el$"))
   (load-file file))
