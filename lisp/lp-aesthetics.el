@@ -38,18 +38,25 @@
 ;;  * That one black theme i'm using right now (6/15/19)
 (require 'use-package)
 
+(use-package sexy-monochrome-theme
+  :straight t
+  :config
+  (load-theme 'sexy-monochrome))
 (use-package twilight-bright-theme
   :straight t
   :disabled
   :config
   (load-theme 'twilight-bright))
 (use-package twilight-anti-bright-theme
+  :disabled
   :straight t)
 (use-package lenlen-theme
+  :disabled
   :straight t)
 
 ;; Taken directly from Prot
 (use-package modus-themes
+  :disabled
   :straight t 
   :init
   ;; Add all your customizations prior to loading the themes
