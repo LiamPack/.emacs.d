@@ -253,4 +253,15 @@
   :config
   (add-hook 'org-mode-hook #'nroam-setup-maybe))
 
+(use-package org-attach-screenshot
+  :straight t
+  :bind ("<f7>" . org-attach-screenshot)
+  :config (setq org-attach-screenshot-dirfunction
+                (lambda ()
+                  (progn (assert (buffer-file-name))
+                         (concat (file-name-sans-extension (buffer-file-name))
+                                 "-att")))
+                org-attach-screenshot-command-line "gnome-screenshot -a -f %f"))
+
+
 (provide 'lp-org)
