@@ -1,5 +1,6 @@
 (require 'use-package)
 (use-package dabbrev
+  :disabled
   :config
   (setq dabbrev-abbrev-char-regexp "\\sw\\|\\s_")
   (setq dabbrev-abbrev-skip-leading-regexp "[$*/=~']")
@@ -27,6 +28,7 @@
   (setq company-dabbrev-code-everywhere t)
   (setq company-dabbrev-code-ignore-case t)
   (global-set-key (kbd "M-/") 'company-capf)
+  (global-set-key (kbd "<backtab>") 'company-capf)
   ;; (global-set-key (kbd "C-M-_") 'company-complete)
   ;; (global-set-key (kbd "C-c C-y") 'company-yasnippet)
   (setq company-backends '(company-files company-keywords
