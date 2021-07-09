@@ -263,5 +263,11 @@
                                  "-att")))
                 org-attach-screenshot-command-line "gnome-screenshot -a -f %f"))
 
+(use-package deft
+  :straight t
+  :bind ("<f7>" . deft)
+  :custom
+  (deft-directory "~/org/roam")
+  (deft-recursive t))
 
 (provide 'lp-org)
