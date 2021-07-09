@@ -1,6 +1,5 @@
 (require 'use-package)
 (use-package dabbrev
-  :disabled
   :config
   (setq dabbrev-abbrev-char-regexp "\\sw\\|\\s_")
   (setq dabbrev-abbrev-skip-leading-regexp "[$*/=~']")
@@ -11,32 +10,46 @@
   (setq dabbrev-check-other-buffers t)
   (setq dabbrev-eliminate-newlines t)
   (setq dabbrev-upcase-means-case-search t)
-  :bind (("TAB" . dabbrev-expand)
-         ("C-M-_" . dabbrev-completion))
+  :bind (("C-M-/" . dabbrev-expand)
+         ("M-/" . dabbrev-completion))
   )
-(use-package company
-  :straight t
-  :diminish
-  :config
-  (setq company-idle-delay 20)
-  (setq company-dabbrev-downcase 0)
-  (setq company-minimum-prefix-length 2)
-  (setq company-dabbrev-downcase nil)
-  (setq company-dabbrev-other-buffers t)
-  (setq company-auto-complete nil)
-  (setq company-dabbrev-code-other-buffers 'all)
-  (setq company-dabbrev-code-everywhere t)
-  (setq company-dabbrev-code-ignore-case t)
-  (global-set-key (kbd "M-/") 'company-capf)
-  (global-set-key (kbd "<backtab>") 'company-capf)
-  ;; (global-set-key (kbd "C-M-_") 'company-complete)
-  ;; (global-set-key (kbd "C-c C-y") 'company-yasnippet)
-  (setq company-backends '(company-files company-keywords
-                                         company-capf company-dabbrev-code company-etags
-                                         company-dabbrev))
-  (global-company-mode 1)
 
-  ;; (add-to-list 'company-backends 'company-capf t)
-  )
+(use-package corfu
+  :straight '(corfu :host github
+                    :repo "minad/corfu")
+  ;;   :straight t
+  ;; Optional customizations
+  :custom
+  (corfu-cycle t)            ;; Enable cycling for `corfu-next/previous'
+  (corfu-auto t)             ;; Enable auto completion
+  (corfu-quit-at-boundary t) ;; Automatically quit at word boundary
+  (corfu-quit-no-match t)    ;; Automatically quit if there is no match
+
+  ;; Optionally use TAB for cycling, default is `corfu-complete'.
+  ;; :bind (:map corfu-map
+  ;;        ("TAB" . corfu-next)
+  ;;        ([tab] . corfu-next)
+  ;;        ("S-TAB" . corfu-previous)
+  ;;        ([backtab] . corfu-previous))
+
+  ;; You may want to enable Corfu only for certain modes.
+  ;; :hook ((prog-mode . corfu-mode)
+  ;;        (shell-mode . corfu-mode)
+  ;;        (eshell-mode . corfu-mode))
+
+  ;; Recommended: Enable Corfu globally.
+  ;; This is recommended since dabbrev can be used globally (M-/).
+  :init
+  (corfu-global-mode))
+
+;; A few more useful configurations...
+(use-package emacs
+  :init
+  ;; TAB cycle if there are only few candidates
+  (setq completion-cycle-threshold 3)
+
+  ;; Enable indentation+completion using the TAB key.
+  ;; `completion-at-point' is often bound to M-TAB.
+  (setq tab-always-indent 'complete))
 
 (provide 'lp-dabbrev)
