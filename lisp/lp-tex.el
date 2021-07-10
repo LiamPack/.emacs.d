@@ -3,9 +3,11 @@
 (require 'use-package)
 
 (use-package tex-site                   ; AUCTeX initialization
-  :ensure auctex)
+  :disabled
+  :straight t)
 
 (use-package magic-latex-buffer
+  :disabled
   :straight t
   :config
   (add-hook 'latex-mode-hook 'magic-latex-buffer)
@@ -16,7 +18,8 @@
 
 (use-package tex
   :defer t
-  :ensure auctex
+  :disabled
+  :straight t
   :mode ("\\.tex\\'" . TeX-latex-mode)
   :config
   (setq TeX-PDF-mode t)
@@ -82,7 +85,8 @@
   )
 
 (use-package tex-style                  ; TeX style
-  :ensure auctex
+  :disabled
+  :straight t
   :defer t
   :config
   ;; Enable support for csquotes
@@ -90,7 +94,8 @@
         LaTeX-csquotes-open-quote "\\enquote{"))
 
 (use-package tex-fold                   ; TeX folding
-  :ensure auctex
+  :disabled
+  :straight t
   :defer t
   :init (add-hook 'TeX-mode-hook #'TeX-fold-mode))
 
