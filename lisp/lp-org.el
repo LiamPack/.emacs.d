@@ -4,10 +4,14 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (use-package org
-  :ensure t
-  :bind (("\C-cl" . org-store-link)
-         ("\C-cb" . org-iswitchb))
+  :straight org-plus-contrib
+  :bind (("\C-cl" . org-store-link))
   :config
+  (defun org-clocking-buffer ()
+    "Return the buffer where the clock is currently running.
+Return nil if no clock is running."
+    (marker-buffer org-clock-marker))
+
   (setq org-priority-highest org-highest-priority)
   (setq org-priority-lowest org-lowest-priority)
   (require 'org-habit)
@@ -129,7 +133,7 @@
                               (search . "  "))
    org-agenda-skip-deadline-prewarning-if-scheduled 'pre-scheduled
    org-agenda-tags-todo-honor-ignore-options t
-   org-agenda-clockreport-parameter-plist `(:link t :maxlevel 6 :fileskip0 t :compact t :narrow 100)
+   ;; org-agenda-clockreport-parameter-plist `(:link t :maxlevel 6 :fileskip0 t :compact t :narrow 100)
    org-agenda-dim-blocked-tasks nil
    org-agenda-block-separator ""
                                         ;org-agenda-time-grid '((daily today require-timed) nil "......" "----------------")
@@ -173,14 +177,14 @@
   ;; sometimes i don't want to wrap text though, so we will toggle
   ;; with C-c q
   (global-set-key (kbd "C-c q") 'auto-fill-mode)
-  )
 
-(use-package org-bullets
-  :straight t
-  :diminish org-bullets-mode
-  :hook ((org-mode-hook . org-bullets-mode))
-  :config
-  (setq org-ellipsis "⤵"))
+
+  (use-package org-bullets
+    :straight t
+    :diminish org-bullets-mode
+    :hook ((org-mode-hook . org-bullets-mode))
+    :config
+    (setq org-ellipsis "⤵")))
 
 (use-package cdlatex
   :straight t
@@ -235,14 +239,21 @@
   :bind (("\C-c i" . 'org-roam-insert-immediate)
          ("\C-c j" . 'org-roam-dailies-find-today)
          ("\C-c o" . 'org-roam-jump-to-index)
+         ("\C-c t" . 'org-roam-tag-add)
          ("\C-c f" . 'org-roam-find-file))
   :custom
   (org-roam-directory (file-truename "~/org/roam/"))
-  (org-roam-graph-viewer "display")
+  (org-roam-graph-viewer
+   (lambda (file)
+     (let ((org-roam-graph-viewer "/mnt/c/Users/LiamP/AppData/Local/Vivaldi/Application/vivaldi.exe"))
+       (org-roam-graph--open (concat "file://///wsl$/Ubuntu" file)))))
   (org-roam-graph-exclude-matcher '("private" "daily" "index" "Index"))
   (org-roam-dailies-directory "daily/")
+  (org-roam-completion-everywhere t)
   :init
-  (add-hook 'after-init-hook 'org-roam-mode))
+  (add-hook 'after-init-hook 'org-roam-mode)
+  :config
+  (require 'org-protocol))
 
 
 (use-package nroam
@@ -252,5 +263,26 @@
   :after org-roam
   :config
   (add-hook 'org-mode-hook #'nroam-setup-maybe))
+
+
+(use-package lister
+  :quelpa (lister :fetcher git
+                  :url "https://github.com/publicimageltd/lister"))
+
+(use-package delve
+  :quelpa (delve :fetcher git
+                 :url "https://github.com/publicimageltd/delve")
+  :config
+  (use-package delve-minor-mode
+    :config
+    (add-hook 'org-mode-hook #'delve-minor-mode-maybe-activate))
+  :bind
+  (("<f12>" . delve-open-or-select)))
+
+(use-package deft
+  :straight t
+  :custom
+  (deft-extensions '("txt" "tex" "org"))
+  (deft-directory "~/org/roam"))
 
 (provide 'lp-org)
