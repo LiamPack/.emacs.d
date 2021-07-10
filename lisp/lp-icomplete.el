@@ -1,30 +1,22 @@
 (require 'use-package)
 
-(use-package icomplete-vertical
-  :straight t
-  :demand t
-  :hook
-  (icomplete-minibuffer-setup . visual-line-mode)
-  :custom
-  (read-file-name-completion-ignore-case t)
-  (read-buffer-completion-ignore-case t)
-  (completion-ignore-case t)
-  (icomplete-in-buffer t)
-  ;; (icomplete-show-matches-on-no-input t)
-  (icomplete-prospects-height 5)
-  (icomplete-vertical-prospects-height 7)
+;; Enable vertico
+(use-package vertico
+  :straight (:type git :host github :repo "minad/vertico" :branch "main")
   :config
-  (fido-mode -1)
-  (icomplete-mode)
-  (icomplete-vertical-mode)
-  :bind (:map icomplete-minibuffer-map
-              ("RET" . icomplete-force-complete-and-exit)
-              ("<down>" . icomplete-forward-completions)
-              ("C-n" . icomplete-forward-completions)
-              ("<up>" . icomplete-backward-completions)
-              ("C-p" . icomplete-backward-completions)
-              ("C-M-i" . minibuffer-complete)
-              ("M-RET" . exit-minibuffer)))
+  (vertico-mode)
+
+  ;; ;; Grow and shrink the Vertico minibuffer
+  ;; (setq vertico-resize t)
+
+  ;; ;; Optionally enable cycling for `vertico-next' and `vertico-previous'.
+  ;; (setq vertico-cycle t)
+  )
+
+;; Persist history over Emacs restarts. Vertico sorts by history position.
+;; (use-package savehist
+;;   :init
+;;   (savehist-mode))
 
 (use-package minibuffer
   :demand

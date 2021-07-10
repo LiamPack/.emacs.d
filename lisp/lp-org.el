@@ -257,21 +257,20 @@ Return nil if no clock is running."
 
 
 (use-package nroam
-  :straight '(nroam :host github
-                    :branch "master"
-                    :repo "NicolasPetton/nroam")
+  :straight (:type git :host github
+                   :branch "master"
+                   :repo "NicolasPetton/nroam")
   :after org-roam
   :config
   (add-hook 'org-mode-hook #'nroam-setup-maybe))
 
-
 (use-package lister
-  :quelpa (lister :fetcher git
-                  :url "https://github.com/publicimageltd/lister"))
+  :straight (:type git :host github
+                   :repo "publicimageltd/lister" :branch "main"))
 
 (use-package delve
-  :quelpa (delve :fetcher git
-                 :url "https://github.com/publicimageltd/delve")
+  :straight (:type git :host github
+                   :repo "publicimageltd/delve" :branch "main")
   :config
   (use-package delve-minor-mode
     :config
@@ -279,10 +278,21 @@ Return nil if no clock is running."
   :bind
   (("<f12>" . delve-open-or-select)))
 
+(use-package org-attach-screenshot
+  :straight t
+  :bind ("<f7>" . org-attach-screenshot)
+  :config (setq org-attach-screenshot-dirfunction
+                (lambda ()
+                  (progn (assert (buffer-file-name))
+                         (concat (file-name-sans-extension (buffer-file-name))
+                                 "-att")))
+                org-attach-screenshot-command-line "gnome-screenshot -a -f %f"))
+
 (use-package deft
   :straight t
+  :bind ("<f7>" . deft)
   :custom
-  (deft-extensions '("txt" "tex" "org"))
-  (deft-directory "~/org/roam"))
+  (deft-directory "~/org/roam")
+  (deft-recursive t))
 
 (provide 'lp-org)

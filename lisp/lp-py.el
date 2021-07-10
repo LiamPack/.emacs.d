@@ -2,6 +2,7 @@
 
 (use-package python
   :straight t
+  :after flycheck
   :mode ("\\.py\\'" . python-mode)
   :interpreter ("python" . python-mode)
   :config

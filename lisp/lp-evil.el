@@ -12,13 +12,15 @@
   (setq evil-vsplit-window-right t)
   (setq evil-split-window-below t)
   (setq evil-shift-round nil)
-  (setq evil-mode-line-format nil
-        evil-insert-state-cursor '(bar "White")
-        evil-visual-state-cursor '(box "#F86155"))
+  (setq evil-mode-line-format nil)
+  ;; (setq evil-mode-line-format nil
+  ;;       evil-insert-state-cursor '(bar "White")
+  ;;       evil-visual-state-cursor '(box "#F86155"))
   (setq evil-want-keybinding nil)
   :config
   (evil-mode 1)
   (setq evil-undo-system 'undo-tree)
+  (evil-set-initial-state 'deft-mode 'emacs)
   (defvar my-leader-map (make-sparse-keymap)
     "Keymap for \"leader key\" shortcuts.")
   (evil-set-initial-state 'deft-mode 'emacs)

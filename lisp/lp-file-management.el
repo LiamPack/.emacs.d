@@ -1,4 +1,4 @@
-                                       ; file management
+                                        ; file management
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 (require 'use-package)
 
@@ -8,6 +8,11 @@
             (dired-hide-details-mode 1)
             (require 'dired-x)
             (dired-dotfiles-toggle)))
+(defun save-all ()
+  (interactive)
+  (save-some-buffers t))
+
+(add-hook 'focus-out-hook 'save-all)
 
 ;; (use-package all-the-icons-dired
 ;;   :straight t
