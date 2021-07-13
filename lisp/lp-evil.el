@@ -23,6 +23,8 @@
   (evil-set-initial-state 'deft-mode 'emacs)
   (defvar my-leader-map (make-sparse-keymap)
     "Keymap for \"leader key\" shortcuts.")
+  (evil-set-initial-state 'deft-mode 'emacs)
+  (evil-set-initial-state 'delve-mode 'emacs)
 
   ;;  (define-key my-leader-map "b" 'list-buffers)
 
@@ -122,6 +124,9 @@
     "d s" 'dap-step-in
     "d r" 'dap-ui-repl
 
+    "n p" 'org-gcal-post-at-point
+    "n i" '(lambda () (interactive) (org-time-stamp-inactive '(16)))
+
     "t b" 'switch-to-buffer-other-tab
     "t d" 'dired-other-tab
     "t f" 'find-file-other-tab
@@ -139,9 +144,8 @@
     "u I" 'org-roam-insert-immediate
     "u g" 'org-roam-graph
     "u o" 'org-roam-jump-to-index
+    "u d" 'deft
     "u t" 'org-roam-tag-add
-
-    "n i" '(lambda () (interactive) (org-time-stamp-inactive '(16)))
     ;;   "M-K" 'consult-keep-lines
     ;;   "M-X" 'consult-mode-command
     ;;"C-c f" 'consult-focus-lines
