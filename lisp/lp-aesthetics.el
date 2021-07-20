@@ -140,8 +140,7 @@
         modus-themes-scale-4 1.27
         modus-themes-scale-title 1.33)
   :config
-  (load-theme 'modus-vivendi)
-  :bind ("<f5>" . modus-themes-toggle))
+  (load-theme 'modus-vivendi))
 
 ;; (set-face-attribute 'mode-line nil :background "NavajoWhite")
 ;; (set-face-attribute 'mode-line-inactive nil :background "#FAFAFA")
