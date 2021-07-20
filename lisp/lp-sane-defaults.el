@@ -33,7 +33,7 @@
 
 ;; Too distracting
 (blink-cursor-mode -1)
-(global-hl-line-mode 1)
+;; (global-hl-line-mode 1)
 
 ;; Don't jerk me around
 (electric-indent-mode -1)
