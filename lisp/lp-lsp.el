@@ -44,6 +44,8 @@
   (setq lsp-clients-clangd-args '("-j=4" "--clang-tidy"))
   ;; Use flycheck instead of flymake
   (setq lsp-prefer-flymake nil)
+  (setq-default flycheck-disabled-checkers '(c/c++-clang
+                                             c/c++-cppcheck c/c++-gcc))
 
   ;; NB: only required if you prefer flake8 instead of the default
   ;; send pyls config via lsp-after-initialize-hook -- harmless for
