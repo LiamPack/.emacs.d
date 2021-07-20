@@ -32,6 +32,7 @@
                  ("l" imagex-sticky-rotate-left "rotate left"))))
 
 (use-package pdf-tools
+  :disabled 
   :straight t
   :config
   (pdf-tools-install)

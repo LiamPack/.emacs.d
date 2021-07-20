@@ -66,6 +66,7 @@
 
 (use-package lsp-ui
   :straight t
+  :disabled
   :after lsp-mode
   :hook (lsp-mode-hook . lsp-ui-mode)
   :diminish lsp-ui-mode
@@ -98,12 +99,11 @@
    lsp-ui-flycheck-enable nil
    lsp-ui-peek-expand-function (lambda (xs) (mapcar #'car xs)))
   ;; Flycheck
-  (setq-default flycheck-disabled-checkers '(c/c++-clang
-                                             c/c++-cppcheck c/c++-gcc))
 
   )
 
 (use-package dap-mode
+  :disabled
   :straight t
   :commands dap-debug
   :hook ((python-mode . dap-ui-mode)
@@ -134,6 +134,7 @@
   :diminish lsp-treemacs-mode)
 
 (use-package lsp-julia
+  :disabled
   :straight t
   :config
   (setq lsp-julia-default-environment "~/.julia/environments/v1.5"))

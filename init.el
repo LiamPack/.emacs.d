@@ -53,7 +53,11 @@
   :straight t)
 (use-package server
   :hook (after-init-hook . server-start))
+(defun save-all ()
+  (interactive)
+  (save-some-buffers t))
 
+(add-hook 'focus-out-hook 'save-all)
 
 (dolist (file (directory-files "~/.emacs.d/lisp/" t ".*el$"))
   (load-file file))
