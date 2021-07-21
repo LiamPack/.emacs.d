@@ -28,6 +28,7 @@ Return nil if no clock is running."
 
   ;; Some nice latex pretty-entites!
   (setq org-startup-with-inline-images t)
+  (setq org-startup-folded 'overview)
   (setq org-pretty-entities t)
   (setq org-pretty-entities-include-sub-superscripts t)
   (add-hook 'org-babel-after-execute-hook 'org-redisplay-inline-images)
