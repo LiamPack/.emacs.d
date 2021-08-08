@@ -56,6 +56,7 @@
   :straight t)
 
 ;; Taken directly from Prot
+
 (use-package modus-themes
   :straight t
   :init
@@ -77,7 +78,7 @@
         ;; that can combine any of `3d' OR `moody', `borderless',
         ;; `accented'.  The variable's doc string shows all possible
         ;; combinations.
-        modus-themes-mode-line '(moody borderless accented)
+        modus-themes-mode-line '(3d borderless)
 
         ;; Options for `modus-themes-syntax' are either nil (the default),
         ;; or a list of properties that may include any of those symbols:
@@ -87,7 +88,7 @@
         ;; Options for `modus-themes-hl-line' are either nil (the default),
         ;; or a list of properties that may include any of those symbols:
         ;; `accented', `underline', `intense'
-        modus-themes-hl-line '(accented intense)
+        modus-themes-hl-line '(accented underline)
 
         ;; Options for `modus-themes-paren-match' are either nil (the
         ;; default), or a list of properties that may include any of those
