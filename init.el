@@ -1,5 +1,6 @@
 (add-to-list 'load-path "~/.emacs.d/lisp/packages/")
 (add-to-list 'load-path "~/.emacs.d/lisp/")
+(add-to-list 'custom-theme-load-path "~/.emacs.d/packages/")
 ;; Do not initialise installed packages (I use `straight.el')
 (setq package-enable-at-startup nil)
 

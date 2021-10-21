@@ -188,6 +188,7 @@ Return nil if no clock is running."
     (setq org-ellipsis "⤵")))
 
 (use-package cdlatex
+  :disabled
   :straight t
   :diminish org-cdlatex-mode
   :hook (org-mode-hook . org-cdlatex-mode))
@@ -236,7 +237,8 @@ Return nil if no clock is running."
 (add-hook 'org-mode-hook 'visual-line-mode)
 
 (use-package org-roam
-  :straight t
+  :straight (:type git :host github
+                   :repo "org-roam/org-roam-v1" :branch "master")
   :bind (("\C-c i" . 'org-roam-insert-immediate)
          ("\C-c j" . 'org-roam-dailies-find-today)
          ("\C-c o" . 'org-roam-jump-to-index)

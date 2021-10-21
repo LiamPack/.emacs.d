@@ -44,14 +44,7 @@
     "f d" 'prot-recentf-recent-dirs
     "j" 'org-roam-dailies-find-today
 
-    "p f" 'projectile-find-file
-    "p p" 'projectile-switch-project
-    "p c" 'projectile-compile-project
-    "p j" 'projectile-find-tag
-    "p a" 'projectile-find-other-file
-    "p A" 'projectile-find-other-file-other-window
-    "p x g" 'projectile-run-gdb
-    "p x v" 'projectile-run-vterm
+    "p" projectile-command-map
 
     "_" 'balance-windows
     "-" 'fit-window-to-buffer
@@ -68,7 +61,7 @@
     "o" 'ace-window
 
     "a" 'embark-act
-    "b" 'switch-to-buffer
+    "b" 'consult-buffer
     "B" 'ibuffer
     ;;"S" 'save-some-buffers
     "F" 'lsp-format-buffer

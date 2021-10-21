@@ -7,7 +7,7 @@
 ;; iosevka, consolas, source code pro, Fira Code, dejavu, IBM 3270,
 ;; Fantasque Sans Mono, Terminus, overpass mono
 ;; meslo LG / menlo
-(set-frame-font "Deja Vu Sans Mono 14")
+(set-frame-font "deja vu sans mono 14")
 
 ;; global-hl-line-mode softly highlights bg color of line.
 (when window-system
