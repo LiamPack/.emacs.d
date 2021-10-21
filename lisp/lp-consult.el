@@ -17,7 +17,7 @@
   ;; ("C-c f" . consult-focus-lines)
   ;; ("M-#" . consult-register-load)
   ;; ("M-'" . consult-register-store)
-  
+
   ;; (:map consult-narrow-map
   ;;       ("?" . consult-narrow-help))
   ;; (:map minibuffer-local-map
@@ -67,11 +67,82 @@
                     (fit-window-to-buffer)))))
 
   (setf (alist-get 'slime-repl-mode consult-mode-histories)
-        'slime-repl-input-history))
+        'slime-repl-input-history)
+
+  (setq consult-goto-map
+        (let ((map (make-sparse-keymap)))
+          (define-key map (kbd "e") 'consult-compile-error)
+          (define-key map (kbd "f") 'consult-flymake)               ;; Alternative: consult-flycheck
+          (define-key map (kbd "g") 'consult-goto-line)             ;; orig. goto-line
+          (define-key map (kbd "M-g") 'consult-goto-line)           ;; orig. goto-line
+          (define-key map (kbd "o") 'consult-outline)               ;; Alternative: consult-org-heading
+          (define-key map (kbd "m") 'consult-mark)
+          (define-key map (kbd "k") 'consult-global-mark)
+          (define-key map (kbd "i") 'consult-imenu)
+          map))
+
+  (setq consult-register-map
+        (let ((map (make-sparse-keymap)))
+          ;; Custom M-# bindings for fast register access
+          (define-key map (kbd "l") 'consult-register-load)
+          (define-key map (kbd "s") 'consult-register-store)          ;; orig. abbrev-prefix-mark (unrelated)
+          (define-key map (kbd "r") 'consult-register)
+          map))
+  (setq consult-mode-mode-map
+        (let ((map (make-sparse-keymap)))
+          (define-key map (kbd "h") 'consult-history)
+          (define-key map (kbd "m") 'consult-mode-command)
+          (define-key map (kbd "k") 'consult-kmacro)
+          map))
+
+  (setq consult-search-map
+        (let ((map (make-sparse-keymap)))
+          (define-key map (kbd "f") 'consult-find)
+          (define-key map (kbd "F") 'consult-locate)
+          (define-key map (kbd "g") 'consult-grep)
+          (define-key map (kbd "G") 'consult-git-grep)
+          (define-key map (kbd "r") 'consult-ripgrep)
+          (define-key map (kbd "l") 'consult-line)
+          (define-key map (kbd "L") 'consult-line-multi)
+          (define-key map (kbd "m") 'consult-multi-occur)
+          (define-key map (kbd "k") 'consult-keep-lines)
+          (define-key map (kbd "u") 'consult-focus-lines)
+          map))
+  (global-set-key (kbd "M-s") consult-search-map)
+  (global-set-key (kbd "M-j") consult-goto-map)
+
+  (setq xref-show-xrefs-function 'consult-xref)
+  (setq xref-show-definitions-function 'consult-xref)
+
+  :bind
+  ("M-s e" . consult-isearch)
+  ("M-e" . consult-isearch))
 
 (use-package consult-flycheck
   :straight t
   :bind (:map flycheck-command-map
               ("!" . consult-flycheck)))
+
+
+;; (define-key map (kbd "C-v k") 'consult-ag)
+;; (define-key map (kbd "C-v l") 'consult-line)
+;; (define-key map (kbd "C-v k") 'consult-imenu)
+;; (define-key map (kbd "C-v k") 'consult-imenu-multi)
+;; (define-key map (kbd "C-v k") 'consult-outline)
+;; (define-key map (kbd "C-v k") 'consult-ripgrep)
+;; (define-key map (kbd "C-v k") 'consult-git-grep)
+;; (define-key map (kbd "C-v k") 'consult-yank-pop)
+;; (define-key map (kbd "C-v k") 'consult-find)
+;; (define-key map (kbd "C-v k") 'consult-locate)
+;; (define-key map (kbd "C-v k") 'consult-xref)
+;; (define-key map (kbd "C-v k") 'consult-focus-lines)
+;; (define-key map (kbd "C-v k") 'consult-global-mark)
+;; (define-key map (kbd "C-v k") 'consult-register-store)
+;; (define-key map (kbd "C-v k") 'consult-register-load)
+;; (define-key map (kbd "C-v k") 'consult-register)
+;; (define-key map (kbd "C-v k") 'consult-buffer)
+;; (define-key map (kbd "C-v k") 'consult-preview-at-point)
+;; (define-key map (kbd "C-v k") 'consult-completion-in-region)
+;; (define-key map (kbd "C-v k") 'consult-ag)
 
 (provide 'lp-consult)

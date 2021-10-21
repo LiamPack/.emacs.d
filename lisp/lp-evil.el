@@ -5,7 +5,7 @@
 
 (use-package evil
   :straight t
-  :after (undo-tree general key-chord)
+  :after consult
   :init
   (setq evil-search-module 'isearch)
   (setq evil-ex-complete-emacs-commands nil)
@@ -16,6 +16,7 @@
   ;; (setq evil-mode-line-format nil
   ;;       evil-insert-state-cursor '(bar "White")
   ;;       evil-visual-state-cursor '(box "#F86155"))
+  (setq evil-want-integration t)
   (setq evil-want-keybinding nil)
   :config
   (evil-mode 1)
@@ -31,6 +32,9 @@
   ;; change the "leader" key to space
   (define-key evil-normal-state-map "," 'evil-repeat-find-char-reverse)
   (define-key evil-normal-state-map (kbd "SPC") my-leader-map)
+  (define-key evil-normal-state-map (kbd "M-.") 'xref-find-definitions)
+  (define-key evil-normal-state-map (kbd "M-,") 'xref-pop-marker-stack)
+  (define-key evil-normal-state-map (kbd "C-M-.") 'xref-find-apropos)
 
   ;; general.el can automate the process of prefix map/command creation
   (general-evil-setup)
@@ -38,13 +42,20 @@
     :prefix "SPC"
     :prefix-map 'my-leader-map
 
-    "f f" 'find-file
-    "f o" 'find-file-other-window
-    "f r" 'prot-recentf-recent-files
-    "f d" 'prot-recentf-recent-dirs
+    ;; "f f" 'find-file
+    ;; "f o" 'find-file-other-window
+    ;; "f r" 'prot-recentf-recent-files
+    ;; "f d" 'prot-recentf-recent-dirs
     "j" 'org-roam-dailies-find-today
 
     "p" projectile-command-map
+    "f" consult-search-map
+    "r" consult-register-map
+    "t" consult-mode-mode-map
+    "s" 'isearch-forward
+
+    "a" 'embark-act
+    "b" 'consult-buffer
 
     "_" 'balance-windows
     "-" 'fit-window-to-buffer
@@ -60,33 +71,16 @@
     "`" '(lambda () (interactive) (switch-to-buffer (other-buffer (current-buffer) 1)))
     "o" 'ace-window
 
-    "a" 'embark-act
-    "b" 'consult-buffer
     "B" 'ibuffer
-    ;;"S" 'save-some-buffers
     "F" 'lsp-format-buffer
 
     "]" 'isearch-forward
     "[" 'isearch-backward
-    "s ." 'isearch-forward-symbol-at-point
-    "s h r" 'highlight-regexp
-    "s h u" 'unhighlight-regexp
+    ;; "s ." 'isearch-forward-symbol-at-point
+    ;; "s h r" 'highlight-regexp
+    ;; 
     "5" 'query-replace
     "%" 'query-replace-regexp
-
-    "l" 'consult-line
-    "i" 'consult-imenu
-    "O" 'consult-outline
-    "m" 'consult-global-mark
-    "k" 'consult-ripgrep
-    "Y" 'consult-yank-pop
-
-    "r w" 'window-configuration-to-register
-    "r p" 'point-to-register
-    "r f" 'frameset-to-register
-    "r s" 'consult-register-store
-    "r l" 'consult-register-load
-    "r j" 'jump-to-register
 
     "e n" 'next-error
     "e p" 'previous-error
@@ -120,15 +114,15 @@
     "n p" 'org-gcal-post-at-point
     "n i" '(lambda () (interactive) (org-time-stamp-inactive '(16)))
 
-    "t b" 'switch-to-buffer-other-tab
-    "t d" 'dired-other-tab
-    "t f" 'find-file-other-tab
-    "t n" 'tab-next
-    "t p" 'tab-previous
-    "t 0" 'tab-close
-    "t 1" 'tab-close-other
-    "t 2" 'tab-bar-new-tab
-    "t l" 'tab-list
+    ;; "t b" 'switch-to-buffer-other-tab
+    ;; "t d" 'dired-other-tab
+    ;; "t f" 'find-file-other-tab
+    ;; "t n" 'tab-next
+    ;; "t p" 'tab-previous
+    ;; "t 0" 'tab-close
+    ;; "t 1" 'tab-close-other
+    ;; "t 2" 'tab-bar-new-tab
+    ;; "t l" 'tab-list
 
     "u f" 'org-roam-find-file
     "u c" 'org-roam-capture
@@ -145,9 +139,10 @@
     ))
 
 (use-package evil-collection
+  :after evil
   :straight t
   :diminish
-  :after evil
+  :config
   (evil-collection-init))
 
 (use-package evil-escape
@@ -166,7 +161,7 @@
   :diminish (evil-snipe-mode evil-snipe-local-mode evil-snipe-override-mode evil-snipe-override-local-mode)
   :init
   (setq evil-snipe-smart-case t
-        evil-snipe-scope 'line
+        evil-snipe-scope 'buffer
         evil-snipe-repeat-scope 'visible
         evil-snipe-char-fold t)
   :config
