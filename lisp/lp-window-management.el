@@ -137,6 +137,7 @@
   :init (add-hook 'ibuffer-hook #'ibuffer-projectile-set-filter-groups))
 
 (use-package tab-bar
+  :disabled
   :init
   (setq tab-bar-close-button-show nil)
   (setq tab-bar-close-last-tab-choice 'tab-bar-mode-disable)
@@ -250,7 +251,6 @@
   (setq even-window-sizes 'height-only)
   (setq window-sides-vertical nil)
   (setq switch-to-buffer-in-dedicated-window 'pop)
-
 
   (let ((map global-map))
     (define-key map (kbd "C-x _") #'balance-windows)      ; underscore

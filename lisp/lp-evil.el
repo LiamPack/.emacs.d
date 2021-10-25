@@ -5,9 +5,17 @@
 
 (use-package evil
   :straight t
-  :after consult
   :init
+  (when (not (boundp 'consult-search-map))
+    (setq consult-search-map nil)
+    (setq consult-register-map nil)
+    (setq consult-mode-mode-map nil))
+
+  (when (not (boundp 'projectile-command-map))
+    (setq projectile-command-map nil))
+
   (setq evil-search-module 'isearch)
+
   (setq evil-ex-complete-emacs-commands nil)
   (setq evil-vsplit-window-right t)
   (setq evil-split-window-below t)
@@ -78,7 +86,7 @@
     "[" 'isearch-backward
     ;; "s ." 'isearch-forward-symbol-at-point
     ;; "s h r" 'highlight-regexp
-    ;; 
+    ;;
     "5" 'query-replace
     "%" 'query-replace-regexp
 

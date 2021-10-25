@@ -136,7 +136,6 @@
   :diminish lsp-treemacs-mode)
 
 (use-package lsp-julia
-  :disabled
   :straight t
   :config
   (setq lsp-julia-default-environment "~/.julia/environments/v1.5"))
