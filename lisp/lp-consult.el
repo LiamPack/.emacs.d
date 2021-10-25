@@ -2,7 +2,7 @@
 
 (use-package consult
   :straight t
-  ;; :bind
+  :bind
   ;; ("M-y" . consult-yank-pop)
   ;; ("M-g l" . consult-line)    ("M-g M-l" . consult-line)
   ;; ("M-g i" . consult-imenu)   ("M-g M-i" . consult-imenu)
@@ -10,7 +10,7 @@
   ;; ("M-g m" . consult-mark)
   ;; ("M-g k" . consult-global-mark)
   ;; ("M-g e" . consult-error)
-  ;; ("C-x b" . consult-buffer)
+  ("C-x b" . consult-buffer)
   ;; ("C-c k" . consult-ripgrep)
   ;; ("M-K" . consult-keep-lines)
   ;; ("M-X" . consult-mode-command)
