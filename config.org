@@ -3,7 +3,8 @@
 - [ ] get rest of init.el in here
 - [ ] clean up TODO-ed headings
 - [ ] finish constructing rest of init
-* sane defaults 
+
+* sane defaults
   #+begin_src emacs-lisp
   (require 'dash)
   (use-package s
@@ -13,7 +14,7 @@
         auto-save-default nil
         inhibit-startup-message t
         initial-scratch-message ";; Present Day
-      "
+          "
         create-lockfiles nil
         echo-keystrokes 0.1
         delete-active-region nil
@@ -77,8 +78,21 @@
   ;; Always use spaces for indentation
   (setq-default indent-tabs-mode nil)
 
-  (global-set-key (kbd "C-c n") #'lp/cleanup-buffer)
+  (defun clean-up-buffer-or-region ()
+    "Untabifies, indents and deletes trailing whitespace from buffer or region."
+    (interactive)
+    (save-excursion
+      (unless (region-active-p)
+        (mark-whole-buffer))
+      (untabify (region-beginning) (region-end))
+      (indent-region (region-beginning) (region-end))
+      (save-restriction
+        (narrow-to-region (region-beginning) (region-end))
+        (delete-trailing-whitespace))))
+
+  (global-set-key (kbd "C-x k") (lambda () (interactive) (kill-buffer nil)))
   (global-set-key (kbd "C-c C-k") #'eval-buffer)
+  (global-set-key (kbd "C-c n") #'clean-up-buffer-or-region)
   (global-set-key (kbd "<f5>")  #'revert-buffer)
   (global-set-key (kbd "C-;") #'comment-or-uncomment-region)
   (global-set-key (kbd "C-c e") #'eval-and-replace) ; this one is pretty cool.
@@ -213,6 +227,7 @@
             map))
     (global-set-key (kbd "M-s") consult-search-map)
     (global-set-key (kbd "M-j") consult-goto-map)
+    (setq consult-preview-key nil) ;; disable live preview
     (setq consult-line-numbers-widen t)
     (setq consult-project-root-function #'projectile-project-root)
     (setq completion-in-region-function #'consult-completion-in-region)
