@@ -6,14 +6,6 @@
 (use-package evil
   :straight t
   :init
-  (when (not (boundp 'consult-search-map))
-    (setq consult-search-map nil)
-    (setq consult-register-map nil)
-    (setq consult-mode-mode-map nil))
-
-  (when (not (boundp 'projectile-command-map))
-    (setq projectile-command-map nil))
-
   (setq evil-search-module 'isearch)
 
   (setq evil-ex-complete-emacs-commands nil)
@@ -26,24 +18,6 @@
   ;;       evil-visual-state-cursor '(box "#F86155"))
   (setq evil-want-integration t)
   (setq evil-want-keybinding nil)
-  :config
-  (evil-mode 1)
-  (setq evil-undo-system 'undo-tree)
-  (evil-set-initial-state 'deft-mode 'emacs)
-  (defvar my-leader-map (make-sparse-keymap)
-    "Keymap for \"leader key\" shortcuts.")
-  (evil-set-initial-state 'deft-mode 'emacs)
-  (evil-set-initial-state 'delve-mode 'emacs)
-
-  ;;  (define-key my-leader-map "b" 'list-buffers)
-
-  ;; change the "leader" key to space
-  (define-key evil-normal-state-map "," 'evil-repeat-find-char-reverse)
-  (define-key evil-normal-state-map (kbd "SPC") my-leader-map)
-  (define-key evil-normal-state-map (kbd "M-.") 'xref-find-definitions)
-  (define-key evil-normal-state-map (kbd "M-,") 'xref-pop-marker-stack)
-  (define-key evil-normal-state-map (kbd "C-M-.") 'xref-find-apropos)
-
   ;; general.el can automate the process of prefix map/command creation
   (general-evil-setup)
   (general-nmap
@@ -55,11 +29,6 @@
     ;; "f r" 'prot-recentf-recent-files
     ;; "f d" 'prot-recentf-recent-dirs
     "j" 'org-roam-dailies-find-today
-
-    "p" projectile-command-map
-    "f" consult-search-map
-    "r" consult-register-map
-    "t" consult-mode-mode-map
     "s" 'isearch-forward
 
     "a" 'embark-act
@@ -141,13 +110,31 @@
     "u o" 'org-roam-jump-to-index
     "u d" 'deft
     "u t" 'org-roam-tag-add
-    ;;   "M-K" 'consult-keep-lines
-    ;;   "M-X" 'consult-mode-command
-    ;;"C-c f" 'consult-focus-lines
-    ))
+    "p" projectile-command-map
+    "f" consult-search-map
+    "r" consult-register-map
+    "t" consult-mode-mode-map)
+  :config
+  (evil-mode 1)
+  (setq evil-undo-system 'undo-tree)
+  (evil-set-initial-state 'deft-mode 'emacs)
+  (defvar my-leader-map (make-sparse-keymap)
+    "Keymap for \"leader key\" shortcuts.")
+  (evil-set-initial-state 'deft-mode 'emacs)
+  (evil-set-initial-state 'delve-mode 'emacs)
+
+  ;;  (define-key my-leader-map "b" 'list-buffers)
+
+  ;; change the "leader" key to space
+  (define-key evil-normal-state-map "," 'evil-repeat-find-char-reverse)
+  (define-key evil-normal-state-map (kbd "SPC") my-leader-map)
+  (define-key evil-normal-state-map (kbd "M-.") 'xref-find-definitions)
+  (define-key evil-normal-state-map (kbd "M-,") 'xref-pop-marker-stack)
+  (define-key evil-normal-state-map (kbd "C-M-.") 'xref-find-apropos)
+
+  )
 
 (use-package evil-collection
-  :after evil
   :straight t
   :diminish
   :config

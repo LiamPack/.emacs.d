@@ -3,24 +3,16 @@
 (require 'use-package)
 
 ;; clean up permissions and owners, less noisy
-(add-hook 'dired-mode-hook
-          (lambda ()
-            (dired-hide-details-mode 1)
-            (require 'dired-x)
-            (dired-dotfiles-toggle)))
-(defun save-all ()
-  (interactive)
-  (save-some-buffers t))
+(use-package dired
+  :config
+  (add-hook 'dired-mode-hook
+            (lambda ()
+              (dired-hide-details-mode 1)
+              (require 'dired-x)
+              (dired-dotfiles-toggle)))
 
-(add-hook 'focus-out-hook 'save-all)
-
-;; (use-package all-the-icons-dired
-;;   :straight t
-;;   :config
-;;   (add-hook 'dired-mode-hook 'all-the-icons-dired-mode))
-
-;; disable ls by default
-(setq dired-use-ls-dired nil)
+  ;; disable ls by default
+  (setq dired-use-ls-dired nil))
 
 (use-package recentf                    ; Save recently visited files
   :init (recentf-mode)
@@ -39,42 +31,6 @@
                          ;; And all other kinds of boring files
                          )))
 
-(use-package prot-recentf
-  :straight (:type built-in)
-  :after (recentf)
-  :config
-  (add-to-list 'recentf-keep 'prot-recentf-keep-predicate)
-  (let ((map global-map))
-    (define-key map (kbd "s-r") #'prot-recentf-recent-files)
-    (define-key map (kbd "C-x C-r") #'prot-recentf-recent-dirs))
-  )
-
-(use-package projectile
-  :straight t
-  :diminish projectile-mode
-  :config
-  ;; Projectile everywhere obviously
-  (projectile-global-mode)
-  (define-key projectile-mode-map (kbd "C-c p") 'projectile-command-map))
-
-;; handle very large files
-(use-package vlf
-  :straight t
-  :config
-  (require 'vlf-setup))
-
-(defun dired-dotfiles-toggle ()
-  "Show/hide dot-files"
-  (interactive)
-  (when (equal major-mode 'dired-mode)
-    (if (or (not (boundp 'dired-dotfiles-show-p)) dired-dotfiles-show-p) ; if currently showing
-        (progn
-          (set (make-local-variable 'dired-dotfiles-show-p) nil)
-          (message "h")
-          (dired-mark-files-regexp "^\\\.")
-          (dired-do-kill-lines))
-      (progn (revert-buffer) ; otherwise just revert to re-show
-             (set (make-local-variable 'dired-dotfiles-show-p) t)))))
 
 (use-package wgrep
   :straight t
