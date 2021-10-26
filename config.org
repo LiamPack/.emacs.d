@@ -106,8 +106,6 @@
 
 * general programming env setup (magit, git-gitter)
   #+begin_src emacs-lisp
-
-
   ;; Mark TODOs , FIXME, BUG as red in src code
   (add-hook 'prog-mode-hook
             (lambda ()
@@ -120,11 +118,6 @@
   (use-package magit
     :straight t
     :commands magit-status magit-blame
-    :init
-    (defadvice magit-status (around magit-fullscreen activate)
-      (window-configuration-to-register :magit-fullscreen)
-      ad-do-it
-      (delete-other-windows))
     :config
     (setq magit-branch-arguments nil
           ;; don't put "origin-" in front of new branch names by default
@@ -132,9 +125,7 @@
           magit-push-always-verify nil
           ;; Get rid of the previous advice to go into fullscreen
           magit-restore-window-configuration t)
-
     :bind ("C-x g" . magit-status))
-
 
   ;; More info here: [[https://github.com/syohex/emacs-git-gutter]]
   (use-package git-gutter ; TODO - git gutter keybinds, going to different hunks and staging only certain portions!
@@ -363,15 +354,6 @@
                 ([tab] . corfu-next)
                 ("S-TAB" . corfu-previous)
                 ([backtab] . corfu-previous))
-
-    ;; You may want to enable Corfu only for certain modes.
-    ;; :hook ((prog-mode . corfu-mode)
-    ;;        (shell-mode . corfu-mode)
-    ;;        (eshell-mode . corfu-mode))
-
-    ;; Recommended: Enable Corfu globally.
-    ;; This is recommended since dabbrev can be used globally (M-/).
-
     :init
     ;; TAB cycle if there are only few candidates
     (setq completion-cycle-threshold 3)
@@ -388,13 +370,94 @@
     :diminish which-key-mode
     :config (which-key-mode 1))
   #+end_src
-* lp-ediff.el
+* ediff
   #+begin_src emacs-lisp
-  (load-file "~/.emacs.d/lisp/lp-ediff.el")
+  (use-package ediff
+    :diminish ediff-mode
+    :custom
+    (ediff-diff-options "-w"))
   #+end_src
 * lp-elfeed.el
   #+begin_src emacs-lisp
-  (load-file "~/.emacs.d/lisp/lp-elfeed.el")
+  (use-package elfeed
+    :disabled
+    :straight t
+    :defer t
+    :config
+    (global-set-key (kbd "C-x w") 'elfeed)
+    (setq shr-width 80)
+
+    (setq-default elfeed-search-filter "@2-weeks-ago +unread ")
+
+    (defun lp/elfeed-show-all ()
+      (interactive)
+      (bookmark-maybe-load-default-file)
+      (bookmark-jump "elfeed-all"))
+    (defun lp/elfeed-show-emacs ()
+      (interactive)
+      (bookmark-maybe-load-default-file)
+      (bookmark-jump "elfeed-emacs"))
+    (defun lp/elfeed-show-daily ()
+      (interactive)
+      (bookmark-maybe-load-default-file)
+      (bookmark-jump "elfeed-daily"))
+
+    ;; Entries older than 2 weeks are marked as readn
+    (add-hook 'elfeed-new-entry-hook
+              (elfeed-make-tagger :before "2 weeks ago"
+                                  :remove 'unread))
+
+
+    ;; code to add and remove a starred tag to elfeed article
+    ;; based on http://matt.hackinghistory.ca/2015/11/22/elfeed/
+
+    ;; add a star
+    (defun bjm/elfeed-star ()
+      "Apply starred to all selected entries."
+      (interactive )
+      (let* ((entries (elfeed-search-selected))
+             (tag (intern "starred")))
+
+        (cl-loop for entry in entries do (elfeed-tag entry tag))
+        (mapc #'elfeed-search-update-entry entries)
+        (unless (use-region-p) (forward-line))))
+
+    ;; remove a start
+    (defun bjm/elfeed-unstar ()
+      "Remove starred tag from all selected entries."
+      (interactive )
+      (let* ((entries (elfeed-search-selected))
+             (tag (intern "starred")))
+
+        (cl-loop for entry in entries do (elfeed-untag entry tag))
+        (mapc #'elfeed-search-update-entry entries)
+        (unless (use-region-p) (forward-line))))
+
+    ;; face for starred articles
+    (defface elfeed-search-starred-title-face
+      '((t :foreground "#f77"))
+      "Marks a starred Elfeed entry.")
+
+    (push '(starred elfeed-search-starred-title-face) elfeed-search-face-alist)
+    (eval-after-load 'elfeed-search
+      '(define-key elfeed-search-mode-map (kbd "*") 'bjm/elfeed-star))
+    (eval-after-load 'elfeed-search
+      '(define-key elfeed-search-mode-map (kbd "8") 'bjm/elfeed-unstar)))
+
+  (use-package elfeed-org
+    :disabled
+    :straight t
+    :config
+    (elfeed-org)
+    (setq rmh-elfeed-org-files (list "~/.emacs.d/elfeed.org")))
+
+      ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+  ;; (defalias 'elfeed-toggle-star
+  ;;   (elfeed-expose #'elfeed-search-toggle-all 'star))
+
+  ;; (eval-after-load 'elfeed-search
+  ;;   '(define-key elfeed-search-mode-map (kbd "m") 'elfeed-toggle-star))
+      ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
   #+end_src
 * embark
   #+begin_src emacs-lisp
