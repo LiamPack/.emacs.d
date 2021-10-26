@@ -6,7 +6,6 @@
 
 * sane defaults
   #+begin_src emacs-lisp
-  (require 'dash)
   (use-package s
     :straight t)
 
@@ -108,6 +107,54 @@
   (load-file "~/.emacs.d/lisp/lp-aesthetics.el")
   #+end_src
 
+* TODO lp-mct.el (getting there, currently ripped and uncustomized)
+  #+begin_src emacs-lisp
+  (use-package mct
+    :straight (:type git :host gitlab
+                     :repo "protesilaos/mct" :branch "main"
+                     :commit "17abf4729f55422bf586aea08049d9899fc69218")
+    :init
+    (setq mct-remove-shadowed-file-names t) ; works when `file-name-shadow-mode' is enabled
+    (setq mct-hide-completion-mode-line t)
+    (setq mct-show-completion-line-numbers nil)
+    (setq mct-apply-completion-stripes 0)
+    (setq mct-minimum-input 3)
+    (setq mct-live-update-delay 0.5)
+
+    ;; NOTE: `mct-completion-blocklist' can be used for commands with lots
+    ;; of candidates, depending also on how low `mct-minimum-input' is.
+    ;; With the settings shown here this is not required, otherwise I would
+    ;; use something like this:
+    ;;
+    ;; (setq mct-completion-blocklist
+    ;;       '( describe-symbol describe-function describe-variable
+    ;;          execute-extended-command insert-char))
+    (setq mct-completion-blocklist nil)
+
+    ;; This is for commands that should always pop up the completions'
+    ;; buffer.  It circumvents the default method of waiting for some user
+    ;; input (see `mct-minimum-input') before displaying and updating the
+    ;; completions' buffer.
+    (setq mct-completion-passlist
+          '(imenu
+            Info-goto-node
+            Info-index
+            Info-menu
+            vc-retrieve-tag))
+
+    ;; You can place the Completions' buffer wherever you want, by following
+    ;; the syntax of `display-buffer'.  For example, try this:
+
+    ;; (setq mct-display-buffer-action
+    ;;       (quote ((display-buffer-reuse-window
+    ;;                display-buffer-in-side-window)
+    ;;               (side . left)
+    ;;               (slot . 99)
+    ;;               (window-width . 0.3))))
+
+    :config
+    (mct-mode 1))
+  #+end_src
 * general programming env setup (magit, git-gitter)
   #+begin_src emacs-lisp
   ;; Mark TODOs , FIXME, BUG as red in src code
@@ -258,6 +305,9 @@
           'slime-repl-input-history)
     (setq xref-show-xrefs-function 'consult-xref)
     (setq xref-show-definitions-function 'consult-xref))
+
+  (use-package consult-flycheck
+    :straight t)
   #+end_src
 * lp-org.el
 
@@ -363,7 +413,6 @@
            (custom-mode-hook . visual-line-mode)))
   #+end_src
 
-
 * anki (bare bones)
   #+begin_src emacs-lisp
   (use-package anki-editor
@@ -384,7 +433,13 @@
 
     (setq tab-width 4)
     (setq c-basic-offset 4)
-    (setq-default indent-tabs-mode nil))
+    (setq-default indent-tabs-mode nil)
+
+    (setq c-block-comment-prefix " *")
+    (define-key c-mode-map (kbd "C-j") 'c-indent-new-comment-line)
+    (define-key c++-mode-map (kbd "C-j") 'c-indent-new-comment-line)
+    ;;(setq c-doc-comment-style 'javadoc)
+    )
 
   (use-package cmake-mode
     :straight t)
@@ -392,30 +447,6 @@
   (use-package eldoc-cmake
     :straight t
     :hook (cmake-mode-hook . eldoc-cmake-enable))
-  #+end_src
-* cursor related (zop, expand-region, undo, iedit)
-  #+begin_src emacs-lisp
-
-  (use-package expand-region
-    :straight t
-    :bind ("C-," . er/expand-region))
-
-  (use-package zop-to-char                ; Better zapping
-    :straight t
-    :bind (("M-z" . zop-to-char)
-           ("M-Z" . zop-up-to-char)))
-
-  (use-package undo-tree                  ; Branching undo
-    :straight t
-    :init (global-undo-tree-mode)
-    :diminish undo-tree-mode)
-
-  (use-package iedit
-    :straight t
-    :init
-    :config
-    (setq iedit-toggle-key-default (kbd "C-:"))
-    :bind (("C-:" . #'iedit-mode)))
   #+end_src
 * TODO dabbrev, corfu (capf / completion framework frontends)
   #+begin_src emacs-lisp
@@ -614,53 +645,6 @@
                 (when (derived-mode-p 'python-mode)
                   (setq my/flycheck-local-cache '((lsp . ((next-checkers . (python-mypy))))))))))
   #+end_src
-* TODO lp-mct.el (getting there, currently ripped and uncustomized)
-  #+begin_src emacs-lisp
-  (use-package mct
-    :straight (:type git :host gitlab
-                     :repo "protesilaos/mct" :branch "main")
-    :init
-    (setq mct-remove-shadowed-file-names t) ; works when `file-name-shadow-mode' is enabled
-    (setq mct-hide-completion-mode-line t)
-    (setq mct-show-completion-line-numbers nil)
-    (setq mct-apply-completion-stripes 0)
-    (setq mct-minimum-input 3)
-    (setq mct-live-update-delay 0.5)
-
-    ;; NOTE: `mct-completion-blocklist' can be used for commands with lots
-    ;; of candidates, depending also on how low `mct-minimum-input' is.
-    ;; With the settings shown here this is not required, otherwise I would
-    ;; use something like this:
-    ;;
-    ;; (setq mct-completion-blocklist
-    ;;       '( describe-symbol describe-function describe-variable
-    ;;          execute-extended-command insert-char))
-    (setq mct-completion-blocklist nil)
-
-    ;; This is for commands that should always pop up the completions'
-    ;; buffer.  It circumvents the default method of waiting for some user
-    ;; input (see `mct-minimum-input') before displaying and updating the
-    ;; completions' buffer.
-    (setq mct-completion-passlist
-          '(imenu
-            Info-goto-node
-            Info-index
-            Info-menu
-            vc-retrieve-tag))
-
-    ;; You can place the Completions' buffer wherever you want, by following
-    ;; the syntax of `display-buffer'.  For example, try this:
-
-    ;; (setq mct-display-buffer-action
-    ;;       (quote ((display-buffer-reuse-window
-    ;;                display-buffer-in-side-window)
-    ;;               (side . left)
-    ;;               (slot . 99)
-    ;;               (window-width . 0.3))))
-
-    :config
-    (mct-mode 1))
-  #+end_src
 * TODO isearch and replace (getting there, clean up)
   #+begin_src emacs-lisp
   (use-package isearch
@@ -697,7 +681,26 @@
 
 ** lp-anzu.el
    #+begin_src emacs-lisp
-   (load-file "~/.emacs.d/lisp/lp-anzu.el")
+   (use-package anzu                       ; Position/matches count for isearch
+     :straight t
+     :diminish anzu-mode
+     :bind
+     (([remap query-replace] . anzu-query-replace)
+      ([remap query-replace-regexp] . anzu-query-replace-regexp)
+      :map isearch-mode-map
+      ([remap isearch-query-replace] . anzu-isearch-query-replace)
+      ([remap isearch-query-replace-regexp] . anzu-isearch-query-replace-regexp))
+     :config
+     (global-anzu-mode)
+     (setq anzu-cons-mode-line-p nil)
+     (set-face-attribute 'anzu-mode-line nil
+                         :foreground "yellow" :weight 'bold)
+     (custom-set-variables
+      '(anzu-mode-lighter "")
+      '(nvm-deactivate-region t)
+      '(anzu-search-threshold 1000)
+      '(anzu-replace-threshold 50)
+      '(anzu-replace-to-string-separator " => ")))
    #+end_src
 * lisp environment configuration
   #+begin_src emacs-lisp
@@ -877,10 +880,10 @@
   (use-package marginalia
     :straight (:host github :repo "minad/marginalia" :branch "main")
     :demand
-    ;; :config
-    ;; (setq marginalia-annotators
-    ;;       '(marginalia-annotators-heavy
-    ;;         marginalia-annotators-light))
+    :config
+    (setq marginalia-annotators
+          '(marginalia-annotators-heavy
+            marginalia-annotators-light))
     (marginalia-mode 1))
   #+end_src
 * markdown
@@ -1012,6 +1015,29 @@
 * lp-yasnippet.el
   #+begin_src emacs-lisp
   (load-file "~/.emacs.d/lisp/lp-yasnippet.el")
+  #+end_src
+* cursor related (zop, expand-region, undo, iedit)
+  #+begin_src emacs-lisp
+
+  (use-package expand-region
+    :straight t
+    :bind ("C-," . er/expand-region))
+
+  (use-package zop-to-char                ; Better zapping
+    :straight t
+    :bind (("M-z" . zop-to-char)
+           ("M-Z" . zop-up-to-char)))
+
+  (use-package undo-tree                  ; Branching undo
+    :straight t
+    :init (global-undo-tree-mode)
+    :diminish undo-tree-mode)
+
+  (use-package iedit
+    :straight t
+    :init
+    (setq iedit-toggle-key-default (kbd "C-:"))
+    :bind (("C-:" . #'iedit-mode)))
   #+end_src
 * lp-evil.el
   #+begin_src emacs-lisp

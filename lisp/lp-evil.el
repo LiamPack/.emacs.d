@@ -136,7 +136,7 @@
 
 (use-package evil-collection
   :straight t
-  :diminish
+  :diminish (evil-collection-unimpaired-mode  global-evil-collection-unimpaired-mode)
   :config
   (evil-collection-init))
 
