@@ -1,0 +1,184 @@
+#+TITLE: emacs config
+
+* aesthetic
+  
+  #+begin_src emacs-lisp
+(load-file "~/.emacs.d/lisp/lp-aesthetics.el")
+  #+end_src
+
+* lp-consult.el
+  #+begin_src emacs-lisp 
+(load-file "~/.emacs.d/lisp/lp-consult.el")
+  #+end_src
+* lp-file-management.el
+  #+begin_src emacs-lisp 
+(load-file "~/.emacs.d/lisp/lp-file-management.el")
+  #+end_src
+* org
+  
+  #+begin_src emacs-lisp
+(load-file "~/.emacs.d/lisp/lp-org.el")
+  #+end_src
+* window-management
+  
+  #+begin_src emacs-lisp
+(load-file "~/.emacs.d/lisp/lp-window-management.el")
+  #+end_src
+  
+
+* lp-anki.el
+  #+begin_src emacs-lisp 
+(load-file "~/.emacs.d/lisp/lp-anki.el")
+  #+end_src
+* lp-anzu.el
+  #+begin_src emacs-lisp 
+(load-file "~/.emacs.d/lisp/lp-anzu.el")
+  #+end_src
+* lp-c-env.el
+  #+begin_src emacs-lisp 
+(load-file "~/.emacs.d/lisp/lp-c-env.el")
+  #+end_src
+* lp-calc.el
+  #+begin_src emacs-lisp 
+(load-file "~/.emacs.d/lisp/lp-calc.el")
+  #+end_src
+* lp-comint.el
+  #+begin_src emacs-lisp 
+(load-file "~/.emacs.d/lisp/lp-comint.el")
+  #+end_src
+* lp-cursor.el
+  #+begin_src emacs-lisp 
+(load-file "~/.emacs.d/lisp/lp-cursor.el")
+  #+end_src
+* lp-dabbrev.el
+  #+begin_src emacs-lisp 
+(load-file "~/.emacs.d/lisp/lp-dabbrev.el")
+  #+end_src
+* lp-defuns.el
+  #+begin_src emacs-lisp 
+(load-file "~/.emacs.d/lisp/lp-defuns.el")
+  #+end_src
+* lp-ediff.el
+  #+begin_src emacs-lisp 
+(load-file "~/.emacs.d/lisp/lp-ediff.el")
+  #+end_src
+* lp-elfeed.el
+  #+begin_src emacs-lisp 
+(load-file "~/.emacs.d/lisp/lp-elfeed.el")
+  #+end_src
+* lp-embark.el
+  #+begin_src emacs-lisp 
+(load-file "~/.emacs.d/lisp/lp-embark.el")
+  #+end_src
+* lp-erc.el
+  #+begin_src emacs-lisp 
+(load-file "~/.emacs.d/lisp/lp-erc.el")
+  #+end_src
+* lp-eshell.el
+  #+begin_src emacs-lisp 
+(load-file "~/.emacs.d/lisp/lp-eshell.el")
+  #+end_src
+* lp-extras.el
+  #+begin_src emacs-lisp 
+(load-file "~/.emacs.d/lisp/lp-extras.el")
+  #+end_src
+* lp-flycheck.el
+  #+begin_src emacs-lisp 
+(load-file "~/.emacs.d/lisp/lp-flycheck.el")
+  #+end_src
+* lp-haskell.el
+  #+begin_src emacs-lisp 
+(load-file "~/.emacs.d/lisp/lp-haskell.el")
+  #+end_src
+* lp-icomplete.el
+  #+begin_src emacs-lisp 
+(load-file "~/.emacs.d/lisp/lp-icomplete.el")
+  #+end_src
+* lp-image.el
+  #+begin_src emacs-lisp 
+(load-file "~/.emacs.d/lisp/lp-image.el")
+  #+end_src
+* lp-isearch.el
+  #+begin_src emacs-lisp 
+(load-file "~/.emacs.d/lisp/lp-isearch.el")
+  #+end_src
+* lp-lisp-env.el
+  #+begin_src emacs-lisp 
+(load-file "~/.emacs.d/lisp/lp-lisp-env.el")
+  #+end_src
+* lp-lsp.el
+  #+begin_src emacs-lisp 
+(load-file "~/.emacs.d/lisp/lp-lsp.el")
+  #+end_src
+* lp-marginalia.el
+  #+begin_src emacs-lisp 
+(load-file "~/.emacs.d/lisp/lp-marginalia.el")
+  #+end_src
+* lp-markdown.el
+  #+begin_src emacs-lisp 
+(load-file "~/.emacs.d/lisp/lp-markdown.el")
+  #+end_src
+* lp-orderless.el
+  #+begin_src emacs-lisp 
+(load-file "~/.emacs.d/lisp/lp-orderless.el")
+  #+end_src
+* lp-org.el
+  #+begin_src emacs-lisp 
+(load-file "~/.emacs.d/lisp/lp-org.el")
+  #+end_src
+* lp-prog-env.el
+  #+begin_src emacs-lisp 
+(load-file "~/.emacs.d/lisp/lp-prog-env.el")
+  #+end_src
+* lp-py.el
+  #+begin_src emacs-lisp 
+(load-file "~/.emacs.d/lisp/lp-py.el")
+  #+end_src
+* lp-res.el
+  #+begin_src emacs-lisp 
+(load-file "~/.emacs.d/lisp/lp-res.el")
+  #+end_src
+* lp-rmsbolt.el
+  #+begin_src emacs-lisp 
+(load-file "~/.emacs.d/lisp/lp-rmsbolt.el")
+  #+end_src
+* lp-sane-defaults.el
+  #+begin_src emacs-lisp 
+(load-file "~/.emacs.d/lisp/lp-sane-defaults.el")
+  #+end_src
+* lp-smartparens.el
+  #+begin_src emacs-lisp 
+(load-file "~/.emacs.d/lisp/lp-smartparens.el")
+  #+end_src
+* lp-tex.el
+  #+begin_src emacs-lisp 
+(load-file "~/.emacs.d/lisp/lp-tex.el")
+  #+end_src
+* lp-utility.el
+  #+begin_src emacs-lisp 
+(load-file "~/.emacs.d/lisp/lp-utility.el")
+  #+end_src
+* lp-w3m.el
+  #+begin_src emacs-lisp 
+(load-file "~/.emacs.d/lisp/lp-w3m.el")
+  #+end_src
+* lp-web.el
+  #+begin_src emacs-lisp 
+(load-file "~/.emacs.d/lisp/lp-web.el")
+  #+end_src
+* lp-window-management.el
+  #+begin_src emacs-lisp 
+(load-file "~/.emacs.d/lisp/lp-window-management.el")
+  #+end_src
+* lp-writing.el
+  #+begin_src emacs-lisp 
+(load-file "~/.emacs.d/lisp/lp-writing.el")
+  #+end_src
+* lp-yasnippet.el
+  #+begin_src emacs-lisp 
+(load-file "~/.emacs.d/lisp/lp-yasnippet.el")
+  #+end_src
+* lp-evil.el
+  #+begin_src emacs-lisp 
+(load-file "~/.emacs.d/lisp/lp-evil.el")
+  #+end_src
