@@ -30,4 +30,11 @@ server/
 url/
 straight/
 session.*
-.emacs.d
+transient/
+quelpa/
+persist/
+org-gcal/
+.org*
+type-break
+org-roam.db
+config.el
