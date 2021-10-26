@@ -250,7 +250,7 @@ Return nil if no clock is running."
    (lambda (file)
      (let ((org-roam-graph-viewer "/mnt/c/Users/LiamP/AppData/Local/Vivaldi/Application/vivaldi.exe"))
        (org-roam-graph--open (concat "file://///wsl$/Ubuntu" file)))))
-  (org-roam-graph-exclude-matcher '("private" "daily" "index" "Index"))
+  (org-roam-graph-exclude-matcher '("physics" "textbook" "quote" "paper" "private" "daily" "index" "Index"))
   (org-roam-dailies-directory "daily/")
   (org-roam-completion-everywhere t)
   :init
@@ -311,5 +311,14 @@ Return nil if no clock is running."
   :custom
   (deft-directory "~/org/roam")
   (deft-recursive t))
+
+;; (use-package org-gcal
+;;   :straight t
+;;   :custom
+;;   (org-gcal-client-id "652997319765-70r61v1ub8oqusedjh31b0np84ovvib5.apps.googleusercontent.com")
+;;   (org-gcal-client-secret "M3ChLs9H23tDKWrnJ_U5wwOs")
+;;   (org-gcal-fetch-file-alist '(("liampacker@gmail.com" . "~/org/inbox.org")))
+;;   )
+
 
 (provide 'lp-org)

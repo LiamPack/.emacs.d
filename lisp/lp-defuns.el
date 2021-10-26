@@ -54,36 +54,8 @@
 (global-set-key (kbd "C-x k") 'lp/kill-current-buffer)
 
 ;;(global-set-key (kbd "M-TAB") 'hippie-expand)
-(global-set-key (kbd "C-j") #'join-line) ; note that paredit binds this to (paredit-newline)
-(global-set-key (kbd "M-g M-g") #'goto-line)
-(global-set-key (kbd "C-c n") #'lp/cleanup-buffer)
-(global-set-key (kbd "<f12>") #'lp/generate-scratch-buffer)
-(global-set-key (kbd "C-c C-k") #'eval-buffer)
-(global-set-key (kbd "C-<f7>") #'compile)
-(global-set-key (kbd "<f5>")  #'revert-buffer)
-(global-set-key (kbd "C-;") #'comment-or-uncomment-region)
-(global-set-key (kbd "C-c e") #'eval-and-replace) ; this one is pretty cool.
-(global-set-key (kbd "C-x p") #'pop-to-mark-command)
-(setq set-mark-command-repeat-pop t)
-
-;; When popping the mark, continue popping until the cursor actually
-;; moves Also, if the last command was a copy - skip past all the
-;; expand-region cruft.
-(defadvice pop-to-mark-command (around ensure-new-position activate)
-  (let ((p (point)))
-    (when (eq last-command 'save-region-or-current-line)
-      ad-do-it
-      ad-do-it
-      ad-do-it)
-    (dotimes (i 10)
-      (when (= p (point)) ad-do-it))))
 
 (global-set-key (kbd "C-m") 'newline-and-indent)
-
-(use-package which-key
-  :straight t
-  :diminish which-key-mode
-  :config (which-key-mode 1))
 
 ;; pop to the last command mark! its cool.
 
