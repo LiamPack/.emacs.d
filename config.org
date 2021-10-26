@@ -377,7 +377,7 @@
     :custom
     (ediff-diff-options "-w"))
   #+end_src
-* lp-elfeed.el
+* TODO elfeed bloated and old
   #+begin_src emacs-lisp
   (use-package elfeed
     :disabled
@@ -463,7 +463,8 @@
   #+begin_src emacs-lisp
   (use-package embark
     :straight t
-    :bind ("M-a" . embark-act)
+    :bind (("C->" . embark-become)
+           ("M-a" . embark-act))
     :config
     (setq embark-action-indicator
           (lambda (map)
