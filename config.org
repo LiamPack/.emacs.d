@@ -13,7 +13,7 @@
         auto-save-default nil
         inhibit-startup-message t
         initial-scratch-message ";; Present Day
-            "
+  "
         create-lockfiles nil
         echo-keystrokes 0.1
         delete-active-region nil
@@ -101,59 +101,229 @@
     :init (focus-autosave-mode)
     :diminish focus-autosave-mode)
   #+end_src
-* lp-aesthetics.el
+* aesthetics
 
   #+begin_src emacs-lisp
-  (load-file "~/.emacs.d/lisp/lp-aesthetics.el")
+  ;;; General aesthetic configurations for emacs
+  ;;
+  ;; espresso ; cyberpunk ; moe-light ;
+  ;;* good themes
+  ;;** base16
+  ;;    * zenburn
+  ;;    * unikitty light
+  ;;    * solarized light
+  ;;    * rebecca
+  ;;    * porple
+  ;;    * phd
+  ;;    * ocean
+  ;;    * nord
+  ;;    * monokai
+  ;;    * mocha
+  ;;    * mellow-purple
+  ;;    * material + material palenight
+  ;;    * harmonic-{light,dark}
+  ;;    * cupertino
+  ;;    * cupcake
+  ;;    * sulphurpool-light
+  ;;    * heath-light
+  ;;    * cave-light
+  ;;    * classic-{dark,light}
+  ;; * avk-daylight
+  ;;
+  ;;* actual good themes
+  ;;  * leuven / parchment (https://github.com/ajgrf/parchment)
+  ;;  * porple
+  ;;  * doom-tomorrow-night
+  ;;    * Any of the doom ones really
+  ;;  * Habamax Theme - a little plain
+  ;;  * Also hydanatantantatna-theme
+  ;;  * gruvbox
+  ;;  * tsdh-light
+  ;;  * tron theme https://github.com/ianpan870102/Emacs-Tron-Legacy-Theme
+  ;;  * Naysayer-theme https://github.com/nickav/naysayer-theme.el
+  ;;  * That one black theme i'm using right now (6/15/19)
+
+  (use-package modus-themes
+    :straight t
+    :init
+    (setq modus-themes-italic-constructs t
+          modus-themes-bold-constructs t
+          modus-themes-no-mixed-fonts nil
+          modus-themes-subtle-line-numbers t
+          modus-themes-success-deuteranopia nil
+
+          modus-themes-fringes 'subtle ; {nil,'subtle,'intense}
+
+          ;; Options for `modus-themes-lang-checkers' are either nil (the
+          ;; default), or a list of properties that may include any of those
+          ;; symbols: `straight-underline', `text-also', `background',
+          ;; `intense'
+          modus-themes-lang-checkers '(straight-underline background intense)
+
+          ;; Options for `modus-themes-mode-line' are either nil, or a list
+          ;; that can combine any of `3d' OR `moody', `borderless',
+          ;; `accented'.  The variable's doc string shows all possible
+          ;; combinations.
+          modus-themes-mode-line '(borderless)
+
+          ;; Options for `modus-themes-syntax' are either nil (the default),
+          ;; or a list of properties that may include any of those symbols:
+          ;; `faint', `yellow-comments', `green-strings', `alt-syntax'
+          modus-themes-syntax '(faint alt-syntax yellow-comments green-strings)
+
+          ;; Options for `modus-themes-hl-line' are either nil (the default),
+          ;; or a list of properties that may include any of those symbols:
+          ;; `accented', `underline', `intense'
+          modus-themes-hl-line '(accented underline)
+
+          ;; Options for `modus-themes-paren-match' are either nil (the
+          ;; default), or a list of properties that may include any of those
+          ;; symbols: `bold', `intense', `underline'
+          modus-themes-paren-match '(bold intense)
+
+          ;; Options for `modus-themes-links' are either nil (the default),
+          ;; or a list of properties that may include any of those symbols:
+          ;; `neutral-underline' OR `no-underline', `faint' OR `no-color',
+          ;; `bold', `italic', `background'
+          modus-themes-links '(neutral-underline background)
+
+          ;; Options for `modus-themes-prompts' are either nil (the
+          ;; default), or a list of properties that may include any of those
+          ;; symbols: `background', `bold', `gray', `intense', `italic'
+          modus-themes-prompts '(intense bold)
+
+          modus-themes-completions 'moderate ; {nil,'moderate,'opinionated}
+
+          modus-themes-mail-citations nil ; {nil,'faint,'monochrome}
+
+          ;; Options for `modus-themes-region' are either nil (the default),
+          ;; or a list of properties that may include any of those symbols:
+          ;; `no-extend', `bg-only', `accented'
+          modus-themes-region '(no-extend accented)
+
+          ;; Options for `modus-themes-diffs': nil, 'desaturated,
+          ;; 'bg-only, 'deuteranopia, 'fg-only-deuteranopia
+          modus-themes-diffs 'fg-only-deuteranopia
+
+          modus-themes-org-blocks 'tinted-background ; {nil,'gray-background,'tinted-background}
+
+          modus-themes-org-agenda ; this is an alist: read the manual or its doc string
+          '((header-block . (variable-pitch scale-title))
+            (header-date . (grayscale workaholic bold-today))
+            (scheduled . uniform)
+            (habit . traffic-light-deuteranopia))
+
+          modus-themes-headings ; this is an alist: read the manual or its doc string
+          '((1 . (overline background))
+            (2 . (rainbow overline))
+            (t . (no-bold)))
+
+          modus-themes-variable-pitch-ui nil
+          modus-themes-variable-pitch-headings t
+          modus-themes-scale-headings t
+          ;; modus-themes-scale-1 1.1
+          ;; modus-themes-scale-2 1.15
+          ;; modus-themes-scale-3 1.21
+          ;; modus-themes-scale-4 1.27
+          ;; modus-themes-scale-title 1.33
+          )
+    :config
+    (load-theme 'modus-vivendi))
+  (use-package time                       ; Show current time
+    :straight t
+    :bind (("C-c w t" . display-time-world))
+    :config
+    (setq display-time-world-time-format "%H:%M %Z, %d. %b"
+          display-time-world-list '(("Europe/Berlin"    "Berlin")
+                                    ("Europe/London"    "London")
+                                    ("Europe/Istanbul"  "Istanbul")
+                                    ("America/Winnipeg" "Winnipeg (CA)")
+                                    ("America/New_York" "New York (USA)")
+                                    ("Asia/Tokyo"       "Tokyo (JP)")))
+    (setf display-time-default-load-average nil
+          display-time-use-mail-icon t
+          display-time-24hr-format t)
+    (display-time-mode))
+
+  ;; Helps with stupid ^L characters - allows a page break to appear
+  (use-package page-break-lines
+    :straight t
+    :diminish page-break-lines-mode
+    :config
+    (global-page-break-lines-mode))
   #+end_src
 
-* TODO lp-mct.el (getting there, currently ripped and uncustomized)
+* DONE lp-mct.el (getting there, currently ripped and uncustomized)
+  CLOSED: [2021-10-26 Tue 19:30]
   #+begin_src emacs-lisp
   (use-package mct
     :straight (:type git :host gitlab
-                     :repo "protesilaos/mct" :branch "main"
-                     :commit "17abf4729f55422bf586aea08049d9899fc69218")
+                     :repo "protesilaos/mct" :branch "main")
     :init
-    (setq mct-remove-shadowed-file-names t) ; works when `file-name-shadow-mode' is enabled
-    (setq mct-hide-completion-mode-line t)
-    (setq mct-show-completion-line-numbers nil)
-    (setq mct-apply-completion-stripes 0)
-    (setq mct-minimum-input 3)
-    (setq mct-live-update-delay 0.5)
 
-    ;; NOTE: `mct-completion-blocklist' can be used for commands with lots
-    ;; of candidates, depending also on how low `mct-minimum-input' is.
-    ;; With the settings shown here this is not required, otherwise I would
-    ;; use something like this:
-    ;;
-    ;; (setq mct-completion-blocklist
-    ;;       '( describe-symbol describe-function describe-variable
-    ;;          execute-extended-command insert-char))
-    (setq mct-completion-blocklist nil)
-
-    ;; This is for commands that should always pop up the completions'
-    ;; buffer.  It circumvents the default method of waiting for some user
-    ;; input (see `mct-minimum-input') before displaying and updating the
-    ;; completions' buffer.
-    (setq mct-completion-passlist
-          '(imenu
-            Info-goto-node
-            Info-index
-            Info-menu
-            vc-retrieve-tag))
-
-    ;; You can place the Completions' buffer wherever you want, by following
-    ;; the syntax of `display-buffer'.  For example, try this:
-
+    (setq mct-live-update-delay 0.2)
     ;; (setq mct-display-buffer-action
     ;;       (quote ((display-buffer-reuse-window
     ;;                display-buffer-in-side-window)
-    ;;               (side . left)
+    ;;               (side . bottom)
     ;;               (slot . 99)
-    ;;               (window-width . 0.3))))
+    ;;               (window-height . 0.2))))
 
+    (setq completion-ignore-case t)
+    (setq completions-detailed t)
+
+    (setq enable-recursive-minibuffers t)
+    (setq minibuffer-eldef-shorten-default t)
+
+    (setq read-buffer-completion-ignore-case t)
+    (setq read-file-name-completion-ignore-case t)
+
+    (setq resize-mini-windows t)
+
+    (file-name-shadow-mode 1)
+    (minibuffer-depth-indicate-mode 1)
+    (minibuffer-electric-default-mode 1)
+
+       ;;; Minibuffer history
+    (require 'savehist)
+    (setq savehist-file (locate-user-emacs-file "savehist"))
+    (setq history-length 10000)
+    (setq history-delete-duplicates t)
+    (setq savehist-save-minibuffer-history t)
+    (add-hook 'after-init-hook #'savehist-mode)
     :config
+    (define-key mct-minibuffer-local-completion-map (kbd "M-p") 'previous-history-element)
     (mct-mode 1))
+  #+end_src
+
+* vertico redux
+  #+begin_src emacs-lisp
+  (use-package vertico
+    :disabled
+    :straight t
+    :init
+    :config
+    (setq vertico-resize t)
+    (setq vertico-cycle t)
+    (vertico-mode)
+
+    ;; Add prompt indicator to `completing-read-multiple'.
+    ;; Alternatively try `consult-completing-read-multiple'.
+    (defun crm-indicator (args)
+      (cons (concat "[CRM] " (car args)) (cdr args)))
+    (advice-add #'completing-read-multiple :filter-args #'crm-indicator)
+    (define-key vertico-map "?" #'minibuffer-completion-help)
+    (define-key vertico-map (kbd "M-RET") #'minibuffer-force-complete-and-exit)
+    (define-key vertico-map (kbd "M-TAB") #'minibuffer-complete)
+    ;; Use `consult-completion-in-region' if Vertico is enabled.
+    ;; Otherwise use the default `completion--in-region' function.
+    ;; (setq completion-in-region-function
+    ;;       (lambda (&rest args)
+    ;;         (apply (if vertico-mode
+    ;;                    #'consult-completion-in-region
+    ;;                  #'completion--in-region)
+    ;;                args)))
+    )
   #+end_src
 * general programming env setup (magit, git-gitter)
   #+begin_src emacs-lisp
@@ -231,7 +401,7 @@
     (setq consult-goto-map
           (let ((map (make-sparse-keymap)))
             (define-key map (kbd "e") 'consult-compile-error)
-            (define-key map (kbd "f") 'consult-flymake)               ;; Alternative: consult-flycheck
+            (define-key map (kbd "f") 'consult-flycheck)               ;; Alternative: consult-flycheck
             (define-key map (kbd "g") 'consult-goto-line)             ;; orig. goto-line
             (define-key map (kbd "M-g") 'consult-goto-line)           ;; orig. goto-line
             (define-key map (kbd "o") 'consult-outline)               ;; Alternative: consult-org-heading
@@ -270,44 +440,20 @@
     (global-set-key (kbd "M-s") consult-search-map)
     (global-set-key (kbd "M-j") consult-goto-map)
     (setq consult-preview-key nil) ;; disable live preview
-    (setq consult-line-numbers-widen t)
     (setq consult-project-root-function #'projectile-project-root)
-    (setq completion-in-region-function #'consult-completion-in-region)
-    (setq consult-async-min-input 3)
-    (setq consult-async-input-debounce 0.5)
-    (setq consult-async-input-throttle 0.8)
+    ;; (setq consult-async-min-input 3)
+    ;; (setq consult-async-input-debounce 0.5)
+    ;; (setq consult-async-input-throttle 0.8)
     (setq consult-narrow-key "<")
 
     :config
-    ;; Registers' setup -- From Consult's README
-    ;;
-    ;; This gives a consistent display for `consult-register',
-    ;; `consult-register-load', `consult-register-store', and the Emacs
-    ;; built-ins.
-    (setq register-preview-delay 0
-          register-preview-function #'consult-register-format)
-    ;; Tweak the register preview window.
-    ;; * Sort the registers
-    ;; * Hide the mode line
-    ;; * Resize the window, such that the contents fit exactly
-    ;; (advice-add #'register-preview #'consult-register-window)
-    (advice-add #'register-preview :around
-                (lambda (fun buffer &optional show-empty)
-                  (let ((register-alist (seq-sort #'car-less-than-car register-alist)))
-                    (funcall fun buffer show-empty))
-                  (when-let (win (get-buffer-window buffer))
-                    (with-selected-window win
-                      (setq-local mode-line-format nil)
-                      (setq-local window-min-height 1)
-                      (fit-window-to-buffer)))))
-
     (setf (alist-get 'slime-repl-mode consult-mode-histories)
           'slime-repl-input-history)
     (setq xref-show-xrefs-function 'consult-xref)
     (setq xref-show-definitions-function 'consult-xref))
 
   (use-package consult-flycheck
-    :straight t)
+    :straight (:type git :host github :repo "minad/consult-flycheck"))
   #+end_src
 * lp-org.el
 
@@ -402,13 +548,6 @@
       (define-key map (kbd "C-x <") #'shrink-window-horizontally); override `scroll-left'
       (define-key map (kbd "C-x +") #'balance-windows-area)
       (define-key map (kbd "C-M-q") #'window-toggle-side-windows))
-    ;; (let ((map resize-window-repeat-map))
-    ;;   (define-key map ">" #'enlarge-window-horizontally)
-    ;;   (define-key map "<" #'shrink-window-horizontally))
-    (setq window-combination-resize t)
-    (setq even-window-sizes 'height-only)
-    (setq window-sides-vertical nil)
-    (setq switch-to-buffer-in-dedicated-window 'pop)
     :hook ((help-mode-hook . visual-line-mode)
            (custom-mode-hook . visual-line-mode)))
   #+end_src
@@ -468,7 +607,6 @@
   (use-package corfu
     :straight '(corfu :host github
                       :repo "minad/corfu")
-    ;;   :straight t
     ;; Optional customizations
     :custom
     (corfu-cycle t)            ;; Enable cycling for `corfu-next/previous'
@@ -592,13 +730,7 @@
   (use-package embark
     :straight t
     :bind (("C->" . embark-become)
-           ("M-a" . embark-act))
-    :config
-    (setq embark-action-indicator
-          (lambda (map)
-            (which-key--show-keymap "Embark" map nil nil 'no-paging)
-            #'which-key--hide-popup-ignore-command)
-          embark-become-indicator embark-action-indicator))
+           ("M-a" . embark-act)))
 
   (use-package embark-consult
     :straight t
@@ -676,10 +808,9 @@
            :map occur-mode-map
            ("t" . toggle-truncate-lines)))
 
-  (load-file "~/.emacs.d/lisp/lp-isearch.el")
   #+end_src
 
-** lp-anzu.el
+** anzu
    #+begin_src emacs-lisp
    (use-package anzu                       ; Position/matches count for isearch
      :straight t
@@ -722,7 +853,6 @@
     (add-hook 'ielm-mode-hook 'turn-on-eldoc-mode))
 
   ;; paren stuff
-  ;; USING SMARTPARENS NOW!
   (use-package paredit
     :straight t
     :diminish paredit-mode

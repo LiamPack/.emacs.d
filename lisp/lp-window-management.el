@@ -10,17 +10,8 @@
 (set-frame-font "deja vu sans mono 14")
 
 ;; global-hl-line-mode softly highlights bg color of line.
-(when window-system
-  (global-hl-line-mode))
-
-;; Buffer, Windows and Frames
-(setq frame-resize-pixelwise t               ; Resize by pixels
-      frame-title-format
-      '(:eval (if (buffer-file-name)
-                  (abbreviate-file-name (buffer-file-name)) "%b"))
-      ;; Size new windows proportionally wrt other windows
-      window-combination-resize t)
-
+;; (when window-system
+;;   (global-hl-line-mode))
 
 ;; I almost always want to switch to a window when I split. So lets do that.
 (defun lp/split-window-below-and-switch ()
@@ -39,11 +30,6 @@
 
 (global-set-key (kbd "C-x 2") 'lp/split-window-below-and-switch)
 (global-set-key (kbd "C-x 3") 'lp/split-window-right-and-switch)
-;; Standard window commands
-(bind-key "C-c w =" #'balance-windows)
-(bind-key "C-c w k" #'delete-window)
-(bind-key "C-c w m" #'delete-other-windows)
-
 
 ;; ace-window stuff
 ;; You can also start by calling ace-window and then decide to switch the action to delete or swap etc. By default the bindings are:
