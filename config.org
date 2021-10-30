@@ -6,9 +6,6 @@
 
 * sane defaults
   #+begin_src emacs-lisp
-  (use-package s
-    :straight t)
-
   (setf backup-inhibited t
         auto-save-default nil
         inhibit-startup-message t
@@ -1272,15 +1269,9 @@
   #+end_src
 * cursor related (zop, expand-region, undo, iedit)
   #+begin_src emacs-lisp
-
   (use-package expand-region
     :straight t
     :bind ("C-," . er/expand-region))
-
-  (use-package zop-to-char                ; Better zapping
-    :straight t
-    :bind (("M-z" . zop-to-char)
-           ("M-Z" . zop-up-to-char)))
 
   (use-package iedit
     :straight t
@@ -1290,6 +1281,7 @@
   #+end_src
 * evil
   #+begin_src emacs-lisp
+  ;; for easy keymap definition in evil
   (use-package general
     :straight t)
 
@@ -1303,11 +1295,9 @@
     (setq evil-split-window-below t)
     (setq evil-shift-round nil)
     (setq evil-mode-line-format nil)
-    ;; (setq evil-mode-line-format nil
-    ;;       evil-insert-state-cursor '(bar "White")
-    ;;       evil-visual-state-cursor '(box "#F86155"))
     (setq evil-want-integration t)
     (setq evil-want-keybinding nil)
+
     ;; general.el can automate the process of prefix map/command creation
     (general-evil-setup)
     (general-nmap
@@ -1410,14 +1400,10 @@
       "u t" 'org-roam-tag-add)
     :config
     (evil-mode 1)
-    (setq evil-undo-system nil)
-    (evil-set-initial-state 'deft-mode 'emacs)
+    (setq evil-undo-system 'undo-redo) ; default undo system
+    ;; (evil-set-initial-state 'deft-mode 'emacs)
     (defvar my-leader-map (make-sparse-keymap)
       "Keymap for \"leader key\" shortcuts.")
-    (evil-set-initial-state 'deft-mode 'emacs)
-    (evil-set-initial-state 'delve-mode 'emacs)
-
-    ;;  (define-key my-leader-map "b" 'list-buffers)
 
     ;; change the "leader" key to space
     (define-key evil-normal-state-map "," 'evil-repeat-find-char-reverse)
@@ -1426,9 +1412,7 @@
     (define-key evil-normal-state-map (kbd "M-,") 'xref-pop-marker-stack)
     (define-key evil-normal-state-map (kbd "C-M-.") 'xref-find-apropos)
     (define-key evil-normal-state-map (kbd "C-M-y") 'consult-yank-pop)
-    (define-key evil-normal-state-map (kbd "C-y") 'yank)
-
-    )
+    (define-key evil-normal-state-map (kbd "C-y") 'yank))
 
   (use-package evil-collection
     :straight t
@@ -1445,8 +1429,8 @@
           evil-escape-key-sequence "jk"
           evil-escape-delay 0.15)
 
-    (evil-escape-mode +1)
-    )
+    (evil-escape-mode +1))
+
   (use-package evil-snipe
     :straight t
     :diminish (evil-snipe-mode evil-snipe-local-mode evil-snipe-override-mode evil-snipe-override-local-mode)
@@ -1467,8 +1451,9 @@
     :config (global-evil-surround-mode 1))
   #+end_src
 
-* comp math (maxima)
+* symbolic math (maxima)
   #+begin_src emacs-lisp
+  (use-package calc)
   (use-package maxima
     :straight (:type git :host gitlab :repo "sasanidas/maxima")
     :init
