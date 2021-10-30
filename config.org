@@ -167,6 +167,17 @@
   ;; org
   (org-block ((t (:background "gray97"))))
   (org-meta-line ((t (:height 90 :inherit 'font-lock-comment-face)))))
+(use-package beacon
+  :straight t
+  :defer 1
+  :diminish beacon-mode
+  :config
+  (setq beacon-blink-delay 0)
+  (setq beacon-size 40)
+  (setq beacon-blink-when-focused t)
+  (setq beacon-blink-duration .3)
+  (setq beacon-blink-when-window-scrolls nil)
+  (beacon-mode 1))
 
 #+end_src
 * aesthetics
@@ -389,7 +400,9 @@
           magit-default-tracking-name-function 'magit-default-tracking-name-branch-only
           magit-push-always-verify nil
           magit-restore-window-configuration t)
-    :bind ("C-x g" . magit-status))
+    :bind ("C-x g" . magit-status)
+    :general
+    (magit-mode-map "SPC" nil))
 
   ;; More info here: [[https://github.com/syohex/emacs-git-gutter]]
   (use-package git-gutter ; TODO - git gutter keybinds, going to different hunks and staging only certain portions!
@@ -1350,6 +1363,16 @@
     :straight t
     :bind ("C-," . er/expand-region))
 
+  (use-package undo-propose
+    :straight t
+    :after evil
+    :general
+    ('normal 'global "C-c u" 'undo-propose)
+    ('normal 'global "u" 'undo-only)
+    :config
+    (setq undo-propose-pop-to-buffer t))
+
+
   #+end_src
 * evil
   #+begin_src emacs-lisp
@@ -1487,6 +1510,8 @@
     (define-key evil-normal-state-map (kbd "C-y") 'yank)
     (define-key evil-normal-state-map (kbd "/") 'isearch-forward)
     (define-key evil-normal-state-map (kbd "?") 'isearch-backward)
+    (define-key evil-normal-state-map (kbd "n") 'isearch-repeat-forward)
+    (define-key evil-normal-state-map (kbd "N") 'isearch-repeat-backward)
 )
 
   (use-package evil-collection
