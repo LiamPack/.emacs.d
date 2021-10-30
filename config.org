@@ -152,7 +152,7 @@
 ;; custom emacs theme
 (use-package emacs
   :if (display-graphic-p)
-  :custom-face 
+  :custom-face
   ;; latex
   (font-latex-sectioning-1-face ((t (:weight bold :slant italic :box t))))
   (font-latex-sectioning-2-face ((t (:weight bold))))
@@ -179,6 +179,38 @@
   (setq beacon-blink-when-window-scrolls nil)
   (beacon-mode 1))
 
+;; load modus in terminal
+(use-package modus-themes
+  :if (not (display-graphic-p))
+  :init
+  (setq modus-themes-org-blocks 'tinted-background
+        modus-themes-prompts '(intense italic)
+        modus-themes-hl-line '(accented)
+        modus-themes-diffs 'desaturated
+        modus-themes-completions 'opinionated
+        modus-themes-paren-match '(bold underline)
+        modus-themes-no-mixed-fonts nil
+        modus-themes-variable-pitch-ui nil
+        modus-themes-syntax '(faint)
+        modus-themes-italic-constructs t
+        modus-themes-bold-constructs t
+        modus-themes-fringes 'subtle
+        modus-themes-headings '((t . (rainbow)))
+        modus-themes-mode-line '(borderless accented moody))
+
+  ;; hook to enforce change when theme is toggled (which loads the theme)
+  (add-hook 'modus-themes-after-load-theme-hook
+            (lambda ()
+              (progn
+                (eval-after-load 'auto-dim-other-buffers
+                  '(set-face-attribute 'auto-dim-other-buffers-face nil
+                                       :foreground (modus-themes-color 'fg-dim)))
+                (eval-after-load 'smartparens
+                  '(set-face-attribute 'sp-show-pair-match-content-face nil
+                                       :background (modus-themes-color 'bg-paren-expression))))))
+  (modus-themes-load-vivendi)
+  :general
+  ("<f6>"  'modus-themes-toggle))
 #+end_src
 * aesthetics
 ** themes i like:
@@ -447,6 +479,30 @@
           ("C-x C-q" . wgrep-change-to-wgrep-mode)
           ("C-c C-p" . wgrep-change-to-wgrep-mode)))
   #+end_src
+* outline
+#+begin_src emacs-lisp
+(use-package outline
+  :straight (:type built-in)
+  :diminish outline-minor-mode
+  :hook
+  (prog-mode . outline-minor-mode)
+  (markdown-mode . outline-minor-mode)
+  (conf-mode . outline-minor-mode)
+  (LaTeX-mode . outline-minor-mode)
+  :general
+  ('normal outline-minor-mode-map "C-j" nil)
+  ('normal outline-minor-mode-map "z j" 'outline-next-visible-heading)
+  ('normal outline-minor-mode-map "z b" 'outline-show-branches)
+  ('normal outline-minor-mode-map "z t" 'outline-show-subtree)
+  ('normal outline-minor-mode-map "z o" 'outline-show-children)
+  ('normal outline-minor-mode-map "z h" 'outline-hide-sublevels)
+  ('normal outline-minor-mode-map "z a" 'outline-show-all)
+  ('normal outline-minor-mode-map "<tab>" 'outline-cycle)
+  ('normal outline-minor-mode-map "z k" 'outline-previous-visible-heading)
+  :config
+  (setq outline-minor-mode-cycle t
+    outline-minor-mode-highlight 'append))
+#+end_src
 * consult
   #+begin_src emacs-lisp
   (use-package consult
