@@ -374,7 +374,7 @@
     :straight t
     :bind
     (("C-x b" . consult-buffer)
-     ("C-y" . consult-yank-pop))
+     ("C-M-y" . consult-yank-pop))
     :init
     (setq consult-goto-map
           (let ((map (make-sparse-keymap)))
@@ -431,7 +431,9 @@
     (setf (alist-get 'slime-repl-mode consult-mode-histories)
           'slime-repl-input-history)
     (setq xref-show-xrefs-function 'consult-xref)
-    (setq xref-show-definitions-function 'consult-xref))
+    (setq xref-show-definitions-function 'consult-xref)
+    (setq completion-in-region-function #'consult-completion-in-region)
+    )
 
   (use-package consult-flycheck
     :straight (:type git :host github :repo "minad/consult-flycheck"))
@@ -710,6 +712,7 @@
     )
 
   (use-package corfu
+    :disabled
     :straight '(corfu :host github
                       :repo "minad/corfu")
     ;; Optional customizations
@@ -1279,11 +1282,6 @@
     :bind (("M-z" . zop-to-char)
            ("M-Z" . zop-up-to-char)))
 
-  (use-package undo-tree                  ; Branching undo
-    :straight t
-    :init (global-undo-tree-mode)
-    :diminish undo-tree-mode)
-
   (use-package iedit
     :straight t
     :init
@@ -1412,7 +1410,7 @@
       "u t" 'org-roam-tag-add)
     :config
     (evil-mode 1)
-    (setq evil-undo-system 'undo-tree)
+    (setq evil-undo-system nil)
     (evil-set-initial-state 'deft-mode 'emacs)
     (defvar my-leader-map (make-sparse-keymap)
       "Keymap for \"leader key\" shortcuts.")
@@ -1427,7 +1425,8 @@
     (define-key evil-normal-state-map (kbd "M-.") 'xref-find-definitions)
     (define-key evil-normal-state-map (kbd "M-,") 'xref-pop-marker-stack)
     (define-key evil-normal-state-map (kbd "C-M-.") 'xref-find-apropos)
-    (define-key evil-normal-state-map (kbd "C-y") 'consult-yank-pop)
+    (define-key evil-normal-state-map (kbd "C-M-y") 'consult-yank-pop)
+    (define-key evil-normal-state-map (kbd "C-y") 'yank)
 
     )
 

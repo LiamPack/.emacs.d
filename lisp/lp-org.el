@@ -4,7 +4,8 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (use-package org
-  :straight org-plus-contrib
+  ;; TODO: fix this with the right straight source
+  ;; :straight t
   :bind (("\C-cl" . org-store-link))
   :config
   (defun org-clocking-buffer ()
@@ -180,6 +181,15 @@ Return nil if no clock is running."
   (global-set-key (kbd "C-c q") 'auto-fill-mode)
 
 
+  ;; random org stuff now
+  (setq org-hide-emphasis-markers nil)
+  (font-lock-add-keywords 'org-mode
+                          '(("^ *\\([-]\\) "
+                             (0 (prog1 () (compose-region (match-beginning 1) (match-end 1) "•"))))))
+
+  ;;(add-hook 'org-mode-hook 'variable-pitch-mode)
+  (add-hook 'org-mode-hook 'visual-line-mode)
+
   (use-package org-bullets
     :straight t
     :diminish org-bullets-mode
@@ -227,15 +237,6 @@ Return nil if no clock is running."
 
 ;; ox-hugo because why not
 
-;; random org stuff now
-(setq org-hide-emphasis-markers nil)
-(font-lock-add-keywords 'org-mode
-                        '(("^ *\\([-]\\) "
-                           (0 (prog1 () (compose-region (match-beginning 1) (match-end 1) "•"))))))
-
-;;(add-hook 'org-mode-hook 'variable-pitch-mode)
-(add-hook 'org-mode-hook 'visual-line-mode)
-
 (use-package org-roam
   :straight (:type git :host github
                    :repo "org-roam/org-roam-v1" :branch "master")
@@ -282,10 +283,12 @@ Return nil if no clock is running."
   (add-hook 'org-mode-hook #'nroam-setup-maybe))
 
 (use-package lister
+  :disabled
   :straight (:type git :host github
                    :repo "publicimageltd/lister" :branch "main"))
 
 (use-package delve
+  :disabled
   :straight (:type git :host github
                    :repo "publicimageltd/delve" :branch "main")
   :config
@@ -296,6 +299,7 @@ Return nil if no clock is running."
   (("<f12>" . delve-open-or-select)))
 
 (use-package org-attach-screenshot
+  :disabled
   :straight t
   :bind ("<f7>" . org-attach-screenshot)
   :config (setq org-attach-screenshot-dirfunction
@@ -306,19 +310,11 @@ Return nil if no clock is running."
                 org-attach-screenshot-command-line "gnome-screenshot -a -f %f"))
 
 (use-package deft
+  :disabled
   :straight t
   :bind ("<f7>" . deft)
   :custom
   (deft-directory "~/org/roam")
   (deft-recursive t))
-
-;; (use-package org-gcal
-;;   :straight t
-;;   :custom
-;;   (org-gcal-client-id "652997319765-70r61v1ub8oqusedjh31b0np84ovvib5.apps.googleusercontent.com")
-;;   (org-gcal-client-secret "M3ChLs9H23tDKWrnJ_U5wwOs")
-;;   (org-gcal-fetch-file-alist '(("liampacker@gmail.com" . "~/org/inbox.org")))
-;;   )
-
 
 (provide 'lp-org)

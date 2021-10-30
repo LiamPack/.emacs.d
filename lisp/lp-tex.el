@@ -17,8 +17,8 @@
   )
 
 (use-package tex
-  :defer t
   :disabled
+  :defer t
   :straight t
   :mode ("\\.tex\\'" . TeX-latex-mode)
   :config
@@ -100,6 +100,7 @@
   :init (add-hook 'TeX-mode-hook #'TeX-fold-mode))
 
 (use-package reftex                     ; TeX/BibTeX cross-reference management
+  :disabled
   :defer t
   :init (add-hook 'LaTeX-mode-hook #'reftex-mode)
   :config
