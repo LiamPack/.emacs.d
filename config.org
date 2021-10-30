@@ -13,7 +13,7 @@
         auto-save-default nil
         inhibit-startup-message t
         initial-scratch-message ";; Present Day
-  "
+    "
         create-lockfiles nil
         echo-keystrokes 0.1
         delete-active-region nil
@@ -23,6 +23,9 @@
         gc-cons-threshold (* 1024 1024 32)
         ring-bell-function 'ignore
         custom-safe-themes t)
+
+  ;; i fat-finger way too much to not have the confirmation
+  (setq confirm-kill-emacs #'yes-or-no-p)
 
   ;; stop truncating lines
   (set-default 'truncate-lines t)
@@ -370,7 +373,8 @@
   (use-package consult
     :straight t
     :bind
-    ("C-x b" . consult-buffer)
+    (("C-x b" . consult-buffer)
+     ("C-y" . consult-yank-pop))
     :init
     (setq consult-goto-map
           (let ((map (make-sparse-keymap)))
@@ -390,6 +394,7 @@
             (define-key map (kbd "l") 'consult-register-load)
             (define-key map (kbd "s") 'consult-register-store)          ;; orig. abbrev-prefix-mark (unrelated)
             (define-key map (kbd "r") 'consult-register)
+            (define-key map (kbd "b") 'consult-bookmark)
             map))
     (setq consult-mode-mode-map
           (let ((map (make-sparse-keymap)))
@@ -410,16 +415,18 @@
             (define-key map (kbd "m") 'consult-multi-occur)
             (define-key map (kbd "k") 'consult-keep-lines)
             (define-key map (kbd "u") 'consult-focus-lines)
+            (define-key map (kbd "j") 'consult-recent-file)
+            (define-key map (kbd "s") 'consult-isearch)
             map))
     (global-set-key (kbd "M-s") consult-search-map)
     (global-set-key (kbd "M-j") consult-goto-map)
+    (global-set-key (kbd "M-r") consult-register-map)
     (setq consult-preview-key nil) ;; disable live preview
     (setq consult-project-root-function #'projectile-project-root)
     ;; (setq consult-async-min-input 3)
     ;; (setq consult-async-input-debounce 0.5)
     ;; (setq consult-async-input-throttle 0.8)
     (setq consult-narrow-key "<")
-
     :config
     (setf (alist-get 'slime-repl-mode consult-mode-histories)
           'slime-repl-input-history)
@@ -671,26 +678,19 @@
     (setq c-basic-offset 4)
     (setq-default indent-tabs-mode nil)
 
-    (setq c-block-comment-prefix " *")
     (define-key c-mode-map (kbd "C-j") 'c-indent-new-comment-line)
     (define-key c++-mode-map (kbd "C-j") 'c-indent-new-comment-line)
-    (add-hook c++-mode-hook
+    (add-hook 'c++-mode-hook
               '(lambda ()
                  (setq compile-command "cmake .. -DCMAKE_EXRORT_COMPILE_COMMANDS=1 -DCMAKE_BUILD_TYPE=Debug; make clean; cmake --build . -j8")
-                 ;; (setq comment-start "\(//\|*\|/*\|/**\|*/\|**/\)")
-                 ;; (setq comment-end "\(**/\|*/\)")
-                 )
+                 )))
 
+  (use-package cmake-mode
+    :straight t)
 
-              ;;(setq c-doc-comment-style 'javadoc)
-              )
-
-    (use-package cmake-mode
-      :straight t)
-
-    (use-package eldoc-cmake
-      :straight t
-      :hook (cmake-mode-hook . eldoc-cmake-enable))
+  (use-package eldoc-cmake
+    :straight t
+    :hook (cmake-mode-hook . eldoc-cmake-enable))
   #+end_src
 * TODO dabbrev, corfu (capf / completion framework frontends)
   #+begin_src emacs-lisp
@@ -1320,17 +1320,25 @@
       ;; "f o" 'find-file-other-window
       ;; "f r" 'prot-recentf-recent-files
       ;; "f d" 'prot-recentf-recent-dirs
-      "j" 'org-roam-dailies-find-today
+      ;; "j" 'org-roam-dailies-find-today
+      "l" 'org-roam-dailies-find-today
       "s" 'isearch-forward
+      "S" 'isearch-backward
 
       "a" 'embark-act
       "b" 'consult-buffer
+      "y" 'consult-yank-pop
+      "p" projectile-command-map
+      "f" consult-search-map
+      "r" consult-register-map
+      "t" consult-mode-mode-map
+      "j" consult-goto-map
+      "k" '(lambda () (interactive) (kill-buffer nil))
 
       "_" 'balance-windows
       "-" 'fit-window-to-buffer
       "+" 'balance-windows-area
       "q" 'window-toggle-side-windows
-      "w k" 'lp/kill-current-buffer
       "w m" 'delete-other-windows
 
       "0" 'delete-window
@@ -1401,11 +1409,7 @@
       "u g" 'org-roam-graph
       "u o" 'org-roam-jump-to-index
       "u d" 'deft
-      "u t" 'org-roam-tag-add
-      "p" projectile-command-map
-      "f" consult-search-map
-      "r" consult-register-map
-      "t" consult-mode-mode-map)
+      "u t" 'org-roam-tag-add)
     :config
     (evil-mode 1)
     (setq evil-undo-system 'undo-tree)
@@ -1423,6 +1427,7 @@
     (define-key evil-normal-state-map (kbd "M-.") 'xref-find-definitions)
     (define-key evil-normal-state-map (kbd "M-,") 'xref-pop-marker-stack)
     (define-key evil-normal-state-map (kbd "C-M-.") 'xref-find-apropos)
+    (define-key evil-normal-state-map (kbd "C-y") 'consult-yank-pop)
 
     )
 
