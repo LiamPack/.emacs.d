@@ -1656,3 +1656,55 @@
     :mode ("\\.mac\\'" . maxima-mode)
     :interpreter ("maxima" . maxima-mode))
   #+end_src
+
+* eww
+ #+begin_src emacs-lisp
+ ;; browser the web inside emacs
+ (use-package eww
+   :straight (:type built-in)
+   :general
+   ("<f12>" 'eww)
+   :hook (eww-mode-hook . (lambda () (define-key evil-normal-state-map (kbd "SPC") my-leader-map)))
+   :config
+   (setq shr-use-colors nil)             ; t is bad for accessibility
+   (setq shr-use-fonts nil)              ; t is not for me
+   (setq shr-max-image-proportion 0.6)
+   (setq shr-image-animate nil)          ; No GIFs, thank you!
+   (setq shr-width nil)                  ; check `prot-eww-readable'
+   (setq shr-discard-aria-hidden t)
+   (setq shr-cookie-policy nil)
+
+   (setq eww-search-prefix "https://www.google.com/search?q=")
+
+   (setq eww-restore-desktop t)
+   (setq eww-desktop-remove-duplicates t)
+   (setq eww-header-line-format nil)
+   (setq eww-download-directory (expand-file-name "~/Documents/eww-downloads"))
+   (setq eww-suggest-uris
+         '(eww-links-at-point
+           thing-at-point-url-at-point))
+   (setq eww-bookmarks-directory (locate-user-emacs-file "eww-bookmarks/"))
+   (setq eww-history-limit 150)
+   (setq eww-browse-url-new-window-is-tab nil)
+   (setq eww-form-checkbox-selected-symbol "[X]")
+   (setq eww-form-checkbox-symbol "[ ]")
+   (setq eww-retrieve-command nil)
+
+   (define-key eww-link-keymap (kbd "v") nil) ; stop overriding `eww-view-source'
+   (define-key eww-mode-map (kbd "L") #'eww-list-bookmarks)
+   (define-key dired-mode-map (kbd "E") #'eww-open-file) ; to render local HTML files
+   (define-key eww-buffers-mode-map (kbd "d") #'eww-bookmark-kill)   ; it actually deletes
+   (define-key eww-bookmark-mode-map (kbd "d") #'eww-bookmark-kill) ; same
+   )
+
+ #+end_src
+* proced (top for emacs)
+#+begin_src emacs-lisp
+(use-package proced
+  :straight (:type built-in)
+  :init
+  (setq proced-auto-update-flag t)
+  (setq proced-auto-update-interval 5)
+  (setq proced-descend t)
+  (setq prcoed-filter 'user))
+#+end_src
