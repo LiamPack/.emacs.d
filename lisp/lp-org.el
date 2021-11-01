@@ -253,7 +253,8 @@ Return nil if no clock is running."
        (org-roam-graph--open (concat "file://///wsl$/Ubuntu" file)))))
   (org-roam-graph-exclude-matcher '("physics" "textbook" "quote" "paper" "private" "daily" "index" "Index"))
   (org-roam-dailies-directory "daily/")
-  (org-roam-completion-everywhere t)
+  (org-roam-db-update-idle-seconds 20)
+  ;; (org-roam-completion-everywhere t)
   :init
   (add-hook 'after-init-hook 'org-roam-mode)
   :config
@@ -275,6 +276,7 @@ Return nil if no clock is running."
         org-roam-server-network-label-wrap-length 20))
 
 (use-package nroam
+  :disabled
   :straight (:type git :host github
                    :branch "master"
                    :repo "NicolasPetton/nroam")

@@ -5,7 +5,7 @@
 - [ ] finish constructing rest of init
 
 * sane defaults
-  #+begin_src emacs-lisp
+#+begin_src emacs-lisp
   ;; minimizes GC interferecen with user activity
   (use-package gcmh
     :straight t
@@ -150,23 +150,7 @@
 #+begin_src emacs-lisp
 
 ;; custom emacs theme
-(use-package emacs
-  :if (display-graphic-p)
-  :custom-face
-  ;; latex
-  (font-latex-sectioning-1-face ((t (:weight bold :slant italic :box t))))
-  (font-latex-sectioning-2-face ((t (:weight bold))))
-  (font-latex-sectioning-3-face ((t (:weight bold :underline t))))
-  (font-latex-sectioning-4-face ((t (:weight normal :slant normal))))
-  (font-latex-sectioning-5-face ((t (:weight normal :slant italic :underline t))))
-  (font-latex-string-face ((t (:foreground "SaddleBrown"))))
-  ;; general
-  (font-lock-comment-face ((t (:foreground "gray60"))))
-  ;; auto-dim-other-buffers
-  (auto-dim-other-buffers-face ((t (:background "gray94"))))
-  ;; org
-  (org-block ((t (:background "gray97"))))
-  (org-meta-line ((t (:height 90 :inherit 'font-lock-comment-face)))))
+
 (use-package beacon
   :straight t
   :defer 1
@@ -179,38 +163,6 @@
   (setq beacon-blink-when-window-scrolls nil)
   (beacon-mode 1))
 
-;; load modus in terminal
-(use-package modus-themes
-  :if (not (display-graphic-p))
-  :init
-  (setq modus-themes-org-blocks 'tinted-background
-        modus-themes-prompts '(intense italic)
-        modus-themes-hl-line '(accented)
-        modus-themes-diffs 'desaturated
-        modus-themes-completions 'opinionated
-        modus-themes-paren-match '(bold underline)
-        modus-themes-no-mixed-fonts nil
-        modus-themes-variable-pitch-ui nil
-        modus-themes-syntax '(faint)
-        modus-themes-italic-constructs t
-        modus-themes-bold-constructs t
-        modus-themes-fringes 'subtle
-        modus-themes-headings '((t . (rainbow)))
-        modus-themes-mode-line '(borderless accented moody))
-
-  ;; hook to enforce change when theme is toggled (which loads the theme)
-  (add-hook 'modus-themes-after-load-theme-hook
-            (lambda ()
-              (progn
-                (eval-after-load 'auto-dim-other-buffers
-                  '(set-face-attribute 'auto-dim-other-buffers-face nil
-                                       :foreground (modus-themes-color 'fg-dim)))
-                (eval-after-load 'smartparens
-                  '(set-face-attribute 'sp-show-pair-match-content-face nil
-                                       :background (modus-themes-color 'bg-paren-expression))))))
-  (modus-themes-load-vivendi)
-  :general
-  ("<f6>"  'modus-themes-toggle))
 #+end_src
 * aesthetics
 ** themes i like:
@@ -258,7 +210,6 @@
 ** modus themes, time, page breaks
    #+begin_src emacs-lisp
    (use-package modus-themes
-   :disabled
      :straight t
      :init
      (setq modus-themes-italic-constructs t
@@ -347,7 +298,6 @@
 
    (use-package time                       ; Show current time
      :straight t
-     :bind (("C-c w t" . display-time-world))
      :config
      (setq display-time-world-time-format "%H:%M %Z, %d. %b"
            display-time-world-list '(("Europe/Berlin"    "Berlin")
@@ -563,8 +513,8 @@
     ;; (setq consult-async-input-throttle 0.8)
     (setq consult-narrow-key "<")
     :config
-    (setf (alist-get 'slime-repl-mode consult-mode-histories)
-          'slime-repl-input-history)
+    ;; (setf (alist-get 'slime-repl-mode consult-mode-histories)
+    ;;       'slime-repl-input-history)
     (setq xref-show-xrefs-function 'consult-xref)
     (setq xref-show-definitions-function 'consult-xref)
     (setq completion-in-region-function #'consult-completion-in-region)
@@ -682,6 +632,7 @@
     :init (add-hook 'ibuffer-hook #'ibuffer-projectile-set-filter-groups))
 
   (use-package desktop
+    :disabled
     :config
     (setq desktop-auto-save-timeout 300)
     (setq desktop-path '("~/.emacs.d/"))
@@ -1086,12 +1037,16 @@
    #+end_src
 * lisp environment configuration
   #+begin_src emacs-lisp
-  (use-package slime ; slime for our clisp goodness
+  (use-package sly 
     :straight t
     :config
-    (slime-setup '(slime-repl))
-    (setq inferior-lisp-program "/usr/bin/sbcl")
-    (setq slime-contribs '(slime-fancy)))
+    (setq inferior-lisp-program "/usr/bin/sbcl"))
+
+  (use-package sly-asdf
+    :straight t)
+
+  (use-package sly-quicklisp
+    :straight t)
 
   ;; eldoc provides minibuffer hints for elisp things. it's super nice
   (use-package eldoc
@@ -1707,4 +1662,12 @@
   (setq proced-auto-update-interval 5)
   (setq proced-descend t)
   (setq prcoed-filter 'user))
+#+end_src
+
+* flyspell
+#+begin_src emacs-lisp
+(use-package flyspell
+  :straight (:type built-in)
+  :diminish flyspell-mode
+  :hook (org-mode-hook . (lambda () (interactive) (flyspell-mode))))
 #+end_src
