@@ -1,44 +1,27 @@
-* blogs                                                              :elfeed:
-** entry-title: \(linux\|linus\|ubuntu\|kde\|gnome\)                  :linux:
-** dev                                                                  :dev:
-*** https://www.bennee.com/~alex/blog/feed/
-** daily                                                              :daily:
-*** http://telescoper.wordpress.com/feed/
-*** http://timharford.com/feed/                                        :econ:
-*** http://understandinguncertainty.org/rss.xml
-*** https://www.reddit.com/r/dailyprogrammer/.rss                        :dp:
-*** https://us18.campaign-archive.com/feed?u=ab0f46cf302c0ed836e0bf0ad&id=56b5f64c5f :engineering:
-** emacs                                                              :emacs:
-*** entry-title: \(emacs\|org-mode\)                                :orgmode:
-*** [[http://www.reddit.com/r/emacs/.rss][emacs reddit]] :ignore:
-*** http://planet.emacsen.org/atom.xml
-*** http://feeds.feedburner.com/XahsEmacsBlog
-*** http://pragmaticemacs.com/feed/
-*** https://oremacs.com/atom.xml
-*** [[http://cestlaz.github.io/rss.xm/][c'est la z]]
-*** [[http://emacs.stackexchange.com/feeds][SX]]                     :ignore:
-** ai                                                                    :ai:
-*** https://jack-clark.net/feed/
-** hackernews                                                            :hn:
-*** https://hnrss.org/newest?points=100
-** roguelike                                                      :roguelike:
-*** http://www.terminally-incoherent.com/blog/feed
-*** [[http://rodneylives.blogspot.com/][rodneylives]]
-** art                                                                  :art:
-*** http://inconvergent.net/atom.xml                           :inconvergent:
-** http://nullprogram.com/feed/
-** http://feeds.feedburner.com/datacolada/                   :statistics:cog:
-** melee                                                              :melee:
-*** https://supersmash.blog/feed/
-** math                                                                :math:
-*** https://terrytao.wordpress.com/feed/
-* webcomic                                                           :elfeed:
+* blogs
+** substacks :stacks:helpself:
+*** https://ava.substack.com/feed
+*** https://askmolly.substack.com/feed
+*** https://askpolly.substack.com/feed
+*** https://cherylstrayed.substack.com/feed
+*** https://griefbacon.substack.com/feed
+*** https://leandramcohen.substack.com/feed
+*** https://defaultfriend.substack.com/feed
+*** https://jdahl.substack.com/feed
+** art :art:
+*** http://feeds.feedburner.com/FineArtAndYou
+*** http://inconvergent.net/atom.xml :infrequent:
+** http://nullprogram.com/feed/ :infrequent:
+** http://feeds.feedburner.com/datacolada/ :infrequent:
+** https://terrytao.wordpress.com/feed/ :math:
 ** http://xkcd.com/rss.xml
-* podcast                                                            :elfeed:
-** roguelike                                                      :roguelike:
-*** http://feeds.feedburner.com/RoguelikeRadio
-** cpp                                                                  :cpp:
-*** http://cppcast.libsyn.com/rss
-** ai                                                                    :ai:
-*** http://feeds.feedburner.com/twimlai
-    
+** http://feeds.feedburner.com/RoguelikeRadio :infrequent:
+** http://cppcast.libsyn.com/rss
+** http://planet.emacsen.org/atom.xml
+** https://www.reddit.com/r/dailyprogrammer/.rss                        :daily:
+** http://understandinguncertainty.org/blog :infrequent:
+** http://timharford.com/feed/                                        :econ:
+** https://www.bennee.com/~alex/blog/feeds/all.atom.xml :infrequent:
+** https://sive.rs/podcast.rss :infrequent:
+** https://jack-clark.net/feed/ :ai:
+** https://lacker.io/feed.xml :ai:
