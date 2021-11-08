@@ -843,7 +843,8 @@ get as long as they do its nice to have a dedicated editing buffer
   :custom
   (ediff-diff-options "-w"))
 #+end_src
-* TODO elfeed bloated and old
+* DONE elfeed -- RSS feed reader
+CLOSED: [2021-11-07 Sun 13:21]
 #+begin_src emacs-lisp
 (use-package elfeed
   :straight t
@@ -876,11 +877,15 @@ get as long as they do its nice to have a dedicated editing buffer
   (add-hook 'elfeed-show-mode-hook
             (lambda () (setq-local shr-width (max 80 (current-fill-column)))))
 
-
   ;; This is set in two places now, once in =eww= and once here.
   (setq browse-url-browser-function 'eww-browse-url)
   (setq browse-url-secondary-browser-function 'browse-url-default-browser)
   (setq elfeed-feeds '("https://hnrss.org/newest?points=100"
+                       ("http://rachelbythebay.com/w/2021/11/06/sql/" tech)
+                       ("https://thinkingthrough.substack.com/feed" tech swe)
+                       ("https://vinvashishta.substack.com/feed" datascience)
+                       ("https://matt.might.net/articles/feed.rss" tech academia pl)
+                       "https://www.nayuki.io/rss20.xml"
                        "https://ava.substack.com/feed"
                        "https://askmolly.substack.com/feed"
                        "https://askpolly.substack.com/feed"
