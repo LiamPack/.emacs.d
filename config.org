@@ -883,7 +883,6 @@ CLOSED: [2021-11-07 Sun 13:21]
   (setq elfeed-feeds '("https://hnrss.org/newest?points=100"
                        ("http://rachelbythebay.com/w/2021/11/06/sql/" tech)
                        ("https://thinkingthrough.substack.com/feed" tech swe)
-                       ("https://vinvashishta.substack.com/feed" datascience)
                        ("https://matt.might.net/articles/feed.rss" tech academia pl)
                        "https://www.nayuki.io/rss20.xml"
                        "https://ava.substack.com/feed"
@@ -1519,7 +1518,9 @@ CLOSED: [2021-11-07 Sun 13:21]
   :straight t
   :diminish (evil-collection-unimpaired-mode  global-evil-collection-unimpaired-mode)
   :config
-  (evil-collection-init))
+  (evil-collection-init)
+  (define-key evil-normal-state-map (kbd "C-o") 'evil-collection-unimpaired-insert-newline-below)
+  (define-key evil-normal-state-map (kbd "C-S-o") 'evil-collection-unimpaired-insert-newline-above))
 
 (use-package evil-escape
   :straight t
@@ -1557,14 +1558,14 @@ CLOSED: [2021-11-07 Sun 13:21]
   :after evil
   :custom-face
   (iedit-occurrence ((t (:background "plum1"))))
-  :general
-  ('visual "R" 'evil-multiedit-match-all)
-  ("M-d" 'evil-multiedit-match-and-next)
-  ("M-C-d" 'evil-multiedit-match-and-prev)
-  (evil-multiedit-state-map "<tab>" 'evil-multiedit-toggle-or-restrict-region) ;RET will toggle the region under the cursor
-  (evil-multiedit-state-map "C-j" 'evil-multiedit-next)
-  (evil-multiedit-state-map "C-k" 'evil-multiedit-prev)
-  ('visual "C-S-d" 'evil-multiedit-restore))
+  :config
+  (define-key evil-visual-state-map (kbd "R") 'evil-multiedit-match-all)
+  (define-key evil-normal-state-map (kbd "M-d") 'evil-multiedit-match-and-next)
+  (define-key evil-normal-state-map (kbd "M-C-d") 'evil-multiedit-match-and-prev)
+  (define-key evil-multiedit-mode-map (kbd "<tab>") 'evil-multiedit-toggle-or-restrict-region) ;RET will toggle the region under the cursor
+  (define-key evil-multiedit-mode-map (kbd "C-j") 'evil-multiedit-next)
+  (define-key evil-multiedit-mode-map (kbd "C-k") 'evil-multiedit-prev)
+  (define-key evil-visual-state-map (kbd "C-S-d") 'evil-multiedit-restore))
 
 (use-package evil-mc
   :straight t
