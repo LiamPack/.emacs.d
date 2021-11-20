@@ -239,7 +239,7 @@ General aesthetic configurations for emacs
         ;; Options for `modus-themes-syntax' are either nil (the default),
         ;; or a list of properties that may include any of those symbols:
         ;; `faint', `yellow-comments', `green-strings', `alt-syntax'
-        modus-themes-syntax '(yellow-comments green-strings)
+        modus-themes-syntax '(yellow-comments green-strings alt-syntax)
 
         ;; Options for `modus-themes-hl-line' are either nil (the default),
         ;; or a list of properties that may include any of those symbols:
@@ -293,7 +293,8 @@ General aesthetic configurations for emacs
         modus-themes-variable-pitch-ui nil
         ))
 
-(load-theme 'modus-operandi)
+(load-theme 'modus-vivendi)
+
 (use-package time                       ; Show current time
   :straight t
   :config
@@ -308,13 +309,6 @@ General aesthetic configurations for emacs
         display-time-use-mail-icon t
         display-time-24hr-format t)
   (display-time-mode))
-
-;; Helps with stupid ^L characters - allows a page break to appear
-(use-package page-break-lines
-  :straight t
-  :diminish page-break-lines-mode
-  :config
-  (global-page-break-lines-mode))
 #+end_src
 
 * DONE lp-mct.el (getting there, currently ripped and uncustomized)
@@ -542,7 +536,7 @@ get as long as they do its nice to have a dedicated editing buffer
 * window management utilities (getting there)
 
 #+begin_src emacs-lisp
-(set-frame-font "deja vu sans mono 14")
+(set-frame-font "deja vu sans mono 12")
 
 ;; global-hl-line-mode softly highlights bg color of line.
 (when window-system
@@ -912,9 +906,6 @@ CLOSED: [2021-11-07 Sun 13:21]
                        ("https://jack-clark.net/feed/" ai)
                        ("https://lacker.io/feed.xml" ai)
                        ("https://graymirror.substack.com/feed" leftist))))
-
-(use-package elfeed-web
-  :after elfeed)
 #+end_src
 * embark
 #+begin_src emacs-lisp
@@ -1058,17 +1049,19 @@ CLOSED: [2021-11-07 Sun 13:21]
   :diminish rainbow-delimiters-mode
   :hook ((emacs-lisp-mode-hook scheme-mode-hook lisp-mode-hook prog-mode-hook) . rainbow-delimiters-mode))
 
-;; (use-package geiser
-;;   :straight t)
+(use-package geiser
+  :straight t)
 
-;; (use-package geiser-chez
-;;   :straight t
-;;   :after geiser)
+(use-package geiser-chez
+  :straight t
+  :after geiser)
 
-;; (add-to-list 'auto-mode-alist
-;;              '("\\.sls\\'" . scheme-mode)
-;;              '("\\.sc\\'" . scheme-mode))
+(add-to-list 'auto-mode-alist
+             '("\\.sc\\'" . scheme-mode))
 
+(add-to-list 'auto-mode-alist
+             '("\\.sls\\'" . scheme-mode)
+             '("\\.sps\\'" . scheme-mode))
 #+end_src
 * TODO lsp bloated
 #+begin_src emacs-lisp
