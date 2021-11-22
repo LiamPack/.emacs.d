@@ -913,9 +913,6 @@ CLOSED: [2021-11-07 Sun 13:21]
                        ("https://jack-clark.net/feed/" ai)
                        ("https://lacker.io/feed.xml" ai)
                        ("https://graymirror.substack.com/feed" leftist))))
-
-(use-package elfeed-web
-  :after elfeed)
 #+end_src
 * embark
 #+begin_src emacs-lisp
@@ -1293,21 +1290,25 @@ CLOSED: [2021-11-07 Sun 13:21]
 * notes, citations, references, research
 #+begin_src emacs-lisp
 (use-package bibtex-utils
+    :disabled
   :straight t)
 
 (use-package biblio
+    :disabled
   :straight t)
 
 (use-package interleave
+    :disabled
   :straight t)
 
 ;;(require 'pubmed)
 ;;(require 'arxiv)
 ;;(require 'sci-id)
 
-(autoload 'helm-bibtex "helm-bibtex" "" t)
+  ;; (autoload 'helm-bibtex "helm-bibtex" "" t)
 
 (use-package org-ref
+    :disabled
   :straight t
   :config
   (require 'doi-utils)
@@ -1317,6 +1318,7 @@ CLOSED: [2021-11-07 Sun 13:21]
         org-ref-pdf-directory "~/Dropbox/res/lib/"))
 
 (use-package helm-bibtex
+    :disabled
   :straight t
   :config
   (setq helm-bibtex-bibliography "~/Dropbox/res/index.bib" ;; where your references are stored
@@ -1328,6 +1330,7 @@ CLOSED: [2021-11-07 Sun 13:21]
 
 
 (use-package org-noter
+    :disabled
   :straight t)
 
 #+end_src
@@ -1661,4 +1664,12 @@ CLOSED: [2021-11-07 Sun 13:21]
   :straight (:type built-in)
   :diminish flyspell-mode
   :hook (org-mode-hook . (lambda () (interactive) (flyspell-mode))))
+#+end_src
+
+* exec path from shell
+#+begin_src emacs-lisp
+(use-package exec-path-from-shell
+  :straight t
+  :config
+  (exec-path-from-shell-initialize))
 #+end_src
