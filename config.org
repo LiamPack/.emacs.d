@@ -1,8 +1,8 @@
 #+TITLE: emacs config
 - [ ] gather general-purpose keybindings into single location
-- [ ] get rest of init.el in here
-- [ ] clean up TODO-ed headings
-- [ ] finish constructing rest of init
+- [X] get rest of init.el in here
+- [X] clean up TODO-ed headings
+- [X] finish constructing rest of init
 
 * sane defaults
 #+begin_src emacs-lisp
@@ -214,6 +214,7 @@ General aesthetic configurations for emacs
 ** modus themes, time, page breaks
 #+begin_src emacs-lisp
 (use-package modus-themes
+  :straight t
   :init
   (setq modus-themes-italic-constructs t
         modus-themes-bold-constructs t
@@ -875,6 +876,7 @@ CLOSED: [2021-11-07 Sun 13:21]
   (setq browse-url-browser-function 'eww-browse-url)
   (setq browse-url-secondary-browser-function 'browse-url-default-browser)
   (setq elfeed-feeds '("https://hnrss.org/newest?points=100"
+                       "https://dynomight.net/feed.xml"
                        ("http://rachelbythebay.com/w/2021/11/06/sql/" tech)
                        ("https://thinkingthrough.substack.com/feed" tech swe)
                        ("https://matt.might.net/articles/feed.rss" tech academia pl)
@@ -1391,13 +1393,13 @@ CLOSED: [2021-11-07 Sun 13:21]
   (general-nmap
     :prefix "SPC"
     :prefix-map 'my-leader-map
+    "l l" 'org-roam-dailies-find-today
+    "l j" 'org-roam-dailies-find-tomorrow
+    "l d" 'org-roam-dailies-find-date
+    "l k" 'org-roam-dailies-find-yesterday
+    "l p" 'org-roam-dailies-find-previous-note
+    "l n" 'org-roam-dailies-find-next-note
 
-    ;; "f f" 'find-file
-    ;; "f o" 'find-file-other-window
-    ;; "f r" 'prot-recentf-recent-files
-    ;; "f d" 'prot-recentf-recent-dirs
-    ;; "j" 'org-roam-dailies-find-today
-    "l" 'org-roam-dailies-find-today
     "s" 'isearch-forward
     "S" 'isearch-backward
 
