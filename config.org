@@ -1,8 +1,8 @@
 #+TITLE: emacs config
 - [ ] gather general-purpose keybindings into single location
-- [ ] get rest of init.el in here
-- [ ] clean up TODO-ed headings
-- [ ] finish constructing rest of init
+- [X] get rest of init.el in here
+- [X] clean up TODO-ed headings
+- [X] finish constructing rest of init
 
 * sane defaults
 #+begin_src emacs-lisp
@@ -127,7 +127,7 @@
 
   (setq-default
    initial-scratch-message ";; Present Day
-  "
+"
    completion-cycle-threshold 3     ; TAB cycle if there are only few candidates
    completions-detailed t       ; add details in completions as prefix/sufix
    idle-update-delay 1.1  ; Slow down the UI being updated to improve performance
@@ -214,6 +214,7 @@ General aesthetic configurations for emacs
 ** modus themes, time, page breaks
 #+begin_src emacs-lisp
 (use-package modus-themes
+  :straight t
   :init
   (setq modus-themes-italic-constructs t
         modus-themes-bold-constructs t
@@ -239,7 +240,7 @@ General aesthetic configurations for emacs
         ;; Options for `modus-themes-syntax' are either nil (the default),
         ;; or a list of properties that may include any of those symbols:
         ;; `faint', `yellow-comments', `green-strings', `alt-syntax'
-        modus-themes-syntax '(yellow-comments green-strings)
+        modus-themes-syntax '(yellow-comments green-strings alt-syntax)
 
         ;; Options for `modus-themes-hl-line' are either nil (the default),
         ;; or a list of properties that may include any of those symbols:
@@ -293,7 +294,8 @@ General aesthetic configurations for emacs
         modus-themes-variable-pitch-ui nil
         ))
 
-(load-theme 'modus-operandi)
+(load-theme 'modus-vivendi)
+
 (use-package time                       ; Show current time
   :straight t
   :config
@@ -308,13 +310,6 @@ General aesthetic configurations for emacs
         display-time-use-mail-icon t
         display-time-24hr-format t)
   (display-time-mode))
-
-;; Helps with stupid ^L characters - allows a page break to appear
-(use-package page-break-lines
-  :straight t
-  :diminish page-break-lines-mode
-  :config
-  (global-page-break-lines-mode))
 #+end_src
 
 * DONE lp-mct.el (getting there, currently ripped and uncustomized)
@@ -542,7 +537,7 @@ get as long as they do its nice to have a dedicated editing buffer
 * window management utilities (getting there)
 
 #+begin_src emacs-lisp
-(set-frame-font "deja vu sans mono 14")
+(set-frame-font "deja vu sans mono 12")
 
 ;; global-hl-line-mode softly highlights bg color of line.
 (when window-system
@@ -881,9 +876,9 @@ CLOSED: [2021-11-07 Sun 13:21]
   (setq browse-url-browser-function 'eww-browse-url)
   (setq browse-url-secondary-browser-function 'browse-url-default-browser)
   (setq elfeed-feeds '("https://hnrss.org/newest?points=100"
+                       "https://dynomight.net/feed.xml"
                        ("http://rachelbythebay.com/w/2021/11/06/sql/" tech)
                        ("https://thinkingthrough.substack.com/feed" tech swe)
-                       ("https://vinvashishta.substack.com/feed" datascience)
                        ("https://matt.might.net/articles/feed.rss" tech academia pl)
                        "https://www.nayuki.io/rss20.xml"
                        "https://ava.substack.com/feed"
@@ -1056,17 +1051,19 @@ CLOSED: [2021-11-07 Sun 13:21]
   :diminish rainbow-delimiters-mode
   :hook ((emacs-lisp-mode-hook scheme-mode-hook lisp-mode-hook prog-mode-hook) . rainbow-delimiters-mode))
 
-;; (use-package geiser
-;;   :straight t)
+(use-package geiser
+  :straight t)
 
-;; (use-package geiser-chez
-;;   :straight t
-;;   :after geiser)
+(use-package geiser-chez
+  :straight t
+  :after geiser)
 
-;; (add-to-list 'auto-mode-alist
-;;              '("\\.sls\\'" . scheme-mode)
-;;              '("\\.sc\\'" . scheme-mode))
+(add-to-list 'auto-mode-alist
+             '("\\.sc\\'" . scheme-mode))
 
+(add-to-list 'auto-mode-alist
+             '("\\.sls\\'" . scheme-mode)
+             '("\\.sps\\'" . scheme-mode))
 #+end_src
 * TODO lsp bloated
 #+begin_src emacs-lisp
@@ -1338,9 +1335,54 @@ CLOSED: [2021-11-07 Sun 13:21]
 #+begin_src emacs-lisp
 (load-file "~/.emacs.d/lisp/lp-tex.el")
 #+end_src
-* TODO  prot-logos
+* TODO  prot-logos, writing in Emacs
 #+begin_src emacs-lisp
 #+end_src
+* =pdf-tools=
+#+begin_src emacs-lisp
+(use-package pdf-tools :straight t
+
+  :config
+  (setq pdf-tools-enabled-modes
+        '(pdf-history-minor-mode
+          pdf-isearch-minor-mode
+          pdf-links-minor-mode
+          pdf-outline-minor-mode
+          pdf-misc-size-indication-minor-mode
+          pdf-occur-global-minor-mode))
+
+  (setq pdf-view-display-size 'fit-height)
+  (setq pdf-view-continuous t)
+  (setq pdf-view-use-dedicated-register nil)
+  (setq pdf-view-max-image-width 1080)
+  (setq pdf-outline-imenu-use-flat-menus t)
+
+  (pdf-loader-install)
+
+  ;; Those functions and hooks are adapted from the manual of my modus-themes.
+  ;; The idea is to (i) add a backdrop that is distinct from the background of
+  ;; the PDF's page and (ii) make pdf-tools adapt to theme switching via, e.g.,
+  ;; `modus-themes-toggle'.
+  (defun prot/pdf-tools-backdrop ()
+    (face-remap-add-relative
+     'default `(:background
+                ,(modus-themes-color
+                  'bg-alt))))
+
+  (defun prot/pdf-tools-midnight-mode-toggle ()
+    (when (derived-mode-p 'pdf-view-mode)
+      (if (eq (car custom-enabled-themes) 'modus-vivendi)
+          (pdf-view-midnight-minor-mode 1)
+        (pdf-view-midnight-minor-mode -1))
+      (prot/pdf-tools-backdrop)))
+
+  (add-hook 'pdf-tools-enabled-hook #'prot/pdf-tools-midnight-mode-toggle)
+  (add-hook 'modus-themes-after-load-theme-hook #'prot/pdf-tools-midnight-mode-toggle)
+
+  ;; TODO change enlarge ratios for =,+,- (pdf-view-enlarge, pdf-view-shrink), etc.
+  )
+#+end_src
+
 * yasnippet
 #+begin_src emacs-lisp
 ;; configuration
@@ -1402,13 +1444,13 @@ CLOSED: [2021-11-07 Sun 13:21]
   (general-nmap
     :prefix "SPC"
     :prefix-map 'my-leader-map
+    "l l" 'org-roam-dailies-find-today
+    "l j" 'org-roam-dailies-find-tomorrow
+    "l d" 'org-roam-dailies-find-date
+    "l k" 'org-roam-dailies-find-yesterday
+    "l p" 'org-roam-dailies-find-previous-note
+    "l n" 'org-roam-dailies-find-next-note
 
-    ;; "f f" 'find-file
-    ;; "f o" 'find-file-other-window
-    ;; "f r" 'prot-recentf-recent-files
-    ;; "f d" 'prot-recentf-recent-dirs
-    ;; "j" 'org-roam-dailies-find-today
-    "l" 'org-roam-dailies-find-today
     "s" 'isearch-forward
     "S" 'isearch-backward
 
@@ -1522,7 +1564,9 @@ CLOSED: [2021-11-07 Sun 13:21]
   :straight t
   :diminish (evil-collection-unimpaired-mode  global-evil-collection-unimpaired-mode)
   :config
-  (evil-collection-init))
+  (evil-collection-init)
+  (define-key evil-normal-state-map (kbd "C-o") 'evil-collection-unimpaired-insert-newline-below)
+  (define-key evil-normal-state-map (kbd "C-S-o") 'evil-collection-unimpaired-insert-newline-above))
 
 (use-package evil-escape
   :straight t
@@ -1560,14 +1604,14 @@ CLOSED: [2021-11-07 Sun 13:21]
   :after evil
   :custom-face
   (iedit-occurrence ((t (:background "plum1"))))
-  :general
-  ('visual "R" 'evil-multiedit-match-all)
-  ("M-d" 'evil-multiedit-match-and-next)
-  ("M-C-d" 'evil-multiedit-match-and-prev)
-  (evil-multiedit-state-map "<tab>" 'evil-multiedit-toggle-or-restrict-region) ;RET will toggle the region under the cursor
-  (evil-multiedit-state-map "C-j" 'evil-multiedit-next)
-  (evil-multiedit-state-map "C-k" 'evil-multiedit-prev)
-  ('visual "C-S-d" 'evil-multiedit-restore))
+  :config
+  (define-key evil-visual-state-map (kbd "R") 'evil-multiedit-match-all)
+  (define-key evil-normal-state-map (kbd "M-d") 'evil-multiedit-match-and-next)
+  (define-key evil-normal-state-map (kbd "M-C-d") 'evil-multiedit-match-and-prev)
+  (define-key evil-multiedit-mode-map (kbd "<tab>") 'evil-multiedit-toggle-or-restrict-region) ;RET will toggle the region under the cursor
+  (define-key evil-multiedit-mode-map (kbd "C-j") 'evil-multiedit-next)
+  (define-key evil-multiedit-mode-map (kbd "C-k") 'evil-multiedit-prev)
+  (define-key evil-visual-state-map (kbd "C-S-d") 'evil-multiedit-restore))
 
 (use-package evil-mc
   :straight t

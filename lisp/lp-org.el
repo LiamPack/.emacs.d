@@ -19,7 +19,6 @@ Return nil if no clock is running."
   (unbind-key "C-," org-mode-map)       ;expand-region
   (unbind-key "C-'" org-mode-map)       ;avy
 
-  (add-hook 'org-mode-hook '(lambda () (org-bullets-mode)) )
 
   ;; Some latex stuff in org
   (setq org-format-latex-options (plist-put org-format-latex-options :scale 3.0))
@@ -188,21 +187,7 @@ Return nil if no clock is running."
                              (0 (prog1 () (compose-region (match-beginning 1) (match-end 1) "•"))))))
 
   ;;(add-hook 'org-mode-hook 'variable-pitch-mode)
-  (add-hook 'org-mode-hook 'visual-line-mode)
-
-  (use-package org-bullets
-    :straight t
-    :diminish org-bullets-mode
-    :hook ((org-mode-hook . org-bullets-mode))
-    :config
-    (setq org-ellipsis "⤵")))
-
-(use-package cdlatex
-  :disabled
-  :straight t
-  :diminish org-cdlatex-mode
-  :hook (org-mode-hook . org-cdlatex-mode))
-
+  (add-hook 'org-mode-hook 'visual-line-mode))
 
                                         ; clocking!
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -240,21 +225,23 @@ Return nil if no clock is running."
 (use-package org-roam
   :straight (:type git :host github
                    :repo "org-roam/org-roam-v1" :branch "master")
-  :bind (("\C-c i" . 'org-roam-insert-immediate)
-         ("\C-c j" . 'org-roam-dailies-find-today)
-         ("\C-c o" . 'org-roam-jump-to-index)
-         ("\C-c t" . 'org-roam-tag-add)
-         ("\C-c f" . 'org-roam-find-file))
+  :diminish
+  :bind (("\C-c i" . org-roam-insert-immediate)
+         ("\C-c j" . org-roam-dailies-find-today)
+         ("\C-c o" . org-roam-jump-to-index)
+         ("\C-c t" . org-roam-tag-add)
+         ("\C-c f" . org-roam-find-file)
+         ("\C-c d l" . org-roam-dailies-find-today)
+         ("\C-c d j" . org-roam-dailies-find-tomorrow)
+         ("\C-c d d" . org-roam-dailies-find-date)
+         ("\C-c d k" . org-roam-dailies-find-yesterday)
+         ("\C-c d p" . org-roam-dailies-find-previous-note)
+         ("\C-c d n" . org-roam-dailies-find-next-note))
   :custom
   (org-roam-directory (file-truename "~/org/roam/"))
-  (org-roam-graph-viewer
-   (lambda (file)
-     (let ((org-roam-graph-viewer "/mnt/c/Users/LiamP/AppData/Local/Vivaldi/Application/vivaldi.exe"))
-       (org-roam-graph--open (concat "file://///wsl$/Ubuntu" file)))))
   (org-roam-graph-exclude-matcher '("physics" "textbook" "quote" "paper" "private" "daily" "index" "Index"))
   (org-roam-dailies-directory "daily/")
   (org-roam-db-update-idle-seconds 20)
-  ;; (org-roam-completion-everywhere t)
   :init
   (add-hook 'after-init-hook 'org-roam-mode)
   :config
@@ -312,11 +299,12 @@ Return nil if no clock is running."
                 org-attach-screenshot-command-line "gnome-screenshot -a -f %f"))
 
 (use-package deft
-  :disabled
   :straight t
   :bind ("<f7>" . deft)
   :custom
   (deft-directory "~/org/roam")
-  (deft-recursive t))
+  (deft-recursive t)
+  (deft-file-limit 30)
+  (deft-current-sort-method 'title))
 
 (provide 'lp-org)
