@@ -1334,8 +1334,8 @@ CLOSED: [2021-11-07 Sun 13:21]
 #+end_src
 * =pdf-tools=
 #+begin_src emacs-lisp
-(use-package pdf-tools :straight t
-
+(use-package pdf-tools
+  :straight t
   :config
   (setq pdf-tools-enabled-modes
         '(pdf-history-minor-mode
@@ -1345,7 +1345,7 @@ CLOSED: [2021-11-07 Sun 13:21]
           pdf-misc-size-indication-minor-mode
           pdf-occur-global-minor-mode))
 
-  (setq pdf-view-display-size 'fit-height)
+  (setq pdf-view-display-size 'fit-width)
   (setq pdf-view-continuous t)
   (setq pdf-view-use-dedicated-register nil)
   (setq pdf-view-max-image-width 1080)
@@ -1702,4 +1702,173 @@ CLOSED: [2021-11-07 Sun 13:21]
   :straight (:type built-in)
   :diminish flyspell-mode
   :hook (org-mode-hook . (lambda () (interactive) (flyspell-mode))))
+#+end_src
+
+* notmuch, mail in emacs
+#+begin_src emacs-lisp
+(use-package notmuch
+  :straight t
+  :config
+  (setq notmuch-show-logo nil)
+  (setq notmuch-column-control t)
+  (setq notmuch-hello-auto-refresh t)
+  (setq notmuch-hello-recent-searches-max 20)
+  (setq notmuch-hello-thousands-separator "")
+  ;; ;; See my variant of it in `prot-notmuch' below.
+  (setq notmuch-hello-sections '(notmuch-hello-insert-saved-searches))
+  (setq notmuch-show-all-tags-list nil)
+
+  (setq notmuch-search-oldest-first nil)
+  (setq notmuch-search-result-format
+        '(("date" . "%12s  ")
+          ("count" . "%-7s  ")
+          ("authors" . "%-20s  ")
+          ("subject" . "%-120s  ")
+          ("tags" . "(%s)")))
+  (setq notmuch-tree-result-format
+        '(("date" . "%12s  ")
+          ("authors" . "%-20s  ")
+          ((("tree" . "%s")
+            ("subject" . "%s"))
+           . " %-120s  ")
+          ("tags" . "(%s)")))
+  (setq notmuch-search-line-faces
+        '(("unread" . notmuch-search-unread-face)
+          ("flag" . notmuch-search-flagged-face)))
+  (setq notmuch-show-empty-saved-searches t)
+
+  (setq notmuch-saved-searches
+        `(( :name "inbox"
+            :query "tag:inbox"
+            :sort-order newest-first
+            :key ,(kbd "i"))
+          ( :name "unread (inbox)"
+            :query "tag:unread and tag:inbox"
+            :sort-order newest-first
+            :key ,(kbd "u"))
+          ( :name "unread all"
+            :query "tag:unread not tag:archived"
+            :sort-order newest-first
+            :key ,(kbd "U"))
+          ( :name "personal"
+            :query "tag:personal not tag:archived"
+            :sort-order newest-first
+            :key ,(kbd "p"))
+          ( :name "personal all"
+            :query "tag:personal"
+            :sort-order newest-first
+            :key ,(kbd "P"))
+          ( :name "todo"
+            :query "tag:todo not tag:archived"
+            :sort-order newest-first
+            :key ,(kbd "t"))
+          ( :name "todo all"
+            :query "tag:todo"
+            :sort-order newest-first
+            :key ,(kbd "t"))
+          ( :name "done"
+            :query "tag:done"
+            :sort-order newest-first
+            :key ,(kbd "t"))
+          ( :name "flagged"
+            :query "tag:flag or tag:flagged or tag:important or tag:starred"
+            :sort-order newest-first
+            :key ,(kbd "f"))
+          ( :name "mailing lists"
+            :query "tag:list not tag:archived"
+            :sort-order newest-first
+            :key ,(kbd "m"))
+          ))
+
+  (setq notmuch-archive-tags '("-inbox" "+archived"))
+  (setq notmuch-message-replied-tags '("+replied"))
+  (setq notmuch-message-forwarded-tags '("+forwarded"))
+  (setq notmuch-show-mark-read-tags '("-unread"))
+  (setq notmuch-draft-tags '("+draft"))
+  (setq notmuch-draft-folder "drafts")
+  (setq notmuch-draft-save-plaintext 'ask)
+
+  ;; ;; NOTE 2021-06-18: See an updated version in the `prot-notmuch'
+  ;; ;; section below.
+  (setq notmuch-tagging-keys
+        `((,(kbd "a") notmuch-archive-tags "Archive (remove from inbox)")
+          (,(kbd "c") ("+archived" "-inbox" "-list" "-todo" "-ref" "-unread") "Complete and archive")
+          (,(kbd "d") ("+del" "-inbox" "-archived" "-unread") "Mark for deletion")
+          (,(kbd "f") ("+flag" "-unread") "Flag as important")
+          ;; (,(kbd "r") notmuch-show-mark-read-tags "Mark as read")
+          (,(kbd "r") ("+ref" "-unread") "Reference for the future")
+          (,(kbd "s") ("+spam" "+del" "-inbox" "-unread") "Mark as spam")
+          (,(kbd "t") ("+todo" "-unread") "To-do")
+          (,(kbd "u") ("+unread") "Mark as unread")))
+  (setq notmuch-tag-formats
+        '(("unread" (propertize tag 'face 'notmuch-tag-unread))
+          ("flag" (propertize tag 'face 'notmuch-tag-flagged))))
+  (setq notmuch-tag-deleted-formats
+        '(("unread" (notmuch-apply-face bare-tag `notmuch-tag-deleted))
+          (".*" (notmuch-apply-face tag `notmuch-tag-deleted))))
+
+;;; Email composition
+  (setq notmuch-mua-compose-in 'current-window)
+  (setq notmuch-mua-hidden-headers nil) ; TODO 2021-05-12: Review hidden headers
+  (setq notmuch-address-command nil)    ; FIXME 2021-05-13: Make it work with EBDB
+  (setq notmuch-always-prompt-for-sender t)
+  (setq notmuch-mua-cite-function 'message-cite-original-without-signature)
+  (setq notmuch-mua-reply-insert-header-p-function 'notmuch-show-reply-insert-header-p-never)
+  (setq notmuch-mua-user-agent-function #'notmuch-mua-user-agent-full)
+  (setq notmuch-maildir-use-notmuch-insert t)
+  (setq notmuch-crypto-process-mime t)
+  (setq notmuch-crypto-get-keys-asynchronously t)
+  (setq notmuch-mua-attachment-regexp   ; see `notmuch-mua-send-hook'
+        (concat "\\b\\(attache\?ment\\|attached\\|attach\\)"
+                "\\b"))
+
+;;; Reading messages
+  (setq notmuch-show-relative-dates t)
+  (setq notmuch-show-all-multipart/alternative-parts nil)
+  (setq notmuch-show-indent-messages-width 0)
+  (setq notmuch-show-indent-multipart nil)
+  (setq notmuch-show-part-button-default-action 'notmuch-show-save-part)
+  (setq notmuch-show-text/html-blocked-images ".") ; block everything
+  (setq notmuch-wash-citation-lines-prefix 6)
+  (setq notmuch-wash-citation-lines-suffix 6)
+  (setq notmuch-wash-wrap-lines-length 100)
+  (setq notmuch-unthreaded-show-out nil)
+  (setq notmuch-message-headers '("To" "Cc" "Subject" "Date"))
+  (setq notmuch-message-headers-visible t)
+
+;;; Hooks and key bindings
+  (add-hook 'notmuch-mua-send-hook #'notmuch-mua-attachment-check)
+  (remove-hook 'notmuch-show-hook #'notmuch-show-turn-on-visual-line-mode)
+  (add-hook 'notmuch-show-hook (lambda () (setq-local header-line-format nil)))
+
+  ;; Use alternating backgrounds, if `stripes' is available.
+  (with-eval-after-load 'stripes
+    (add-hook 'notmuch-search-hook #'stripes-mode)
+    ;; ;; To disable `hl-line-mode':
+    ;; (setq notmuch-search-hook nil)
+    ;; (add-hook 'notmuch-search-hook #'prot-common-disable-hl-line)
+    )
+
+  (let ((map global-map))
+    (define-key map (kbd "C-c m") #'notmuch)
+    (define-key map (kbd "C-x m") #'notmuch-mua-new-mail)) ; override `compose-mail'
+  (define-key notmuch-search-mode-map (kbd "/") #'notmuch-search-filter) ; alias for l
+  (define-key notmuch-hello-mode-map (kbd "C-<tab>") nil))
+
+
+;;; Sending email (SMTP)
+(use-package smtpmail
+  :config
+  (setq smtpmail-stream-type 'ssl)
+  (setq smtpmail-smtp-service 465)
+  (setq smtpmail-queue-mail nil)
+  (setq smtpmail-smtp-server "smtp.gmail.com")
+  ;; (setq smtpmail-auth-credentials '(("smtp.gmail.com" 465 "liampacker@gmail.com" "acydhqtbgeudyvxm")))
+  (setq smtpmail-debug-info t)
+  (setq smtpmail-debug-verb t)
+  )
+
+(use-package sendmail
+  :config
+  (setq send-mail-function 'smtpmail-send-it))
 #+end_src
