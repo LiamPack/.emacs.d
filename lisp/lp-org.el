@@ -299,11 +299,12 @@ Return nil if no clock is running."
                 org-attach-screenshot-command-line "gnome-screenshot -a -f %f"))
 
 (use-package deft
-  :disabled
   :straight t
   :bind ("<f7>" . deft)
   :custom
   (deft-directory "~/org/roam")
-  (deft-recursive t))
+  (deft-recursive t)
+  (deft-file-limit 30)
+  (deft-current-sort-method 'title))
 
 (provide 'lp-org)

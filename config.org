@@ -127,7 +127,7 @@
 
   (setq-default
    initial-scratch-message ";; Present Day
-  "
+"
    completion-cycle-threshold 3     ; TAB cycle if there are only few candidates
    completions-detailed t       ; add details in completions as prefix/sufix
    idle-update-delay 1.1  ; Slow down the UI being updated to improve performance
@@ -1329,9 +1329,54 @@ CLOSED: [2021-11-07 Sun 13:21]
 #+begin_src emacs-lisp
 (load-file "~/.emacs.d/lisp/lp-tex.el")
 #+end_src
-* TODO  prot-logos
+* TODO  prot-logos, writing in Emacs
 #+begin_src emacs-lisp
 #+end_src
+* =pdf-tools=
+#+begin_src emacs-lisp
+(use-package pdf-tools :straight t
+
+  :config
+  (setq pdf-tools-enabled-modes
+        '(pdf-history-minor-mode
+          pdf-isearch-minor-mode
+          pdf-links-minor-mode
+          pdf-outline-minor-mode
+          pdf-misc-size-indication-minor-mode
+          pdf-occur-global-minor-mode))
+
+  (setq pdf-view-display-size 'fit-height)
+  (setq pdf-view-continuous t)
+  (setq pdf-view-use-dedicated-register nil)
+  (setq pdf-view-max-image-width 1080)
+  (setq pdf-outline-imenu-use-flat-menus t)
+
+  (pdf-loader-install)
+
+  ;; Those functions and hooks are adapted from the manual of my modus-themes.
+  ;; The idea is to (i) add a backdrop that is distinct from the background of
+  ;; the PDF's page and (ii) make pdf-tools adapt to theme switching via, e.g.,
+  ;; `modus-themes-toggle'.
+  (defun prot/pdf-tools-backdrop ()
+    (face-remap-add-relative
+     'default `(:background
+                ,(modus-themes-color
+                  'bg-alt))))
+
+  (defun prot/pdf-tools-midnight-mode-toggle ()
+    (when (derived-mode-p 'pdf-view-mode)
+      (if (eq (car custom-enabled-themes) 'modus-vivendi)
+          (pdf-view-midnight-minor-mode 1)
+        (pdf-view-midnight-minor-mode -1))
+      (prot/pdf-tools-backdrop)))
+
+  (add-hook 'pdf-tools-enabled-hook #'prot/pdf-tools-midnight-mode-toggle)
+  (add-hook 'modus-themes-after-load-theme-hook #'prot/pdf-tools-midnight-mode-toggle)
+
+  ;; TODO change enlarge ratios for =,+,- (pdf-view-enlarge, pdf-view-shrink), etc.
+  )
+#+end_src
+
 * yasnippet
 #+begin_src emacs-lisp
 ;; configuration
