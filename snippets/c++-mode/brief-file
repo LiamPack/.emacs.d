@@ -3,6 +3,7 @@
 # key: \bfile
 # --
 /**
- * \file $0
+ * \file `(buffer-name)`
  *
+ * \brief $0
  */
