@@ -1,0 +1,5 @@
+# -*- mode: snippet -*-
+# name: math_parens
+# key: m
+# --
+\\($1\\)

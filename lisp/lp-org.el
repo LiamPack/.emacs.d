@@ -5,7 +5,7 @@
 
 (use-package org
   ;; TODO: fix this with the right straight source
-  ;; :straight t
+  :straight (:type built-in)
   :bind (("\C-cl" . org-store-link))
   :config
   (defun org-clocking-buffer ()
@@ -28,7 +28,7 @@ Return nil if no clock is running."
 
   ;; Some nice latex pretty-entites!
   (setq org-startup-with-inline-images t)
-  (setq org-startup-folded 'overview)
+  (setq org-startup-folded 'fold)
   (setq org-pretty-entities t)
   (setq org-pretty-entities-include-sub-superscripts t)
   (add-hook 'org-babel-after-execute-hook 'org-redisplay-inline-images)
