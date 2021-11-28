@@ -322,10 +322,20 @@ CLOSED: [2021-10-26 Tue 19:30]
   ;; use something like this:
   (setq mct-completion-blocklist
         '( describe-symbol describe-function describe-variable
-           execute-extended-command insert-char consult-buffer ))
+           execute-extended-command insert-char consult-buffer
+           consult-git-grep consult-grep consult-ripgrep 
+           ))
 
   (setq mct-completion-passlist
         '(imenu
+          consult-imenu
+          consult-isearch-history
+          consult-outline
+          consult-recent-files
+          consult-flycheck
+          consult-compile-error
+          consult-mark
+          consult-global-mark
           Info-goto-node
           Info-index
           Info-menu
@@ -927,7 +937,10 @@ CLOSED: [2021-11-07 Sun 13:21]
 (use-package embark
   :straight t
   :bind (("C->" . embark-become)
-         ("M-a" . embark-act)))
+         ("M-a" . embark-act))
+  :config
+  (define-key completion-list-mode-map (kbd "M-a")
+    #'(lambda () (interactive) () (mct-focus-mini-or-completions) (embark-act))))
 
 (use-package embark-consult
   :straight t
@@ -936,7 +949,7 @@ CLOSED: [2021-11-07 Sun 13:21]
   :config
   (define-key embark-collect-mode-map (kbd "o") 'consult-preview-at-point)
   ;; :hook (embark-collect-mode . embark-consult-preview-minor-mode)
-)
+  )
 #+end_src
 
 * eshell
