@@ -379,11 +379,11 @@ CLOSED: [2021-10-26 Tue 19:30]
   (define-key mct-minibuffer-local-completion-map (kbd "M-p") 'previous-history-element)
   (define-key mct-minibuffer-local-completion-map (kbd "M-g") 'mct-choose-completion-number)
   (define-key mct-minibuffer-local-completion-map (kbd "<backtab>") 'undo)
-  (define-key mct-minibuffer-local-completion-map (kbd "<return>")
+  (define-key mct-minibuffer-local-completion-map (kbd "M-<return>")
     #'(lambda () (interactive)
         (minibuffer-force-complete)
         (minibuffer-complete-and-exit)))
-  (define-key mct-minibuffer-local-completion-map (kbd "M-<return>") #'minibuffer-complete-and-exit)
+  (define-key mct-minibuffer-local-completion-map (kbd "<return>") #'minibuffer-complete-and-exit)
 
   (global-set-key (kbd "C-c C-m") 'mct-focus-mini-or-completions)
   (mct-mode 1))
@@ -566,7 +566,8 @@ CLOSED: [2021-10-26 Tue 19:30]
 (use-package consult-eglot
   :straight t
   :config
-  (define-key eglot-mode-map [remap xref-find-apropos] #'consult-eglot-symbols))
+  (define-key eglot-mode-map [remap xref-find-apropos] #'consult-eglot-symbols)
+  (define-key eglot-mode-map (kbd "C-c y l") #'consult-flymake))
 #+end_src
 * lp-org.el
 
@@ -1152,10 +1153,14 @@ CLOSED: [2021-11-07 Sun 13:21]
 (use-package eglot
   :diminish lsp-mode
   :straight t
-  :hook (((python-mode-hook cc-mode-hook c-mode-hook c++-mode-hook cuda-mode-hook c-common-mode-hook julia-mode-hook rjsx-mode-hook typescript-mode-hook tuarget-mode-hook ) . eglot-ensure)
+  :hook (((python-mode-hook cc-mode-hook c-mode-hook c++-mode-hook cuda-mode-hook c-common-mode-hook julia-mode-hook rjsx-mode-hook typescript-mode-hook tuareg-mode-hook ) . eglot-ensure)
          )
   :config
   (define-key eglot-mode-map (kbd "C-c y n") #'eglot-rename)
+  (define-key eglot-mode-map (kbd "C-c y n") #'eglot-rename)
+  (define-key eglot-mode-map (kbd "C-c y o") #'eglot-reconnect)
+  (define-key eglot-mode-map (kbd "C-c y a") #'eglot-code-actions)
+  (define-key eglot-mode-map (kbd "C-c y b") #'eglot-format-buffer)
   (define-key eglot-mode-map (kbd "C-c y h") #'eldoc)
   (setq-default flycheck-disabled-checkers '(c/c++-clang
                                              c/c++-cppcheck c/c++-gcc))
