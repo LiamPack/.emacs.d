@@ -226,13 +226,6 @@ Return nil if no clock is running."
   :straight (:type git :host github
                    :repo "org-roam/org-roam-v1" :branch "master")
   :diminish
-  :bind (("\C-c i" . org-roam-insert-immediate)
-         ("\C-c j" . org-roam-dailies-find-today)
-         ("\C-c o" . org-roam-jump-to-index)
-         ("\C-c t" . org-roam-tag-add)
-         ("\C-c f" . org-roam-find-file)
-         ("\C-c d" . org-roam-dailies-map)
-         ("\C-c \C-u" . org-roam-general-map))
   :custom
   (org-roam-directory (file-truename "~/org/roam/"))
   (org-roam-graph-exclude-matcher '("physics" "textbook" "quote" "paper" "private" "daily" "index" "Index"))
@@ -241,17 +234,14 @@ Return nil if no clock is running."
   :init
   (add-hook 'after-init-hook 'org-roam-mode)
   :config
+  (define-key org-roam-dailies-map (kbd "l") 'org-roam-dailies-find-today)
+  (define-key org-roam-dailies-map (kbd "j") 'org-roam-dailies-find-tomorrow)
+  (define-key org-roam-dailies-map (kbd "d") 'org-roam-dailies-find-date)
+  (define-key org-roam-dailies-map (kbd "k") 'org-roam-dailies-find-yesterday)
+  (define-key org-roam-dailies-map (kbd "p") 'org-roam-dailies-find-previous-note)
+  (define-key org-roam-dailies-map (kbd "n") 'org-roam-dailies-find-next-note)
 
-  (setq org-roam-dailies-map
-        (let ((map (make-sparse-keymap)))
-          (define-key map (kbd "l") 'org-roam-dailies-find-today)
-          (define-key map (kbd "j") 'org-roam-dailies-find-tomorrow)
-          (define-key map (kbd "d") 'org-roam-dailies-find-date)
-          (define-key map (kbd "k") 'org-roam-dailies-find-yesterday)
-          (define-key map (kbd "p") 'org-roam-dailies-find-previous-note)
-          (define-key map (kbd "n") 'org-roam-dailies-find-next-note)
-          map))
-  (setq org-roam-general-map
+  (setq roam-nav-map
         (let ((map (make-sparse-keymap)))
           (define-key map (kbd "f") 'org-roam-find-file)
           (define-key map (kbd "c") 'org-roam-capture)
@@ -263,7 +253,15 @@ Return nil if no clock is running."
           (define-key map (kbd "d") 'deft)
           (define-key map (kbd "t") 'org-roam-tag-add)
           map))
-  (require 'org-protocol))
+  (global-set-key (kbd "C-c C-u") roam-nav-map)
+  (require 'org-protocol)
+  :bind (("\C-c i" . org-roam-insert-immediate)
+         ("\C-c j" . org-roam-dailies-find-today)
+         ("\C-c o" . org-roam-jump-to-index)
+         ("\C-c t" . org-roam-tag-add)
+         ("\C-c f" . org-roam-find-file)
+         ("\C-c d" . org-roam-dailies-map)
+         ))
 
 (use-package org-roam-server
   :straight t

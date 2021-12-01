@@ -347,7 +347,12 @@ CLOSED: [2021-10-26 Tue 19:30]
   (setq completions-detailed t)
   (setq completion-ignore-case t)
   (setq completions-detailed t)
+  
   (setq completion-cycle-threshold t) ;; always allow tab cycle
+  ;; emacs28 completoins stuff
+  (setq completions-group t)
+  (setq completions-group-sort nil)  
+
 
   (setq enable-recursive-minibuffers t)
   (setq minibuffer-eldef-shorten-default t) ;; default completion in [bracks]
@@ -491,6 +496,7 @@ CLOSED: [2021-10-26 Tue 19:30]
   (setq consult-goto-map
         (let ((map (make-sparse-keymap)))
           (define-key map (kbd "e") 'consult-compile-error)
+          (define-key map (kbd "l") 'consult-flymake)
           (define-key map (kbd "f") 'consult-flycheck)               ;; Alternative: consult-flycheck
           (define-key map (kbd "g") 'consult-goto-line)             ;; orig. goto-line
           (define-key map (kbd "o") 'consult-outline)               ;; Alternative: consult-org-heading
@@ -556,6 +562,11 @@ CLOSED: [2021-10-26 Tue 19:30]
 
 (use-package consult-flycheck
   :straight (:type git :host github :repo "minad/consult-flycheck"))
+
+(use-package consult-eglot
+  :straight t
+  :config
+  (define-key eglot-mode-map [remap xref-find-apropos] #'consult-eglot-symbols))
 #+end_src
 * lp-org.el
 
@@ -621,30 +632,9 @@ get as long as they do its nice to have a dedicated editing buffer
 (use-package ibuffer                    ; Better buffer list
   :straight t
   :bind (([remap list-buffers] . ibuffer))
-  ;; Show VC Status in ibuffer
   :config
-  (setq
-   ibuffer-formats
-   '((mark modified read-only vc-status-mini " "
-           (name 18 18 :left :elide)
-           " "
-           (size 9 -1 :right)
-           " "
-           (mode 16 16 :left :elide)
-           " "
-           (vc-status 16 16 :left)
-           " "
-           filename-and-process)
-     (mark modified read-only " "
-           (name 18 18 :left :elide)
-           " "
-           (size 9 -1 :right)
-           " "
-           (mode 16 16 :left :elide)
-           " " filename-and-process)
-     (mark " " (name 16 -1) " " filename))))
-
-
+  (unbind-key (kbd "C-x C-b") global-map)
+  (global-set-key (kbd "C-x B") #'ibuffer))
 
 (use-package ibuffer-vc                 ; Group buffers by VC project and status
   :straight t
@@ -654,7 +644,6 @@ get as long as they do its nice to have a dedicated editing buffer
                     (ibuffer-vc-set-filter-groups-by-vc-root)
                     (unless (eq ibuffer-sorting-mode 'alphabetic)
                       (ibuffer-do-sort-by-alphabetic)))))
-
 
 (use-package ibuffer-projectile         ; Group buffers by Projectile project
   :straight t
@@ -688,7 +677,6 @@ get as long as they do its nice to have a dedicated editing buffer
   (setq tab-bar-show nil)
   (setq tab-bar-tab-hints nil)
   (setq tab-bar-tab-name-function 'tab-bar-tab-name-all)
-
 
   (setq tab-nav-map
         (let ((map (make-sparse-keymap)))
@@ -867,7 +855,6 @@ get as long as they do its nice to have a dedicated editing buffer
   )
 
 (use-package corfu
-  :disabled
   :straight '(corfu :host github
                     :repo "minad/corfu")
   ;; Optional customizations
@@ -888,6 +875,16 @@ get as long as they do its nice to have a dedicated editing buffer
   ;; `completion-at-point' is often bound to M-TAB.
   (setq tab-always-indent 'complete)
   (corfu-global-mode))
+
+(use-package cape
+  :straight (:type git :host github :repo "minad/cape")
+  :config
+  (dolist (backend '( cape-abbrev-capf cape-keyword-capf
+                      cape-dict-capf cape-ispell-capf cape-file-capf
+                      cape-dabbrev-capf))
+    (add-to-list 'completion-at-point-functions backend))
+  (setq-local completion-at-point-functions
+            (list (cape-capf-buster #'some-caching-capf))))
 #+end_src
 * which-key
 #+begin_src emacs-lisp
@@ -1018,8 +1015,7 @@ CLOSED: [2021-11-07 Sun 13:21]
   :hook
   ((prog-mode-hook . flycheck-mode))
   :config
-  (when (not (display-graphic-p))
-    (setq flycheck-indication-mode nil))
+  (setq flycheck-indication-mode nil)
 
   ;; set up simple cache so the checker isn't linear searching the (very many) checkers if it needs one
   (defvar-local my/flycheck-local-cache nil)
@@ -1033,6 +1029,7 @@ CLOSED: [2021-11-07 Sun 13:21]
             (lambda ()
               (when (derived-mode-p 'python-mode)
                 (setq my/flycheck-local-cache '((lsp . ((next-checkers . (python-mypy)))))))))
+
   (setq error-search-map
         (let ((map (make-sparse-keymap)))
           (define-key map (kbd "n") 'next-error)
@@ -1043,7 +1040,7 @@ CLOSED: [2021-11-07 Sun 13:21]
           (define-key map (kbd "c") 'flycheck-compile)
           (define-key map (kbd "w") 'flycheck-copy-errors-as-kill)
           map))
-  (global-set-key (kbd "C-c C-e") error-search-map))
+  (global-set-key (kbd "C-c y e") error-search-map))
 #+end_src
 * TODO isearch and replace (getting there, clean up)
 #+begin_src emacs-lisp
@@ -1152,133 +1149,67 @@ CLOSED: [2021-11-07 Sun 13:21]
 #+end_src
 * TODO lsp bloated
 #+begin_src emacs-lisp
-(use-package lsp-mode
+(use-package eglot
   :diminish lsp-mode
   :straight t
-  :hook (((python-mode-hook cc-mode-hook c-mode-hook c++-mode-hook cuda-mode-hook c-common-mode-hook julia-mode-hook rjsx-mode-hook typescript-mode-hook) . lsp)
+  :hook (((python-mode-hook cc-mode-hook c-mode-hook c++-mode-hook cuda-mode-hook c-common-mode-hook julia-mode-hook rjsx-mode-hook typescript-mode-hook tuarget-mode-hook ) . eglot-ensure)
          )
-  :bind
-  (:map
-   lsp-mode-map
-   ("C-c y n" . lsp-rename)
-   ("C-c y o" . lsp-restart-workspace)
-   ("C-c y c" . lsp-disconnect)
-   ("C-c y a" . lsp-execute-code-action)
-   ("C-c f" . lsp-format-region))
   :config
-  (setq lsp-enable-snippet t)
-  (setq lsp-enable-indentation t)
-  (setq read-process-output-max (* 10 1024 1024))
-  (setq lsp-idle-delay 0.5)
-  (setq lsp-log-io nil)
-  (setq lsp-print-performance nil)
-  (setq lsp-auto-guess-root t)
-  (setq lsp-response-timeout 5)
-  (setq lsp-eldoc-enable-hover t)
-
-  (add-to-list 'lsp-file-watch-ignored "build")
-  (add-to-list 'lsp-file-watch-ignored ".clangd")
-  (add-to-list 'lsp-file-watch-ignored "pyc")
-
-  (add-hook 'lsp-after-open-hook 'lsp-enable-imenu)
-
-  (setq lsp-prefer-capf t)
-
-  ;; Increase the amount of data which Emacs reads from the process. The emacs
-  ;; default is too low 4k considering that the some of the language server
-  ;; responses are in 800k - 3M range. Set to 1MB
-  (setq read-process-output-max (* 1024 1024))
-
-  (setq lsp-clients-clangd-executable "clangd")
-  (setq lsp-clients-clangd-args '("-j=4" "--clang-tidy"))
-  ;; Use flycheck instead of flymake
-  (setq lsp-prefer-flymake nil)
+  (define-key eglot-mode-map (kbd "C-c y n") #'eglot-rename)
+  (define-key eglot-mode-map (kbd "C-c y h") #'eldoc)
   (setq-default flycheck-disabled-checkers '(c/c++-clang
                                              c/c++-cppcheck c/c++-gcc))
 
-  ;; NB: only required if you prefer flake8 instead of the default
-  ;; send pyls config via lsp-after-initialize-hook -- harmless for
-  ;; other servers due to pyls key, but would prefer only sending this
-  ;; when pyls gets initialised (:initialize function in
-  ;; lsp-define-stdio-client is invoked too early (before server
-  ;; start)) -- cpbotha
-  ;; (defun lsp-set-cfg ()
-  ;;   (let ((lsp-cfg `(:pyls (:configurationSources ("flake8")))))
-  ;;     ;; TODO: check lsp--cur-workspace here to decide per server / project
-  ;;     (lsp--set-configuration lsp-cfg)))
-  ;; (push 'company-lsp company-backends)
-  ;; (setq company-lsp-cache-candidates 'auto)
-  ;; (setq company-lsp-async t)
-  ;; (setq company-lsp-enable-snippet nil)
-  ;; (setq company-lsp-enable-recompletion t)
-  ;; (add-hook 'lsp-after-initialize-hook 'lsp-set-cfg)
+  ;; i don't relaly like flymake, this issue
+  ;; https://github.com/joaotavora/eglot/issues/42
   )
+;; meh hack from here
 
+;; https://gist.github.com/purcell/ca33abbea9a98bb0f8a04d790a0cadcd
+;; might try flymake for a change
 
-(use-package lsp-ui
-  :straight t
-  :disabled
-  :after lsp-mode
-  :hook (lsp-mode-hook . lsp-ui-mode)
-  :diminish lsp-ui-mode
-  :bind
-  (:map
-   lsp-ui-mode-map
-   ("M-." . lsp-ui-peek-find-definitions)
-   ("M-?" . lsp-ui-peek-find-references))
-  :config
-  (setq
-   ;; Disable sideline hints
-   lsp-ui-imenu-enable nil
-   lsp-ui-sideline-enable nil
-   lsp-ui-sideline-ignore-duplicate t
-   lsp-doc-use-childframe nil
-   ;; Disable imenu
-   lsp-ui-imenu-enable nil
-   ;; Disable ui-doc (already present in minibuffer)
-   lsp-ui-doc-enable nil
-   lsp-ui-doc-header nil
-   lsp-ui-doc-include-signature nil
-   ;; lsp-ui-doc-background (doom-color 'base4)
-   ;; lsp-ui-doc-border (doom-color 'fg)
-   ;; Enable ui-peek
-   lsp-ui-peek-enable t
-                                        ;lsp-ui-peek-fontify t
-   lsp-ui-flycheck-live-reporting t
-   lsp-ui-peek-always-show nil
-   lsp-ui-peek-force-fontify nil
-   lsp-ui-flycheck-enable nil
-   lsp-ui-peek-expand-function (lambda (xs) (mapcar #'car xs)))
-  ;; Flycheck
+;; (defvar-local flycheck-eglot-current-errors nil)
 
-  )
+;; (defun flycheck-eglot-report-fn (diags &rest _)
+;;   (setq flycheck-eglot-current-errors
+;;         (mapcar (lambda (diag)
+;;                   (save-excursion
+;;                     (goto-char (flymake--diag-beg diag))
+;;                     (flycheck-error-new-at (line-number-at-pos)
+;;                                            (1+ (- (point) (line-beginning-position)))
+;;                                            (pcase (flymake--diag-type diag)
+;;                                              ('eglot-error 'error)
+;;                                              ('eglot-warning 'warning)
+;;                                              ('eglot-note 'info)
+;;                                              (_ (error "Unknown diag type, %S" diag)))
+;;                                            (flymake--diag-text diag)
+;;                                            :checker 'eglot)))
+;;                 diags))
+;;   (flycheck-buffer))
 
-(use-package dap-mode
-  :disabled
-  :straight t
-  :commands dap-debug
-  :hook ((python-mode . dap-ui-mode)
-         (python-mode . dap-mode))
-  :config
-  (eval-when-compile
-    (require 'cl))
+;; (defun flycheck-eglot--start (checker callback)
+;;   (funcall callback 'finished flycheck-eglot-current-errors))
 
-  (require 'dap-python)
-  (require 'dap-lldb)
-  (setq dap-python-debugger 'ptvsd)
-  (setq dap-python-terminal nil)
-  ;; Eval Buffer with `M-x eval-buffer' to register the newly created template.
+;; (defun flycheck-eglot--available-p ()
+;;   (bound-and-true-p eglot--managed-mode))
 
-  (dap-register-debug-template
-   "Python :: Run go-ask-alice --get_alice_scores"
-   (list :type "python"
-         :request "launch"
-         :cwd "/home/packell1/irads/just-ask-alice/src"
-         :program "main.py"
-         :args ["--get_alice_scores"]
-         :name "Python :: Run go-ask-alice --get_alice_scores"))
+;; (flycheck-define-generic-checker 'eglot
+;;   "Report `eglot' diagnostics using `flycheck'."
+;;   :start #'flycheck-eglot--start
+;;   :predicate #'flycheck-eglot--available-p
+;;   :modes '(prog-mode text-mode))
 
-  )
+;; (push 'eglot flycheck-checkers)
+
+;; (defun sanityinc/eglot-prefer-flycheck ()
+;;   (when eglot--managed-mode
+;;     (flycheck-add-mode 'eglot major-mode)
+;;     (flycheck-select-checker 'eglot)
+;;     (flycheck-mode)
+;;     (flymake-mode -1)
+;;     (setq eglot--current-flymake-report-fn 'flycheck-eglot-report-fn)))
+
+;; (add-hook 'eglot--managed-mode-hook 'sanityinc/eglot-prefer-flycheck)
 #+end_src
 * marginalia
 #+begin_src emacs-lisp
@@ -1308,7 +1239,6 @@ CLOSED: [2021-11-07 Sun 13:21]
 (use-package orderless
   :straight t
   :config
-  ;;(setq orderless-component-separator " +")
   (setq completion-styles '(orderless))
   (setq  completion-category-defaults nil
          completion-category-overrides '((file (styles . (partial-completion)))))
@@ -1318,24 +1248,6 @@ CLOSED: [2021-11-07 Sun 13:21]
                                     orderless-regexp
                                     ;;orderless-flex
                                     ))
-
-  (defun lp-orderless-flex-dispatcher (pattern _index _total)
-    "Literal style dispatcher using the equals sign as a suffix.
-  It matches PATTERN _INDEX and _TOTAL according to how Orderless
-  parses its input."
-    (when (string-suffix-p "," pattern)
-      `(orderless-flex . ,(substring pattern 0 -1))))
-
-  (defun lp-orderless-literal-dispatcher (pattern _index _total)
-    "Leading initialism  dispatcher using the comma suffix.
-  It matches PATTERN _INDEX and _TOTAL according to how Orderless
-  parses its input."
-    (when (string-suffix-p "=" pattern)
-      `(orderless-literal . ,(substring pattern 0 -1))))
-
-  (setq orderless-style-dispatchers
-        '(lp-orderless-literal-dispatcher
-          lp-orderless-flex-dispatcher))
   ;; SPC should never complete: use it for `orderless' groups.
   :bind (:map minibuffer-local-completion-map
               ("SPC" . nil)
@@ -1459,22 +1371,11 @@ CLOSED: [2021-11-07 Sun 13:21]
   (yas-global-mode 1)
   (setq yas-fallback-behavior 'return-nil)
   (setq yas-triggers-in-field t)
-  (setq yas-verbosity 0)
-  (yas-reload-all))
-
-(use-package yasnippet-snippets
-  :straight t
-  :after yasnippet
-  :config
-  (yas-reload-all))
+  (setq yas-verbosity 0))
 #+end_src
 
 * cursor related (zop, expand-region, undo, iedit)
 #+begin_src emacs-lisp
-(use-package expand-region
-  :straight t
-  :bind ("C-," . er/expand-region))
-
 (use-package undo-propose
   :straight t
   :general
@@ -1485,194 +1386,6 @@ CLOSED: [2021-11-07 Sun 13:21]
 
 
 #+end_src
-* evil :disabled:
-#+begin_src emacs-lisp
-;; for easy keymap definition in evil
-(use-package evil
-  :straight t
-  :disabled
-  :init
-  (setq evil-search-module 'isearch)
-
-  (setq evil-ex-complete-emacs-commands nil)
-  (setq evil-vsplit-window-right t)
-  (setq evil-split-window-below t)
-  (setq evil-shift-round nil)
-  (setq evil-mode-line-format nil)
-  (setq evil-want-integration t)
-  (setq evil-want-keybinding nil)
-
-  ;; general.el can automate the process of prefix map/command creation
-  (general-evil-setup)
-  (general-nmap
-   :prefix "SPC"
-   :prefix-map 'my-leader-map
-   "l" org-roam-dailies-map
-
-   "s" 'consult-isearch-history
-   "S" 'isearch-backward
-
-   "a" 'embark-act
-   "b" 'consult-buffer
-   "y" 'consult-yank-pop
-   "p" projectile-command-map
-   "f" consult-search-map
-   "r" consult-register-map
-   "t" consult-mode-mode-map
-   "j" consult-goto-map
-
-   "k" '(lambda () (interactive) (kill-buffer nil))
-   "K" '(lambda () (interactive) (kill-buffer nil) (delete-window))
-
-   "_" 'balance-windows
-   "-" 'fit-window-to-buffer
-   "+" 'balance-windows-area
-   "q" 'window-toggle-side-windows
-   "w m" 'delete-other-windows
-
-   "0" 'delete-window
-   "1" 'delete-other-windows
-   "2" 'lp/split-window-below-and-switch
-   "3" 'lp/split-window-right-and-switch
-
-   "o" 'ace-window
-
-   "B" 'ibuffer
-
-   ;; "s ." 'isearch-forward-symbol-at-point
-   ;; "s h r" 'highlight-regexp
-   ;;
-   "5" 'query-replace
-   "%" 'query-replace-regexp
-
-   "e" 'error-search-map
-   "g" gud-nav-map
-   
-   "d l" 'dap-debug-last
-   "d d" 'dap-debug
-   "d b a" 'dap-breakpoint-add
-   "d b c" 'dap-breakpoint-condition
-   "d b d" 'dap-breakpoint-condition
-   "d c" 'dap-continue
-   "d n" 'dap-next
-   "d s" 'dap-step-in
-   "d r" 'dap-ui-repl
-
-   "n p" 'org-gcal-post-at-point
-   "n i" '(lambda () (interactive) (org-time-stamp-inactive '(16)))
-
-   "t" tab-nav-map
-
-   "u f" 'org-roam-find-file
-   "u c" 'org-roam-capture
-   "u i" 'org-roam-insert
-   "u r" 'org-roam
-   "u I" 'org-roam-insert-immediate
-   "u g" 'org-roam-graph
-   "u o" 'org-roam-jump-to-index
-   "u d" 'deft
-   "u t" 'org-roam-tag-add)
-  :config
-  (evil-mode 1)
-  (setq evil-undo-system 'undo-redo) ; default undo system
-  ;; (evil-set-initial-state 'deft-mode 'emacs)
-  (defvar my-leader-map (make-sparse-keymap)
-    "Keymap for \"leader key\" shortcuts.")
-
-  ;; change the "leader" key to space
-  (define-key evil-normal-state-map "," 'evil-repeat-find-char-reverse)
-  (define-key evil-normal-state-map (kbd "SPC") my-leader-map)
-  (define-key evil-normal-state-map (kbd "M-.") 'xref-find-definitions)
-  (define-key evil-normal-state-map (kbd "M-,") 'xref-pop-marker-stack)
-  (define-key evil-normal-state-map (kbd "C-M-.") 'xref-find-apropos)
-  (define-key evil-normal-state-map (kbd "C-M-y") 'consult-yank-pop)
-  (define-key evil-normal-state-map (kbd "C-y") 'yank)
-  (define-key evil-normal-state-map (kbd "/") 'isearch-forward)
-  (define-key evil-normal-state-map (kbd "?") 'isearch-backward)
-  (define-key evil-normal-state-map (kbd "n") 'isearch-repeat-forward)
-  (define-key evil-normal-state-map (kbd "N") 'isearch-repeat-backward))
-
-(use-package evil-collection
-  :straight t
-  :disabled
-  :diminish (evil-collection-unimpaired-mode  global-evil-collection-unimpaired-mode)
-  :config
-  (evil-collection-init)
-  (define-key evil-normal-state-map (kbd "C-o") 'evil-collection-unimpaired-insert-newline-below)
-  (define-key evil-normal-state-map (kbd "C-S-o") 'evil-collection-unimpaired-insert-newline-above)
-  (define-key evil-insert-state-map (kbd "C-y") 'yank))
-
-(use-package evil-escape
-  :straight t
-  :disabled
-  :diminish
-  :init
-  (setq evil-escape-excluded-states '(normal visual multiedit emacs motion)
-        evil-escape-excluded-major-modes '(neotree-mode tab-switcher-mode)
-        evil-escape-key-sequence "jk"
-        evil-escape-delay 0.15)
-
-  (evil-escape-mode +1))
-
-(use-package evil-snipe
-  :straight t
-  :disabled
-  :diminish (evil-snipe-mode evil-snipe-local-mode evil-snipe-override-mode evil-snipe-override-local-mode)
-  :init
-  (setq evil-snipe-smart-case t
-        evil-snipe-scope 'buffer
-        evil-snipe-repeat-scope 'visible
-        evil-snipe-char-fold t)
-  :config
-  ;;(append evil-snipe-disabled-modes 'Info-mode 'calc-mode 'treemacs-mode)
-  (evil-snipe-mode +1)
-  (evil-snipe-override-mode +1))
-
-
-(use-package evil-surround
-  :straight t
-  :disabled
-  :diminish
-  :config (global-evil-surround-mode 1))
-
-
-(use-package evil-multiedit
-  :straight t
-  :disabled
-  :after evil
-  :custom-face
-  (iedit-occurrence ((t (:background "plum1"))))
-  :config
-  (define-key evil-visual-state-map (kbd "R") 'evil-multiedit-match-all)
-  (define-key evil-normal-state-map (kbd "M-d") 'evil-multiedit-match-and-next)
-  (define-key evil-normal-state-map (kbd "M-C-d") 'evil-multiedit-match-and-prev)
-  (define-key evil-multiedit-mode-map (kbd "<tab>") 'evil-multiedit-toggle-or-restrict-region) ;RET will toggle the region under the cursor
-  (define-key evil-multiedit-mode-map (kbd "C-j") 'evil-multiedit-next)
-  (define-key evil-multiedit-mode-map (kbd "C-k") 'evil-multiedit-prev)
-  (define-key evil-visual-state-map (kbd "C-S-d") 'evil-multiedit-restore))
-
-(use-package evil-mc
-  :straight t
-  :disabled
-  :after evil
-  :diminish evil-mc-mode
-  :general
-  ;; autoload keymap, `g s` will trigger the loading of `evil-mc` library
-  ;; change prefix for `cursors-map`
-  ('(normal visual) "g s" '(:keymap evil-mc-cursors-map))
-  ('(normal visual) evil-mc-key-map "g s a" 'evil-mc-make-cursor-in-visual-selection-beg)
-  ;; evil-mc-cursors-map is accessed with evil-mc-cursors-map
-  (evil-mc-cursors-map
-   "n" 'evil-mc-make-and-goto-next-match
-   "p" 'evil-mc-make-and-goto-prev-match
-   "N" 'evil-mc-skip-and-goto-next-match
-   "P" 'evil-mc-skip-and-goto-prev-match)
-  :config
-  (global-evil-mc-mode 1)
-  (push '(evil-org-delete . ((:default . evil-mc-execute-default-evil-delete)))
-        evil-mc-known-commands))
-#+end_src
-
 * [experimenting] meow (modular editing, not evil)
 - need to configure which modes this should be activated int
 - some keybindings are jank
@@ -2051,15 +1764,6 @@ CLOSED: [2021-11-07 Sun 13:21]
 
 * ocaml
 #+begin_src emacs-lisp
-(use-package merlin
-  :disabled
-  :straight t
-  :config
-  (add-hook 'tuareg-mode-hook #'merlin-mode)
-  (add-hook 'caml-mode-hook #'merlin-mode)
-  (add-hook 'utop-mode-hook #'merlin-mode)
-  )
-
 (use-package tuareg
   :straight t)
 
