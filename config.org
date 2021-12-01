@@ -6,6 +6,7 @@
 - [ ] Evaluate Tree-Sitter instead of font-lock for syntax highlighting
 - [ ] clean up latex
 - [ ] clean up org
+- [ ] update org-roam to v2
 - [ ] think harder about notmuch tags
 - start hitting some real customization: get familiar with how frames are made,
   how visualization is done, how attributes are structured for font groups, how
@@ -35,8 +36,8 @@
     (save-restriction
       (narrow-to-region (region-beginning) (region-end)) (delete-trailing-whitespace))))
 
-(global-set-key (kbd "C-x k") (lambda () (interactive) (kill-buffer nil)))
-(global-set-key (kbd "C-x C-k") (lambda () (interactive) (kill-buffer nil) (delete-window)))
+(global-set-key (kbd "C-x k") #'(lambda () (interactive) (kill-buffer nil)))
+(global-set-key (kbd "C-x C-k") #'(lambda () (interactive) (kill-buffer nil) (delete-window)))
 (global-set-key (kbd "C-c C-k") #'eval-buffer)
 (global-set-key (kbd "C-c n") #'clean-up-buffer-or-region)
 (global-set-key (kbd "<f5>")  #'revert-buffer)
@@ -323,7 +324,7 @@ CLOSED: [2021-10-26 Tue 19:30]
   (setq mct-completion-blocklist
         '( describe-symbol describe-function describe-variable
            execute-extended-command insert-char consult-buffer
-           consult-git-grep consult-grep consult-ripgrep 
+           consult-git-grep consult-grep consult-ripgrep
            ))
 
   (setq mct-completion-passlist
@@ -373,6 +374,12 @@ CLOSED: [2021-10-26 Tue 19:30]
   (define-key mct-minibuffer-local-completion-map (kbd "M-p") 'previous-history-element)
   (define-key mct-minibuffer-local-completion-map (kbd "M-g") 'mct-choose-completion-number)
   (define-key mct-minibuffer-local-completion-map (kbd "<backtab>") 'undo)
+  (define-key mct-minibuffer-local-completion-map (kbd "<return>")
+    #'(lambda () (interactive)
+        (minibuffer-force-complete)
+        (minibuffer-complete-and-exit)))
+  (define-key mct-minibuffer-local-completion-map (kbd "M-<return>") #'minibuffer-complete-and-exit)
+
   (global-set-key (kbd "C-c C-m") 'mct-focus-mini-or-completions)
   (mct-mode 1))
 #+end_src
@@ -486,7 +493,6 @@ CLOSED: [2021-10-26 Tue 19:30]
           (define-key map (kbd "e") 'consult-compile-error)
           (define-key map (kbd "f") 'consult-flycheck)               ;; Alternative: consult-flycheck
           (define-key map (kbd "g") 'consult-goto-line)             ;; orig. goto-line
-          (define-key map (kbd "M-g") 'consult-goto-line)           ;; orig. goto-line
           (define-key map (kbd "o") 'consult-outline)               ;; Alternative: consult-org-heading
           (define-key map (kbd "m") 'consult-mark)
           (define-key map (kbd "k") 'consult-global-mark)
@@ -672,7 +678,6 @@ get as long as they do its nice to have a dedicated editing buffer
   (desktop-save-mode 1))
 
 (use-package tab-bar
-  :disabled
   :init
   (setq tab-bar-close-button-show nil)
   (setq tab-bar-close-last-tab-choice 'tab-bar-mode-disable)
@@ -683,6 +688,20 @@ get as long as they do its nice to have a dedicated editing buffer
   (setq tab-bar-show nil)
   (setq tab-bar-tab-hints nil)
   (setq tab-bar-tab-name-function 'tab-bar-tab-name-all)
+
+
+  (setq tab-nav-map
+        (let ((map (make-sparse-keymap)))
+          (define-key map (kbd "b") 'switch-to-buffer-other-tab)
+          (define-key map (kbd "d") 'dired-other-tab)
+          (define-key map (kbd "f") 'find-file-other-tab)
+          (define-key map (kbd "n") 'tab-next)
+          (define-key map (kbd "p") 'tab-previous)
+          (define-key map (kbd "0") 'tab-close)
+          (define-key map (kbd "1") 'tab-close-other)
+          (define-key map (kbd "2") 'tab-bar-new-tab)
+          (define-key map (kbd "l") 'tab-list)
+          map))
   :config
   (tab-bar-mode -1)
   (tab-bar-history-mode -1)
@@ -796,6 +815,24 @@ get as long as they do its nice to have a dedicated editing buffer
             '(lambda ()
                (setq compile-command "cmake .. -DCMAKE_EXRORT_COMPILE_COMMANDS=1 -DCMAKE_BUILD_TYPE=Debug; make clean; cmake --build . -j8")
                )))
+
+(use-package gud
+  :config
+  (setq gud-nav-map
+        (let ((map (make-sparse-keymap)))
+          (define-key map (kbd "g b") 'gud-break)
+          (define-key map (kbd "g <") 'gud-up)
+          (define-key map (kbd "g >") 'gud-down)
+          (define-key map (kbd "g n") 'gud-next)
+          (define-key map (kbd "g s") 'gud-step)
+          (define-key map (kbd "g c") 'gud-cont)
+          (define-key map (kbd "g p") 'gud-print)
+          (define-key map (kbd "g d") 'gud-remove)
+          (define-key map (kbd "g l") 'gud-refresh)
+          (define-key map (kbd "g e") 'gud-statement)
+          map))
+  (define-key c-mode-map (kbd "C-c C-g") gud-nav-map)
+  (define-key c++-mode-map (kbd "C-c C-g") gud-nav-map))
 
 (use-package cmake-mode
   :straight t)
@@ -995,7 +1032,18 @@ CLOSED: [2021-11-07 Sun 13:21]
   (add-hook 'lsp-managed-mode-hook
             (lambda ()
               (when (derived-mode-p 'python-mode)
-                (setq my/flycheck-local-cache '((lsp . ((next-checkers . (python-mypy))))))))))
+                (setq my/flycheck-local-cache '((lsp . ((next-checkers . (python-mypy)))))))))
+  (setq error-search-map
+        (let ((map (make-sparse-keymap)))
+          (define-key map (kbd "n") 'next-error)
+          (define-key map (kbd "p") 'previous-error)
+          (define-key map (kbd "d") 'flycheck-display-error-at-point)
+          (define-key map (kbd "l") 'consult-flycheck)
+          (define-key map (kbd "L") 'flycheck-list-errors)
+          (define-key map (kbd "c") 'flycheck-compile)
+          (define-key map (kbd "w") 'flycheck-copy-errors-as-kill)
+          map))
+  (global-set-key (kbd "C-c C-e") error-search-map))
 #+end_src
 * TODO isearch and replace (getting there, clean up)
 #+begin_src emacs-lisp
@@ -1429,7 +1477,6 @@ CLOSED: [2021-11-07 Sun 13:21]
 
 (use-package undo-propose
   :straight t
-  :after evil
   :general
   ('normal 'global "C-c u" 'undo-propose)
   ('normal 'global "u" 'undo-only)
@@ -1438,14 +1485,12 @@ CLOSED: [2021-11-07 Sun 13:21]
 
 
 #+end_src
-* evil
+* evil :disabled:
 #+begin_src emacs-lisp
 ;; for easy keymap definition in evil
-(use-package general
-  :straight t)
-
 (use-package evil
   :straight t
+  :disabled
   :init
   (setq evil-search-module 'isearch)
 
@@ -1460,102 +1505,73 @@ CLOSED: [2021-11-07 Sun 13:21]
   ;; general.el can automate the process of prefix map/command creation
   (general-evil-setup)
   (general-nmap
-    :prefix "SPC"
-    :prefix-map 'my-leader-map
-    "l l" 'org-roam-dailies-find-today
-    "l j" 'org-roam-dailies-find-tomorrow
-    "l d" 'org-roam-dailies-find-date
-    "l k" 'org-roam-dailies-find-yesterday
-    "l p" 'org-roam-dailies-find-previous-note
-    "l n" 'org-roam-dailies-find-next-note
+   :prefix "SPC"
+   :prefix-map 'my-leader-map
+   "l" org-roam-dailies-map
 
-    "s" 'consult-isearch-history
-    "S" 'isearch-backward
+   "s" 'consult-isearch-history
+   "S" 'isearch-backward
 
-    "a" 'embark-act
-    "b" 'consult-buffer
-    "y" 'consult-yank-pop
-    "p" projectile-command-map
-    "f" consult-search-map
-    "r" consult-register-map
-    "t" consult-mode-mode-map
-    "j" consult-goto-map
-    "k" '(lambda () (interactive) (kill-buffer nil))
-    "K" '(lambda () (interactive) (kill-buffer nil) (delete-window))
+   "a" 'embark-act
+   "b" 'consult-buffer
+   "y" 'consult-yank-pop
+   "p" projectile-command-map
+   "f" consult-search-map
+   "r" consult-register-map
+   "t" consult-mode-mode-map
+   "j" consult-goto-map
 
-    "_" 'balance-windows
-    "-" 'fit-window-to-buffer
-    "+" 'balance-windows-area
-    "q" 'window-toggle-side-windows
-    "w m" 'delete-other-windows
+   "k" '(lambda () (interactive) (kill-buffer nil))
+   "K" '(lambda () (interactive) (kill-buffer nil) (delete-window))
 
-    "0" 'delete-window
-    "1" 'delete-other-windows
-    "2" 'lp/split-window-below-and-switch
-    "3" 'lp/split-window-right-and-switch
-    "`" '(lambda () (interactive) (switch-to-buffer (other-buffer (current-buffer) 1)))
-    "o" 'ace-window
+   "_" 'balance-windows
+   "-" 'fit-window-to-buffer
+   "+" 'balance-windows-area
+   "q" 'window-toggle-side-windows
+   "w m" 'delete-other-windows
 
-    "B" 'ibuffer
-    "F" 'lsp-format-buffer
+   "0" 'delete-window
+   "1" 'delete-other-windows
+   "2" 'lp/split-window-below-and-switch
+   "3" 'lp/split-window-right-and-switch
 
-    ;; "s ." 'isearch-forward-symbol-at-point
-    ;; "s h r" 'highlight-regexp
-    ;;
-    "5" 'query-replace
-    "%" 'query-replace-regexp
+   "o" 'ace-window
 
-    "e n" 'next-error
-    "e p" 'previous-error
-    "e d" 'flycheck-display-error-at-point
-    "e l" 'consult-flycheck
-    "e L" 'flycheck-list-errors
-    "e c" 'flycheck-compile
-    "e w" 'flycheck-copy-errors-as-kill
+   "B" 'ibuffer
 
-    "g b" 'gud-break
-    "g <" 'gud-up
-    "g >" 'gud-down
-    "g n" 'gud-next
-    "g s" 'gud-step
-    "g c" 'gud-cont
-    "g p" 'gud-print
-    "g d" 'gud-remove
-    "g l" 'gud-refresh
-    "g e" 'gud-statement
+   ;; "s ." 'isearch-forward-symbol-at-point
+   ;; "s h r" 'highlight-regexp
+   ;;
+   "5" 'query-replace
+   "%" 'query-replace-regexp
 
-    "d l" 'dap-debug-last
-    "d d" 'dap-debug
-    "d b a" 'dap-breakpoint-add
-    "d b c" 'dap-breakpoint-condition
-    "d b d" 'dap-breakpoint-condition
-    "d c" 'dap-continue
-    "d n" 'dap-next
-    "d s" 'dap-step-in
-    "d r" 'dap-ui-repl
+   "e" 'error-search-map
+   "g" gud-nav-map
+   
+   "d l" 'dap-debug-last
+   "d d" 'dap-debug
+   "d b a" 'dap-breakpoint-add
+   "d b c" 'dap-breakpoint-condition
+   "d b d" 'dap-breakpoint-condition
+   "d c" 'dap-continue
+   "d n" 'dap-next
+   "d s" 'dap-step-in
+   "d r" 'dap-ui-repl
 
-    "n p" 'org-gcal-post-at-point
-    "n i" '(lambda () (interactive) (org-time-stamp-inactive '(16)))
+   "n p" 'org-gcal-post-at-point
+   "n i" '(lambda () (interactive) (org-time-stamp-inactive '(16)))
 
-    "t b" 'switch-to-buffer-other-tab
-    "t d" 'dired-other-tab
-    "t f" 'find-file-other-tab
-    "t n" 'tab-next
-    "t p" 'tab-previous
-    "t 0" 'tab-close
-    "t 1" 'tab-close-other
-    "t 2" 'tab-bar-new-tab
-    "t l" 'tab-list
+   "t" tab-nav-map
 
-    "u f" 'org-roam-find-file
-    "u c" 'org-roam-capture
-    "u i" 'org-roam-insert
-    "u r" 'org-roam
-    "u I" 'org-roam-insert-immediate
-    "u g" 'org-roam-graph
-    "u o" 'org-roam-jump-to-index
-    "u d" 'deft
-    "u t" 'org-roam-tag-add)
+   "u f" 'org-roam-find-file
+   "u c" 'org-roam-capture
+   "u i" 'org-roam-insert
+   "u r" 'org-roam
+   "u I" 'org-roam-insert-immediate
+   "u g" 'org-roam-graph
+   "u o" 'org-roam-jump-to-index
+   "u d" 'deft
+   "u t" 'org-roam-tag-add)
   :config
   (evil-mode 1)
   (setq evil-undo-system 'undo-redo) ; default undo system
@@ -1578,6 +1594,7 @@ CLOSED: [2021-11-07 Sun 13:21]
 
 (use-package evil-collection
   :straight t
+  :disabled
   :diminish (evil-collection-unimpaired-mode  global-evil-collection-unimpaired-mode)
   :config
   (evil-collection-init)
@@ -1587,6 +1604,7 @@ CLOSED: [2021-11-07 Sun 13:21]
 
 (use-package evil-escape
   :straight t
+  :disabled
   :diminish
   :init
   (setq evil-escape-excluded-states '(normal visual multiedit emacs motion)
@@ -1598,6 +1616,7 @@ CLOSED: [2021-11-07 Sun 13:21]
 
 (use-package evil-snipe
   :straight t
+  :disabled
   :diminish (evil-snipe-mode evil-snipe-local-mode evil-snipe-override-mode evil-snipe-override-local-mode)
   :init
   (setq evil-snipe-smart-case t
@@ -1612,12 +1631,14 @@ CLOSED: [2021-11-07 Sun 13:21]
 
 (use-package evil-surround
   :straight t
+  :disabled
   :diminish
   :config (global-evil-surround-mode 1))
 
 
 (use-package evil-multiedit
   :straight t
+  :disabled
   :after evil
   :custom-face
   (iedit-occurrence ((t (:background "plum1"))))
@@ -1632,6 +1653,7 @@ CLOSED: [2021-11-07 Sun 13:21]
 
 (use-package evil-mc
   :straight t
+  :disabled
   :after evil
   :diminish evil-mc-mode
   :general
@@ -1649,6 +1671,115 @@ CLOSED: [2021-11-07 Sun 13:21]
   (global-evil-mc-mode 1)
   (push '(evil-org-delete . ((:default . evil-mc-execute-default-evil-delete)))
         evil-mc-known-commands))
+#+end_src
+
+* [experimenting] meow (modular editing, not evil)
+- need to configure which modes this should be activated int
+- some keybindings are jank
+- i kinda like it
+
+#+begin_src emacs-lisp
+(use-package meow
+  :straight (:type git :host github :repo "meow-edit/meow")
+  :config
+  (defun meow-setup ()
+    (setq meow-cheatsheet-layout meow-cheatsheet-layout-qwerty)
+    (meow-motion-overwrite-define-key
+     '("j" . meow-next)
+     '("k" . meow-prev))
+    (meow-leader-define-key
+     ;; SPC j/k will run the original command in MOTION state.
+     '("j" . "H-j")
+     '("k" . "H-k")
+     ;; Use SPC (0-9) for digit arguments.
+     '("1" . meow-digit-argument)
+     '("2" . meow-digit-argument)
+     '("3" . meow-digit-argument)
+     '("4" . meow-digit-argument)
+     '("5" . meow-digit-argument)
+     '("6" . meow-digit-argument)
+     '("7" . meow-digit-argument)
+     '("8" . meow-digit-argument)
+     '("9" . meow-digit-argument)
+     '("0" . meow-digit-argument)
+     '("/" . meow-keypad-describe-key)
+     '("?" . meow-cheatsheet))
+    (meow-normal-define-key
+     '("0" . meow-expand-0)
+     '("9" . meow-expand-9)
+     '("8" . meow-expand-8)
+     '("7" . meow-expand-7)
+     '("6" . meow-expand-6)
+     '("5" . meow-expand-5)
+     '("4" . meow-expand-4)
+     '("3" . meow-expand-3)
+     '("2" . meow-expand-2)
+     '("1" . meow-expand-1)
+     '("-" . negative-argument)
+     '(";" . meow-reverse)
+     '("," . meow-inner-of-thing)
+     '("." . meow-bounds-of-thing)
+     '("[" . meow-beginning-of-thing)
+     '("]" . meow-end-of-thing)
+     '("a" . meow-append)
+     '("A" . meow-open-below)
+     '("b" . meow-back-word)
+     '("B" . meow-back-symbol)
+     '("c" . meow-change)
+     '("d" . meow-delete)
+     '("D" . meow-backward-delete)
+     '("e" . meow-next-word)
+     '("E" . meow-next-symbol)
+     '("f" . meow-find)
+     '("g" . meow-cancel-selection)
+     '("G" . meow-grab)
+     '("h" . meow-left)
+     '("H" . meow-left-expand)
+     '("i" . meow-insert)
+     '("I" . meow-open-above)
+     '("j" . meow-next)
+     '("J" . meow-next-expand)
+     '("k" . meow-prev)
+     '("K" . meow-prev-expand)
+     '("l" . meow-right)
+     '("L" . meow-right-expand)
+     '("m" . meow-join)
+     '("n" . meow-search)
+     '("o" . meow-block)
+     '("O" . meow-to-block)
+     '("p" . meow-yank)
+     ;;     '("q" . meow-quit)
+     ;;     '("Q" . meow-goto-line)
+     '("r" . meow-replace)
+     '("R" . meow-swap-grab)
+     '("s" . meow-kill)
+     '("t" . meow-till)
+     '("u" . meow-undo)
+     '("U" . meow-undo-in-selection)
+     '("v" . meow-visit)
+     '("w" . meow-mark-word)
+     '("W" . meow-mark-symbol)
+     '("x" . meow-line)
+     '("X" . meow-goto-line)
+     '("y" . meow-save)
+     '("Y" . meow-sync-grab)
+     '("z" . meow-pop-selection)
+     '("'" . repeat)
+     ;;     '("<escape>" . mode-line-other-buffer)
+     '("/" . isearch-forward)
+     '("?" . isearch-backward)
+     '("$" . move-end-of-line)
+     '("0" . move-beginning-of-line)
+     ))
+
+  (meow-setup)
+
+  (setf meow-mode-state-list (append meow-mode-state-list
+                                     '((magit . motion)
+                                       (dired . motion))))
+
+  (meow-global-mode 1)
+  )
 #+end_src
 
 * symbolic math (maxima)

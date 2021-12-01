@@ -231,12 +231,8 @@ Return nil if no clock is running."
          ("\C-c o" . org-roam-jump-to-index)
          ("\C-c t" . org-roam-tag-add)
          ("\C-c f" . org-roam-find-file)
-         ("\C-c d l" . org-roam-dailies-find-today)
-         ("\C-c d j" . org-roam-dailies-find-tomorrow)
-         ("\C-c d d" . org-roam-dailies-find-date)
-         ("\C-c d k" . org-roam-dailies-find-yesterday)
-         ("\C-c d p" . org-roam-dailies-find-previous-note)
-         ("\C-c d n" . org-roam-dailies-find-next-note))
+         ("\C-c d" . org-roam-dailies-map)
+         ("\C-c \C-u" . org-roam-general-map))
   :custom
   (org-roam-directory (file-truename "~/org/roam/"))
   (org-roam-graph-exclude-matcher '("physics" "textbook" "quote" "paper" "private" "daily" "index" "Index"))
@@ -245,6 +241,28 @@ Return nil if no clock is running."
   :init
   (add-hook 'after-init-hook 'org-roam-mode)
   :config
+
+  (setq org-roam-dailies-map
+        (let ((map (make-sparse-keymap)))
+          (define-key map (kbd "l") 'org-roam-dailies-find-today)
+          (define-key map (kbd "j") 'org-roam-dailies-find-tomorrow)
+          (define-key map (kbd "d") 'org-roam-dailies-find-date)
+          (define-key map (kbd "k") 'org-roam-dailies-find-yesterday)
+          (define-key map (kbd "p") 'org-roam-dailies-find-previous-note)
+          (define-key map (kbd "n") 'org-roam-dailies-find-next-note)
+          map))
+  (setq org-roam-general-map
+        (let ((map (make-sparse-keymap)))
+          (define-key map (kbd "f") 'org-roam-find-file)
+          (define-key map (kbd "c") 'org-roam-capture)
+          (define-key map (kbd "i") 'org-roam-insert)
+          (define-key map (kbd "r") 'org-roam)
+          (define-key map (kbd "I") 'org-roam-insert-immediate)
+          (define-key map (kbd "g") 'org-roam-graph)
+          (define-key map (kbd "o") 'org-roam-jump-to-index)
+          (define-key map (kbd "d") 'deft)
+          (define-key map (kbd "t") 'org-roam-tag-add)
+          map))
   (require 'org-protocol))
 
 (use-package org-roam-server
