@@ -346,12 +346,11 @@ CLOSED: [2021-10-26 Tue 19:30]
   (setq completion-show-inline-help t)
   (setq completions-detailed t)
   (setq completion-ignore-case t)
-  (setq completions-detailed t)
-  
+
   (setq completion-cycle-threshold t) ;; always allow tab cycle
   ;; emacs28 completoins stuff
   (setq completions-group t)
-  (setq completions-group-sort nil)  
+  (setq completions-group-sort nil)
 
 
   (setq enable-recursive-minibuffers t)
@@ -383,7 +382,6 @@ CLOSED: [2021-10-26 Tue 19:30]
     #'(lambda () (interactive)
         (minibuffer-force-complete)
         (minibuffer-complete-and-exit)))
-  (define-key mct-minibuffer-local-completion-map (kbd "<return>") #'minibuffer-complete-and-exit)
 
   (global-set-key (kbd "C-c C-m") 'mct-focus-mini-or-completions)
   (mct-mode 1))
@@ -832,14 +830,6 @@ get as long as they do its nice to have a dedicated editing buffer
 #+end_src
 * TODO dabbrev, corfu (capf / completion framework frontends)
 #+begin_src emacs-lisp
-(use-package abbrev
-  :straight (:type built-in)
-  :config
-  ;; abbrev for speed and less strain
-  (setq-default abbrev-mode t)
-  (diminish 'abbrev-mode)
-  (setq save-abbrevs 'silently))
-
 (use-package dabbrev
   :config
   (setq dabbrev-abbrev-char-regexp "\\sw\\|\\s_")
@@ -864,7 +854,7 @@ get as long as they do its nice to have a dedicated editing buffer
   (corfu-auto t)             ;; Enable auto completion
   (corfu-quit-at-boundary t) ;; Automatically quit at word boundary
   (corfu-quit-no-match t)    ;; Automatically quit if there is no match
-
+  (setq tab-always-indent 'complete)
   ;; Optionally use TAB for cycling, default is `corfu-complete'.
   :bind (:map corfu-map
               ("TAB" . corfu-next)
@@ -880,12 +870,21 @@ get as long as they do its nice to have a dedicated editing buffer
 (use-package cape
   :straight (:type git :host github :repo "minad/cape")
   :config
-  (dolist (backend '( cape-abbrev-capf cape-keyword-capf
-                      cape-dict-capf cape-ispell-capf cape-file-capf
-                      cape-dabbrev-capf))
-    (add-to-list 'completion-at-point-functions backend))
-  (setq-local completion-at-point-functions
-            (list (cape-capf-buster #'some-caching-capf))))
+  (add-to-list 'completion-at-point-functions #'cape-file)
+  (add-to-list 'completion-at-point-functions #'cape-dabbrev)
+  (add-to-list 'completion-at-point-functions #'cape-keyword)
+  (add-to-list 'completion-at-point-functions #'cape-abbrev)
+  (add-to-list 'completion-at-point-functions #'cape-ispell)
+  (add-to-list 'completion-at-point-functions #'cape-dict)
+  (add-to-list 'completion-at-point-functions #'cape-symbol)
+  (add-to-list 'org-roam-completion-functions #'cape-file)
+  (add-to-list 'org-roam-completion-functions #'cape-dabbrev)
+  (add-to-list 'org-roam-completion-functions #'cape-keyword)
+  (add-to-list 'org-roam-completion-functions #'cape-abbrev)
+  (add-to-list 'org-roam-completion-functions #'cape-ispell)
+  (add-to-list 'org-roam-completion-functions #'cape-dict)
+  (add-to-list 'org-roam-completion-functions #'cape-symbol)
+  )
 #+end_src
 * which-key
 #+begin_src emacs-lisp
@@ -1244,7 +1243,7 @@ CLOSED: [2021-11-07 Sun 13:21]
 (use-package orderless
   :straight t
   :config
-  (setq completion-styles '(orderless))
+  (setq completion-styles '(basic substring initials flex partial-completion orderless))
   (setq  completion-category-defaults nil
          completion-category-overrides '((file (styles . (partial-completion)))))
   (setq orderless-matching-styles '(orderless-prefixes
@@ -1253,6 +1252,9 @@ CLOSED: [2021-11-07 Sun 13:21]
                                     orderless-regexp
                                     ;;orderless-flex
                                     ))
+
+
+
   ;; SPC should never complete: use it for `orderless' groups.
   :bind (:map minibuffer-local-completion-map
               ("SPC" . nil)
@@ -1492,9 +1494,10 @@ CLOSED: [2021-11-07 Sun 13:21]
 
   (meow-setup)
 
-  (setf meow-mode-state-list (append meow-mode-state-list
-                                     '((magit . motion)
-                                       (dired . motion))))
+  (add-to-list 'meow-mode-state-list
+               '((magit . motion)
+                 (dired . motion)
+                 (sly-mrepl-mode . normal)))
 
   (meow-global-mode 1)
   )
