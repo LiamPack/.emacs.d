@@ -1526,6 +1526,13 @@ General aesthetic configurations for emacs
   :diminish git-gutter-mode
   :config
   (global-git-gutter-mode +1))
+
+(use-package projectile
+  :straight t
+  :diminish
+  :config
+  (projectile-global-mode)
+  (define-key projectile-mode-map (kbd "C-c p") 'projectile-command-map))
 #+end_src
 ** eshell
 #+begin_src emacs-lisp
