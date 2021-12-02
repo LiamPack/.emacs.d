@@ -52,21 +52,9 @@
 (straight-register-package 'org)
 (straight-register-package 'org-contrib)
 
-(use-package general
-  :straight t
-  :demand)
-
 ;; basics and better default
 ;; from https://pastebin.com/MDagsZD7
 (use-package emacs
-  :general
-  ("C-<tab>" 'next-window-any-frame)
-  ("<backtab>" 'previous-window-any-frame)
-  ("C-c w" 'enlarge-window-horizontally)
-  ("C-x C-M-e" 'pp-macroexpand-last-sexp)
-  ("C-x C-e" 'eval-defun)
-  ("C-x e" 'eval-last-sexp)
-  ("C-h j" 'describe-keymap)
   :init
   ;; i fat-finger way too much to not have the confirmation
   (setq confirm-kill-emacs #'yes-or-no-p)
@@ -117,7 +105,7 @@
    visible-bell t
    create-lockfiles nil
    custom-safe-themes)
-  
+
   (show-paren-mode t)
   (setq show-paren-style 'parenthesis)
   ;; do not allow the cursor in the minibuffer prompt
@@ -130,7 +118,15 @@
    indent-tabs-mode nil      ; don't insert tab when indent
    ;; this is giving me problems when creating new lines in org-mode source blocks
    help-window-select t     ; focus on help window when openend
-   window-combination-resize t)) ; resize windows proportionaly
+   window-combination-resize t)
+  (define-key (kbd "C-<tab>") 'next-window-any-frame)
+  (define-key (kbd "<backtab>") 'previous-window-any-frame)
+  (define-key (kbd "C-c w") 'enlarge-window-horizontally)
+  (define-key (kbd "C-x C-M-e") 'pp-macroexpand-last-sexp)
+  (define-key (kbd "C-x C-e") 'eval-defun)
+  (define-key (kbd "C-x e") 'eval-last-sexp)
+  (define-key (kbd "C-h j") 'describe-keymap)
+  ) ; resize windows proportionaly
 #+end_src
 
 #+RESULTS:
@@ -421,9 +417,6 @@ General aesthetic configurations for emacs
 #+begin_src emacs-lisp
 (use-package undo-propose
   :straight t
-  :general
-  ('normal 'global "C-c u" 'undo-propose)
-  ('normal 'global "u" 'undo-only)
   :config
   (setq undo-propose-pop-to-buffer t))
 
@@ -832,7 +825,7 @@ General aesthetic configurations for emacs
   :config
   (define-key consult-search-map (kbd "b") #'consult-bibtex)
   (with-eval-after-load 'embark
-  (add-to-list 'embark-keymap-alist '(bibtex-completion . consult-bibtex-embark-map)))
+    (add-to-list 'embark-keymap-alist '(bibtex-completion . consult-bibtex-embark-map)))
   (setq consult-bibtex-default-action #'consult-bibtex-edit-notes))
 
 (use-package tex
@@ -1325,7 +1318,7 @@ General aesthetic configurations for emacs
   (add-hook 'tuareg-mode-hook 'utop-minor-mode)
   )
 #+end_src
-** python 
+** python
 #+begin_src emacs-lisp
 (use-package python
   :straight t
@@ -1464,7 +1457,7 @@ General aesthetic configurations for emacs
              '("\\.sls\\'" . scheme-mode)
              '("\\.sps\\'" . scheme-mode))
 #+end_src
-** flycheck 
+** flycheck
 #+begin_src emacs-lisp
 (use-package flycheck
   :straight t
@@ -1524,9 +1517,8 @@ General aesthetic configurations for emacs
         magit-default-tracking-name-function 'magit-default-tracking-name-branch-only
         magit-push-always-verify nil
         magit-restore-window-configuration t)
-  :bind ("C-x g" . magit-status)
-  :general
-  (magit-mode-map "SPC" nil))
+  (unbind-key (kbd "SPC") magit-mode-map)
+  :bind ("C-x g" . magit-status))
 
 ;; More info here: [[https://github.com/syohex/emacs-git-gutter]]
 (use-package git-gutter ; TODO - git gutter keybinds, going to different hunks and staging only certain portions!
