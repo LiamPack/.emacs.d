@@ -196,7 +196,7 @@ General aesthetic configurations for emacs
         ;; default), or a list of properties that may include any of those
         ;; symbols: `straight-underline', `text-also', `background',
         ;; `intense'
-        modus-themes-lang-checkers '(straight-underline background)
+        modus-themes-lang-checkers '(straight-underline)
 
         ;; Options for `modus-themes-mode-line' are either nil, or a list
         ;; that can combine any of `3d' OR `moody', `borderless',
@@ -207,7 +207,7 @@ General aesthetic configurations for emacs
         ;; Options for `modus-themes-syntax' are either nil (the default),
         ;; or a list of properties that may include any of those symbols:
         ;; `faint', `yellow-comments', `green-strings', `alt-syntax'
-        modus-themes-syntax '(yellow-comments green-strings alt-syntax)
+        modus-themes-syntax '(yellow-comments green-strings)
 
         ;; Options for `modus-themes-hl-line' are either nil (the default),
         ;; or a list of properties that may include any of those symbols:
@@ -217,7 +217,7 @@ General aesthetic configurations for emacs
         ;; Options for `modus-themes-paren-match' are either nil (the
         ;; default), or a list of properties that may include any of those
         ;; symbols: `bold', `intense', `underline'
-        modus-themes-paren-match '(bold intense underline)
+        modus-themes-paren-match '(bold underline)
 
         ;; Options for `modus-themes-links' are either nil (the default),
         ;; or a list of properties that may include any of those symbols:
@@ -228,7 +228,7 @@ General aesthetic configurations for emacs
         ;; Options for `modus-themes-prompts' are either nil (the
         ;; default), or a list of properties that may include any of those
         ;; symbols: `background', `bold', `gray', `intense', `italic'
-        modus-themes-prompts '(background bold)
+        modus-themes-prompts '(background italic)
 
         modus-themes-completions 'opinionated ; {nil,'moderate,'opinionated}
 
@@ -237,13 +237,13 @@ General aesthetic configurations for emacs
         ;; Options for `modus-themes-region' are either nil (the default),
         ;; or a list of properties that may include any of those symbols:
         ;; `no-extend', `bg-only', `accented'
-        modus-themes-region nil
+        modus-themes-region '(no-extend bg-only accented)
 
         ;; Options for `modus-themes-diffs': nil, 'desaturated,
         ;; 'bg-only, 'deuteranopia, 'fg-only-deuteranopia
         modus-themes-diffs 'fg-only-deuteranopia
 
-        modus-themes-org-blocks 'gray-background ; {nil,'gray-background,'tinted-background}
+        modus-themes-org-blocks nil ; {nil,'gray-background,'tinted-background}
 
         modus-themes-org-agenda ; this is an alist: read the manual or its doc string
         nil
@@ -409,6 +409,19 @@ General aesthetic configurations for emacs
                '((magit . motion)
                  (dired . motion)
                  (sly-mrepl-mode . normal)))
+  ;; (setq meow-char-thing-table
+  ;;       '((?\( . round)
+  ;;         (?\[ . square)
+  ;;         (?{ . curly)
+  ;;         (?\ . string)
+  ;;         (?s . symbol)
+  ;;         (?w . window)
+  ;;         (?b . buffer)
+  ;;         (?p . paragraph)
+  ;;         (?l . line)
+  ;;         (?d . defun)
+  ;;         (?i . indent)
+  ;;         (?e . extend)))
 
   (meow-global-mode 1)
   )
@@ -833,7 +846,6 @@ General aesthetic configurations for emacs
   (setq consult-bibtex-default-action #'consult-bibtex-edit-notes))
 
 (use-package tex
-  :straight t
   :config
   (setq TeX-PDF-mode t)
   ;; The damn text is too tiny on the preview.
