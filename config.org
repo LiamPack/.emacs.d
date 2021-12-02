@@ -119,13 +119,13 @@
    ;; this is giving me problems when creating new lines in org-mode source blocks
    help-window-select t     ; focus on help window when openend
    window-combination-resize t)
-  (define-key (kbd "C-<tab>") 'next-window-any-frame)
-  (define-key (kbd "<backtab>") 'previous-window-any-frame)
-  (define-key (kbd "C-c w") 'enlarge-window-horizontally)
-  (define-key (kbd "C-x C-M-e") 'pp-macroexpand-last-sexp)
-  (define-key (kbd "C-x C-e") 'eval-defun)
-  (define-key (kbd "C-x e") 'eval-last-sexp)
-  (define-key (kbd "C-h j") 'describe-keymap)
+  (define-key global-map (kbd "C-<tab>") 'next-window-any-frame)
+  (define-key global-map (kbd "<backtab>") 'previous-window-any-frame)
+  (define-key global-map (kbd "C-c w") 'enlarge-window-horizontally)
+  (define-key global-map (kbd "C-x C-M-e") 'pp-macroexpand-last-sexp)
+  (define-key global-map (kbd "C-x C-e") 'eval-defun)
+  (define-key global-map (kbd "C-x e") 'eval-last-sexp)
+  (define-key global-map (kbd "C-h j") 'describe-keymap)
   ) ; resize windows proportionaly
 #+end_src
 
@@ -720,7 +720,7 @@ General aesthetic configurations for emacs
 
   ;; sometimes i don't want to wrap text though, so we will toggle
   ;; with C-c q
-  (global-set-key org-mode-map (kbd "C-c q") 'auto-fill-mode)
+  (define-key org-mode-map (kbd "C-c q") 'auto-fill-mode)
 
   (setq org-hide-emphasis-markers nil))
 
@@ -828,7 +828,7 @@ General aesthetic configurations for emacs
     (add-to-list 'embark-keymap-alist '(bibtex-completion . consult-bibtex-embark-map)))
   (setq consult-bibtex-default-action #'consult-bibtex-edit-notes))
 
-(use-package tex
+(use-package tex-mode
   :config
   (setq TeX-PDF-mode t)
   ;; The damn text is too tiny on the preview.
@@ -1346,10 +1346,9 @@ General aesthetic configurations for emacs
 ** c environment (bare bones)
 #+begin_src emacs-lisp
 (use-package cc-mode
-  :defer t
   :hook
   (c-common-mode-hook . hs-minor-mode)
-  :init
+  :config
   (setq gdb-many-windows 't)
   (setq compilation-ask-about-save nil)
   (setq compilation-scroll-output 'next-error)
@@ -1367,6 +1366,7 @@ General aesthetic configurations for emacs
                )))
 
 (use-package gud
+  :after cc-mode
   :config
   (setq gud-nav-map
         (let ((map (make-sparse-keymap)))
@@ -1784,10 +1784,9 @@ General aesthetic configurations for emacs
 #+begin_src emacs-lisp
 (use-package eww
   :straight (:type built-in)
-  :general
-  ("<f12>" 'eww)
   :hook (eww-mode-hook . (lambda () (define-key evil-normal-state-map (kbd "SPC") my-leader-map)))
   :config
+  (global-set-key (kbd "<f12>") 'eww)
   (setq shr-use-colors nil)             ; t is bad for accessibility
   (setq shr-use-fonts nil)              ; t is not for me
   (setq shr-max-image-proportion 0.6)
