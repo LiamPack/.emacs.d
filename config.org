@@ -4,13 +4,10 @@
 - [X] finish constructing rest of init
 - [ ] gather general-purpose keybindings into single location
 - [ ] Evaluate Tree-Sitter instead of font-lock for syntax highlighting
-- [ ] clean up latex
-- [ ] clean up org
-- [ ] update org-roam to v2
+- [X] clean up latex
+- [X] clean up org
+- [-] update org-roam to v2
 - [ ] think harder about notmuch tags
-- start hitting some real customization: get familiar with how frames are made,
-  how visualization is done, how attributes are structured for font groups, how
-  to generate editing functions/macros procedural, ...
 
 * sane defaults
 #+begin_src emacs-lisp
@@ -56,6 +53,9 @@
 ;; from https://pastebin.com/MDagsZD7
 (use-package emacs
   :init
+  ;; why does this bind exist
+  (unbind-key (kbd "C-x C-z") global-map)
+
   ;; i fat-finger way too much to not have the confirmation
   (setq confirm-kill-emacs #'yes-or-no-p)
   (global-hl-line-mode t) ; highlight current line

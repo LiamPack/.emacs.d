@@ -60,14 +60,6 @@
 
 (add-hook 'focus-out-hook 'save-all)
 
-(use-package projectile
-  :straight t
-  :diminish
-  :config
-  (projectile-global-mode)
-  (define-key projectile-mode-map (kbd "C-c p") 'projectile-command-map))
-
-
 ;; Mark safe variables early so that tangling won't break
 (put 'after-save-hook 'safe-local-variable
      (lambda (value) (equal value '(org-babel-tangle t))))
