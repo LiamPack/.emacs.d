@@ -382,7 +382,7 @@ General aesthetic configurations for emacs
      '("Y" . meow-sync-grab)
      '("z" . meow-pop-selection)
      '("'" . repeat)
-     ;;     '("<escape>" . mode-line-other-buffer)
+     '("<escape>" . mode-line-other-buffer)
      '("/" . isearch-forward)
      '("?" . isearch-backward)
      '("$" . move-end-of-line)
@@ -819,14 +819,6 @@ General aesthetic configurations for emacs
    bibtex-completion-library-path '("~/org/bib/bibtex-pdfs/")
    bibtex-completion-notes-path "~/org/roam/"))
 
-(use-package consult-bibtex
-  :straight (:type git :host github :repo "mohkale/consult-bibtex")
-  :after (embark consult)
-  :config
-  (define-key consult-search-map (kbd "b") #'consult-bibtex)
-  (with-eval-after-load 'embark
-    (add-to-list 'embark-keymap-alist '(bibtex-completion . consult-bibtex-embark-map)))
-  (setq consult-bibtex-default-action #'consult-bibtex-edit-notes))
 
 (use-package tex-mode
   :config
@@ -1043,6 +1035,7 @@ General aesthetic configurations for emacs
           (define-key map (kbd "k") 'consult-global-mark)
           (define-key map (kbd "i") 'consult-imenu)
           (define-key map (kbd "I") 'consult-imenu-multi)
+          (define-key map (kbd "b") #'consult-bibtex)
           map))
 
   (setq consult-register-map
@@ -1099,6 +1092,13 @@ General aesthetic configurations for emacs
          ("C-x C-d" . consult-dir)
          ("C-x C-j" . consult-dir-jump-file)))
 
+
+(use-package consult-bibtex
+  :straight (:type git :host github :repo "mohkale/consult-bibtex")
+  :config
+  (with-eval-after-load 'embark
+    (add-to-list 'embark-keymap-alist '(bibtex-completion . consult-bibtex-embark-map)))
+  (setq consult-bibtex-default-action #'consult-bibtex-edit-notes))
 #+end_src
 ** embark
 #+begin_src emacs-lisp
