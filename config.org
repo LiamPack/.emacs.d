@@ -1448,7 +1448,8 @@ General aesthetic configurations for emacs
 
 (use-package geiser-chez
   :straight t
-  :after geiser)
+  :config
+  (require 'geiser-chez))
 
 (add-to-list 'auto-mode-alist
              '("\\.sc\\'" . scheme-mode))
@@ -1784,7 +1785,6 @@ General aesthetic configurations for emacs
 #+begin_src emacs-lisp
 (use-package eww
   :straight (:type built-in)
-  :hook (eww-mode-hook . (lambda () (define-key evil-normal-state-map (kbd "SPC") my-leader-map)))
   :config
   (global-set-key (kbd "<f12>") 'eww)
   (setq shr-use-colors nil)             ; t is bad for accessibility
