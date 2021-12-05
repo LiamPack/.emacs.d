@@ -59,7 +59,6 @@
   ;; i fat-finger way too much to not have the confirmation
   (setq confirm-kill-emacs #'yes-or-no-p)
   (global-hl-line-mode t) ; highlight current line
-  (winner-mode t)     ; move between windows configuration
   (setq-default fill-column 80)   ; column length
   (column-number-mode t)  ; show column number in the mode line
 
@@ -121,7 +120,6 @@
    window-combination-resize t)
   (define-key global-map (kbd "C-<tab>") 'next-window-any-frame)
   (define-key global-map (kbd "<backtab>") 'previous-window-any-frame)
-  (define-key global-map (kbd "C-c w") 'enlarge-window-horizontally)
   (define-key global-map (kbd "C-x C-M-e") 'pp-macroexpand-last-sexp)
   (define-key global-map (kbd "C-x C-e") 'eval-defun)
   (define-key global-map (kbd "C-x e") 'eval-last-sexp)
@@ -592,19 +590,108 @@ General aesthetic configurations for emacs
 ;; https://protesilaos.com/dotemacs/#h:c110e399-3f43-4555-8427-b1afe44c0779)
 (use-package window
   :init
+  (setq display-buffer-alist
+        `(;; no window
+          ("\\`\\*Async Shell Command\\*\\'"
+           (display-buffer-no-window))
+          ;; top side window
+          ("\\*\\(Flymake diagnostics\\|Package-Lint\\|flycheck\\).*"
+           (display-buffer-in-side-window)
+           (window-height . 0.16)
+           (side . top)
+           (slot . 0))
+          ("\\*Messages.*"
+           (display-buffer-in-side-window)
+           (window-height . 0.16)
+           (side . top)
+           (slot . 1))
+          ("\\*\\(Backtrace\\|Warnings\\|Compile-Log\\|Flymake log\\|compilation\\|\\)\\*"
+           (display-buffer-in-side-window)
+           (window-height . 0.16)
+           (side . top)
+           (slot . 2))
+          ;; left side window
+          ("\\*\\(.* # Help.*\\|Help\\)\\*"    ; See the hooks for `visual-line-mode'
+           (display-buffer-reuse-mode-window display-buffer-in-side-window)
+           (window-width . 0.25)
+           (side . left)
+           (slot . 0))
+          ;; bottom buffer (NOT side window)
+          ("\\*Embark Actions\\*"
+           (display-buffer-reuse-mode-window display-buffer-at-bottom)
+           (window-height . fit-window-to-buffer)
+           (window-parameters . ((no-other-window . t)
+                                 (mode-line-format . none))))
+          ("\\*\\(Embark\\)?.*Completions.*"
+           (display-buffer-reuse-mode-window display-buffer-at-bottom)
+           (window-parameters . ((no-other-window . t))))
+          ("\\*\\(Output\\|Register Preview\\).*"
+           (display-buffer-reuse-mode-window display-buffer-at-bottom))
+          ;; below current window
+          ("\\*.*\\(e?shell\\|v?term\\|.*geiser.*\\|\\).*"
+           (display-buffer-reuse-mode-window display-buffer-below-selected)
+           (window-height 0.2))
+          ("\\*\\vc-\\(incoming\\|outgoing\\|git : \\).*"
+           (display-buffer-reuse-mode-window display-buffer-below-selected)
+           ;; NOTE 2021-10-06: we cannot `fit-window-to-buffer' because
+           ;; the height is not known in advance.
+           (window-height . 0.3u))
+          ("magit: .*"
+           (display-buffer-reuse-mode-window display-buffer-below-selected)
+           ;; NOTE 2021-10-06: we cannot `fit-window-to-buffer' because
+           ;; the height is not known in advance.
+           (window-height . 0.3))
+          ("\\*\\(Calendar\\|Bookmark Annotation\\).*"
+           (display-buffer-reuse-mode-window display-buffer-below-selected)
+           (window-height . fit-window-to-buffer))))
   (let ((map global-map))
+    (define-key map (kbd "C-x <down>") #'next-buffer)
+    (define-key map (kbd "C-x <up>") #'previous-buffer)
+    (define-key map (kbd "C-x C-n") #'next-buffer)     ; override `set-goal-column'
+    (define-key map (kbd "C-x C-p") #'previous-buffer) ; override `mark-page'
+    (define-key map (kbd "C-x !") #'delete-other-windows-vertically)
     (define-key map (kbd "C-x _") #'balance-windows)      ; underscore
     (define-key map (kbd "C-x -") #'fit-window-to-buffer) ; hyphen
     (define-key map (kbd "C-x +") #'balance-windows-area)
-    (define-key map (kbd "s-q") #'window-toggle-side-windows)
     (define-key map (kbd "C-x }") #'enlarge-window)
     (define-key map (kbd "C-x {") #'shrink-window)
     (define-key map (kbd "C-x >") #'enlarge-window-horizontally) ; override `scroll-right'
-    (define-key map (kbd "C-x <") #'shrink-window-horizontally); override `scroll-left'
-    (define-key map (kbd "C-x +") #'balance-windows-area)
-    (define-key map (kbd "C-M-q") #'window-toggle-side-windows))
+    (define-key map (kbd "C-x <") #'shrink-window-horizontally)) ; override `scroll-left'
+  (let ((map resize-window-repeat-map))
+    (define-key map ">" #'enlarge-window-horizontally)
+    (define-key map "<" #'shrink-window-horizontally))
   :hook ((help-mode-hook . visual-line-mode)
          (custom-mode-hook . visual-line-mode)))
+
+(use-package winner
+  :config
+  (winner-mode t)     ; move between windows configuration
+  )
+
+
+;;; Directional window motions (windmove)
+(use-package popper
+  :straight t
+  :bind (("C-M-q"   . (lambda ()
+                        (interactive)
+                        (popper-toggle-latest)
+                        (other-window 1)))
+         ("M-`"   . popper-cycle)
+         ("C-M-`" . popper-toggle-type))
+  :init
+  (setq popper-reference-buffers
+        '("\\*Messages\\*"
+          "Output\\*$"
+          "\\*Async Shell Command\\*"
+          "magit: .*"
+          eshell-mode
+          help-mode
+          geiser-repl-mode
+          magit-
+          compilation-mode))
+  (setq popper-display-control nil) ;; already have rules set up
+  (popper-mode +1)
+  (popper-echo-mode +1))
 #+end_src
 
 ** beacon
@@ -1186,7 +1273,6 @@ General aesthetic configurations for emacs
   (corfu-auto t)             ;; Enable auto completion
   (corfu-quit-at-boundary t) ;; Automatically quit at word boundary
   (corfu-quit-no-match t)    ;; Automatically quit if there is no match
-  (setq tab-always-indent 'complete)
   ;; Optionally use TAB for cycling, default is `corfu-complete'.
   :bind (:map corfu-map
               ("TAB" . corfu-next)
