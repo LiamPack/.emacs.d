@@ -1543,6 +1543,7 @@ General aesthetic configurations for emacs
 (add-to-list 'auto-mode-alist
              '("\\.sls\\'" . scheme-mode)
              '("\\.sps\\'" . scheme-mode))
+(unbind-key (kbd "C-M-q") scheme-mode-map)
 #+end_src
 ** flycheck
 #+begin_src emacs-lisp
