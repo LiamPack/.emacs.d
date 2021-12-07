@@ -411,7 +411,7 @@ General aesthetic configurations for emacs
   )
 #+end_src
 
-** cursor related (zop, expand-region, undo, iedit)
+** cursor related (undo, iedit, avy)
 #+begin_src emacs-lisp
 (use-package undo-propose
   :straight t
@@ -420,6 +420,13 @@ General aesthetic configurations for emacs
 
 (use-package iedit
   :straight t)
+
+(use-package avy
+  :straight t
+  :config
+  (avy-setup-default)
+  (global-set-key (kbd "C-'") 'avy-goto-char-timer)
+  (global-set-key (kbd "C-\"") 'avy-resume))
 #+end_src
 ** isearch and replace (getting there, clean up)
 #+begin_src emacs-lisp
@@ -1015,91 +1022,77 @@ General aesthetic configurations for emacs
 
 * Minibuffer and completion
 ** mct, minimalist completion
+[2021-12-06] I gave it a serious try but MCT isn't gonna cut it. I'd like my
+completions to be done quicker, and I would also like the option of performing
+=completion-at-point= functionality through a minibuffer selection instead of
+through e.g. corfu. MCT doesn't offer that.
+
+** general minibuffer completion configuration
+
 #+begin_src emacs-lisp
-(use-package mct
-  :straight (:type git :host gitlab
-                   :repo "protesilaos/mct" :branch "main")
-  :init
-  (setq mct-minimum-input 2)
-  (setq mct-live-update-delay 0.3)
-  (setq mct-live-completion 'visible)
-  (setq mct-apply-completion-stripes t)
-  (setq mct-hide-completion-mode-line t)
-  (setq mct-completions-format 'one-column) ;; 'one-column
+(setq completion-show-inline-help t)
+(setq completions-detailed t)
+(setq completion-ignore-case t)
 
-  (setq mct-display-buffer-action
-        (quote ((display-buffer-reuse-window
-                 display-buffer-at-bottom))))
-
-  ;; NOTE: `mct-completion-blocklist' can be used for commands with lots
-  ;; of candidates, depending also on how low `mct-minimum-input' is.
-  ;; With the settings shown here this is not required, otherwise I would
-  ;; use something like this:
-  (setq mct-completion-blocklist
-        '( describe-symbol describe-function describe-variable
-           execute-extended-command insert-char consult-buffer
-           consult-git-grep consult-grep consult-ripgrep
-           ))
-
-  (setq mct-completion-passlist
-        '(imenu
-          consult-imenu
-          consult-isearch-history
-          consult-outline
-          consult-recent-files
-          consult-flycheck
-          consult-compile-error
-          consult-mark
-          consult-global-mark
-          Info-goto-node
-          Info-index
-          Info-menu
-          vc-retrieve-tag
-          find-file))
-
-  (setq completion-show-inline-help t)
-  (setq completions-detailed t)
-  (setq completion-ignore-case t)
-
-  (setq completion-cycle-threshold t) ;; always allow tab cycle
-  ;; emacs28 completoins stuff
-  (setq completions-group t)
-  (setq completions-group-sort nil)
+(setq completion-cycle-threshold t) ;; always allow tab cycle
+;; emacs28 completoins stuff
+(setq completions-group t)
+(setq completions-group-sort nil)
 
 
-  (setq enable-recursive-minibuffers t)
-  (setq minibuffer-eldef-shorten-default t) ;; default completion in [bracks]
+(setq enable-recursive-minibuffers t)
+(setq minibuffer-eldef-shorten-default t) ;; default completion in [bracks]
 
-  (setq read-buffer-completion-ignore-case t)
-  (setq read-file-name-completion-ignore-case t)
+(setq read-buffer-completion-ignore-case t)
+(setq read-file-name-completion-ignore-case t)
 
-  (setq resize-mini-windows t)
+(setq resize-mini-windows t)
 
-  (file-name-shadow-mode 1)
-  (minibuffer-depth-indicate-mode 1)
-  (minibuffer-electric-default-mode 1) ;; update default completion if change
+(file-name-shadow-mode 1)
+(minibuffer-depth-indicate-mode 1)
+(minibuffer-electric-default-mode 1) ;; update default completion if change
 
      ;;; Minibuffer history
-  (require 'savehist)
-  (setq savehist-file (locate-user-emacs-file "savehist"))
-  (setq history-length 10000)
-  (setq history-delete-duplicates t)
-  (setq savehist-save-minibuffer-history t)
-  (add-hook 'after-init-hook #'savehist-mode)
+(require 'savehist)
+(setq savehist-file (locate-user-emacs-file "savehist"))
+(setq history-length 10000)
+(setq history-delete-duplicates t)
+(setq savehist-save-minibuffer-history t)
+(add-hook 'after-init-hook #'savehist-mode)
+;; Add prompt indicator to `completing-read-multiple'.
+;; Alternatively try `consult-completing-read-multiple'.
+(defun crm-indicator (args)
+  (cons (concat "[CRM] " (car args)) (cdr args)))
+(advice-add #'completing-read-multiple :filter-args #'crm-indicator)
 
-  ;; can preview if we point at something in the completion list
-  :config
-  (define-key mct-minibuffer-local-completion-map (kbd "M-p") 'previous-history-element)
-  (define-key mct-minibuffer-local-completion-map (kbd "M-g") 'mct-choose-completion-number)
-  (define-key mct-minibuffer-local-completion-map (kbd "<backtab>") 'undo)
-  (define-key mct-minibuffer-local-completion-map (kbd "M-<return>")
-    #'(lambda () (interactive)
-        (minibuffer-force-complete)
-        (minibuffer-complete-and-exit)))
-
-  (global-set-key (kbd "C-c C-m") 'mct-focus-mini-or-completions)
-  (mct-mode 1))
+;; Do not allow the cursor in the minibuffer prompt
+(setq minibuffer-prompt-properties
+      '(read-only t cursor-intangible t face minibuffer-prompt))
 #+end_src
+
+** vertigo
+#+BEGIN_SRC emacs-lisp
+(use-package vertico
+  :straight t
+  :init
+  (vertico-mode)
+
+  ;; Different scroll margin
+  (setq vertico-scroll-margin 0)
+
+  ;; Show more candidates
+  (setq vertico-count 20)
+
+  ;; Grow and shrink the Vertico minibuffer
+  (setq vertico-resize t)
+
+  ;; Optionally enable cycling for `vertico-next' and `vertico-previous'.
+  (setq vertico-cycle t)
+  (define-key vertico-map "?" #'minibuffer-completion-help)
+  (define-key vertico-map (kbd "M-RET") #'minibuffer-force-complete-and-exit)
+  (define-key vertico-map (kbd "M-TAB") #'minibuffer-complete))
+
+#+END_SRC
 
 ** consult
 #+begin_src emacs-lisp
@@ -1170,7 +1163,17 @@ General aesthetic configurations for emacs
   (setq xref-show-xrefs-function #'consult-xref)
   (setq xref-show-definitions-function #'consult-xref)
   (setq completion-in-region-function #'consult-completion-in-region)
-  (define-key completion-list-mode-map (kbd "C-o") #'consult-preview-at-point))
+  (define-key completion-list-mode-map (kbd "C-o") #'consult-preview-at-point)
+
+  ;; Use `consult-completion-in-region' if Vertico is enabled.
+  ;; Otherwise use the default `completion--in-region' function.
+  (setq completion-in-region-function
+        (lambda (&rest args)
+          (apply (if vertico-mode
+                     #'consult-completion-in-region
+                   #'completion--in-region)
+                 args)))
+  )
 
 (use-package consult-dir
   :straight t
@@ -1230,7 +1233,7 @@ General aesthetic configurations for emacs
 (use-package orderless
   :straight t
   :config
-  (setq completion-styles '(basic substring initials flex partial-completion orderless))
+  (setq completion-styles '(orderless))
   (setq  completion-category-defaults nil
          completion-category-overrides '((file (styles . (partial-completion)))))
   (setq orderless-matching-styles '(orderless-prefixes
@@ -1273,6 +1276,8 @@ General aesthetic configurations for emacs
   (corfu-auto t)             ;; Enable auto completion
   (corfu-quit-at-boundary t) ;; Automatically quit at word boundary
   (corfu-quit-no-match t)    ;; Automatically quit if there is no match
+  (corfu-echo-documentation t)
+  (setq tab-always-indent 'complete)
   ;; Optionally use TAB for cycling, default is `corfu-complete'.
   :bind (:map corfu-map
               ("TAB" . corfu-next)
@@ -1785,7 +1790,7 @@ General aesthetic configurations for emacs
   ;; ;; section below.
   (setq notmuch-tagging-keys
         `((,(kbd "a") notmuch-archive-tags "Archive (remove from inbox)")
-          (,(kbd "c") ("+archived" "-inbox" "-list" "-todo" "-ref" "-unread") "Complete and archive")
+          (,(kbd "c") ("+archived" "-inbox" "-list" "-todo" "-ref" "-unread" "+done") "Complete and archive")
           (,(kbd "d") ("+del" "-inbox" "-archived" "-unread") "Mark for deletion")
           (,(kbd "f") ("+flag" "-unread") "Flag as important")
           ;; (,(kbd "r") notmuch-show-mark-read-tags "Mark as read")
