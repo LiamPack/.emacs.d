@@ -1288,12 +1288,6 @@ through e.g. corfu. MCT doesn't offer that.
   (corfu-quit-no-match t)    ;; Automatically quit if there is no match
   (corfu-echo-documentation t)
   (setq tab-always-indent 'complete)
-  ;; Optionally use TAB for cycling, default is `corfu-complete'.
-  :bind (:map corfu-map
-              ("TAB" . corfu-next)
-              ([tab] . corfu-next)
-              ("S-TAB" . corfu-previous)
-              ([backtab] . corfu-previous))
   :init
   ;; Enable indentation+completion using the TAB key.
   ;; `completion-at-point' is often bound to M-TAB.
