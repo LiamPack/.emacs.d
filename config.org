@@ -385,6 +385,10 @@ General aesthetic configurations for emacs
      '("?" . isearch-backward)
      '("$" . move-end-of-line)
      '("0" . move-beginning-of-line)
+     '("<" . enlarge-window-horizontally)
+     '(">" . shrink-window-horizontally)
+     '("}" . enlarge-window)
+     '("{" . shrink-window)
      ))
 
   (meow-setup)
