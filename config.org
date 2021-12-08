@@ -1458,7 +1458,10 @@ through e.g. corfu. MCT doesn't offer that.
   (add-hook 'c++-mode-hook
             '(lambda ()
                (setq compile-command "cmake .. -DCMAKE_EXRORT_COMPILE_COMMANDS=1 -DCMAKE_BUILD_TYPE=Debug; make clean; cmake --build . -j8")
-               )))
+               ))
+  (unbind-key (kbd "C-M-q") c-mode-map)
+  (unbind-key (kbd "C-M-q") c++-mode-map)
+  )
 
 (use-package gud
   :after cc-mode
