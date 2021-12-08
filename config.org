@@ -728,6 +728,7 @@ General aesthetic configurations for emacs
   :bind (("\C-cl" . org-store-link))
   :config
   (require 'org-habit)
+  (unbind-key (kbd "C-'") org-mode-map)
 
   ;; Some latex stuff in org
   (setq org-format-latex-options (plist-put org-format-latex-options :scale 3.0))
