@@ -124,6 +124,7 @@
   (define-key global-map (kbd "C-x C-e") 'eval-defun)
   (define-key global-map (kbd "C-x e") 'eval-last-sexp)
   (define-key global-map (kbd "C-h j") 'describe-keymap)
+  (define-key global-map (kbd "C-c C-j") 'join-line)
   ) ; resize windows proportionaly
 #+end_src
 
@@ -295,7 +296,8 @@ General aesthetic configurations for emacs
 
 #+begin_src emacs-lisp
 (use-package meow
-  :straight (:type git :host github :repo "meow-edit/meow")
+  :disabled
+    :straight (:type git :host github :repo "meow-edit/meow")
   :config
   (defun meow-setup ()
     (setq meow-cheatsheet-layout meow-cheatsheet-layout-qwerty)
@@ -431,6 +433,10 @@ General aesthetic configurations for emacs
   (avy-setup-default)
   (global-set-key (kbd "C-'") 'avy-goto-char-timer)
   (global-set-key (kbd "C-\"") 'avy-resume))
+
+(use-package expand-region
+  :straight t
+  :bind ("C-=" . er/expand-region))
 #+end_src
 ** isearch and replace (getting there, clean up)
 #+begin_src emacs-lisp
@@ -857,7 +863,6 @@ General aesthetic configurations for emacs
   (global-set-key (kbd "C-c C-u") roam-nav-map)
   (require 'org-protocol)
   :bind (("\C-c i" . org-roam-insert-immediate)
-         ("\C-c j" . org-roam-dailies-find-today)
          ("\C-c o" . org-roam-jump-to-index)
          ("\C-c t" . org-roam-tag-add)
          ("\C-c f" . org-roam-find-file)
@@ -887,6 +892,7 @@ General aesthetic configurations for emacs
   (deft-file-limit 30)
   (deft-current-sort-method 'title))
 #+end_src
+
 ** latex
 
 #+begin_src emacs-lisp
