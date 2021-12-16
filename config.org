@@ -1967,7 +1967,8 @@ CLOSED: [2021-11-07 Sun 13:21]
   ;; This is set in two places now, once in =eww= and once here.
   (setq browse-url-browser-function 'eww-browse-url)
   (setq browse-url-secondary-browser-function 'browse-url-default-browser)
-  (setq elfeed-feeds '("https://protesilaos.com/master.xml"
+  (setq elfeed-feeds '("https://www.juliabloggers.com/feed/" ;; julia blogs
+                       "https://protesilaos.com/master.xml"
                        "https://hnrss.org/newest?points=100"
                        "https://dynomight.net/feed.xml"
                        ("https://computer.rip/rss.xml" tech) ;; "computers are bad
