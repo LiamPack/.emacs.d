@@ -197,17 +197,17 @@ General aesthetic configurations for emacs
         ;; that can combine any of `3d' OR `moody', `borderless',
         ;; `accented'.  The variable's doc string shows all possible
         ;; combinations.
-        modus-themes-mode-line '(accented)
+        modus-themes-mode-line '()
 
         ;; Options for `modus-themes-syntax' are either nil (the default),
         ;; or a list of properties that may include any of those symbols:
         ;; `faint', `yellow-comments', `green-strings', `alt-syntax'
-        modus-themes-syntax '(yellow-comments green-strings)
+        modus-themes-syntax '(yellow-comments green-strings alt-syntax)
 
         ;; Options for `modus-themes-hl-line' are either nil (the default),
         ;; or a list of properties that may include any of those symbols:
         ;; `accented', `underline', `intense'
-        modus-themes-hl-line '(accented underline)
+        modus-themes-hl-line '()
 
         ;; Options for `modus-themes-paren-match' are either nil (the
         ;; default), or a list of properties that may include any of those
@@ -1542,9 +1542,9 @@ through e.g. corfu. MCT doesn't offer that.
   (global-eldoc-mode 1))
 
 ;; paren stuff
-(use-package paredit
+(use-package lispy
   :straight t
-  :diminish paredit-mode
+  :diminish lispy-mode
   :hook ((emacs-lisp-mode-hook scheme-mode-hook lisp-mode-hook) . paredit-mode))
 
 (use-package rainbow-delimiters
