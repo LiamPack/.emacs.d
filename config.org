@@ -497,7 +497,7 @@ General aesthetic configurations for emacs
 ** window management utilities (getting there)
 
 #+begin_src emacs-lisp
-(set-frame-font "deja vu sans mono 12")
+(set-frame-font "courier 14")
 
 ;; I almost always want to switch to a window when I split. So lets do that.
 (defun lp/split-window-below-and-switch ()
@@ -541,7 +541,7 @@ General aesthetic configurations for emacs
   :bind (([remap list-buffers] . ibuffer))
   :config
   (unbind-key (kbd "C-x C-b") global-map)
-  (global-set-key (kbd "C-x B") #'ibuffer))
+  (global-set-key (kbd "C-x C-b") #'ibuffer))
 
 (use-package ibuffer-vc                 ; Group buffers by VC project and status
   :straight t
@@ -1358,6 +1358,13 @@ through e.g. corfu. MCT doesn't offer that.
   ;; https://github.com/joaotavora/eglot/issues/42
   )
 
+(use-package eglot-jl
+  :straight t
+  :config
+  (eglot-jl-init)
+  (setq eglot-connect-timeout 100)
+  )
+
 (use-package consult-eglot
   :straight t
   :config
@@ -1449,6 +1456,24 @@ through e.g. corfu. MCT doesn't offer that.
   :straight t)
                                         ; optional: if Org Ref is not loaded anywhere else, load it here
 #+end_src
+
+** julia
+#+begin_src emacs-lisp
+(use-package julia-mode
+  :straight t)
+
+(use-package vterm
+  :straight t)
+
+(use-package julia-snail
+  :straight t
+  :hook (julia-mode . julia-snail-mode)
+  :config
+  (add-hook 'julia-mode-hook 'julia-snail-mode)
+  (customize-set-variable 'split-height-threshold 15)
+  )
+#+end_src
+
 ** c environment (bare bones)
 #+begin_src emacs-lisp
 (use-package cc-mode
@@ -1545,7 +1570,7 @@ through e.g. corfu. MCT doesn't offer that.
 (use-package lispy
   :straight t
   :diminish lispy-mode
-  :hook ((emacs-lisp-mode-hook scheme-mode-hook lisp-mode-hook) . paredit-mode))
+  :hook ((emacs-lisp-mode-hook scheme-mode-hook lisp-mode-hook) . lispy-mode))
 
 (use-package rainbow-delimiters
   :straight t
