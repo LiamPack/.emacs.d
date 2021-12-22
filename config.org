@@ -1778,12 +1778,10 @@ through e.g. corfu. MCT doesn't offer that.
           ( :name "inbox"
             :query "tag:inbox not tag:archived"
             :sort-order newest-first
-            :search-type tree
             :key ,(kbd "i"))
           ( :name "unread (inbox)"
             :query "tag:unread and tag:inbox"
             :sort-order newest-first
-            :search-type tree
             :key ,(kbd "u"))
           ( :name "unread all"
             :query "tag:unread and not tag:archived and not tag:list and not tag:lists"
@@ -1791,37 +1789,30 @@ through e.g. corfu. MCT doesn't offer that.
             :key ,(kbd "U"))
           ( :name "personal"
             :query "tag:personal not tag:archived"
-            :search-type tree
             :sort-order newest-first
             :key ,(kbd "p"))
           ( :name "personal all"
             :query "tag:personal"
             :sort-order newest-first
-            :search-type tree
             :key ,(kbd "P"))
           ( :name "todo"
             :query "tag:todo not tag:archived"
             :sort-order newest-first
-            :search-type tree
             :key ,(kbd "t"))
           ( :name "todo all"
             :query "tag:todo"
             :sort-order newest-first
-            :search-type tree
             :key ,(kbd "T"))
           ( :name "done"
             :query "tag:done"
             :sort-order newest-first
-            :search-type tree
             :key ,(kbd "d"))
           ( :name "flagged"
             :query "tag:flag or tag:flagged or tag:important or tag:starred"
             :sort-order newest-first
-            :search-type tree
             :key ,(kbd "f"))
           ( :name "mailing lists"
             :query "tag:list or tag:lists not tag:archived"
-            :sort-order newest-first
             :key ,(kbd "m"))
           ))
 
@@ -1843,7 +1834,7 @@ through e.g. corfu. MCT doesn't offer that.
           ;; (,(kbd "r") notmuch-show-mark-read-tags "Mark as read")
           (,(kbd "r") ("+ref" "+notes" "-unread") "Reference for the future")
           (,(kbd "s") ("+spam" "+del" "-inbox" "-unread") "Mark as spam")
-          (,(kbd "T") ("+todo" "-unread") "To-do")
+          (,(kbd "t") ("+todo" "-unread") "To-do")
           (,(kbd "u") ("+unread") "Mark as unread")))
 
   (setq notmuch-tag-formats
@@ -1996,7 +1987,8 @@ CLOSED: [2021-11-07 Sun 13:21]
   ;; This is set in two places now, once in =eww= and once here.
   (setq browse-url-browser-function 'eww-browse-url)
   (setq browse-url-secondary-browser-function 'browse-url-default-browser)
-  (setq elfeed-feeds '("https://www.juliabloggers.com/feed/" ;; julia blogs
+  (setq elfeed-feeds '("https://freddiedeboer.substack.com/feed.rss" ;; marxist i think
+                       "https://www.juliabloggers.com/feed/" ;; julia blogs
                        "https://protesilaos.com/master.xml"
                        "https://hnrss.org/newest?points=100"
                        "https://dynomight.net/feed.xml"
