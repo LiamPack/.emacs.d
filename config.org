@@ -2005,7 +2005,6 @@ CLOSED: [2021-11-07 Sun 13:21]
                        ("https://leandramcohen.substack.com/feed" fashion)
                        "https://defaultfriend.substack.com/feed"
                        "https://jdahl.substack.com/feed"
-                       ("https://www.garrisonkeillor.com/feed/" writing)
                        ("https://www.spreaker.com/show/3389445/episodes/feed" writing)
                        ("http://feeds.feedburner.com/FineArtAndYou" art)
                        ("http://inconvergent.net/atom.xml" infrequent)
