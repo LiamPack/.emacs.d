@@ -54,15 +54,16 @@
 (use-package emacs
   :init
   ;; why does this bind exist
+  (unbind-key (kbd "C-z") global-map)
   (unbind-key (kbd "C-x C-z") global-map)
 
   ;; i fat-finger way too much to not have the confirmation
   (setq confirm-kill-emacs #'yes-or-no-p)
   (global-hl-line-mode t)               ; highlight current line
-  (setq-default fill-column 80)         ; column length
+  (setq-default fill-column 90)         ; column length
   (column-number-mode t)                ; show column number in the mode line
 
-  ;; name on top of window
+  ;; name on top of frame
   (setq-default frame-title-format '("%b [%m]"))
 
   (setq warning-minimum-level :error)   ;avoid warning buffer
@@ -102,8 +103,7 @@
    initial-scratch-message ";; Present Day
 "
    visible-bell t
-   create-lockfiles nil
-   custom-safe-themes)
+   create-lockfiles nil)
 
   (show-paren-mode t)
   (setq show-paren-style 'parenthesis)
@@ -121,8 +121,8 @@
   (define-key global-map (kbd "C-<tab>") 'next-window-any-frame)
   (define-key global-map (kbd "<backtab>") 'previous-window-any-frame)
   (define-key global-map (kbd "C-x C-M-e") 'pp-macroexpand-last-sexp)
-  (define-key global-map (kbd "C-x C-e") 'eval-defun)
-  (define-key global-map (kbd "C-x e") 'eval-last-sexp)
+  (define-key global-map (kbd "C-x e") 'eval-defun)
+  (define-key global-map (kbd "C-x C-e") 'eval-last-sexp)
   (define-key global-map (kbd "C-h j") 'describe-keymap)
   (define-key global-map (kbd "C-c C-j") 'join-line)
   (define-key global-map (kbd "C-S-p") (lambda () (interactive) (previous-line 7)))
@@ -548,10 +548,7 @@ General aesthetic configurations for emacs
 
 (use-package ibuffer                    ; Better buffer list
   :straight t
-  :bind (([remap list-buffers] . ibuffer))
-  :config
-  (unbind-key (kbd "C-x C-b") global-map)
-  (global-set-key (kbd "C-x C-b") #'ibuffer))
+  :bind (([remap list-buffers] . ibuffer)))
 
 (use-package ibuffer-vc                 ; Group buffers by VC project and status
   :straight t
@@ -568,13 +565,12 @@ General aesthetic configurations for emacs
   :init (add-hook 'ibuffer-hook #'ibuffer-projectile-set-filter-groups))
 
 (use-package desktop
-  :disabled
   :config
   (setq desktop-auto-save-timeout 300)
   (setq desktop-path '("~/.emacs.d/"))
   (setq desktop-base-file-name "desktop")
-  (setq desktop-files-not-to-save "\\(.*magit.*\\)")
-  (setq desktop-modes-not-to-save '(magit-mode magit-status-mode help-mode))
+  (setq desktop-files-not-to-save ".*magit.*")
+  (setq desktop-modes-not-to-save '(magit-mode magit-status-mode help-mode info-mode compilation-mode-map))
   (setq desktop-globals-to-clear nil)
   (setq desktop-load-locked-desktop t)
   (setq desktop-missing-file-warning nil)
@@ -755,7 +751,7 @@ General aesthetic configurations for emacs
 (use-package org
   ;; TODO: fix this with the right straight source
   :straight (:type built-in)
-  :bind (("\C-cl" . org-store-link))
+  :bind (("\C-c l" . org-store-link))
   :config
   (require 'org-habit)
   (unbind-key (kbd "C-'") org-mode-map)
@@ -766,9 +762,11 @@ General aesthetic configurations for emacs
   ;; (setq org-latex-listings 'minted)
 
   ;; Some nice latex pretty-entites!
-  (setq org-startup-folded 'fold)
+  (setq org-startup-folded t)
   (setq org-pretty-entities t)
   (setq org-pretty-entities-include-sub-superscripts nil)
+  (setq org-indirect-buffer-display #'current-window)
+  (setq org-hide-emphasis-markers nil)
 
   ;; NOTE: If this isn't working, make sure to delete /
   ;; byte-recompile the /elpa/org/.. directory!
@@ -804,7 +802,7 @@ General aesthetic configurations for emacs
   ;; Place tags close to the right-hand side of the window
   (defun place-agenda-tags ()
     "Put the agenda tags by the right border of the agenda window."
-    (setq org-agenda-tags-column (- 4 (window-width)))
+    (setq org-agenda-tags-column 110)
     (org-agenda-align-tags))
   (add-hook 'org-finalize-agenda-hook 'place-agenda-tags)
 
@@ -812,10 +810,10 @@ General aesthetic configurations for emacs
 
                                         ; agenda stuff
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-  ;; (setq org-agenda-dim-blocked-tasks nil)
-  ;; (setq org-agenda-compact-blocks t)
-  ;; (setq org-agenda-block-separator 45)
-  ;; Check out NOX for stuff
+  (setq org-agenda-dim-blocked-tasks nil)
+  (setq org-agenda-compact-blocks t)
+  (setq org-agenda-block-separator 45)
+
   (require 'calendar)
 
   (setq-default org-agenda-span 'week)
@@ -839,9 +837,7 @@ General aesthetic configurations for emacs
   (setq org-inbox-directory org-directory)
   (setq org-capture-templates
         `(("i" "inbox" entry (file (org-file-path "inbox.org"))
-           "* TODO %^{Task} %^g\n%t\n %?")
-          ("h" "habit" entry (file (org-file-path  "inbox.org"))
-           "* %^{Habit} %^g\n %?")))
+           "* TODO %^{Task} %^g\n%t\n %?")))
 
   ;; Auto wrap paragraphs in some modes (auto-fill-mode)
   (add-hook 'text-mode-hook 'turn-on-auto-fill)
@@ -849,9 +845,7 @@ General aesthetic configurations for emacs
 
   ;; sometimes i don't want to wrap text though, so we will toggle
   ;; with C-c q
-  (define-key org-mode-map (kbd "C-c q") 'auto-fill-mode)
-
-  (setq org-hide-emphasis-markers nil))
+  (define-key org-mode-map (kbd "C-c q") 'auto-fill-mode))
 
 (use-package org-roam
   :straight (:type git :host github
@@ -906,15 +900,6 @@ General aesthetic configurations for emacs
         org-roam-server-network-label-truncate t
         org-roam-server-network-label-truncate-length 60
         org-roam-server-network-label-wrap-length 20))
-
-(use-package deft
-  :straight t
-  :bind ("<f7>" . deft)
-  :custom
-  (deft-directory "~/org/roam")
-  (deft-recursive t)
-  (deft-file-limit 30)
-  (deft-current-sort-method 'title))
 #+end_src
 
 ** latex
@@ -923,8 +908,10 @@ General aesthetic configurations for emacs
 (use-package org-ref
   :straight t
   :config
+
   (use-package async
     :straight t)
+
   (require 'async)
   (require 'org-ref-bibtex)
   (require 'doi-utils)
@@ -951,10 +938,6 @@ General aesthetic configurations for emacs
 
 (use-package tex-mode
   :config
-  (setq TeX-PDF-mode t)
-  ;; The damn text is too tiny on the preview.
-  ;; (set-default 'preview-scale-function 3.0)
-
   ;; revert pdf-view after compilation
   (add-hook 'TeX-after-compilation-finished-functions #'TeX-revert-document-buffer)
   (setq TeX-view-program-selection '((output-pdf "PDF Tools"))
@@ -967,21 +950,6 @@ General aesthetic configurations for emacs
   (add-hook 'LaTeX-mode-hook 'flyspell-mode)
   (add-hook 'LaTeX-mode-hook 'flyspell-buffer)
   (add-hook 'LaTeX-mode-hook 'turn-on-reftex)
-
-  ;; TODO Alt config!
-  (setq TeX-auto-save t)
-  (setq TeX-parse-self t)
-  (setq-default TeX-master nil)
-  (setq TeX-PDF-mode t)
-  (setq reftex-plug-into-AUCTeX t)
-  (setq TeX-save-query nil)
-  (setq-default TeX-command-extra-options "--shell-escape")
-  (setq TeX-error-overview-open-after-TeX-run t)
-  (setq TeX-electric-math '("$" . "$"))
-  (setq TeX-electric-sub-and-superscript t)
-
-  ;; Fix auto-fill in math mode
-  (setq-default LaTeX-fill-break-at-separators (quote (\\\( \\\[ \\\])))
 
   (eval-after-load "ispell"
     (progn
@@ -1041,10 +1009,7 @@ General aesthetic configurations for emacs
       (prot/pdf-tools-backdrop)))
 
   (add-hook 'pdf-tools-enabled-hook #'prot/pdf-tools-midnight-mode-toggle)
-  (add-hook 'modus-themes-after-load-theme-hook #'prot/pdf-tools-midnight-mode-toggle)
-
-  ;; TODO change enlarge ratios for =,+,- (pdf-view-enlarge, pdf-view-shrink), etc.
-  )
+  (add-hook 'modus-themes-after-load-theme-hook #'prot/pdf-tools-midnight-mode-toggle))
 #+end_src
 
 ** flyspell
@@ -1105,7 +1070,7 @@ through e.g. corfu. MCT doesn't offer that.
       '(read-only t cursor-intangible t face minibuffer-prompt))
 #+end_src
 
-** vertigo
+** vertico
 #+BEGIN_SRC emacs-lisp
 (use-package vertico
   :straight t
@@ -1193,11 +1158,10 @@ through e.g. corfu. MCT doesn't offer that.
   (setq consult-async-input-throttle 0.8)
   (setq consult-narrow-key "<")
   :config
-  ;; (setf (alist-get 'slime-repl-mode consult-mode-histories)
-  ;;       'slime-repl-input-history)
+  (setf (alist-get 'slime-repl-mode consult-mode-histories)
+        'slime-repl-input-history)
   (setq xref-show-xrefs-function #'consult-xref)
   (setq xref-show-definitions-function #'consult-xref)
-  (setq completion-in-region-function #'consult-completion-in-region)
   (define-key completion-list-mode-map (kbd "C-o") #'consult-preview-at-point)
 
   ;; Use `consult-completion-in-region' if Vertico is enabled.
@@ -1207,8 +1171,7 @@ through e.g. corfu. MCT doesn't offer that.
           (apply (if vertico-mode
                      #'consult-completion-in-region
                    #'completion--in-region)
-                 args)))
-  )
+                 args))))
 
 (use-package consult-dir
   :straight t
@@ -1216,7 +1179,6 @@ through e.g. corfu. MCT doesn't offer that.
          :map minibuffer-local-completion-map
          ("C-x C-d" . consult-dir)
          ("C-x C-j" . consult-dir-jump-file)))
-
 
 (use-package consult-bibtex
   :straight (:type git :host github :repo "mohkale/consult-bibtex")
@@ -1275,8 +1237,9 @@ through e.g. corfu. MCT doesn't offer that.
                                     orderless-literal
                                     orderless-strict-leading-initialism
                                     orderless-regexp
-                                    ;;orderless-flex
+                                    orderless-flex
                                     ))
+
   (defun literal-if-comma (pattern _index _total)
     (when (string-suffix-p "," pattern)
       `(orderless-literal . ,(substring pattern 0 -1))))
@@ -1345,8 +1308,7 @@ through e.g. corfu. MCT doesn't offer that.
   (add-to-list 'org-roam-completion-functions #'cape-abbrev)
   (add-to-list 'org-roam-completion-functions #'cape-ispell)
   (add-to-list 'org-roam-completion-functions #'cape-dict)
-  (add-to-list 'org-roam-completion-functions #'cape-symbol)
-  )
+  (add-to-list 'org-roam-completion-functions #'cape-symbol))
 #+end_src
 ** yasnippet
 #+begin_src emacs-lisp
@@ -1360,6 +1322,9 @@ through e.g. corfu. MCT doesn't offer that.
   (setq yas-fallback-behavior 'return-nil)
   (setq yas-triggers-in-field t)
   (setq yas-verbosity 0))
+
+(use-package yasnippet-snippets
+  :straight t)
 #+end_src
 
 * programming languages and environments
