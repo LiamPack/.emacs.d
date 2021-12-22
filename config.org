@@ -35,7 +35,7 @@
 
 (global-set-key (kbd "C-x k") #'(lambda () (interactive) (kill-buffer nil)))
 (global-set-key (kbd "C-x C-k") #'(lambda () (interactive) (kill-buffer nil) (delete-window)))
-(global-set-key (kbd "C-c C-k") #'eval-buffer)
+(define-key emacs-lisp-mode-map (kbd "C-c C-k") #'eval-buffer)
 (global-set-key (kbd "C-c n") #'clean-up-buffer-or-region)
 (global-set-key (kbd "<f5>")  #'revert-buffer)
 (global-set-key (kbd "C-;") #'comment-or-uncomment-region)
@@ -58,17 +58,17 @@
 
   ;; i fat-finger way too much to not have the confirmation
   (setq confirm-kill-emacs #'yes-or-no-p)
-  (global-hl-line-mode t) ; highlight current line
-  (setq-default fill-column 80)   ; column length
-  (column-number-mode t)  ; show column number in the mode line
+  (global-hl-line-mode t)               ; highlight current line
+  (setq-default fill-column 80)         ; column length
+  (column-number-mode t)                ; show column number in the mode line
 
   ;; name on top of window
   (setq-default frame-title-format '("%b [%m]"))
 
-  (setq warning-minimum-level :error)        ;avoid warning buffer
+  (setq warning-minimum-level :error)   ;avoid warning buffer
 
   ;; scroll
-  (setq auto-window-vscroll nil)        ;avoid next-line to trigger line-move-partial
+  (setq auto-window-vscroll nil)  ; avoid next-line to trigger line-move-partial
   (setq scroll-conservatively 10)
   (setq scroll-margin 7)
   (menu-bar-mode -1)
@@ -87,7 +87,7 @@
 
   ;; create backups in separate folder
   (setq backup-directory-alist `(("." . "~/.saves")))
-  (setq create-lockfiles nil)       ; files with # problem with onedrive...
+  (setq create-lockfiles nil)           ; files with # problem with onedrive...
 
   ;; answering just 'y' or 'n' will do
   (defalias 'yes-or-no-p 'y-or-n-p)
@@ -114,9 +114,9 @@
 
   (setq set-mark-command-repeat-pop t)
   (setq-default
-   indent-tabs-mode nil      ; don't insert tab when indent
+   indent-tabs-mode nil                 ; don't insert tab when indent
    ;; this is giving me problems when creating new lines in org-mode source blocks
-   help-window-select t     ; focus on help window when openend
+   help-window-select t                 ; focus on help window when openend
    window-combination-resize t)
   (define-key global-map (kbd "C-<tab>") 'next-window-any-frame)
   (define-key global-map (kbd "<backtab>") 'previous-window-any-frame)
@@ -125,7 +125,17 @@
   (define-key global-map (kbd "C-x e") 'eval-last-sexp)
   (define-key global-map (kbd "C-h j") 'describe-keymap)
   (define-key global-map (kbd "C-c C-j") 'join-line)
+  (define-key global-map (kbd "C-S-p") (lambda () (interactive) (previous-line 7)))
+  (define-key global-map (kbd "C-S-n") (lambda () (interactive) (next-line 7)))
   ) ; resize windows proportionaly
+
+(use-package repeat
+  :straight (:type built-in)
+  :config
+  (setq repeat-on-final-keystroke t)
+  (setq set-mark-command-repeat-pop t)
+
+  (repeat-mode 1))
 #+end_src
 
 #+RESULTS:
@@ -297,7 +307,7 @@ General aesthetic configurations for emacs
 #+begin_src emacs-lisp
 (use-package meow
   :disabled
-    :straight (:type git :host github :repo "meow-edit/meow")
+  :straight (:type git :host github :repo "meow-edit/meow")
   :config
   (defun meow-setup ()
     (setq meow-cheatsheet-layout meow-cheatsheet-layout-qwerty)
@@ -610,7 +620,9 @@ General aesthetic configurations for emacs
   (global-set-key (kbd "C-x C-o") 'display-buffer)
   ;; [2021-12-21 Tue] C-x C-{p,n} go to next/previous buffer (new to me)
   (setq display-buffer-alist
-        `(;; no window
+        `(
+          (".*eww.*"
+           (display-buffer-reuse-window display-buffer-same-window))
           ("\\`\\*Async Shell Command\\*\\'"
            (display-buffer-no-window))
           ;; top side window
@@ -657,14 +669,10 @@ General aesthetic configurations for emacs
            (window-height . 0.3u))
           ("magit: .*"
            (display-buffer-reuse-mode-window display-buffer-below-selected)
-           ;; NOTE 2021-10-06: we cannot `fit-window-to-buffer' because
-           ;; the height is not known in advance.
            (window-height . 0.4))
           ("\\*\\(Calendar\\|Bookmark Annotation\\).*"
            (display-buffer-reuse-mode-window display-buffer-below-selected)
-           (window-height . fit-window-to-buffer))
-          ("\\*.*eww.*"
-           (display-buffer-same-window))))
+           (window-height . fit-window-to-buffer))))
   (let ((map global-map))
     (define-key map (kbd "C-x <down>") #'next-buffer)
     (define-key map (kbd "C-x <up>") #'previous-buffer)
@@ -678,9 +686,21 @@ General aesthetic configurations for emacs
     (define-key map (kbd "C-x {") #'shrink-window)
     (define-key map (kbd "C-x >") #'enlarge-window-horizontally) ; override `scroll-right'
     (define-key map (kbd "C-x <") #'shrink-window-horizontally)) ; override `scroll-left'
-  (let ((map resize-window-repeat-map))
-    (define-key map ">" #'enlarge-window-horizontally)
-    (define-key map "<" #'shrink-window-horizontally))
+  (defvar resize-window-repeat-map
+    (let ((map (make-sparse-keymap)))
+      ;; Standard keys:
+      (define-key map "^" 'enlarge-window)
+      (define-key map "}" 'enlarge-window-horizontally)
+      (define-key map "{" 'shrink-window-horizontally) ; prot note: those three are C-x KEY
+      ;; Additional keys:
+      (define-key map "v" 'shrink-window) ; prot note: this is not bound by default
+      map)
+    "Keymap to repeat window resizing commands.  Used in `repeat-mode'.")
+  (put 'enlarge-window 'repeat-map 'resize-window-repeat-map)
+  (put 'enlarge-window-horizontally 'repeat-map 'resize-window-repeat-map)
+  (put 'shrink-window-horizontally 'repeat-map 'resize-window-repeat-map)
+  (put 'shrink-window 'repeat-map 'resize-window-repeat-map)
+
   :hook ((help-mode-hook . visual-line-mode)
          (custom-mode-hook . visual-line-mode)))
 
