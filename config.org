@@ -497,7 +497,7 @@ General aesthetic configurations for emacs
 ** window management utilities (getting there)
 
 #+begin_src emacs-lisp
-(set-frame-font "courier 14")
+(set-frame-font "InputMono 12")
 
 ;; I almost always want to switch to a window when I split. So lets do that.
 (defun lp/split-window-below-and-switch ()
@@ -607,6 +607,8 @@ General aesthetic configurations for emacs
 ;; https://protesilaos.com/dotemacs/#h:c110e399-3f43-4555-8427-b1afe44c0779)
 (use-package window
   :init
+  (global-set-key (kbd "C-x C-o") 'display-buffer)
+  ;; [2021-12-21 Tue] C-x C-{p,n} go to next/previous buffer (new to me)
   (setq display-buffer-alist
         `(;; no window
           ("\\`\\*Async Shell Command\\*\\'"
@@ -628,7 +630,7 @@ General aesthetic configurations for emacs
            (side . top)
            (slot . 2))
           ;; left side window
-          ("\\*\\(.* # Help.*\\|Help\\)\\*"    ; See the hooks for `visual-line-mode'
+          ("\\*\\(.* # Help.*\\|Help\\)\\*" ; See the hooks for `visual-line-mode'
            (display-buffer-reuse-mode-window display-buffer-in-side-window)
            (window-width . 0.25)
            (side . left)
@@ -657,10 +659,12 @@ General aesthetic configurations for emacs
            (display-buffer-reuse-mode-window display-buffer-below-selected)
            ;; NOTE 2021-10-06: we cannot `fit-window-to-buffer' because
            ;; the height is not known in advance.
-           (window-height . 0.3))
+           (window-height . 0.4))
           ("\\*\\(Calendar\\|Bookmark Annotation\\).*"
            (display-buffer-reuse-mode-window display-buffer-below-selected)
-           (window-height . fit-window-to-buffer))))
+           (window-height . fit-window-to-buffer))
+          ("\\*.*eww.*"
+           (display-buffer-same-window))))
   (let ((map global-map))
     (define-key map (kbd "C-x <down>") #'next-buffer)
     (define-key map (kbd "C-x <up>") #'previous-buffer)
@@ -1092,10 +1096,10 @@ through e.g. corfu. MCT doesn't offer that.
   (setq vertico-scroll-margin 0)
 
   ;; Show more candidates
-  (setq vertico-count 20)
+  (setq vertico-count 15)
 
   ;; Grow and shrink the Vertico minibuffer
-  (setq vertico-resize t)
+  (setq vertico-resize nil)
 
   ;; Optionally enable cycling for `vertico-next' and `vertico-previous'.
   (setq vertico-cycle t)
