@@ -1,15 +1,23 @@
-#+TITLE: emacs config
-- [X] get rest of init.el in here
-- [X] clean up TODO-ed headings
-- [X] finish constructing rest of init
-- [ ] gather general-purpose keybindings into single location
+#+TITLE: My Emacs Config
+
+Documenting this configuration is a way to consolidate the knowledge of my own
+environment. This could serve as an entry-point for someone (bless their heart) to try to
+see what this configuration has to offer, but primarily this is (somewhat
+counter intuitively) for selfish reasons.
+
+Outstanding things to do:
 - [ ] Evaluate Tree-Sitter instead of font-lock for syntax highlighting
-- [X] clean up latex
-- [X] clean up org
 - [-] update org-roam to v2
-- [ ] think harder about notmuch tags
 
 * sane defaults
+Not all of the emacs defaults are quite sane. So here's to some sanity. This section is
+long and needs to be broken up. Some sanity includes:
+- high cap GC which doesn't intrude on user experience (=gcmh=)
+- tramp 
+- buffer cleanup utility
+- autosaving 
+- useful binds (ELisp evaluation)
+
 #+begin_src emacs-lisp
 ;; minimizes GC interferecen with user activity
 (use-package gcmh
@@ -138,10 +146,8 @@
   (repeat-mode 1))
 #+end_src
 
-#+RESULTS:
-
 * aesthetics
-** themes i like:
+** solid themes
 General aesthetic configurations for emacs
 
 #+begin_verse
@@ -184,6 +190,8 @@ General aesthetic configurations for emacs
 #+end_verse
 
 ** modus themes, time on mode line
+=modus-themes= is simply the GOAT at this point. Not much more to say than that.
+
 #+begin_src emacs-lisp
 (use-package modus-themes
   :straight t
@@ -284,22 +292,8 @@ General aesthetic configurations for emacs
   (display-time-mode))
 #+end_src
 
-* outline
-#+begin_src emacs-lisp
-(use-package outline
-  :straight (:type built-in)
-  :diminish outline-minor-mode
-  :hook
-  (prog-mode . outline-minor-mode)
-  (markdown-mode . outline-minor-mode)
-  (conf-mode . outline-minor-mode)
-  (LaTeX-mode . outline-minor-mode)
-  :config
-  (setq outline-minor-mode-cycle t
-        outline-minor-mode-highlight 'append))
-#+end_src
 * movement and editing
-** [experimenting] meow (modular editing, not evil)
+** [experimental] meow (modular editing, not evil)
 - need to configure which modes this should be activated int
 - some keybindings are jank
 - i kinda like it
@@ -427,7 +421,14 @@ General aesthetic configurations for emacs
   )
 #+end_src
 
-** cursor related (undo, iedit, avy)
+** cursor positioning and duplicating
+Sometimes =undo= can be unwieldy to deal with. =undo-propose= provides a scratch buffer
+for that purpose. At least that's what I use it for. I understand its more powerful than
+that but I'm ignorant in many ways.
+
+=iedit= is a provides simple mark-and-multiedit capabilities. I haven't RTFM'd on
+rectangle mode to see if it provides that capability, so to the externals we go.
+
 #+begin_src emacs-lisp
 (use-package undo-propose
   :straight t
@@ -449,6 +450,11 @@ General aesthetic configurations for emacs
   :bind ("C-=" . er/expand-region))
 #+end_src
 ** isearch and replace (getting there, clean up)
+=isearch= isn't gonna go out of style anytime soon that's for sure. And especially not if
+you know some of the configuration options. Below is configured for isearch to "fuzzy
+search" on its candidates. This is accomplished by setting =search-whitespace-regexp= to
+match =.*?=, i.e all characters are whitespace. 
+
 #+begin_src emacs-lisp
 (use-package isearch
   :diminish
@@ -466,7 +472,8 @@ General aesthetic configurations for emacs
   (setq isearch-allow-scroll 'unlimited)
   (define-key minibuffer-local-isearch-map (kbd "M-/") #'isearch-complete-edit)
   (let ((map isearch-mode-map))
-    (define-key map (kbd "C-g") #'isearch-cancel) ; instead of `isearch-abort'
+    ;; (define-key map (kbd "C-g") #'isearch-cancel) ; instead of `isearch-abort'
+    (define-key map (kbd "C-g") #'isearch-abort)
     (define-key map (kbd "M-/") #'isearch-complete)))
 
 (use-package replace
@@ -504,10 +511,28 @@ General aesthetic configurations for emacs
    '(anzu-replace-threshold 50)
    '(anzu-replace-to-string-separator " => ")))
 #+end_src
-** window management utilities (getting there)
+** window management utilities
+Without good window management, there cannot be a good editor. The imperative is to
+provide a malleable, predictable, and adaptable environment built from the basics. For
+this, =display-buffer= plays a key role. Perhaps more should play a larger role, but
+alas.
+
+=ibuffer= remains a time-tested classic. It does exactly its job: logical grouping of
+buffers with some enhanced information over =list-buffers=.
+
+I have a love-hate relationship with =desktop=. I haven't read the manual enough to
+find the right configuration required to have a more seamless start-up and shut-down. But
+it remains.
+
+=tab-bar= is an interesting addition to the Emacs built-ins. I'd guess the experience
+should emulate a typical tab system in, say, VS-Code. But I don't have much experience
+with this package so I have nothing intelligent to say about it yet.
+
+Currently =popper= is lightly used in dealing with evanescent buffers.
 
 #+begin_src emacs-lisp
-(set-frame-font "InputMono 12")
+;; inputmono is my current font kick. DejaVu won't go out of style though.
+(set-frame-font "Deja Vu Sans Mono 12") 
 
 ;; I almost always want to switch to a window when I split. So lets do that.
 (defun lp/split-window-below-and-switch ()
@@ -526,25 +551,8 @@ General aesthetic configurations for emacs
 
 (global-set-key (kbd "C-x 2") 'lp/split-window-below-and-switch)
 (global-set-key (kbd "C-x 3") 'lp/split-window-right-and-switch)
-
-;; ace-window stuff
-;; You can also start by calling ace-window and then decide to switch the action to delete or swap etc. By default the bindings are:
-;;     x - delete window
-;;     m - swap windows
-;;     M - move window
-;;     j - select buffer
-;;     n - select the previous window
-;;     u - select buffer in the other window
-;;     c - split window fairly, either vertically or horizontally
-;;     v - split window vertically
-;;     b - split window horizontally
-;;     o - maximize current window
-;;     ? - show these command bindings
-(use-package ace-window
-  :straight t
-  :bind ("M-o" . ace-window)
-  :config
-  (setq  aw-keys '(?a ?s ?d ?f ?g ?h ?j ?k ?l)))
+(define-key global-map (kbd "M-o") 'other-window)
+(define-key global-map (kbd "M-O") '(lambda () (interative) (other-window -1)))
 
 (use-package ibuffer                    ; Better buffer list
   :straight t
@@ -729,7 +737,7 @@ General aesthetic configurations for emacs
           eshell-mode
           help-mode
           geiser-repl-mode
-          magit-
+          magit-mode
           compilation-mode))
   (setq popper-display-control nil) ;; already have rules set up
   (popper-mode +1)
@@ -737,6 +745,8 @@ General aesthetic configurations for emacs
 #+end_src
 
 ** beacon
+Lights up the cursor. Nice to know where the cursor is when you tab back in.
+
 #+begin_src emacs-lisp
 (use-package beacon
   :straight t
@@ -749,6 +759,20 @@ General aesthetic configurations for emacs
   (setq beacon-blink-duration .3)
   (setq beacon-blink-when-window-scrolls nil)
   (beacon-mode 1))
+#+end_src
+** outline
+#+begin_src emacs-lisp
+(use-package outline
+  :straight (:type built-in)
+  :diminish outline-minor-mode
+  :hook
+  (prog-mode . outline-minor-mode)
+  (markdown-mode . outline-minor-mode)
+  (conf-mode . outline-minor-mode)
+  (LaTeX-mode . outline-minor-mode)
+  :config
+  (setq outline-minor-mode-cycle t
+        outline-minor-mode-highlight 'append))
 #+end_src
 * reading and writing
 ** org
