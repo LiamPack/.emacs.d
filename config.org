@@ -1228,6 +1228,7 @@ General aesthetic configurations for emacs
   (setq calendar-daylight-time-zone-name "EDT")
 
   (require 'diary-lib)
+  (setq diary-file (file-truename "~/org/diary"))
   (setq user-mail-address "liampacker@gmail.com")
   (setq diary-mail-addr user-mail-address)
   (setq diary-date-forms diary-iso-date-forms)
