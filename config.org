@@ -610,6 +610,7 @@ Currently =popper= is lightly used in dealing with evanescent buffers.
           (define-key map (kbd "2") 'tab-bar-new-tab)
           (define-key map (kbd "l") 'tab-list)
           map))
+  (global-set-key (kbd "C-c C-t") tab-nav-map)
   :config
   (tab-bar-mode -1)
   (tab-bar-history-mode -1)
