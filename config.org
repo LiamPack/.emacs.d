@@ -578,11 +578,10 @@ Currently =popper= is lightly used in dealing with evanescent buffers.
   (setq desktop-path '("~/.emacs.d/"))
   (setq desktop-base-file-name "desktop")
   (setq desktop-files-not-to-save ".*magit.*")
-  (setq desktop-modes-not-to-save '(magit-mode magit-status-mode help-mode info-mode compilation-mode-map))
-  (setq desktop-globals-to-clear nil)
+  (setq desktop-modes-not-to-save '(magit-mode magit-status-mode help-mode info-mode compilation-mode-map tags-table-mode completion-mode))
   (setq desktop-load-locked-desktop t)
-  (setq desktop-missing-file-warning nil)
-  (setq desktop-restore-eager 20)
+  (setq desktop-missing-file-warning t)
+  (setq desktop-restore-eager 10)
   (setq desktop-restore-frames t)
   (setq desktop-save 'ask-if-new)
   (desktop-save-mode 1))
@@ -1454,7 +1453,7 @@ Lights up the cursor. Nice to know where the cursor is when you tab back in.
   :hook ((org-mode-hook markdown-mode-hook) . (lambda () (interactive) (flyspell-mode))))
 #+end_src
 
-* Minibuffer and completion
+* minibuffer and completion
 ** mct, minimalist completion
 [2021-12-06] I gave it a serious try but MCT isn't gonna cut it. I'd like my
 completions to be done quicker, and I would also like the option of performing
@@ -2055,7 +2054,7 @@ through e.g. corfu. MCT doesn't offer that.
 (use-package consult-flycheck
   :straight (:type git :host github :repo "minad/consult-flycheck"))
 #+end_src
-* unix environment interaction
+* unix environment interface
 ** magit and vc
 #+begin_src emacs-lisp
 ;; Mark TODOs , FIXME, BUG as red in src code
@@ -2168,7 +2167,8 @@ through e.g. corfu. MCT doesn't offer that.
   (exec-path-from-shell-initialize))
 #+end_src
 
-* notmuch, mail in emacs
+* external environment interface
+** notmuch, mail in emacs
 #+begin_src emacs-lisp
 (use-package notmuch
   :straight t
@@ -2330,7 +2330,7 @@ through e.g. corfu. MCT doesn't offer that.
   (setq send-mail-function 'smtpmail-send-it))
 #+END_SRC
 
-* eww, web browsing
+** eww, web browsing
 #+begin_src emacs-lisp
 (use-package eww
   :straight (:type built-in)
@@ -2369,8 +2369,8 @@ through e.g. corfu. MCT doesn't offer that.
   (define-key eww-bookmark-mode-map (kbd "d") #'eww-bookmark-kill) ; same
   )
 #+end_src
-* elfeed -- RSS feed reader
-CLOSED: [2021-11-07 Sun 13:21]
+** elfeed, RSS feed reader
+
 #+begin_src emacs-lisp
 (use-package elfeed
   :straight t
