@@ -617,8 +617,13 @@ General aesthetic configurations for emacs
   ;; [2021-12-21 Tue] C-x C-{p,n} go to next/previous buffer (new to me)
   (setq display-buffer-alist
         `(
+          ("\\*Org Agenda\\*"
+           (display-buffer-reuse-window display-buffer-same-window))
           (".*eww.*"
            (display-buffer-reuse-window display-buffer-same-window))
+          ("\\*Org Src.*"
+           (display-buffer-reuse-window display-buffer-same-window)
+           (window-height . fit-window-to-buffer))
           ("\\`\\*Async Shell Command\\*\\'"
            (display-buffer-no-window))
           ;; top side window
@@ -746,6 +751,114 @@ General aesthetic configurations for emacs
   (beacon-mode 1))
 #+end_src
 * reading and writing
+** diary, calendar
+#+begin_src emacs-lisp
+(use-package calendar
+  :straight (:type built-in)
+  :config
+  ;; lots ripped from prot
+  (setq calendar-mark-diary-entries-flag t)
+  (setq calendar-mark-holidays-flag t)
+  (setq calendar-mode-line-format nil)
+  (setq calendar-time-display-form
+        '(24-hours ":" minutes
+                   (when time-zone
+                     (format "(%s)" time-zone))))
+  (setq calendar-week-start-day 1)      ; Monday
+  (setq calendar-date-style 'iso)
+  (setq calendar-date-display-form calendar-iso-date-display-form)
+  (setq calendar-time-zone-style 'numeric) ; Emacs 28.1
+
+  (require 'solar)
+  (setq calendar-latitude 39.0         ; Not my actual coordinates
+        calendar-longitude -76.4)
+
+  (require 'cal-dst)
+  (setq calendar-standard-time-zone-name "EST")
+  (setq calendar-daylight-time-zone-name "EDT")
+
+  (require 'diary-lib)
+  (setq user-mail-address "liampacker@gmail.com")
+  (setq diary-mail-addr user-mail-address)
+  (setq diary-date-forms diary-iso-date-forms)
+  (setq diary-comment-start ";;")
+  (setq diary-comment-end "")
+  (setq diary-nonmarking-symbol "!")
+  (setq diary-show-holidays-flag t)
+  (setq diary-display-function #'diary-fancy-display) ; better than its alternative
+  (setq diary-header-line-format nil)
+  (setq diary-list-include-blanks nil)
+  (setq diary-number-of-entries 2)
+  (setq diary-mail-days 2)
+  (setq diary-abbreviated-year-flag nil)
+
+  (add-hook 'calendar-today-visible-hook #'calendar-mark-today)
+  (add-hook 'diary-list-entries-hook 'diary-sort-entries t)
+  (add-hook 'diary-mode-hook #'goto-address-mode) ; buttonise plain text links
+
+  ;; Those presuppose (setq diary-display-function #'diary-fancy-display)
+  (add-hook 'diary-list-entries-hook 'diary-include-other-diary-files)
+  (add-hook 'diary-mark-entries-hook 'diary-mark-included-diary-files)
+
+  ;; Prevent Org from interfering with my key bindings.
+  (remove-hook 'calendar-mode-hook #'org--setup-calendar-bindings)
+
+  (let ((map calendar-mode-map))
+    (define-key map (kbd "s") #'calendar-sunrise-sunset)
+    (define-key map (kbd "l") #'lunar-phases)
+    (define-key map (kbd "i") nil) ; Org sets this, much to my chagrin (see `remove-hook' above)
+    (define-key map (kbd "i a") #'diary-insert-anniversary-entry)
+    (define-key map (kbd "i b") #'diary-insert-block-entry)
+    (define-key map (kbd "i c") #'diary-insert-cyclic-entry)
+    (define-key map (kbd "i d") #'diary-insert-entry) ; for current "day"
+    (define-key map (kbd "i i") #'diary-insert-entry) ; most common action, easier to type
+    (define-key map (kbd "i m") #'diary-insert-monthly-entry)
+    (define-key map (kbd "i w") #'diary-insert-weekly-entry)
+    (define-key map (kbd "i y") #'diary-insert-yearly-entry)
+    (define-key map (kbd "M-n") #'calendar-forward-month)
+    (define-key map (kbd "M-p") #'calendar-backward-month)))
+
+(use-package appt
+  :straight (:type built-in)
+  :config
+  (setq appt-display-diary nil)
+  (setq appt-disp-window-function #'appt-disp-window)
+  (setq appt-display-mode-line t)
+  (setq appt-display-interval 3)
+  (setq appt-audible nil)
+  (setq appt-warning-time-regexp "appt \\([0-9]+\\)")
+  (setq appt-message-warning-time 6)
+
+  (run-at-time 10 nil #'appt-activate 1))
+
+
+;; The idea is to get a reminder via email when I launch Emacs in the
+;; morning and this file is evaluated.  Obviously this is not a super
+;; sophisticated approach, though I do not need one.
+(let ((time (string-to-number (format-time-string "%H"))))
+  (when (and (> time 4) (< time 9))
+    (run-at-time (* 60 5) nil #'diary-mail-entries)))
+
+(require 'holidays)
+;; (setq calendar-holidays (append holiday-solar-holidays prot-diary-local-holidays))
+
+;; (with-eval-after-load 'prot-outline
+;;   (add-hook 'diary-mode-hook #'prot-outline-minor-mode-safe))
+
+;; (let ((map diary-mode-map))
+;;   (define-key map (kbd "<M-return>") #'prot-diary-newline-indent)
+;;   (define-key map (kbd "M-n") #'prot-diary-heading-next)
+;;   (define-key map (kbd "M-p") #'prot-diary-heading-previous)
+;;   (define-key map (kbd "C-c C-a") #'prot-diary-align-timestamped-entries))
+(let ((map global-map))
+  (define-key map (kbd "C-c d c") #'calendar)
+  ;; (define-key map (kbd "C-c d d") #'prot-diary-display-entries)
+  ;; (define-key map (kbd "C-c d e") #'prot-diary-edit-diary)
+  (define-key map (kbd "C-c d i") #'diary-insert-entry)
+  (define-key map (kbd "C-c d m") #'diary-mail-entries))
+
+#+end_src
+
 ** org
 #+begin_src emacs-lisp
 (use-package org
@@ -755,49 +868,138 @@ General aesthetic configurations for emacs
   :config
   (require 'org-habit)
   (unbind-key (kbd "C-'") org-mode-map)
+  (defun org-file-path (filename)
+    "Return absolute address of an org file give its relative name."
+    (concat (file-name-as-directory org-directory) filename))
 
-  ;; Some latex stuff in org
-  (setq org-format-latex-options (plist-put org-format-latex-options :scale 3.0))
-  ;; (setq-default org-highlight-latex-and-related '(latex script entities))
-  ;; (setq org-latex-listings 'minted)
-
-  ;; Some nice latex pretty-entites!
+;;; org latex interplay
+  (setq-default org-highlight-latex-and-related '(native latex script entities))
+  (setq org-latex-listings 'minted) ;; export source code with color+font
   (setq org-startup-folded t)
   (setq org-pretty-entities t)
-  (setq org-pretty-entities-include-sub-superscripts nil)
+  (setq org-pretty-entities-include-sub-superscripts nil) ; not a fan of hidden characters
   (setq org-indirect-buffer-display #'current-window)
-  (setq org-hide-emphasis-markers nil)
+  (setq org-src-window-setup 'plain) ;; let display-buffer handle it
 
+;;; babel
   ;; NOTE: If this isn't working, make sure to delete /
-  ;; byte-recompile the /elpa/org/.. directory!
+  ;; byte-recompile the /elpa/org/.. directory.
   ;; enable language compiles
   (org-babel-do-load-languages
    'org-babel-load-languages
    '((emacs-lisp . t)
      (gnuplot . t)))
+  ;; (setq org-confirm-babel-evaluate nil)
+  ;; (setq org-M-RET-may-split-line nil)
+  ;; (setq org-src-fontify-natively t)
+  ;; (setq org-src-tab-acts-natively t)
+  ;; (setq org-edit-src-content-indentation 0)
+  ;; (setq org-treat-S-cursor-todo-selection-as-state-change nil)
 
   (setq org-confirm-babel-evaluate nil)
-  (setq org-M-RET-may-split-line nil)
+  (setq org-src-window-setup 'current-window)
+  (setq org-edit-src-persistent-message nil)
   (setq org-src-fontify-natively t)
+  (setq org-src-preserve-indentation t)
   (setq org-src-tab-acts-natively t)
   (setq org-edit-src-content-indentation 0)
-  (setq org-use-fast-todo-selection t)
-  (setq org-treat-S-cursor-todo-selection-as-state-change nil)
 
-  ;; Org-capture management + Tasks
+;;; general org configuration. Lots of inspiration and discovery from Prot's org configuration (glad he RTFM!)
   (setq org-directory "~/org/")
+  (setq org-inbox-directory org-directory)
+  (setq org-imenu-depth 7)
+  (setq org-special-ctrl-a/e nil)
+  (setq org-special-ctrl-k nil)
+  (setq org-hide-emphasis-markers nil)
+  (setq org-M-RET-may-split-line '((default . nil)))
+  (setq org-hide-leading-stars nil)
+  (setq org-cycle-separator-lines 0)
+  (setq org-structure-template-alist
+        '(("s" . "src")
+          ("E" . "src emacs-lisp")
+          ("e" . "example")
+          ("q" . "quote")
+          ("v" . "verse")
+          ("V" . "verbatim")
+          ("c" . "center")
+          ("C" . "comment")))
+  (setq org-catch-invisible-edits 'show)
+  (setq org-return-follows-link nil)
+  (setq org-loop-over-headlines-in-active-region 'start-level)
+  (setq org-use-sub-superscripts '{})   ; not a big fan of the ambiguity
+  (setq org-insert-heading-respect-content t)
 
-  (defun org-file-path (filename)
-    "Return absolute address of an org file give its relative name."
-    (concat (file-name-as-directory org-directory) filename))
 
+  ;; tags
+  (setq org-tags-match-list-sublevels t)
+
+  ;; refile
   (setq org-refile-targets '((all-org-files :maxlevel . 3)))
-
   (setq org-refile-use-outline-path 'file)
   (setq org-outline-path-complete-in-steps t)
+  (setq org-refile-allow-creating-parent-nodes 'confirm) ; allow creating new parents on refile
+  (setq org-refile-use-cache t)
 
-  ;; allow creating new parents on refile
-  (setq org-refile-allow-creating-parent-nodes 'confirm)
+  ;; todos
+  (setq org-reverse-note-order nil)
+  (setq org-todo-keywords
+        '((sequence "TODO(t)" "MAYBE(m)" "WAIT(w@/!)" "|" "CANCEL(c@)" "DONE(d!)")))
+  (setq org-todo-keyword-faces
+        '(("WAIT" . '(bold org-todo))
+          ("MAYBE" . '(bold shadow))
+          ("CANCEL" . '(bold org-done))))
+  (setq org-use-fast-todo-selection 'expert)
+  (setq org-priority-faces
+        '((?A . '(bold org-priority))
+          (?B . org-priority)
+          (?C . '(shadow org-priority))))
+  (setq org-fontify-done-headline nil)
+  (setq org-fontify-quote-and-verse-blocks t)
+  (setq org-fontify-whole-heading-line nil)
+  (setq org-fontify-whole-block-delimiter-line nil)
+  (setq org-highlight-latex-and-related nil) ; other options affect elisp regexp in src blocks
+  (setq org-enforce-todo-dependencies t)
+  (setq org-enforce-todo-checkbox-dependencies t)
+  (setq org-track-ordered-property-with-tag t)
+  (setq org-highest-priority ?A)
+  (setq org-lowest-priority ?C)
+  (setq org-default-priority ?A)
+
+;;; logging
+  (setq org-log-done 'time)             ; also record when the TODO was archived
+  (setq org-log-into-drawer t)
+  (setq org-log-note-clock-out nil)
+  (setq org-log-redeadline 'time)
+  (setq org-log-reschedule 'time)
+  (setq org-read-date-prefer-future 'time)
+
+;;; links
+  (setq org-link-keep-stored-after-insertion nil)
+
+;;; agenda
+;;;;; Basic agenda setup
+  (setq org-default-notes-file (thread-last org-directory (expand-file-name "notes.org")))
+  (setq org-agenda-files `(,org-directory "~/org/roam/"))
+  (setq org-agenda-span 'week)
+  (setq org-agenda-start-on-weekday 1)  ; Monday
+  (setq org-agenda-confirm-kill t)
+  (setq org-agenda-show-all-dates t)
+  (setq org-agenda-show-outline-path nil)
+  (setq org-agenda-window-setup 'current-window)
+  (setq org-agenda-skip-comment-trees t)
+  (setq org-agenda-menu-show-matcher t)
+  (setq org-agenda-menu-two-columns nil)
+  (setq org-agenda-sticky nil)
+  (setq org-agenda-custom-commands-contexts nil)
+  (setq org-agenda-max-entries nil)
+  (setq org-agenda-max-todos nil)
+  (setq org-agenda-max-tags nil)
+  (setq org-agenda-max-effort nil)
+
+  (run-at-time (* 60 5) nil #'org-agenda-to-appt)
+
+  (setq org-agenda-files (list (org-file-path "inbox.org")))
+  (define-key global-map (kbd "C-c a") 'org-agenda)
 
   ;; Place tags close to the right-hand side of the window
   (defun place-agenda-tags ()
@@ -806,19 +1008,191 @@ General aesthetic configurations for emacs
     (org-agenda-align-tags))
   (add-hook 'org-finalize-agenda-hook 'place-agenda-tags)
 
-
-
-                                        ; agenda stuff
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-  (setq org-agenda-dim-blocked-tasks nil)
   (setq org-agenda-compact-blocks t)
   (setq org-agenda-block-separator 45)
+  (setq org-agenda-sorting-strategy
+        '(((agenda habit-down time-up priority-down category-keep)
+           (todo priority-down category-keep)
+           (tags priority-down category-keep)
+           (search category-keep))))
+  (setq org-agenda-breadcrumbs-separator "->")
+  (setq org-agenda-fontify-priorities 'cookies)
+  (setq org-agenda-category-icon-alist nil)
+  (setq org-agenda-remove-times-when-in-prefix nil)
+  (setq org-agenda-remove-timeranges-from-blocks nil)
+  (setq org-agenda-compact-blocks nil)
+  (setq org-agenda-block-separator ?—)
 
-  (require 'calendar)
+;;;;; Agenda marks
+  (setq org-agenda-bulk-mark-char ">")
+  (setq org-agenda-persistent-marks nil)
 
-  (setq-default org-agenda-span 'week)
-  ;; Custom agenda command definitions
-  (setq org-tags-match-list-sublevels t)
+;;;;; Agenda diary entries
+  (setq org-agenda-insert-diary-strategy 'date-tree)
+  (setq org-agenda-insert-diary-extract-time nil)
+  (setq org-agenda-include-diary t)     ;; TODO: i'm not so sure about this yet
+
+;;;;; Agenda follow mode
+  (setq org-agenda-start-with-follow-mode nil)
+  (setq org-agenda-follow-indirect t)
+
+;;;;; Agenda multi-item tasks
+  (setq org-agenda-dim-blocked-tasks t)
+  (setq org-agenda-todo-list-sublevels t)
+
+;;;;; Agenda filters and restricted views
+  (setq org-agenda-persistent-filter nil)
+  (setq org-agenda-restriction-lock-highlight-subtree t)
+
+;;;;; Agenda items with deadline and scheduled timestamps
+  (setq org-agenda-include-deadlines t)
+  (setq org-deadline-warning-days 5)
+  (setq org-agenda-skip-scheduled-if-done nil)
+  (setq org-agenda-skip-scheduled-if-deadline-is-shown t)
+  (setq org-agenda-skip-timestamp-if-deadline-is-shown t)
+  (setq org-agenda-skip-deadline-if-done nil)
+  (setq org-agenda-skip-deadline-prewarning-if-scheduled 1)
+  (setq org-agenda-skip-scheduled-delay-if-deadline nil)
+  (setq org-agenda-skip-additional-timestamps-same-entry nil)
+  (setq org-agenda-skip-timestamp-if-done nil)
+  (setq org-agenda-search-headline-for-time nil)
+  (setq org-scheduled-past-days 365)
+  (setq org-deadline-past-days 365)
+  (setq org-agenda-move-date-from-past-immediately-to-today t)
+  (setq org-agenda-show-future-repeats t)
+  (setq org-agenda-prefer-last-repeat nil)
+  (setq org-agenda-timerange-leaders
+        '("" "(%d/%d): "))
+  (setq org-agenda-scheduled-leaders
+        '("Scheduled: " "Sched.%2dx: "))
+  (setq org-agenda-inactive-leader "[")
+  (setq org-agenda-deadline-leaders
+        '("Deadline:  " "In %3d d.: " "%2d d. ago: "))
+  ;; Time grid
+  (setq org-agenda-time-leading-zero t)
+  (setq org-agenda-timegrid-use-ampm nil)
+  (setq org-agenda-use-time-grid t)
+  (setq org-agenda-show-current-time-in-grid t)
+  (setq org-agenda-current-time-string
+        (concat "Now " (make-string 70 ?-)))
+  (setq org-agenda-time-grid
+        '((daily today require-timed)
+          (0600 0700 0800 0900 1000 1100
+                1200 1300 1400 1500 1600
+                1700 1800 1900 2000 2100)
+          " ....." "-----------------"))
+  (setq org-agenda-default-appointment-duration nil)
+
+;;;;; Agenda global to-do list
+  (setq org-agenda-todo-ignore-with-date t)
+  (setq org-agenda-todo-ignore-timestamp t)
+  (setq org-agenda-todo-ignore-scheduled t)
+  (setq org-agenda-todo-ignore-deadlines t)
+  (setq org-agenda-todo-ignore-time-comparison-use-seconds t)
+  (setq org-agenda-tags-todo-honor-ignore-options nil)
+
+;;;;; Agenda tagged items
+  (setq org-agenda-show-inherited-tags t)
+  (setq org-agenda-use-tag-inheritance
+        '(todo search agenda))
+  (setq org-agenda-hide-tags-regexp nil)
+  (setq org-agenda-remove-tags nil)
+  (setq org-agenda-tags-column -100)
+
+;;;;; Agenda entry
+  ;; NOTE: I do not use this right now.  Leaving everything to its
+  ;; default value.
+  (setq org-agenda-start-with-entry-text-mode nil)
+  (setq org-agenda-entry-text-maxlines 5)
+  (setq org-agenda-entry-text-exclude-regexps nil)
+  (setq org-agenda-entry-text-leaders "    > ")
+
+;;;;; Agenda logging and clocking
+  ;; NOTE: I do not use these yet, though I plan to.  Leaving everything
+  ;; to its default value for the time being.
+  (setq org-agenda-log-mode-items '(closed clock))
+  (setq org-agenda-clock-consistency-checks
+        '((:max-duration "10:00" :min-duration 0 :max-gap "0:05" :gap-ok-around
+                         ("4:00")
+                         :default-face ; This should definitely be reviewed
+                         ((:background "DarkRed")
+                          (:foreground "white"))
+                         :overlap-face nil :gap-face nil :no-end-time-face nil
+                         :long-face nil :short-face nil)))
+  (setq org-agenda-log-mode-add-notes t)
+  (setq org-agenda-start-with-log-mode nil)
+  (setq org-agenda-start-with-clockreport-mode nil)
+  (setq org-agenda-clockreport-parameter-plist '(:link t :maxlevel 2))
+  (setq org-agenda-search-view-always-boolean nil)
+  (setq org-agenda-search-view-force-full-words nil)
+  (setq org-agenda-search-view-max-outline-level 0)
+  (setq org-agenda-search-headline-for-time t)
+  (setq org-agenda-use-time-grid t)
+  (setq org-agenda-cmp-user-defined nil)
+  (setq org-agenda-sort-notime-is-late t) ; Org 9.4
+  (setq org-agenda-sort-noeffort-is-high t) ; Org 9.4
+
+;;;;; Agenda column view
+  ;; NOTE I do not use these, but may need them in the future.
+  (setq org-agenda-view-columns-initially nil)
+  (setq org-agenda-columns-show-summaries t)
+  (setq org-agenda-columns-compute-summary-properties t)
+  (setq org-agenda-columns-add-appointments-to-effort-sum nil)
+  (setq org-agenda-auto-exclude-function nil)
+  (setq org-agenda-bulk-custom-functions nil)
+
+  (setq org-agenda-custom-commands
+        `(("a" "What's Going On"
+           ,`((tags-todo "*"
+                         ((org-agenda-skip-function '(org-agenda-skip-if nil '(timestamp)))
+                          (org-agenda-skip-function
+                           `(org-agenda-skip-entry-if
+                             'notregexp ,(format "\\[#%s\\]" (char-to-string org-priority-highest))))
+                          (org-agenda-block-separator nil)
+                          (org-agenda-overriding-header "Important tasks without a date\n")))
+              (agenda "" ((org-agenda-time-grid nil)
+                          (org-agenda-start-on-weekday nil)
+                          (org-agenda-span 1)
+                          (org-agenda-show-all-dates nil)
+                          (org-scheduled-past-days 365)
+                          ;; Excludes today's scheduled items
+                          (org-scheduled-delay-days 1)
+                          (org-agenda-block-separator nil)
+                          (org-agenda-entry-types '(:scheduled))
+                          (org-agenda-skip-function '(org-agenda-skip-entry-if 'todo 'done))
+                          (org-agenda-day-face-function (lambda (date) 'org-agenda-date))
+                          (org-agenda-format-date "")
+                          (org-agenda-overriding-header "\nPending scheduled tasks")))
+              (agenda "" ((org-agenda-span 1)
+                          (org-deadline-warning-days 0)
+                          (org-agenda-block-separator nil)
+                          (org-scheduled-past-days 0)
+                          ;; We don't need the `org-agenda-date-today'
+                          ;; highlight because that only has a practical
+                          ;; utility in multi-day views.
+                          (org-agenda-day-face-function (lambda (date) 'org-agenda-date))
+                          (org-agenda-format-date "%A %-e %B %Y")
+                          (org-agenda-overriding-header "\nToday's agenda\n")))
+              (agenda "" ((org-agenda-start-on-weekday nil)
+                          (org-agenda-start-day "+1d")
+                          (org-agenda-span 3)
+                          (org-deadline-warning-days 0)
+                          (org-agenda-block-separator nil)
+                          (org-agenda-skip-function '(org-agenda-skip-entry-if 'todo 'done))
+                          (org-agenda-overriding-header "\nNext three days\n")))
+              (agenda "" ((org-agenda-time-grid nil)
+                          (org-agenda-start-on-weekday nil)
+                          ;; We don't want to replicate the previous section's
+                          ;; three days, so we start counting from the day after.
+                          (org-agenda-start-day "+4d")
+                          (org-agenda-span 14)
+                          (org-agenda-show-all-dates nil)
+                          (org-deadline-warning-days 0)
+                          (org-agenda-block-separator nil)
+                          (org-agenda-entry-types '(:deadline))
+                          (org-agenda-skip-function '(org-agenda-skip-entry-if 'todo 'done))
+                          (org-agenda-overriding-header "\nUpcoming deadlines (+14d)\n"))))
+           )))
 
   ;; Bind C-c C-x C-s to mark todo as done and archive it
   (defun lp/mark-done-and-archive ()
@@ -828,23 +1202,56 @@ General aesthetic configurations for emacs
     (org-archive-subtree))
 
   (define-key org-mode-map (kbd "C-c C-x C-s") 'lp/mark-done-and-archive)
-  (setq org-log-done 'time)   ; also record when the TODO was archived
 
-  ;; Useful keybinds
-  (setq org-agenda-files (list (org-file-path "inbox.org")))
-  (define-key global-map (kbd "C-c a") 'org-agenda)
+;;; capturing
   (define-key global-map (kbd "C-c c") 'org-capture)
-  (setq org-inbox-directory org-directory)
   (setq org-capture-templates
-        `(("i" "inbox" entry (file (org-file-path "inbox.org"))
-           "* TODO %^{Task} %^g\n%t\n %?")))
+        `(("b" "Basic task for future review" entry
+           (file+headline "tasks.org" "Tasks to be reviewed")
+           ,(concat "* %^{Title}\n"
+                    ":PROPERTIES:\n"
+                    ":CAPTURED: %U\n"
+                    ":END:\n\n"
+                    "%i%l")
+           :empty-lines-after 1)
+          ("m" "Memorandum of conversation" entry
+           (file+headline "tasks.org" "Tasks to be reviewed")
+           ,(concat "* Memorandum of conversation with %^{Person}\n"
+                    ":PROPERTIES:\n"
+                    ":CAPTURED: %U\n"
+                    ":END:\n\n"
+                    "%i%?")
+           :empty-lines-after 1)
+          ("t" "Task with a due date" entry
+           (file+headline "tasks.org" "Tasks with a date")
+           ,(concat "* TODO %^{Title} %^g\n"
+                    "SCHEDULED: %^t\n"
+                    ":PROPERTIES:\n"
+                    ":CAPTURED: %U\n"
+                    ":END:\n\n"
+                    "%i%?")
+           :empty-lines-after 1)
+          ("e" "Email note" entry
+           (file+headline "tasks.org" "Tasks to be reviewed")
+           ,(concat "* MAYBE %:subject :mail:\n"
+                    ":PROPERTIES:\n"
+                    ":CAPTURED: %U\n"
+                    ":END:\n\n"
+                    "%a\n%i%?")
+           :empty-lines-after 1)))
 
+  (setq org-capture-templates-contexts
+        '(("e" ((in-mode . "notmuch-search-mode")
+                (in-mode . "notmuch-show-mode")
+                (in-mode . "notmuch-tree-mode")))))
+  ;; (setq org-capture-templates
+  ;;       `(("i" "inbox" entry (file (org-file-path "inbox.org"))
+  ;;          "* TODO %^{Task} %^g\n%t\n %?")))
+
+;;; autofill
   ;; Auto wrap paragraphs in some modes (auto-fill-mode)
   (add-hook 'text-mode-hook 'turn-on-auto-fill)
   (add-hook 'org-mode-hook 'turn-on-auto-fill)
-
-  ;; sometimes i don't want to wrap text though, so we will toggle
-  ;; with C-c q
   (define-key org-mode-map (kbd "C-c q") 'auto-fill-mode))
 
 (use-package org-roam
