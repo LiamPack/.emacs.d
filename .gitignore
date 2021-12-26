@@ -40,3 +40,11 @@ org-roam.db
 config.el
 eln-cache/
 elfeed
+
+savehist
+projects
+magithub
+eww-bookmarks
+dune*
+diary
+desktop

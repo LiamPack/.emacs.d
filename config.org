@@ -469,6 +469,13 @@ match =.*?=, i.e all characters are whitespace.
   (setq lazy-count-suffix-format " (%s/%s)")
   (setq isearch-yank-on-move 'shift)
   (setq isearch-allow-scroll 'unlimited)
+  ;; Emacs 28
+  (setq isearch-repeat-on-direction-change t)
+  (setq lazy-highlight-initial-delay 0.5)
+  (setq lazy-highlight-no-delay-length 3)
+  (setq isearch-wrap-pause t)
+
+
   (define-key minibuffer-local-isearch-map (kbd "M-/") #'isearch-complete-edit)
   (let ((map isearch-mode-map))
     ;; (define-key map (kbd "C-g") #'isearch-cancel) ; instead of `isearch-abort'
@@ -485,6 +492,7 @@ match =.*?=, i.e all characters are whitespace.
          ("t" . toggle-truncate-lines))
   :config
   (setq list-matching-lines-jump-to-current-line t)
+
   )
 
 #+end_src
@@ -774,11 +782,8 @@ Currently =popper= is lightly used in dealing with evanescent buffers.
   ;; TODO: fix this with the right straight source
   :straight t
   :config
-  (require 'org-habit)
-  (require 'org-src)
   (unbind-key (kbd "C-'") org-mode-map)
   (unbind-key (kbd "C-c C-j") org-mode-map)
-  (define-key org-mode-map (kbd "C-c '") 'org-edit-special)
   (defun org-file-path (filename)
     "Return absolute address of an org file give its relative name."
     (concat (file-name-as-directory org-directory) filename))
@@ -1186,7 +1191,6 @@ Currently =popper= is lightly used in dealing with evanescent buffers.
           (define-key map (kbd "t") 'org-roam-tag-add)
           map))
   (define-key global-map (kbd "C-c C-u") roam-nav-map)
-  (require 'org-protocol)
   :bind (("\C-c i" . org-roam-insert-immediate)
          ("\C-c o" . org-roam-jump-to-index)
          ("\C-c t" . org-roam-tag-add)
@@ -1428,7 +1432,7 @@ Currently =popper= is lightly used in dealing with evanescent buffers.
   :hook ((org-mode-hook markdown-mode-hook) . (lambda () (interactive) (flyspell-mode))))
 #+end_src
 
-* minibuffer and completion
+* minibuffer, completion, and definitions
 ** mct, minimalist completion
 [2021-12-06] I gave it a serious try but MCT isn't gonna cut it. I'd like my
 completions to be done quicker, and I would also like the option of performing
@@ -1782,6 +1786,21 @@ nice snippets. they'll never go out of fashion
   :straight t)
 #+end_src
 
+** xref
+Its debateable whether xref should be in this section. May re-evaluate in future
+
+#+BEGIN_SRC emacs-lisp
+(use-package xref
+  :straight (:type built-in)
+  :config
+  ;; All those have been changed for Emacs 28
+  (setq xref-show-definitions-function #'xref-show-definitions-completing-read) ; for M-.
+  (setq xref-show-xrefs-function #'xref-show-definitions-buffer) ; for grep and the like
+  (setq xref-file-name-display 'project-relative)
+  (setq xref-search-program 'ripgrep)
+  )
+#+END_SRC
+
 * programming languages and environments
 ** General Prog Mode
 #+begin_src emacs-lisp
@@ -1943,8 +1962,8 @@ nice snippets. they'll never go out of fashion
   (define-key c++-mode-map (kbd "C-j") 'c-indent-new-comment-line)
   (add-hook 'c++-mode-hook
             #'(lambda ()
-               (setq compile-command "cmake .. -DCMAKE_EXRORT_COMPILE_COMMANDS=1 -DCMAKE_BUILD_TYPE=Debug; make clean; cmake --build . -j8")
-               ))
+                (setq compile-command "cmake .. -DCMAKE_EXRORT_COMPILE_COMMANDS=1 -DCMAKE_BUILD_TYPE=Debug; make clean; cmake --build . -j8")
+                ))
   (unbind-key (kbd "C-M-q") c-mode-map)
   (unbind-key (kbd "C-M-q") c++-mode-map)
   )
@@ -2268,9 +2287,9 @@ nice snippets. they'll never go out of fashion
   (setq prcoed-filter 'user))
 #+end_src
 
-** dired, recentf, wgrep
+** dired
+starting from prot's configuration since he always RTFMs. And I don't...
 #+begin_src emacs-lisp
-;; clean up permissions and owners, less noisy
 (use-package dired
   :config
   (add-hook 'dired-mode-hook
@@ -2278,8 +2297,41 @@ nice snippets. they'll never go out of fashion
               (dired-hide-details-mode 1)))
 
   ;; disable ls by default
-  (setq dired-use-ls-dired nil))
+  (setq delete-by-moving-to-trash t)
+  (setq dired-listing-switches
+        "-AGFhlv --group-directories-first --time-style=long-iso")
+  (setq dired-dwim-target t)
+  (setq dired-auto-revert-buffer #'dired-directory-changed-p) ; also see `dired-do-revert-buffer'
+  (add-hook 'dired-mode-hook #'dired-hide-details-mode)
+  (add-hook 'dired-mode-hook #'hl-line-mode))
 
+(use-package dired-aux
+  :straight (:type built-in)
+  :config
+  (setq dired-isearch-filenames 'dwim)
+  ;; The following variables were introduced in Emacs 27.1
+  (setq dired-create-destination-dirs 'ask)
+  (setq dired-vc-rename-file t)
+  ;; And this is for Emacs 28
+  (setq dired-do-revert-buffer (lambda (dir) (not (file-remote-p dir))))
+
+  (let ((map dired-mode-map))
+    (define-key map (kbd "C-+") #'dired-create-empty-file)
+    (define-key map (kbd "M-s f") #'nil)
+    (define-key map (kbd "C-x v v") #'dired-vc-next-action))
+  )
+(use-package dired-x
+  :straight (:type built-in)
+  :config
+  (setq dired-clean-up-buffers-too t)
+  (setq dired-clean-confirm-killing-deleted-buffers t)
+  (setq dired-x-hands-off-my-keys t)    ; easier to show the keys I use
+  (setq dired-bind-man nil)
+  (setq dired-bind-info nil)
+  (define-key dired-mode-map (kbd "I") #'dired-info))
+#+end_src
+** recentf, wgrep
+#+begin_src emacs-lisp
 (use-package recentf                    ; Save recently visited files
   :init (recentf-mode)
   :diminish recentf-mode
