@@ -115,17 +115,16 @@ long and needs to be broken up. Some sanity includes:
   (define-key emacs-lisp-mode-map (kbd "C-c C-k") #'eval-buffer)
   (define-key global-map (kbd "C-c n") #'lp/clean-up-buffer-or-region)
   (define-key global-map (kbd "<f5>")  #'revert-buffer)
-  (define-key global-map (kbd "C-;") #'comment-or-uncomment-region)
 
   (define-key global-map (kbd "C-<tab>") 'next-window-any-frame)
   (define-key global-map (kbd "<backtab>") 'previous-window-any-frame)
   (define-key global-map (kbd "C-x C-M-e") 'pp-macroexpand-last-sexp)
-  (define-key global-map (kbd "C-x e") 'eval-defun)
-  (define-key global-map (kbd "C-x C-e") 'eval-last-sexp)
+  (define-key global-map (kbd "C-x C-e") 'eval-defun)
+  (define-key global-map (kbd "C-x e") 'eval-last-sexp)
   (define-key global-map (kbd "C-h j") 'describe-keymap)
   (define-key global-map (kbd "C-c C-j") 'join-line)
-  (define-key global-map (kbd "C-S-p") (lambda () (interactive) (previous-line 7)))
-  (define-key global-map (kbd "C-S-n") (lambda () (interactive) (next-line 7)))
+  (define-key global-map (kbd "C-S-p") #'(lambda () (interactive) (previous-line 7)))
+  (define-key global-map (kbd "C-S-n") #'(lambda () (interactive) (next-line 7)))
   (use-package repeat
     :straight (:type built-in)
     :config
@@ -438,7 +437,7 @@ rectangle mode to see if it provides that capability, so to the externals we go.
   (setq undo-propose-pop-to-buffer t))
 
 (use-package iedit
-  :straight t)
+  :straight t) ;; default bind is C-;
 
 (use-package avy
   :straight t
@@ -541,7 +540,7 @@ Currently =popper= is lightly used in dealing with evanescent buffers.
 ;; inputmono is my current font kick. DejaVu won't go out of style though.
 (set-frame-font "Deja Vu Sans Mono 12")
 (define-key global-map (kbd "M-o") 'other-window)
-(define-key global-map (kbd "M-O") '(lambda () (interative) (other-window -1)))
+(define-key global-map (kbd "M-O") (lambda () (interative) (other-window -1)))
 
 (use-package ibuffer                    ; Better buffer list
   :straight (:type built-in)
@@ -1952,7 +1951,7 @@ nice snippets. they'll never go out of fashion
   (define-key c-mode-map (kbd "C-j") 'c-indent-new-comment-line)
   (define-key c++-mode-map (kbd "C-j") 'c-indent-new-comment-line)
   (add-hook 'c++-mode-hook
-            '(lambda ()
+            #'(lambda ()
                (setq compile-command "cmake .. -DCMAKE_EXRORT_COMPILE_COMMANDS=1 -DCMAKE_BUILD_TYPE=Debug; make clean; cmake --build . -j8")
                ))
   (unbind-key (kbd "C-M-q") c-mode-map)
@@ -2226,14 +2225,46 @@ nice snippets. they'll never go out of fashion
 #+begin_src emacs-lisp
 (use-package eshell
   :init
+  (require 'esh-mode)
+  (require 'esh-module)
+  (setq eshell-modules-list             ; It works but may need review
+        '(eshell-alias
+          eshell-basic
+          eshell-cmpl
+          eshell-dirs
+          eshell-glob
+          eshell-hist
+          eshell-ls
+          eshell-pred
+          eshell-prompt
+          eshell-script
+          eshell-term
+          eshell-tramp
+          eshell-unix))
+  (setenv "PAGER" "cat") ; solves issues, such as with 'git log' and the default 'less'
+  (require 'em-cmpl)
+  (require 'em-dirs)
+  (setq eshell-cd-on-directory t)
+
+  (require 'em-tramp)
+  (setq password-cache t)
+  (setq password-cache-expiry 600)
+
+  (require 'em-hist)
+  (setq eshell-hist-ignoredups t)
+  (setq eshell-save-history-on-exit t)
+
   (setq eshell-buffer-shorthand t
-        eshell-scroll-to-bottom-on-input 'all
-        eshell-error-if-no-glob t
-        eshell-hist-ignoredups t
-        eshell-save-history-on-exit t
-        eshell-prefer-lisp-functions nil
         eshell-destroy-buffer-when-process-dies t)
   :bind ("<f1>" . eshell))
+#+end_src
+** shell
+#+begin_src emacs-lisp
+(use-package shell
+  :straight (:type built-in)
+  :config
+  (setq shell-command-prompt-show-cwd t) ; Emacs 27.1
+  (setq ansi-color-for-comint-mode t))
 #+end_src
 ** proced (top for emacs)
 #+begin_src emacs-lisp
