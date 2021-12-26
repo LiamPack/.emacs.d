@@ -39,3 +39,4 @@ type-break
 org-roam.db
 config.el
 eln-cache/
+elfeed
