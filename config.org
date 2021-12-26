@@ -7,52 +7,18 @@ counter intuitively) for selfish reasons.
 
 Outstanding things to do:
 - [ ] Evaluate Tree-Sitter instead of font-lock for syntax highlighting
-- [-] update org-roam to v2
+- [ ] update org-roam to v2
 
 * sane defaults
 Not all of the emacs defaults are quite sane. So here's to some sanity. This section is
 long and needs to be broken up. Some sanity includes:
 - high cap GC which doesn't intrude on user experience (=gcmh=)
-- tramp 
+- tramp
 - buffer cleanup utility
-- autosaving 
+- autosaving
 - useful binds (ELisp evaluation)
 
 #+begin_src emacs-lisp
-;; minimizes GC interferecen with user activity
-(use-package gcmh
-  :straight t
-  :diminish gcmh-mode
-  :init
-  (setq gcmh-idle-delay 0.5
-        gcmh-high-cons-threshold (* 16 1024 1024))
-  (gcmh-mode 1))
-
-;; quicktramp setup
-(setq tramp-default-method "ssh")
-(defun clean-up-buffer-or-region ()
-  "Untabifies, indents and deletes trailing whitespace from buffer or region."
-  (interactive)
-  (save-excursion
-    (unless (region-active-p)
-      (mark-whole-buffer))
-    (untabify (region-beginning) (region-end))
-    (indent-region (region-beginning) (region-end))
-    (save-restriction
-      (narrow-to-region (region-beginning) (region-end)) (delete-trailing-whitespace))))
-
-(global-set-key (kbd "C-x k") #'(lambda () (interactive) (kill-buffer nil)))
-(global-set-key (kbd "C-x C-k") #'(lambda () (interactive) (kill-buffer nil) (delete-window)))
-(define-key emacs-lisp-mode-map (kbd "C-c C-k") #'eval-buffer)
-(global-set-key (kbd "C-c n") #'clean-up-buffer-or-region)
-(global-set-key (kbd "<f5>")  #'revert-buffer)
-(global-set-key (kbd "C-;") #'comment-or-uncomment-region)
-
-(use-package focus-autosave-mode        ; Save buffers when focus is lost
-  :straight t
-  :init (focus-autosave-mode)
-  :diminish focus-autosave-mode)
-
 ;; prevent emacs-provided org from being loaded
 (straight-register-package 'org)
 (straight-register-package 'org-contrib)
@@ -64,6 +30,9 @@ long and needs to be broken up. Some sanity includes:
   ;; why does this bind exist
   (unbind-key (kbd "C-z") global-map)
   (unbind-key (kbd "C-x C-z") global-map)
+  ;; minimizes GC interferecen with user activity
+  (setq gc-cons-threshold (* 16 1024 1024))
+
 
   ;; i fat-finger way too much to not have the confirmation
   (setq confirm-kill-emacs #'yes-or-no-p)
@@ -119,6 +88,9 @@ long and needs to be broken up. Some sanity includes:
   (setq minibuffer-prompt-properties
         '(read-only t cursor-intangible t face minibuffer-prompt))
   (add-hook 'minibuffer-setup-hook #'cursor-intangible-mode)
+  ;; quicktramp setup
+  (setq tramp-default-method "ssh")
+
 
   (setq set-mark-command-repeat-pop t)
   (setq-default
@@ -126,6 +98,25 @@ long and needs to be broken up. Some sanity includes:
    ;; this is giving me problems when creating new lines in org-mode source blocks
    help-window-select t                 ; focus on help window when openend
    window-combination-resize t)
+
+  (defun lp/clean-up-buffer-or-region ()
+    "Untabifies, indents and deletes trailing whitespace from buffer or region."
+    (interactive)
+    (save-excursion
+      (unless (region-active-p)
+        (mark-whole-buffer))
+      (untabify (region-beginning) (region-end))
+      (indent-region (region-beginning) (region-end))
+      (save-restriction
+        (narrow-to-region (region-beginning) (region-end)) (delete-trailing-whitespace))))
+
+  (define-key global-map (kbd "C-x k") #'(lambda () (interactive) (kill-buffer nil)))
+  (define-key global-map (kbd "C-x C-k") #'(lambda () (interactive) (kill-buffer nil) (delete-window)))
+  (define-key emacs-lisp-mode-map (kbd "C-c C-k") #'eval-buffer)
+  (define-key global-map (kbd "C-c n") #'lp/clean-up-buffer-or-region)
+  (define-key global-map (kbd "<f5>")  #'revert-buffer)
+  (define-key global-map (kbd "C-;") #'comment-or-uncomment-region)
+
   (define-key global-map (kbd "C-<tab>") 'next-window-any-frame)
   (define-key global-map (kbd "<backtab>") 'previous-window-any-frame)
   (define-key global-map (kbd "C-x C-M-e") 'pp-macroexpand-last-sexp)
@@ -135,17 +126,41 @@ long and needs to be broken up. Some sanity includes:
   (define-key global-map (kbd "C-c C-j") 'join-line)
   (define-key global-map (kbd "C-S-p") (lambda () (interactive) (previous-line 7)))
   (define-key global-map (kbd "C-S-n") (lambda () (interactive) (next-line 7)))
+  (use-package repeat
+    :straight (:type built-in)
+    :config
+    (setq repeat-on-final-keystroke t)
+    (setq set-mark-command-repeat-pop t)
+
+    (repeat-mode 1))
   ) ; resize windows proportionaly
 
-(use-package repeat
-  :straight (:type built-in)
-  :config
-  (setq repeat-on-final-keystroke t)
-  (setq set-mark-command-repeat-pop t)
 
-  (repeat-mode 1))
+
+
+(use-package focus-autosave-mode        ; Save buffers when focus is lost
+  :straight t
+  :init (focus-autosave-mode)
+  :diminish focus-autosave-mode)
+
 #+end_src
-
+** time on mode-line
+#+begin_src emacs-lisp
+(use-package time                       ; Show current time
+  :straight t
+  :config
+  (setq display-time-world-time-format "%H:%M %Z, %d. %b"
+        display-time-world-list '(("Europe/Berlin"    "Berlin")
+                                  ("Europe/London"    "London")
+                                  ("Europe/Istanbul"  "Istanbul")
+                                  ("America/Winnipeg" "Winnipeg (CA)")
+                                  ("America/New_York" "New York (USA)")
+                                  ("Asia/Tokyo"       "Tokyo (JP)")))
+  (setf display-time-default-load-average nil
+        display-time-use-mail-icon t
+        display-time-24hr-format t)
+  (display-time-mode))
+#+end_src
 * aesthetics
 ** solid themes
 General aesthetic configurations for emacs
@@ -276,20 +291,7 @@ General aesthetic configurations for emacs
 
 (load-theme 'modus-vivendi)
 
-(use-package time                       ; Show current time
-  :straight t
-  :config
-  (setq display-time-world-time-format "%H:%M %Z, %d. %b"
-        display-time-world-list '(("Europe/Berlin"    "Berlin")
-                                  ("Europe/London"    "London")
-                                  ("Europe/Istanbul"  "Istanbul")
-                                  ("America/Winnipeg" "Winnipeg (CA)")
-                                  ("America/New_York" "New York (USA)")
-                                  ("Asia/Tokyo"       "Tokyo (JP)")))
-  (setf display-time-default-load-average nil
-        display-time-use-mail-icon t
-        display-time-24hr-format t)
-  (display-time-mode))
+
 #+end_src
 
 * movement and editing
@@ -442,8 +444,8 @@ rectangle mode to see if it provides that capability, so to the externals we go.
   :straight t
   :config
   (avy-setup-default)
-  (global-set-key (kbd "C-'") 'avy-goto-char-timer)
-  (global-set-key (kbd "C-\"") 'avy-resume))
+  (define-key global-map (kbd "C-'") 'avy-goto-char-timer)
+  (define-key global-map (kbd "C-\"") 'avy-resume))
 
 (use-package expand-region
   :straight t
@@ -453,10 +455,11 @@ rectangle mode to see if it provides that capability, so to the externals we go.
 =isearch= isn't gonna go out of style anytime soon that's for sure. And especially not if
 you know some of the configuration options. Below is configured for isearch to "fuzzy
 search" on its candidates. This is accomplished by setting =search-whitespace-regexp= to
-match =.*?=, i.e all characters are whitespace. 
+match =.*?=, i.e all characters are whitespace.
 
 #+begin_src emacs-lisp
 (use-package isearch
+  :straight (:type built-in)
   :diminish
   :config
   (setq search-highlight t)
@@ -477,20 +480,24 @@ match =.*?=, i.e all characters are whitespace.
     (define-key map (kbd "M-/") #'isearch-complete)))
 
 (use-package replace
-  :config
-  (setq list-matching-lines-jump-to-current-line t)
+  :straight (:type built-in)
   :hook ((occur-mode-hook . hl-line-mode)
          (occur-mode-hook . (lambda ()
                               (toggle-truncate-lines t))))
   :bind (("M-s M-o" . multi-occur)
          :map occur-mode-map
-         ("t" . toggle-truncate-lines)))
+         ("t" . toggle-truncate-lines))
+  :config
+  (setq list-matching-lines-jump-to-current-line t)
+  )
 
 #+end_src
 
 *** anzu
+For a more interactive search+replace experience
 #+begin_src emacs-lisp
 (use-package anzu                       ; Position/matches count for isearch
+  :disabled
   :straight t
   :diminish anzu-mode
   :bind
@@ -511,7 +518,7 @@ match =.*?=, i.e all characters are whitespace.
    '(anzu-replace-threshold 50)
    '(anzu-replace-to-string-separator " => ")))
 #+end_src
-** window management utilities
+** window+buffer management utilities
 Without good window management, there cannot be a good editor. The imperative is to
 provide a malleable, predictable, and adaptable environment built from the basics. For
 this, =display-buffer= plays a key role. Perhaps more should play a larger role, but
@@ -532,53 +539,55 @@ Currently =popper= is lightly used in dealing with evanescent buffers.
 
 #+begin_src emacs-lisp
 ;; inputmono is my current font kick. DejaVu won't go out of style though.
-(set-frame-font "Deja Vu Sans Mono 12") 
-
-;; I almost always want to switch to a window when I split. So lets do that.
-(defun lp/split-window-below-and-switch ()
-  "Split window horizontally, then switch to that new window"
-  (interactive)
-  (split-window-below)
-  (balance-windows)
-  (other-window 1))
-
-(defun lp/split-window-right-and-switch ()
-  "Split the window vertically, then switch to the new pane."
-  (interactive)
-  (split-window-right)
-  (balance-windows)
-  (other-window 1))
-
-(global-set-key (kbd "C-x 2") 'lp/split-window-below-and-switch)
-(global-set-key (kbd "C-x 3") 'lp/split-window-right-and-switch)
+(set-frame-font "Deja Vu Sans Mono 12")
 (define-key global-map (kbd "M-o") 'other-window)
 (define-key global-map (kbd "M-O") '(lambda () (interative) (other-window -1)))
 
 (use-package ibuffer                    ; Better buffer list
-  :straight t
-  :bind (([remap list-buffers] . ibuffer)))
-
-(use-package ibuffer-vc                 ; Group buffers by VC project and status
-  :straight t
-  :defer t
-  :init (add-hook 'ibuffer-hook
-                  (lambda ()
-                    (ibuffer-vc-set-filter-groups-by-vc-root)
-                    (unless (eq ibuffer-sorting-mode 'alphabetic)
-                      (ibuffer-do-sort-by-alphabetic)))))
-
-(use-package ibuffer-projectile         ; Group buffers by Projectile project
-  :straight t
-  :defer t
-  :init (add-hook 'ibuffer-hook #'ibuffer-projectile-set-filter-groups))
+  :straight (:type built-in)
+  :bind (([remap list-buffers] . ibuffer))
+  :config
+  ;; as always, from prot:
+  (setq ibuffer-expert t)
+  (setq ibuffer-display-summary nil)
+  (setq ibuffer-use-other-window nil)
+  (setq ibuffer-show-empty-filter-groups nil)
+  (setq ibuffer-movement-cycle nil)
+  (setq ibuffer-default-sorting-mode 'filename/process)
+  (setq ibuffer-use-header-line t)
+  (setq ibuffer-default-shrink-to-minimum-size nil)
+  (setq ibuffer-formats
+        '((mark modified read-only locked " "
+                (name 40 40 :left :elide)
+                " "
+                (size 9 -1 :right)
+                " "
+                (mode 16 16 :left :elide)
+                " " filename-and-process)
+          (mark " "
+                (name 16 -1)
+                " " filename)))
+  (setq ibuffer-saved-filter-groups nil)
+  (setq ibuffer-old-time 48)
+  (add-hook 'ibuffer-mode-hook #'hl-line-mode)
+  (define-key global-map (kbd "C-x C-b") #'ibuffer)
+  (let ((map ibuffer-mode-map))
+    (define-key map (kbd "* f") #'ibuffer-mark-by-file-name-regexp)
+    (define-key map (kbd "* g") #'ibuffer-mark-by-content-regexp) ; "g" is for "grep"
+    (define-key map (kbd "* n") #'ibuffer-mark-by-name-regexp)
+    (define-key map (kbd "s n") #'ibuffer-do-sort-by-alphabetic)  ; "sort name" mnemonic
+    (define-key map (kbd "/ g") #'ibuffer-filter-by-content))
+  )
 
 (use-package desktop
+  :straight (:type built-in)
   :config
   (setq desktop-auto-save-timeout 300)
   (setq desktop-path '("~/.emacs.d/"))
   (setq desktop-base-file-name "desktop")
   (setq desktop-files-not-to-save ".*magit.*")
-  (setq desktop-modes-not-to-save '(magit-mode magit-status-mode help-mode info-mode compilation-mode-map tags-table-mode completion-mode))
+  (setq desktop-modes-not-to-save '(magit-mode magit-status-mode help-mode info-mode
+                                               compilation-mode-map tags-table-mode completion-mode))
   (setq desktop-load-locked-desktop t)
   (setq desktop-missing-file-warning t)
   (setq desktop-restore-eager 10)
@@ -587,6 +596,7 @@ Currently =popper= is lightly used in dealing with evanescent buffers.
   (desktop-save-mode 1))
 
 (use-package tab-bar
+  :straight (:type built-in)
   :init
   (setq tab-bar-close-button-show nil)
   (setq tab-bar-close-last-tab-choice 'tab-bar-mode-disable)
@@ -610,7 +620,7 @@ Currently =popper= is lightly used in dealing with evanescent buffers.
           (define-key map (kbd "2") 'tab-bar-new-tab)
           (define-key map (kbd "l") 'tab-list)
           map))
-  (global-set-key (kbd "C-c C-t") tab-nav-map)
+  (define-key global-map (kbd "C-c C-t") tab-nav-map)
   :config
   (tab-bar-mode -1)
   (tab-bar-history-mode -1)
@@ -620,8 +630,9 @@ Currently =popper= is lightly used in dealing with evanescent buffers.
 ;; Thank you prot (see
 ;; https://protesilaos.com/dotemacs/#h:c110e399-3f43-4555-8427-b1afe44c0779)
 (use-package window
+  :straight (:type built-in)
   :init
-  (global-set-key (kbd "C-x C-o") 'display-buffer)
+  (define-key global-map (kbd "C-x C-o") 'display-buffer)
   ;; [2021-12-21 Tue] C-x C-{p,n} go to next/previous buffer (new to me)
   (setq display-buffer-alist
         `(
@@ -735,6 +746,7 @@ Currently =popper= is lightly used in dealing with evanescent buffers.
           "\\*Async Shell Command\\*"
           "magit: .*"
           eshell-mode
+          shell-mode
           help-mode
           geiser-repl-mode
           magit-mode
@@ -744,23 +756,7 @@ Currently =popper= is lightly used in dealing with evanescent buffers.
   (popper-echo-mode +1))
 #+end_src
 
-** beacon
-Lights up the cursor. Nice to know where the cursor is when you tab back in.
-
-#+begin_src emacs-lisp
-(use-package beacon
-  :straight t
-  :defer 1
-  :diminish beacon-mode
-  :config
-  (setq beacon-blink-delay 0)
-  (setq beacon-size 40)
-  (setq beacon-blink-when-focused t)
-  (setq beacon-blink-duration .3)
-  (setq beacon-blink-when-window-scrolls nil)
-  (beacon-mode 1))
-#+end_src
-** outline
+** outlines and outline mode
 #+begin_src emacs-lisp
 (use-package outline
   :straight (:type built-in)
@@ -774,7 +770,7 @@ Lights up the cursor. Nice to know where the cursor is when you tab back in.
   (setq outline-minor-mode-cycle t
         outline-minor-mode-highlight 'append))
 #+end_src
-* reading and writing
+* reading, writing, and tasks
 ** org
 #+begin_src emacs-lisp
 (use-package org
@@ -784,6 +780,7 @@ Lights up the cursor. Nice to know where the cursor is when you tab back in.
   :config
   (require 'org-habit)
   (unbind-key (kbd "C-'") org-mode-map)
+  (unbind-key (kbd "C-c C-j") org-mode-map)
   (defun org-file-path (filename)
     "Return absolute address of an org file give its relative name."
     (concat (file-name-as-directory org-directory) filename))
@@ -1160,9 +1157,6 @@ Lights up the cursor. Nice to know where the cursor is when you tab back in.
         '(("e" ((in-mode . "notmuch-search-mode")
                 (in-mode . "notmuch-show-mode")
                 (in-mode . "notmuch-tree-mode")))))
-  ;; (setq org-capture-templates
-  ;;       `(("i" "inbox" entry (file (org-file-path "inbox.org"))
-  ;;          "* TODO %^{Task} %^g\n%t\n %?")))
 
 ;;; autofill
   ;; Auto wrap paragraphs in some modes (auto-fill-mode)
@@ -1201,7 +1195,7 @@ Lights up the cursor. Nice to know where the cursor is when you tab back in.
           (define-key map (kbd "d") 'deft)
           (define-key map (kbd "t") 'org-roam-tag-add)
           map))
-  (global-set-key (kbd "C-c C-u") roam-nav-map)
+  (define-key global-map (kbd "C-c C-u") roam-nav-map)
   (require 'org-protocol)
   :bind (("\C-c i" . org-roam-insert-immediate)
          ("\C-c o" . org-roam-jump-to-index)
@@ -1315,16 +1309,6 @@ Lights up the cursor. Nice to know where the cursor is when you tab back in.
     (run-at-time (* 60 5) nil #'diary-mail-entries)))
 
 (require 'holidays)
-;; (setq calendar-holidays (append holiday-solar-holidays prot-diary-local-holidays))
-
-;; (with-eval-after-load 'prot-outline
-;;   (add-hook 'diary-mode-hook #'prot-outline-minor-mode-safe))
-
-;; (let ((map diary-mode-map))
-;;   (define-key map (kbd "<M-return>") #'prot-diary-newline-indent)
-;;   (define-key map (kbd "M-n") #'prot-diary-heading-next)
-;;   (define-key map (kbd "M-p") #'prot-diary-heading-previous)
-;;   (define-key map (kbd "C-c C-a") #'prot-diary-align-timestamped-entries))
 
 ;; This weirdly needs to come after =org-roam=. otherwise these binds are shadowed by the
 ;; =org-roam-dailies-map= assignment
@@ -1337,7 +1321,6 @@ Lights up the cursor. Nice to know where the cursor is when you tab back in.
 #+end_src
 
 ** latex
-
 #+begin_src emacs-lisp
 (use-package org-ref
   :straight t
@@ -1384,11 +1367,6 @@ Lights up the cursor. Nice to know where the cursor is when you tab back in.
   (add-hook 'LaTeX-mode-hook 'flyspell-mode)
   (add-hook 'LaTeX-mode-hook 'flyspell-buffer)
   (add-hook 'LaTeX-mode-hook 'turn-on-reftex)
-
-  (eval-after-load "ispell"
-    (progn
-      (setq ispell-dictionary "en_US")
-      (setq ispell-silently-savep t))) ; save personal dict without confirmation
   )
 #+end_src
 ** markdown
@@ -1446,8 +1424,14 @@ Lights up the cursor. Nice to know where the cursor is when you tab back in.
   (add-hook 'modus-themes-after-load-theme-hook #'prot/pdf-tools-midnight-mode-toggle))
 #+end_src
 
-** flyspell
+** ispell+flyspell
 #+begin_src emacs-lisp
+(use-package ispell
+  :straight (:type built-in)
+  :init
+  (setq ispell-dictionary "en_US")
+  (setq ispell-silently-savep t))
+
 (use-package flyspell
   :straight (:type built-in)
   :diminish flyspell-mode
@@ -1462,7 +1446,7 @@ completions to be done quicker, and I would also like the option of performing
 through e.g. corfu. MCT doesn't offer that.
 
 ** general minibuffer completion configuration
-
+completion options, minibuffer options, minibuffer history options, prompt faces, ...
 #+begin_src emacs-lisp
 (setq completion-show-inline-help t)
 (setq completions-detailed t)
@@ -1505,6 +1489,7 @@ through e.g. corfu. MCT doesn't offer that.
 #+end_src
 
 ** vertico
+
 #+BEGIN_SRC emacs-lisp
 (use-package vertico
   :straight t
@@ -1518,7 +1503,7 @@ through e.g. corfu. MCT doesn't offer that.
   (setq vertico-count 15)
 
   ;; Grow and shrink the Vertico minibuffer
-  (setq vertico-resize nil)
+  (setq vertico-resize t)
 
   ;; Optionally enable cycling for `vertico-next' and `vertico-previous'.
   (setq vertico-cycle t)
@@ -1529,6 +1514,19 @@ through e.g. corfu. MCT doesn't offer that.
 #+END_SRC
 
 ** consult
+consult is an important set of utilities that extend a number of important built-in
+functions (like =list-buffers=, =goto-line=), where comprehensive completions and
+additional utilities are provided within-command.
+
+I set up a number of consult maps for quick access to important commands. Notable maps are
+the =consult-goto-map= containing any "jumping" commands such as =imenu=, =outline=, and
+so forth, and the =consult-search-map= containing any "searching" commands such as
+=ripgrep=, =isearch=, and so forth.
+
+Importantly: =consult= is can be used for word completion in terminal mode when a visual
+posframe-based or frame-based completion utility, e.g. =corfu= can't be displayed. It
+doesn't play well with lsp, but i haven't heard anything about =eglot=.
+
 #+begin_src emacs-lisp
 (use-package consult
   :straight t
@@ -1582,9 +1580,9 @@ through e.g. corfu. MCT doesn't offer that.
           (define-key map (kbd "j") 'consult-recent-file)
           (define-key map (kbd "s") 'consult-isearch)
           map))
-  (global-set-key (kbd "M-s") consult-search-map)
-  (global-set-key (kbd "M-j") consult-goto-map)
-  (global-set-key (kbd "M-r") consult-register-map)
+  (define-key global-map (kbd "M-s") consult-search-map)
+  (define-key global-map (kbd "M-j") consult-goto-map)
+  (define-key global-map (kbd "M-r") consult-register-map)
   (setq consult-preview-key (kbd "C-o") ) ;; disable live preview
   (setq consult-project-root-function #'projectile-project-root)
   (setq consult-async-min-input 3)
@@ -1622,6 +1620,14 @@ through e.g. corfu. MCT doesn't offer that.
   (setq consult-bibtex-default-action #'consult-bibtex-edit-notes))
 #+end_src
 ** embark
+
+An absolute beast of a package in its design and possible use-cases. Whether you're
+unmarked, in minibuffer, in an =info-mode= buffer, Embark will gather useful actions for
+you to execute.
+
+Over time I hope to have a better intuition for the situations in which this package can
+shine, but for now I'm using it mostly for =embark-export= for batched editing operations.
+
 #+begin_src emacs-lisp
 (use-package embark
   :straight t
@@ -1642,6 +1648,10 @@ through e.g. corfu. MCT doesn't offer that.
 #+end_src
 
 ** marginalia
+
+Enhanced minibuffer information when using =switch-to-buffer=, =find-file=,
+=describe-variable=, etc.
+
 #+begin_src emacs-lisp
 (use-package marginalia
   :straight (:host github :repo "minad/marginalia" :branch "main")
@@ -1653,6 +1663,11 @@ through e.g. corfu. MCT doesn't offer that.
   (marginalia-mode 1))
 #+end_src
 ** which-key
+
+I use =which-key= to discover new useful commands hiding in a keymap prefix. That's pretty
+much it, but its proven itself tremendously helpful for exploring features of the built-in
+or of a new package.
+
 #+begin_src emacs-lisp
 (use-package which-key
   :straight t
@@ -1660,6 +1675,17 @@ through e.g. corfu. MCT doesn't offer that.
   :config (which-key-mode 1))
 #+end_src
 ** orderless
+
+For matching symbols without regard for order, we use =orderless=.
+
+Can be not very performant depending on the matching styles (=orderless-flex= being the
+worst offender). A big configuration dream is for =orderless= to work as seamlessly as the
+usual completion utilities.
+
+When =orderless-flex= is enabled, a postfixed =,= can be used to match a literal
+string, defined by the function =literal-if-comma=. To match everything but a string,
+prefix the string with a "bang" =!=.
+
 #+begin_src emacs-lisp
 (use-package orderless
   :straight t
@@ -1710,6 +1736,7 @@ through e.g. corfu. MCT doesn't offer that.
   )
 
 (use-package corfu
+  :disabled
   :straight '(corfu :host github
                     :repo "minad/corfu")
   ;; Optional customizations
@@ -1718,6 +1745,7 @@ through e.g. corfu. MCT doesn't offer that.
   (corfu-auto t)             ;; Enable auto completion
   (corfu-quit-at-boundary t) ;; Automatically quit at word boundary
   (corfu-quit-no-match t)    ;; Automatically quit if there is no match
+  (corfu-auto-delay 0.7)
   (corfu-echo-documentation t)
   (setq tab-always-indent 'complete)
   :init
@@ -1745,6 +1773,9 @@ through e.g. corfu. MCT doesn't offer that.
   (add-to-list 'org-roam-completion-functions #'cape-symbol))
 #+end_src
 ** yasnippet
+
+nice snippets. they'll never go out of fashion
+
 #+begin_src emacs-lisp
 ;; configuration
 (use-package yasnippet
@@ -1762,6 +1793,15 @@ through e.g. corfu. MCT doesn't offer that.
 #+end_src
 
 * programming languages and environments
+** General Prog Mode
+#+begin_src emacs-lisp
+;; Mark TODOs , FIXME, BUG as red in src code
+(add-hook 'prog-mode-hook
+          (lambda ()
+            (font-lock-add-keywords
+             nil
+             '(("\\<\\(FIXME\\|TODO\\|BUG\\)" 1 font-lock-warning-face prepend)))))
+#+end_src
 ** eglot
 #+begin_src emacs-lisp
 (use-package eglot
@@ -1890,14 +1930,11 @@ through e.g. corfu. MCT doesn't offer that.
 
 (use-package julia-snail
   :straight t
-  :hook (julia-mode . julia-snail-mode)
   :config
-  (add-hook 'julia-mode-hook 'julia-snail-mode)
-  (customize-set-variable 'split-height-threshold 15)
-  )
+  (add-hook 'julia-mode-hook 'julia-snail-mode))
 #+end_src
 
-** c environment (bare bones)
+** c{,++} environment
 #+begin_src emacs-lisp
 (use-package cc-mode
   :hook
@@ -1948,7 +1985,7 @@ through e.g. corfu. MCT doesn't offer that.
   :straight t
   :hook (cmake-mode-hook . eldoc-cmake-enable))
 #+end_src
-** symbolic math (maxima)
+** symbolic math (maxima, calc)
 #+begin_src emacs-lisp
 (use-package calc)
 (use-package maxima
@@ -1956,9 +1993,7 @@ through e.g. corfu. MCT doesn't offer that.
   :init
   (add-hook 'maxima-mode-hook #'maxima-hook-function)
   (add-hook 'maxima-inferior-mode-hook #'maxima-hook-function)
-  (setq
-   org-format-latex-options (plist-put org-format-latex-options :scale 2.0)
-   maxima-display-maxima-buffer nil)
+  (setq maxima-display-maxima-buffer t)
   :mode ("\\.mac\\'" . maxima-mode)
   :interpreter ("maxima" . maxima-mode))
 #+end_src
@@ -1998,7 +2033,8 @@ through e.g. corfu. MCT doesn't offer that.
 (use-package rainbow-delimiters
   :straight t
   :diminish rainbow-delimiters-mode
-  :hook (prog-mode-hook . rainbow-delimiters-mode))
+  :init
+  (add-hook 'prog-mode-hook 'rainbow-delimiters-mode))
 
 (use-package geiser
   :straight t)
@@ -2021,12 +2057,9 @@ through e.g. corfu. MCT doesn't offer that.
 (use-package flycheck
   :straight t
   :diminish flycheck-mode
-  :defer t
-  :hook
-  ((prog-mode-hook . flycheck-mode))
+  :init (add-hook 'prog-mode-hook 'flycheck-mode)
   :config
   (setq flycheck-indication-mode nil)
-
   ;; set up simple cache so the checker isn't linear searching the (very many) checkers if it needs one
   (defvar-local my/flycheck-local-cache nil)
   (defun my/flycheck-checker-get (fn checker property)
@@ -2035,10 +2068,11 @@ through e.g. corfu. MCT doesn't offer that.
   (advice-add 'flycheck-checker-get :around 'my/flycheck-checker-get)
 
   ;; set up mypy for flycheck in setting up typed python
-  (add-hook 'lsp-managed-mode-hook
-            (lambda ()
-              (when (derived-mode-p 'python-mode)
-                (setq my/flycheck-local-cache '((lsp . ((next-checkers . (python-mypy)))))))))
+  ;;; [2021-12-26 Sun] I've moved to eglot and have yet to used typed python in a while. not sure if there's more to do here.
+  ;; (add-hook 'lsp-managed-mode-hook
+  ;;           (lambda ()
+  ;;             (when (derived-mode-p 'python-mode)
+  ;;               (setq my/flycheck-local-cache '((lsp . ((next-checkers . (python-mypy)))))))))
 
   (setq error-search-map
         (let ((map (make-sparse-keymap)))
@@ -2050,7 +2084,7 @@ through e.g. corfu. MCT doesn't offer that.
           (define-key map (kbd "c") 'flycheck-compile)
           (define-key map (kbd "w") 'flycheck-copy-errors-as-kill)
           map))
-  (global-set-key (kbd "C-c y e") error-search-map))
+  (define-key global-map (kbd "C-c y e") error-search-map))
 
 (use-package consult-flycheck
   :straight (:type git :host github :repo "minad/consult-flycheck"))
@@ -2058,26 +2092,17 @@ through e.g. corfu. MCT doesn't offer that.
 * unix environment interface
 ** magit and vc
 #+begin_src emacs-lisp
-;; Mark TODOs , FIXME, BUG as red in src code
-(add-hook 'prog-mode-hook
-          (lambda ()
-            (font-lock-add-keywords
-             nil
-             '(("\\<\\(FIXME\\|TODO\\|BUG\\)" 1 font-lock-warning-face prepend)))))
-
 ;;; Magit
 ;; God bless magit and all that it does
 (use-package magit
   :straight t
   :commands magit-status magit-blame
   :config
-  (setq magit-branch-arguments nil
-        ;; don't put "origin-" in front of new branch names by default
-        magit-default-tracking-name-function 'magit-default-tracking-name-branch-only
-        magit-push-always-verify nil
-        magit-restore-window-configuration t)
-  (unbind-key (kbd "SPC") magit-mode-map)
-  :bind ("C-x g" . magit-status))
+  (setq
+   ;; don't put "origin-" in front of new branch names by default
+   magit-default-tracking-name-function 'magit-default-tracking-name-branch-only
+   magit-push-always-verify nil)
+  (define-key globa-map (kbd "C-x g") 'magit-status))
 
 ;; More info here: [[https://github.com/syohex/emacs-git-gutter]]
 (use-package git-gutter ; TODO - git gutter keybinds, going to different hunks and staging only certain portions!
@@ -2092,6 +2117,110 @@ through e.g. corfu. MCT doesn't offer that.
   :config
   (projectile-global-mode)
   (define-key projectile-mode-map (kbd "C-c p") 'projectile-command-map))
+
+(use-package vc
+  :straight (:type built-in)
+  :config
+  ;;;  As always, from Prot. Directly copied. No shame. See https://protesilaos.com/emacs/dotemacs#h:31deeff4-dfae-48d9-a906-1f3272f29bc9
+
+  ;; Those offer various types of functionality, such as blaming,
+  ;; viewing logs, showing a dedicated buffer with changes to affected
+  ;; files.
+  (require 'vc-annotate)
+  (require 'vc-dir)
+  (require 'vc-git)
+  (require 'add-log)
+  (require 'log-view)
+
+  ;; This one is for editing commit messages.
+  (require 'log-edit)
+  (setq log-edit-confirm 'changed)
+  (setq log-edit-keep-buffer nil)
+  (setq log-edit-require-final-newline t)
+  (setq log-edit-setup-add-author nil)
+
+  ;; Note that `prot-vc-git-setup-mode' will run the following when
+  ;; activated:
+  ;;
+  ;;   (remove-hook 'log-edit-hook #'log-edit-show-files)
+  ;;
+  ;; If you need the window to pop back up, do it manually with C-c C-f
+  ;; which calls `log-edit-show-files'.
+
+  (setq vc-find-revision-no-save t)
+  (setq vc-annotate-display-mode 'scale) ; scale to oldest
+  ;; I use a different account for git commits
+  ;; (setq add-log-mailing-address "info@protesilaos.com")
+  (setq add-log-keep-changes-together t)
+  (setq vc-git-diff-switches '("--patch-with-stat" "--histogram"))
+  (setq vc-git-print-log-follow t)
+  (setq vc-git-revision-complete-only-branches nil) ; Emacs 28
+  (setq vc-git-root-log-format
+        '("%d %h %ad %an: %s"
+          ;; The first shy group matches the characters drawn by --graph.
+          ;; We use numbered groups because `log-view-message-re' wants the
+          ;; revision number to be group 1.
+          "^\\(?:[*/\\|]+\\)\\(?:[*/\\| ]+\\)?\
+\\(?2: ([^)]+) \\)?\\(?1:[0-9a-z]+\\) \
+\\(?4:[0-9]\\{4\\}-[0-9]\\{2\\}-[0-9]\\{2\\}\\) \
+\\(?3:.*?\\):"
+          ((1 'log-view-message)
+           (2 'change-log-list nil lax)
+           (3 'change-log-name)
+           (4 'change-log-date))))
+
+  (add-hook 'log-view-mode-hook #'hl-line-mode)
+
+  ;; NOTE: I override lots of the defaults
+  (let ((map global-map))
+    (define-key map (kbd "C-x v b") #'vc-retrieve-tag)  ; "branch" switch
+    (define-key map (kbd "C-x v t") #'vc-create-tag)
+    (define-key map (kbd "C-x v f") #'vc-log-incoming)  ; the actual git fetch
+    (define-key map (kbd "C-x v o") #'vc-log-outgoing)
+    (define-key map (kbd "C-x v F") #'vc-update)        ; "F" because "P" is push
+    (define-key map (kbd "C-x v d") #'vc-diff))
+  (let ((map vc-dir-mode-map))
+    (define-key map (kbd "b") #'vc-retrieve-tag)
+    (define-key map (kbd "t") #'vc-create-tag)
+    (define-key map (kbd "O") #'vc-log-outgoing)
+    (define-key map (kbd "o") #'vc-dir-find-file-other-window)
+    (define-key map (kbd "f") #'vc-log-incoming) ; replaces `vc-dir-find-file' (use RET)
+    (define-key map (kbd "F") #'vc-update)       ; symmetric with P: `vc-push'
+    (define-key map (kbd "d") #'vc-diff)         ; parallel to D: `vc-root-diff'
+    (define-key map (kbd "k") #'vc-dir-clean-files)
+    (define-key map (kbd "G") #'vc-revert)
+    (let ((prot-vc-git-branch-map (make-sparse-keymap)))
+      (define-key map "B" prot-vc-git-branch-map)
+      (define-key prot-vc-git-branch-map "n" #'vc-create-tag) ; new branch/tag
+      (define-key prot-vc-git-branch-map "s" #'vc-retrieve-tag) ; switch branch/tag
+      ;; (define-key prot-vc-git-branch-map "c" #'prot-vc-git-checkout-remote)
+                                        ; "checkout" remote
+      (define-key prot-vc-git-branch-map "l" #'vc-print-branch-log))
+    (let ((prot-vc-git-stash-map (make-sparse-keymap)))
+      (define-key map "S" prot-vc-git-stash-map)
+      (define-key prot-vc-git-stash-map "c" 'vc-git-stash) ; "create" named stash
+      (define-key prot-vc-git-stash-map "s" 'vc-git-stash-snapshot)))
+  (let ((map vc-git-stash-shared-map))
+    (define-key map "a" 'vc-git-stash-apply-at-point)
+    (define-key map "c" 'vc-git-stash) ; "create" named stash
+    (define-key map "D" 'vc-git-stash-delete-at-point)
+    (define-key map "p" 'vc-git-stash-pop-at-point)
+    (define-key map "s" 'vc-git-stash-snapshot))
+  (let ((map vc-annotate-mode-map))
+    (define-key map (kbd "M-q") #'vc-annotate-toggle-annotation-visibility)
+    (define-key map (kbd "C-c C-c") #'vc-annotate-goto-line)
+    (define-key map (kbd "<return>") #'vc-annotate-find-revision-at-line))
+  (let ((map log-view-mode-map))
+    (define-key map (kbd "<tab>") #'log-view-toggle-entry-display)
+    (define-key map (kbd "<return>") #'log-view-find-revision)
+    (define-key map (kbd "s") #'vc-log-search)
+    (define-key map (kbd "o") #'vc-log-outgoing)
+    (define-key map (kbd "f") #'vc-log-incoming)
+    (define-key map (kbd "F") #'vc-update)
+    (define-key map (kbd "P") #'vc-push))
+
+
+  )
 #+end_src
 ** eshell
 #+begin_src emacs-lisp
@@ -2336,7 +2465,7 @@ through e.g. corfu. MCT doesn't offer that.
 (use-package eww
   :straight (:type built-in)
   :config
-  (global-set-key (kbd "<f12>") 'eww)
+  (define-key global-map (kbd "<f12>") 'eww)
   (setq shr-use-colors nil)             ; t is bad for accessibility
   (setq shr-use-fonts nil)              ; t is not for me
   (setq shr-max-image-proportion 0.6)
@@ -2378,7 +2507,6 @@ through e.g. corfu. MCT doesn't offer that.
   :config
   (define-key global-map (kbd "C-c e") #'elfeed)
 
-  (global-set-key (kbd "C-x w") 'elfeed)
   (setq elfeed-use-curl t)
   (setq elfeed-curl-max-connections 10)
   (setq elfeed-db-directory (concat user-emacs-directory "elfeed/"))
@@ -2386,7 +2514,7 @@ through e.g. corfu. MCT doesn't offer that.
   (setq elfeed-search-filter "@4-months-ago +unread")
   (setq elfeed-sort-order 'descending)
   (setq elfeed-search-clipboard-type 'CLIPBOARD)
-  (setq elfeed-search-title-max-width 160)
+  (setq elfeed-search-title-max-width 110)
   (setq elfeed-search-title-min-width 30)
   (setq elfeed-search-trailing-width 25)
   (setq elfeed-show-truncate-long-urls t)
@@ -2407,40 +2535,43 @@ through e.g. corfu. MCT doesn't offer that.
   ;; This is set in two places now, once in =eww= and once here.
   (setq browse-url-browser-function 'eww-browse-url)
   (setq browse-url-secondary-browser-function 'browse-url-default-browser)
-  (setq elfeed-feeds '("https://freddiedeboer.substack.com/feed.rss" ;; marxist i think
-                       "https://www.juliabloggers.com/feed/" ;; julia blogs
-                       "https://protesilaos.com/master.xml"
-                       "https://hnrss.org/newest?points=100"
+  (setq elfeed-feeds '(("https://freddiedeboer.substack.com/feed.rss" leftist) ;; marxist i think
+                       ("https://www.juliabloggers.com/feed/" julia ) ;; julia blogs
+                       ("https://protesilaos.com/master.xml" leftist philosphy emacs)
+                       ("https://hnrss.org/newest?points=100" hacker-news tech)
                        "https://dynomight.net/feed.xml"
                        ("https://computer.rip/rss.xml" tech) ;; "computers are bad
                        ("http://rachelbythebay.com/w/2021/11/06/sql/" tech)
-                       ("https://thinkingthrough.substack.com/feed" tech swe)
                        ("https://matt.might.net/articles/feed.rss" tech academia pl)
-                       "https://www.nayuki.io/rss20.xml"
-                       "https://ava.substack.com/feed"
-                       "https://askmolly.substack.com/feed"
-                       "https://askpolly.substack.com/feed"
-                       "https://cherylstrayed.substack.com/feed"
-                       "https://griefbacon.substack.com/feed"
+                       ("https://www.nayuki.io/rss20.xml" hacker)
+                       ("https://ava.substack.com/feed" writing help-self)
+                       ("https://askmolly.substack.com/feed" writing help-self)
+                       ("https://askpolly.substack.com/feed" writing help-self)
+                       ("https://cherylstrayed.substack.com/feed" writing help-self)
+                       ("https://griefbacon.substack.com/feed" writing)
                        ("https://leandramcohen.substack.com/feed" fashion)
-                       "https://defaultfriend.substack.com/feed"
-                       "https://jdahl.substack.com/feed"
-                       ("https://www.spreaker.com/show/3389445/episodes/feed" writing)
+                       ("https://defaultfriend.substack.com/feed" writing)
+                       ("https://jdahl.substack.com/feed" writing)
                        ("http://feeds.feedburner.com/FineArtAndYou" art)
                        ("http://inconvergent.net/atom.xml" infrequent)
                        ("http://nullprogram.com/feed/" infrequent)
                        ("http://feeds.feedburner.com/datacolada/" infrequent)
                        ("https://terrytao.wordpress.com/feed/" math)
-                       "http://xkcd.com/rss.xml"
+                       ("http://xkcd.com/rss.xml" comic)
                        ("http://feeds.feedburner.com/RoguelikeRadio" infrequent)
-                       "http://cppcast.libsyn.com/rss"
-                       "http://planet.emacsen.org/atom.xml"
-                       ("https://www.reddit.com/r/dailyprogrammer/.rss"                        daily)
+                       ("http://cppcast.libsyn.com/rss" cpp)
+                       ("http://planet.emacsen.org/atom.xml" lisp) ;; emacs
+                       ("https://planet.lisp.org/rss20.xml" lisp) ;; lisp
+                       ("https://tymoon.eu/api/reader/atom" lisp) ;; lisp, gamedev
+                       ("https://40ants.com/lisp-project-of-the-day/rss.xml" lisp) ;; lisp project of the day
+                       ("https://ambrevar.xyz/atom.xml" lisp) ;; lisper, maker of nyxt browser
+                       ("https://alhassy.github.io/rss.xml" lisp) ;; lisper, had that great post about emacs lisp's type system
+                       ("https://www.reddit.com/r/dailyprogrammer/.rss" daily)
                        ("http://understandinguncertainty.org/blog" infrequent)
-                       ("http://timharford.com/feed/"                                        econ)
+                       ("http://timharford.com/feed/" econ)
                        ("https://www.bennee.com/~alex/blog/feeds/all.atom.xml" infrequent)
                        ("https://sive.rs/podcast.rss" infrequent)
-                       ("https://jack-clark.net/feed/" ai)
-                       ("https://lacker.io/feed.xml" ai)
+                       ("https://jack-clark.net/feed/" ai tech)
+                       ("https://lacker.io/feed.xml" ai tech)
                        ("https://graymirror.substack.com/feed" leftist))))
 #+end_src
