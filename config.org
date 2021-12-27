@@ -523,6 +523,61 @@ For a more interactive search+replace experience
    '(anzu-replace-threshold 50)
    '(anzu-replace-to-string-separator " => ")))
 #+end_src
+** relating to saving the state of emacs
+*** emacs server
+
+Starting a server will allow the quick access of emacs through a server connection rather
+than having to open and load a full configuration every time.
+
+#+begin_src emacs-lisp
+(use-package server
+  :straight (:type built-in)
+  :init
+  (add-hook 'after-init-hook #'server-start))
+#+end_src
+*** desktop
+I have a love-hate relationship with =desktop=. I haven't read the manual enough to
+find the right configuration required to have a more seamless start-up and shut-down. But
+it remains. At the moment I store no buffers or frames to load from since that generates
+too much friction on startup. 
+
+#+begin_src emacs-lisp
+(use-package desktop
+  :straight (:type built-in)
+  :config
+  (setq desktop-auto-save-timeout 300)
+  (setq desktop-path `(,user-emacs-directory))
+  (setq desktop-base-file-name "desktop")
+  (setq desktop-files-not-to-save ".*")
+  (setq desktop-buffers-not-to-save ".*")
+  (setq desktop-globals-to-clear nil)
+  (setq desktop-load-locked-desktop t)
+  (setq desktop-missing-file-warning nil)
+  (setq desktop-restore-eager 0)
+  (setq desktop-restore-frames nil)
+  (setq desktop-save 'ask-if-new)
+  (dolist (symbol '(kill-ring log-edit-comment-ring))
+    (add-to-list 'desktop-globals-to-save symbol))
+
+  (desktop-save-mode 1)
+  )
+#+end_src
+
+*** saveplace
+Saving the cursor position in a file is a subtle hint of what you were doing. Its also
+relatively convenient
+
+#+begin_src emacs-lisp
+(use-package saveplace
+  :straight (:type built-in)
+  :diminish
+  :init
+  (setq save-place-file (locate-user-emacs-file "saveplace"))
+  (setq save-place-forget-unreadable-files t)
+  (save-place-mode 1)
+  )
+#+end_src
+
 ** window+buffer management utilities
 Without good window management, there cannot be a good editor. The imperative is to
 provide a malleable, predictable, and adaptable environment built from the basics. For
@@ -531,11 +586,6 @@ alas.
 
 =ibuffer= remains a time-tested classic. It does exactly its job: logical grouping of
 buffers with some enhanced information over =list-buffers=.
-
-I have a love-hate relationship with =desktop=. I haven't read the manual enough to
-find the right configuration required to have a more seamless start-up and shut-down. But
-it remains. At the moment I store no buffers or frames to load from since that generates
-too much friction on startup. 
 
 =tab-bar= is an interesting addition to the Emacs built-ins. I'd guess the experience
 should emulate a typical tab system in, say, VS-Code. But I don't have much experience
@@ -582,26 +632,6 @@ Currently =popper= is lightly used in dealing with evanescent buffers.
     (define-key map (kbd "* n") #'ibuffer-mark-by-name-regexp)
     (define-key map (kbd "s n") #'ibuffer-do-sort-by-alphabetic)  ; "sort name" mnemonic
     (define-key map (kbd "/ g") #'ibuffer-filter-by-content))
-  )
-
-(use-package desktop
-  :straight (:type built-in)
-  :config
-  (setq desktop-auto-save-timeout 300)
-  (setq desktop-path `(,user-emacs-directory))
-  (setq desktop-base-file-name "desktop")
-  (setq desktop-files-not-to-save ".*")
-  (setq desktop-buffers-not-to-save ".*")
-  (setq desktop-globals-to-clear nil)
-  (setq desktop-load-locked-desktop t)
-  (setq desktop-missing-file-warning nil)
-  (setq desktop-restore-eager 0)
-  (setq desktop-restore-frames nil)
-  (setq desktop-save 'ask-if-new)
-  (dolist (symbol '(kill-ring log-edit-comment-ring))
-    (add-to-list 'desktop-globals-to-save symbol))
-
-  (desktop-save-mode 1)
   )
 
 (use-package tab-bar
