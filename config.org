@@ -9,7 +9,8 @@ Outstanding things to do:
 - [ ] Evaluate Tree-Sitter instead of font-lock for syntax highlighting
 - [ ] update org-roam to v2
 
-* sane defaults
+* sane defaults and default emacs capabilities
+** initial setup, keybinds, etc.
 Not all of the emacs defaults are quite sane. So here's to some sanity. This section is
 long and needs to be broken up. Some sanity includes:
 - high cap GC which doesn't intrude on user experience (=gcmh=)
@@ -157,6 +158,15 @@ long and needs to be broken up. Some sanity includes:
         display-time-use-mail-icon t
         display-time-24hr-format t)
   (display-time-mode))
+#+end_src
+** info mode, man mode
+#+begin_src emacs-lisp
+(use-package man
+  :straight (:type built-in)
+  :config
+  (define-key Man-mode-map (kbd "i") #'Man-goto-section)
+  (define-key Man-mode-map (kbd "g") #'Man-update-manpage)
+  )
 #+end_src
 * aesthetics
 ** solid themes
@@ -2207,6 +2217,57 @@ Its debateable whether xref should be in this section. May re-evaluate in future
 (use-package consult-flycheck
   :straight (:type git :host github :repo "minad/consult-flycheck"))
 #+end_src
+** flymake, proselint (!) 
+
+Writing prose is tough and proselint is a nice tool. To install, run =sudo apt install
+python3-proselint=
+
+#+begin_src emacs-lisp
+(use-package flymake
+  :straight (:type built-in)
+  :config
+  (setq flymake-fringe-indicator-position 'left-fringe)
+  (setq flymake-suppress-zero-counters t)
+  (setq flymake-start-on-flymake-mode t)
+  (setq flymake-no-changes-timeout nil)
+  (setq flymake-start-on-save-buffer t)
+  (setq flymake-proc-compilation-prevents-syntax-check t)
+  (setq flymake-wrap-around nil)
+  (setq flymake-mode-line-format
+        '("" flymake-mode-line-exception flymake-mode-line-counters))
+  (setq flymake-mode-line-counter-format
+        '(" " flymake-mode-line-error-counter
+          flymake-mode-line-warning-counter
+          flymake-mode-line-note-counter ""))
+
+  (let ((map flymake-mode-map))
+    (define-key map (kbd "C-c ! s") #'flymake-start)
+    (define-key map (kbd "C-c ! d") #'flymake-show-buffer-diagnostics) ; Emacs28
+    (define-key map (kbd "C-c ! n") #'flymake-goto-next-error)
+    (define-key map (kbd "C-c ! p") #'flymake-goto-prev-error)))
+
+(use-package flymake-diagnostic-at-point
+  :straight t
+  :config
+  (setq flymake-diagnostic-at-point-display-diagnostic-function
+        'flymake-diagnostic-at-point-display-minibuffer))
+
+;;; Flymake + Shellcheck
+(use-package flymake-shellcheck
+  :straight t
+  :init
+  (add-hook 'sh-mode-hook 'flymake-shellcheck-load))
+
+
+;;; Flymake + Proselint
+(use-package flymake-proselint
+  :straight t
+  :init
+  (add-hook 'markdown-mode-hook #'flymake-proselint-setup)
+  (add-hook 'org-mode-hook #'flymake-proselint-setup)
+  (add-hook 'text-mode-hook #'flymake-proselint-setup))
+#+end_src
+
 * unix environment interface
 ** magit and vc
 #+begin_src emacs-lisp
