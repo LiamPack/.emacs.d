@@ -112,7 +112,7 @@ long and needs to be broken up. Some sanity includes:
         (narrow-to-region (region-beginning) (region-end)) (delete-trailing-whitespace))))
 
   (define-key global-map (kbd "C-x k") #'(lambda () (interactive) (kill-buffer nil)))
-  (define-key global-map (kbd "C-x C-k") #'(lambda () (interactive) (kill-buffer nil) (delete-window)))
+  (define-key global-map (kbd "C-x K") #'(lambda () (interactive) (kill-buffer nil) (delete-window)))
   (define-key emacs-lisp-mode-map (kbd "C-c C-k") #'eval-buffer)
   (define-key global-map (kbd "C-c n") #'lp/clean-up-buffer-or-region)
   (define-key global-map (kbd "<f5>")  #'revert-buffer)
@@ -947,7 +947,7 @@ Currently =popper= is lightly used in dealing with evanescent buffers.
 ;;;;; Agenda diary entries
   (setq org-agenda-insert-diary-strategy 'date-tree)
   (setq org-agenda-insert-diary-extract-time nil)
-  (setq org-agenda-include-diary t)     ;; TODO: i'm not so sure about this yet
+  (setq org-agenda-include-diary t) ;; TODO: i'm not so sure about this yet
 
 ;;;;; Agenda follow mode
   (setq org-agenda-start-with-follow-mode nil)
@@ -1031,7 +1031,7 @@ Currently =popper= is lightly used in dealing with evanescent buffers.
   (setq org-agenda-clock-consistency-checks
         '((:max-duration "10:00" :min-duration 0 :max-gap "0:05" :gap-ok-around
                          ("4:00")
-                         :default-face ; This should definitely be reviewed
+                         :default-face  ; This should definitely be reviewed
                          ((:background "DarkRed")
                           (:foreground "white"))
                          :overlap-face nil :gap-face nil :no-end-time-face nil
@@ -1046,7 +1046,7 @@ Currently =popper= is lightly used in dealing with evanescent buffers.
   (setq org-agenda-search-headline-for-time t)
   (setq org-agenda-use-time-grid t)
   (setq org-agenda-cmp-user-defined nil)
-  (setq org-agenda-sort-notime-is-late t) ; Org 9.4
+  (setq org-agenda-sort-notime-is-late t)   ; Org 9.4
   (setq org-agenda-sort-noeffort-is-high t) ; Org 9.4
 
 ;;;;; Agenda column view
@@ -1166,7 +1166,12 @@ Currently =popper= is lightly used in dealing with evanescent buffers.
   ;; Auto wrap paragraphs in some modes (auto-fill-mode)
   (add-hook 'text-mode-hook 'turn-on-auto-fill)
   (add-hook 'org-mode-hook 'turn-on-auto-fill)
-  (define-key org-mode-map (kbd "C-c q") 'auto-fill-mode))
+  (define-key org-mode-map (kbd "C-c q") 'auto-fill-mode)
+
+;;; making links to other contexts
+  (define-key global-map (kbd "C-c l") 'org-store-link)
+
+  )
 
 (use-package org-roam
   :straight (:type git :host github
@@ -1437,6 +1442,21 @@ Currently =popper= is lightly used in dealing with evanescent buffers.
 #+end_src
 
 ** ispell+flyspell
+=ispell= and =flyspell= are built-in utilities to interface with externally installed
+spelling programs (=hunspell=, =aspell=, =ispell=, etc.). =flyspell= is much like
+=flymake= where, on the fly, misspelled words are highlighted as you type them or move
+over them. Words not passed or typed will not be checked unless explicitly invoked by
+=flyspell-buffer=. =ispell= provides functionality for checking and correcting spelling
+on-command.
+
+=ispell= provides some fairly sophisticated, but simple, capabilities when correcting a
+word. After invoking =ispell= (=M-$=), a buffer pops up which details what corrections are
+known by the external spelling program for the word at point. A user can choose a
+correction (digit), skip (=<SPC>=), replace word-at-point with a new word (=r NEW <RET>=),
+replace all occurrences of the word at point (=R NEW <RET>=), accept the incorrect word
+(=a=), insert this word into a private dictionary file (=i=, =m=), and a couple of other
+actions specified in the manual.
+
 #+begin_src emacs-lisp
 (use-package ispell
   :straight (:type built-in)
@@ -1619,6 +1639,7 @@ doesn't play well with lsp, but i haven't heard anything about =eglot=.
   (define-key global-map (kbd "M-s") consult-search-map)
   (define-key global-map (kbd "M-j") consult-goto-map)
   (define-key global-map (kbd "M-r") consult-register-map)
+  (define-key global-map (kbd "M-M") consult-mode-mode-map)
   (setq consult-preview-key (kbd "C-o") ) ;; disable live preview
   (setq consult-project-root-function #'projectile-project-root)
   (setq consult-async-min-input 3)
