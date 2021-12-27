@@ -23,6 +23,9 @@ long and needs to be broken up. Some sanity includes:
 (straight-register-package 'org)
 (straight-register-package 'org-contrib)
 
+;; hacky way to remove the =custom-variables= generation in =init.el=
+(setq custom-file (make-temp-file "emacs-custom-"))
+
 ;; basics and better default
 ;; from https://pastebin.com/MDagsZD7
 (use-package emacs
@@ -91,8 +94,6 @@ long and needs to be broken up. Some sanity includes:
   ;; quicktramp setup
   (setq tramp-default-method "ssh")
 
-
-  (setq set-mark-command-repeat-pop t)
   (setq-default
    indent-tabs-mode nil                 ; don't insert tab when indent
    ;; this is giving me problems when creating new lines in org-mode source blocks
@@ -130,7 +131,20 @@ long and needs to be broken up. Some sanity includes:
     :config
     (setq repeat-on-final-keystroke t)
     (setq set-mark-command-repeat-pop t)
-
+    (defvar resize-window-repeat-map
+      (let ((map (make-sparse-keymap)))
+        ;; Standard keys:
+        (define-key map "^" 'enlarge-window)
+        (define-key map "}" 'enlarge-window-horizontally)
+        (define-key map "{" 'shrink-window-horizontally) ; prot note: those three are C-x KEY
+        ;; Additional keys:
+        (define-key map "v" 'shrink-window) ; prot note: this is not bound by default
+        map)
+      "Keymap to repeat window resizing commands.  Used in `repeat-mode'.")
+    (put 'enlarge-window 'repeat-map 'resize-window-repeat-map)
+    (put 'enlarge-window-horizontally 'repeat-map 'resize-window-repeat-map)
+    (put 'shrink-window-horizontally 'repeat-map 'resize-window-repeat-map)
+    (put 'shrink-window 'repeat-map 'resize-window-repeat-map)
     (repeat-mode 1))
   ) ; resize windows proportionaly
 
@@ -545,7 +559,7 @@ Currently =popper= is lightly used in dealing with evanescent buffers.
 ;; inputmono is my current font kick. DejaVu won't go out of style though.
 (set-frame-font "Deja Vu Sans Mono 12")
 (define-key global-map (kbd "M-o") 'other-window)
-(define-key global-map (kbd "M-O") (lambda () (interative) (other-window -1)))
+(define-key global-map (kbd "M-O") (lambda () (interactive) (other-window -1)))
 
 (use-package ibuffer                    ; Better buffer list
   :straight (:type built-in)
@@ -710,21 +724,6 @@ Currently =popper= is lightly used in dealing with evanescent buffers.
     (define-key map (kbd "C-x {") #'shrink-window)
     (define-key map (kbd "C-x >") #'enlarge-window-horizontally) ; override `scroll-right'
     (define-key map (kbd "C-x <") #'shrink-window-horizontally)) ; override `scroll-left'
-  (defvar resize-window-repeat-map
-    (let ((map (make-sparse-keymap)))
-      ;; Standard keys:
-      (define-key map "^" 'enlarge-window)
-      (define-key map "}" 'enlarge-window-horizontally)
-      (define-key map "{" 'shrink-window-horizontally) ; prot note: those three are C-x KEY
-      ;; Additional keys:
-      (define-key map "v" 'shrink-window) ; prot note: this is not bound by default
-      map)
-    "Keymap to repeat window resizing commands.  Used in `repeat-mode'.")
-  (put 'enlarge-window 'repeat-map 'resize-window-repeat-map)
-  (put 'enlarge-window-horizontally 'repeat-map 'resize-window-repeat-map)
-  (put 'shrink-window-horizontally 'repeat-map 'resize-window-repeat-map)
-  (put 'shrink-window 'repeat-map 'resize-window-repeat-map)
-
   :hook ((help-mode-hook . visual-line-mode)
          (custom-mode-hook . visual-line-mode)))
 
@@ -1455,7 +1454,7 @@ completions to be done quicker.
   (setq mct-completion-blocklist
         '( describe-symbol describe-function describe-variable
            execute-extended-command insert-char))
-  
+
   ;; This is for commands that should always pop up the completions'
   ;; buffer.  It circumvents the default method of waiting for some user
   ;; input (see `mct-minimum-input') before displaying and updating the
