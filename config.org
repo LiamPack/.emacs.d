@@ -534,7 +534,8 @@ buffers with some enhanced information over =list-buffers=.
 
 I have a love-hate relationship with =desktop=. I haven't read the manual enough to
 find the right configuration required to have a more seamless start-up and shut-down. But
-it remains.
+it remains. At the moment I store no buffers or frames to load from since that generates
+too much friction on startup. 
 
 =tab-bar= is an interesting addition to the Emacs built-ins. I'd guess the experience
 should emulate a typical tab system in, say, VS-Code. But I don't have much experience
@@ -584,21 +585,24 @@ Currently =popper= is lightly used in dealing with evanescent buffers.
   )
 
 (use-package desktop
-  :disabled
   :straight (:type built-in)
   :config
   (setq desktop-auto-save-timeout 300)
-  (setq desktop-path '("~/.emacs.d/"))
+  (setq desktop-path `(,user-emacs-directory))
   (setq desktop-base-file-name "desktop")
-  (setq desktop-files-not-to-save ".*magit.*")
-  (setq desktop-modes-not-to-save '(magit-mode magit-status-mode help-mode info-mode
-                                               compilation-mode-map tags-table-mode completion-mode))
+  (setq desktop-files-not-to-save ".*")
+  (setq desktop-buffers-not-to-save ".*")
+  (setq desktop-globals-to-clear nil)
   (setq desktop-load-locked-desktop t)
-  (setq desktop-missing-file-warning t)
-  (setq desktop-restore-eager 10)
-  (setq desktop-restore-frames t)
+  (setq desktop-missing-file-warning nil)
+  (setq desktop-restore-eager 0)
+  (setq desktop-restore-frames nil)
   (setq desktop-save 'ask-if-new)
-  (desktop-save-mode 1))
+  (dolist (symbol '(kill-ring log-edit-comment-ring))
+    (add-to-list 'desktop-globals-to-save symbol))
+
+  (desktop-save-mode 1)
+  )
 
 (use-package tab-bar
   :straight (:type built-in)
