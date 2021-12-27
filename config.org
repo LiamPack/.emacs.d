@@ -115,6 +115,9 @@ long and needs to be broken up. Some sanity includes:
   (define-key global-map (kbd "C-c n") #'lp/clean-up-buffer-or-region)
   (define-key global-map (kbd "<f5>")  #'revert-buffer)
 
+  (define-key global-map (kbd "M-z") #'zap-up-to-char) ;; i generally go up to a char non-inclusive
+  (define-key global-map (kbd "M-Z") #'zap-to-char)
+
   (define-key global-map (kbd "C-<tab>") 'next-window-any-frame)
   (define-key global-map (kbd "<backtab>") 'previous-window-any-frame)
   (define-key global-map (kbd "C-x C-M-e") 'pp-macroexpand-last-sexp)
@@ -137,7 +140,6 @@ long and needs to be broken up. Some sanity includes:
   :straight t
   :init (focus-autosave-mode)
   :diminish focus-autosave-mode)
-
 #+end_src
 ** time on mode-line
 #+begin_src emacs-lisp
@@ -640,7 +642,7 @@ Currently =popper= is lightly used in dealing with evanescent buffers.
   (setq display-buffer-alist
         `(
           ;; below current window
-          ("\\*.*\\(e?shell\\|v?term\\|.*geiser.*\\|\\).*"
+          ("\\*\\(e?shell\\|v?term\\|.*geiser.*\\|\\)\\*"
            (display-buffer-below-selected)
            (window-height . 0.3))
           ("\\*Org Agenda\\*"
@@ -733,7 +735,6 @@ Currently =popper= is lightly used in dealing with evanescent buffers.
   :config
   (winner-mode t)     ; move between windows configuration
   )
-
 
 ;;; Directional window motions (windmove)
 (use-package popper
