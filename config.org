@@ -1645,7 +1645,7 @@ doesn't play well with lsp, but i haven't heard anything about =eglot=.
         (let ((map (make-sparse-keymap)))
           (define-key map (kbd "e") 'consult-compile-error)
           (define-key map (kbd "l") 'consult-flymake)
-          (define-key map (kbd "f") 'consult-flycheck)               ;; Alternative: consult-flycheck
+          (define-key map (kbd "f") 'consult-flymake)               ;; Alternative: consult-flycheck
           (define-key map (kbd "g") 'consult-goto-line)             ;; orig. goto-line
           (define-key map (kbd "o") 'consult-outline)               ;; Alternative: consult-org-heading
           (define-key map (kbd "m") 'consult-mark)
@@ -1960,54 +1960,6 @@ Its debateable whether xref should be in this section. May re-evaluate in future
   :config
   (define-key eglot-mode-map [remap xref-find-apropos] #'consult-eglot-symbols)
   (define-key eglot-mode-map (kbd "C-c y l") #'consult-flymake))
-
-;; meh hack from here to use flycheck in eglot
-
-;; https://gist.github.com/purcell/ca33abbea9a98bb0f8a04d790a0cadcd
-;; might try flymake for a change
-
-;; (defvar-local flycheck-eglot-current-errors nil)
-
-;; (defun flycheck-eglot-report-fn (diags &rest _)
-;;   (setq flycheck-eglot-current-errors
-;;         (mapcar (lambda (diag)
-;;                   (save-excursion
-;;                     (goto-char (flymake--diag-beg diag))
-;;                     (flycheck-error-new-at (line-number-at-pos)
-;;                                            (1+ (- (point) (line-beginning-position)))
-;;                                            (pcase (flymake--diag-type diag)
-;;                                              ('eglot-error 'error)
-;;                                              ('eglot-warning 'warning)
-;;                                              ('eglot-note 'info)
-;;                                              (_ (error "Unknown diag type, %S" diag)))
-;;                                            (flymake--diag-text diag)
-;;                                            :checker 'eglot)))
-;;                 diags))
-;;   (flycheck-buffer))
-
-;; (defun flycheck-eglot--start (checker callback)
-;;   (funcall callback 'finished flycheck-eglot-current-errors))
-
-;; (defun flycheck-eglot--available-p ()
-;;   (bound-and-true-p eglot--managed-mode))
-
-;; (flycheck-define-generic-checker 'eglot
-;;   "Report `eglot' diagnostics using `flycheck'."
-;;   :start #'flycheck-eglot--start
-;;   :predicate #'flycheck-eglot--available-p
-;;   :modes '(prog-mode text-mode))
-
-;; (push 'eglot flycheck-checkers)
-
-;; (defun sanityinc/eglot-prefer-flycheck ()
-;;   (when eglot--managed-mode
-;;     (flycheck-add-mode 'eglot major-mode)
-;;     (flycheck-select-checker 'eglot)
-;;     (flycheck-mode)
-;;     (flymake-mode -1)
-;;     (setq eglot--current-flymake-report-fn 'flycheck-eglot-report-fn)))
-
-;; (add-hook 'eglot--managed-mode-hook 'sanityinc/eglot-prefer-flycheck)
 #+end_src
 ** ocaml
 #+begin_src emacs-lisp
@@ -2026,7 +1978,6 @@ Its debateable whether xref should be in this section. May re-evaluate in future
 #+begin_src emacs-lisp
 (use-package python
   :straight t
-  :after flycheck
   :mode ("\\.py\\'" . python-mode)
   :interpreter ("python" . python-mode)
   :config
@@ -2036,11 +1987,11 @@ Its debateable whether xref should be in this section. May re-evaluate in future
         python-shell-prompt-detect-failure-warning nil)
   ;; (add-to-list 'python-shell-completion-native-disabled-interpreters
   ;;              "jupyter")
-  (custom-set-variables
-   '(flycheck-python-flake8-executable "python3")
-   '(flycheck-python-pycompile-executable "python3")
-   '(flycheck-python-pylint-executable "python3"))
-  (flycheck-add-next-checker 'python-flake8 'python-mypy t)
+  ;; (custom-set-variables
+  ;;  '(flycheck-python-flake8-executable "python3")
+  ;;  '(flycheck-python-pycompile-executable "python3")
+  ;;  '(flycheck-python-pylint-executable "python3"))
+  ;; (flycheck-add-next-checker 'python-flake8 'python-mypy t)
   )
 
 (use-package pyvenv
@@ -2180,43 +2131,6 @@ Its debateable whether xref should be in this section. May re-evaluate in future
              '("\\.sps\\'" . scheme-mode))
 (unbind-key (kbd "C-M-q") scheme-mode-map)
 #+end_src
-** flycheck
-#+begin_src emacs-lisp
-(use-package flycheck
-  :straight t
-  :diminish flycheck-mode
-  :init (add-hook 'prog-mode-hook 'flycheck-mode)
-  :config
-  (setq flycheck-indication-mode nil)
-  ;; set up simple cache so the checker isn't linear searching the (very many) checkers if it needs one
-  (defvar-local my/flycheck-local-cache nil)
-  (defun my/flycheck-checker-get (fn checker property)
-    (or (alist-get property (alist-get checker my/flycheck-local-cache))
-        (funcall fn checker property)))
-  (advice-add 'flycheck-checker-get :around 'my/flycheck-checker-get)
-
-  ;; set up mypy for flycheck in setting up typed python
-  ;;; [2021-12-26 Sun] I've moved to eglot and have yet to used typed python in a while. not sure if there's more to do here.
-  ;; (add-hook 'lsp-managed-mode-hook
-  ;;           (lambda ()
-  ;;             (when (derived-mode-p 'python-mode)
-  ;;               (setq my/flycheck-local-cache '((lsp . ((next-checkers . (python-mypy)))))))))
-
-  (setq error-search-map
-        (let ((map (make-sparse-keymap)))
-          (define-key map (kbd "n") 'next-error)
-          (define-key map (kbd "p") 'previous-error)
-          (define-key map (kbd "d") 'flycheck-display-error-at-point)
-          (define-key map (kbd "l") 'consult-flycheck)
-          (define-key map (kbd "L") 'flycheck-list-errors)
-          (define-key map (kbd "c") 'flycheck-compile)
-          (define-key map (kbd "w") 'flycheck-copy-errors-as-kill)
-          map))
-  (define-key global-map (kbd "C-c y e") error-search-map))
-
-(use-package consult-flycheck
-  :straight (:type git :host github :repo "minad/consult-flycheck"))
-#+end_src
 ** flymake, proselint (!) 
 
 Writing prose is tough and proselint is a nice tool. To install, run =sudo apt install
@@ -2240,11 +2154,13 @@ python3-proselint=
           flymake-mode-line-warning-counter
           flymake-mode-line-note-counter ""))
 
+  (add-hook 'prog-mode-hook 'flymake-mode)
+
   (let ((map flymake-mode-map))
-    (define-key map (kbd "C-c ! s") #'flymake-start)
-    (define-key map (kbd "C-c ! d") #'flymake-show-buffer-diagnostics) ; Emacs28
-    (define-key map (kbd "C-c ! n") #'flymake-goto-next-error)
-    (define-key map (kbd "C-c ! p") #'flymake-goto-prev-error)))
+    (define-key map (kbd "C-c y s") #'flymake-start)
+    (define-key map (kbd "C-c y d") #'flymake-show-buffer-diagnostics) ; Emacs28
+    (define-key map (kbd "C-c y n") #'flymake-goto-next-error)
+    (define-key map (kbd "C-c y p") #'flymake-goto-prev-error)))
 
 (use-package flymake-diagnostic-at-point
   :straight t
