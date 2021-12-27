@@ -131,20 +131,7 @@ long and needs to be broken up. Some sanity includes:
     :config
     (setq repeat-on-final-keystroke t)
     (setq set-mark-command-repeat-pop t)
-    (defvar resize-window-repeat-map
-      (let ((map (make-sparse-keymap)))
-        ;; Standard keys:
-        (define-key map "^" 'enlarge-window)
-        (define-key map "}" 'enlarge-window-horizontally)
-        (define-key map "{" 'shrink-window-horizontally) ; prot note: those three are C-x KEY
-        ;; Additional keys:
-        (define-key map "v" 'shrink-window) ; prot note: this is not bound by default
-        map)
-      "Keymap to repeat window resizing commands.  Used in `repeat-mode'.")
-    (put 'enlarge-window 'repeat-map 'resize-window-repeat-map)
-    (put 'enlarge-window-horizontally 'repeat-map 'resize-window-repeat-map)
-    (put 'shrink-window-horizontally 'repeat-map 'resize-window-repeat-map)
-    (put 'shrink-window 'repeat-map 'resize-window-repeat-map)
+
     (repeat-mode 1))
   ) ; resize windows proportionaly
 
@@ -711,6 +698,22 @@ Currently =popper= is lightly used in dealing with evanescent buffers.
           ("\\*\\(Calendar\\|Bookmark Annotation\\).*"
            (display-buffer-reuse-mode-window display-buffer-below-selected)
            (window-height . fit-window-to-buffer))))
+
+  (defvar resize-window-repeat-map
+    (let ((map (make-sparse-keymap)))
+      ;; Standard keys:
+      (define-key map "^" 'enlarge-window)
+      (define-key map "}" 'enlarge-window-horizontally)
+      (define-key map "{" 'shrink-window-horizontally) ; prot note: those three are C-x KEY
+      ;; Additional keys:
+      (define-key map "v" 'shrink-window) ; prot note: this is not bound by default
+      map)
+    "Keymap to repeat window resizing commands.  Used in `repeat-mode'.")
+  (put 'enlarge-window 'repeat-map 'resize-window-repeat-map)
+  (put 'enlarge-window-horizontally 'repeat-map 'resize-window-repeat-map)
+  (put 'shrink-window-horizontally 'repeat-map 'resize-window-repeat-map)
+  (put 'shrink-window 'repeat-map 'resize-window-repeat-map)
+
   (let ((map global-map))
     (define-key map (kbd "C-x <down>") #'next-buffer)
     (define-key map (kbd "C-x <up>") #'previous-buffer)
@@ -771,6 +774,14 @@ Currently =popper= is lightly used in dealing with evanescent buffers.
   :config
   (setq outline-minor-mode-cycle t
         outline-minor-mode-highlight 'append))
+#+end_src
+** really long lines
+#+begin_src emacs-lisp
+(use-package so-long
+  :straight (:type built-in)
+  :diminish
+  :config
+  (global-so-long-mode 1))
 #+end_src
 * reading, writing, and tasks
 ** org
@@ -1832,11 +1843,14 @@ Its debateable whether xref should be in this section. May re-evaluate in future
 ** eglot
 #+begin_src emacs-lisp
 (use-package eglot
-  :diminish lsp-mode
   :straight t
-  :hook (((python-mode-hook cc-mode-hook c-mode-hook c++-mode-hook cuda-mode-hook c-common-mode-hook julia-mode-hook rjsx-mode-hook typescript-mode-hook tuareg-mode-hook ) . eglot-ensure)
-         )
   :config
+  (defvar eglot-prog-mode-hooks '(python-mode-hook cc-mode-hook c-mode-hook c++-mode-hook cuda-mode-hook
+                                                   c-common-mode-hook julia-mode-hook rjsx-mode-hook
+                                                   typescript-mode-hook tuareg-mode-hook))
+  (dolist (mode eglot-prog-mode-hooks)
+    (add-hook mode 'eglot-ensure))
+
   (define-key eglot-mode-map (kbd "C-c y n") #'eglot-rename)
   (define-key eglot-mode-map (kbd "C-c y n") #'eglot-rename)
   (define-key eglot-mode-map (kbd "C-c y o") #'eglot-reconnect)
@@ -1846,7 +1860,15 @@ Its debateable whether xref should be in this section. May re-evaluate in future
 
   ;; i don't relaly like flymake, this issue
   ;; https://github.com/joaotavora/eglot/issues/42
-  )
+
+  ;; corfu can be weird man.
+  (eval-after-load "corfu"
+    (progn
+      (defun corfu-eglot-setup ()
+        (setq-local completion-styles '(orderless)
+                    completion-category-defaults nil))
+
+      (add-hook 'eglot-mode-hook #'corfu-eglot-setup))))
 
 (use-package eglot-jl
   :straight t
@@ -1860,7 +1882,8 @@ Its debateable whether xref should be in this section. May re-evaluate in future
   :config
   (define-key eglot-mode-map [remap xref-find-apropos] #'consult-eglot-symbols)
   (define-key eglot-mode-map (kbd "C-c y l") #'consult-flymake))
-;; meh hack from here
+
+;; meh hack from here to use flycheck in eglot
 
 ;; https://gist.github.com/purcell/ca33abbea9a98bb0f8a04d790a0cadcd
 ;; might try flymake for a change
