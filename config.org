@@ -91,8 +91,6 @@ long and needs to be broken up. Some sanity includes:
   (setq minibuffer-prompt-properties
         '(read-only t cursor-intangible t face minibuffer-prompt))
   (add-hook 'minibuffer-setup-hook #'cursor-intangible-mode)
-  ;; quicktramp setup
-  (setq tramp-default-method "ssh")
 
   (setq-default
    indent-tabs-mode nil                 ; don't insert tab when indent
@@ -2205,6 +2203,7 @@ Its debateable whether xref should be in this section. May re-evaluate in future
 (use-package vc
   :straight (:type built-in)
   :config
+  (setq vc-handled-backends '(SVN Git))
   ;;;  As always, from Prot. Directly copied. No shame. See https://protesilaos.com/emacs/dotemacs#h:31deeff4-dfae-48d9-a906-1f3272f29bc9
 
   ;; Those offer various types of functionality, such as blaming,
@@ -2446,6 +2445,83 @@ starting from prot's configuration since he always RTFMs. And I don't...
   (exec-path-from-shell-initialize))
 #+end_src
 
+** Transparent Remote (file) Access, Multiple Protocol (TRAMP)
+
+The manual walks through a number of examples that demonstrate the hidden processes that
+TRAMP does so the user doesn't have to. The most sensible methods that I use are =ssh=
+(unix based) and =smb= (windows, samba).
+
+There's a couple of typical uses that are nice to have written down (more examples in [[info:tramp#File name
+ syntax][tramp#File name syntax]]):
+- =/-::= -- Use the default TRAMP method and connect to the local host with the current
+  username
+- =/ssh:domain:= -- Use the =ssh= method to connect to domain name =domain=. =domain= can be
+  an an IPv4, an IPv6, or a resolvable domain name address.
+- =/ssh:username@domain:= -- connect to =domain= with the user =username=. This will
+  prompt a login sequence if no token or key is already registered.
+- =/ssh:username@domain|sudo::/path/to/file= connect to =domain= with username =username=,
+  to then tunnel into a =localhost= connection for =sudo=.
+- =/ssh:username@domain#port:= -- Connect to =domain= for user =username= on the port
+  =port=. This can be especially useful if tunneling occurs on specific open ports
+  (usually something like =:22= but could be different). Equivalent to =ssh -p PORT=. 
+
+There is a distinction between =inline= and =external= methods. The inline methods include
+the ubiquitous =ssh=. External methods include =scp=, =rsync=, =ftp=, =smb= and so
+forth. Details on =smb= can be checked in [[info:tramp#External methods][the manual]]. =inline= methods should be used
+first since they generally work well with small files. =external= methods can be used
+after finding =internal= methods insufficient.
+
+To avoid repeated authentication, native caching mechanisms can be used and are generally
+prompted for in the natural TRAMP usage. Another package =auth-source.el= reads passwords
+from different sources stored in the default authentication file =~/.authinfo{,.gpg}= (but
+can be changed through the variable =auth-sources=). See [[info:auth#Help for users][auth#Help for users]] for more
+information on the format of this file and the details that =auth-source= goes through to
+access it.
+
+The usual very capable built-in packages interop well with tramp: =shell.el=, =eshell.el=,
+=compile.el= (commands like =compile= and =grep=) and =gud.el= (=gdb= or =perldb=). The
+most typical problem with these packages will be the problem with the remote =PATH= found
+by tramp (configurable through =tramp-remote-path=). This can help find programs in, say
+=~/.local/bin/, ~/bin=.
+
+=DISPLAY= can be problematic. [[info:tramp#Remote processes][tramp#Remote processes]] has some details. The upshot is that
+the =tramp-remote-process-environment= needs to have the variable =DISPLAY=(getenv
+"DISPLAY")= set (if X11 is configured properly on the hosting shell). You can also specify
+=ForwardX11 yes= or =ForwardX11Trusted yes= in =~/.ssh/config=.
+
+External =shell-command= usages use the remote host's file path system (not the
+=/ssh:host:...= system specified by tramp). =shell-command= will infer the host on which
+it is being used so that the relative file path is always "correct", given that you know
+the machine you're on.
+
+=eshell= has very tight interop with TRAMP. You can simply run =cd /sudo::/etc= to enter
+the local =/etc= directory in =sudo= mode. Any TRAMP file specification can be used to
+seamlessly remote in the eshell session.
+
+Running =gdb= through =gud.el= can be done, but as opposed to =shell-command= the TRAMP
+naming system must be used: =gdb -i=mi /ssh:host:~/program <RET>=. I/O will be restricted
+since =gdb= and =gdb-inferior= will not belong to the same process group on the remote
+host. Relative file paths are possible as well, but when in doubt the full path should be
+the go-to.
+
+
+_Using tramp with docker_:
+...
+
+
+#+begin_src emacs-lisp
+(use-package tramp
+  :straight (:type built-in)
+  :config
+  ;;; I'm actually going to give scp a try as the default method for now. There might be benefits due to the encryption overhead required of ssh in =external= use cases.
+
+  ;; ssh > scp (the default).
+  ;; (setq tramp-default-method "ssh")
+  ;; (setq tramp-default-user "packell1")
+
+  (setq tramp-verbose 3) ;; can go up to 11! 3 is the default.
+  )
+#+end_src
 * external environment interface
 ** notmuch, mail in emacs
 #+begin_src emacs-lisp
