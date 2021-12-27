@@ -1199,6 +1199,16 @@ Currently =popper= is lightly used in dealing with evanescent buffers.
           (define-key map (kbd "t") 'org-roam-tag-add)
           map))
   (define-key global-map (kbd "C-c C-u") roam-nav-map)
+
+  (eval-after-load "cape"
+    (progn
+      (add-to-list 'org-roam-completion-functions #'cape-file)
+      (add-to-list 'org-roam-completion-functions #'cape-dabbrev)
+      (add-to-list 'org-roam-completion-functions #'cape-keyword)
+      (add-to-list 'org-roam-completion-functions #'cape-abbrev)
+      (add-to-list 'org-roam-completion-functions #'cape-ispell)
+      (add-to-list 'org-roam-completion-functions #'cape-dict)
+      (add-to-list 'org-roam-completion-functions #'cape-symbol)))
   :bind (("\C-c i" . org-roam-insert-immediate)
          ("\C-c o" . org-roam-jump-to-index)
          ("\C-c t" . org-roam-tag-add)
@@ -1501,7 +1511,7 @@ completion options, minibuffer options, minibuffer history options, prompt faces
 (setq completion-ignore-case t)
 
 (setq completion-cycle-threshold 3) ;; always allow tab cycle
-;; emacs28 completoins stuff
+;; emacs28 completion stuff
 (setq completions-group t)
 (setq completions-group-sort nil)
 
@@ -1519,12 +1529,15 @@ completion options, minibuffer options, minibuffer history options, prompt faces
 (minibuffer-electric-default-mode 1) ;; update default completion if change
 
      ;;; Minibuffer history
-(require 'savehist)
-(setq savehist-file (locate-user-emacs-file "savehist"))
-(setq history-length 10000)
-(setq history-delete-duplicates t)
-(setq savehist-save-minibuffer-history t)
-(add-hook 'after-init-hook #'savehist-mode)
+(use-package savehist
+  :straight (:type built-in)
+  :config
+  (setq savehist-file (locate-user-emacs-file "savehist"))
+  (setq history-length 10000)
+  (setq history-delete-duplicates t)
+  (setq savehist-save-minibuffer-history t)
+  (add-hook 'after-init-hook #'savehist-mode))
+
 ;; Add prompt indicator to `completing-read-multiple'.
 ;; Alternatively try `consult-completing-read-multiple'.
 (defun crm-indicator (args)
@@ -1619,14 +1632,7 @@ doesn't play well with lsp, but i haven't heard anything about =eglot=.
   (setq xref-show-definitions-function #'consult-xref)
   (define-key completion-list-mode-map (kbd "C-o") #'consult-preview-at-point)
 
-  ;; Use `consult-completion-in-region' if Vertico is enabled.
-  ;; Otherwise use the default `completion--in-region' function.
-  (setq completion-in-region-function
-        (lambda (&rest args)
-          (apply (if vertico-mode
-                     #'consult-completion-in-region
-                   #'completion--in-region)
-                 args))))
+  (setq completion-in-region-function #'consult-completion-in-region))
 
 (use-package consult-dir
   :straight t
@@ -1678,11 +1684,8 @@ Enhanced minibuffer information when using =switch-to-buffer=, =find-file=,
 #+begin_src emacs-lisp
 (use-package marginalia
   :straight (:host github :repo "minad/marginalia" :branch "main")
-  :demand
   :config
-  (setq marginalia-annotators
-        '(marginalia-annotators-heavy
-          marginalia-annotators-light))
+  (setq marginalia-max-relative-age 0)  ; time is absolute here!
   (marginalia-mode 1))
 #+end_src
 ** which-key
@@ -1717,15 +1720,20 @@ prefix the string with a "bang" =!=.
   (setq  completion-category-defaults nil
          completion-category-overrides '((file (styles . (partial-completion)))))
   (setq orderless-matching-styles '(orderless-prefixes
-                                    orderless-literal
                                     orderless-strict-leading-initialism
-                                    orderless-regexp
-                                    orderless-flex
-                                    ))
+                                    orderless-regexp))
 
   (defun literal-if-comma (pattern _index _total)
     (when (string-suffix-p "," pattern)
       `(orderless-literal . ,(substring pattern 0 -1))))
+
+  (defun flex-if-tilde (pattern _index _total)
+    (when (string-suffix-p "~" pattern)
+      `(orderless-flex . ,(substring pattern 0 -1))))
+
+  (defun initialism-if-eql (pattern _index _total)
+    (when (string-suffix-p "=" pattern)
+      `(orderless-strict-leading-initialism . ,(substring pattern 0 -1))))
 
   (defun without-if-bang (pattern _index _total)
     (cond
@@ -1734,7 +1742,7 @@ prefix the string with a "bang" =!=.
      ((string-prefix-p "!" pattern)
       `(orderless-without-literal . ,(substring pattern 1)))))
 
-  (setq orderless-style-dispatchers '(literal-if-comma without-if-bang))
+  (setq orderless-style-dispatchers '(literal-if-comma without-if-bang flex-if-tilde initialism-if-eql))
 
   ;; SPC should never complete: use it for `orderless' groups.
   :bind (:map minibuffer-local-completion-map
@@ -1743,9 +1751,17 @@ prefix the string with a "bang" =!=.
 #+end_src
 ** TODO dabbrev, corfu (capf / completion framework frontends)
 #+begin_src emacs-lisp
+(use-package abbrev
+  :straight (:type built-in)
+  :config
+  (setq abbrev-suggest t)
+  (setq save-abbrevs 'silently))
+
 (use-package dabbrev
   :config
-  (setq dabbrev-abbrev-char-regexp "\\sw\\|\\s_")
+  (define-key global-map (kbd "M-/") 'dabbrev-completion)
+  (define-key global-map (kbd "C-M-/") 'dabbrev-expand)
+  (setq dabbrev-abbrev-char-regexp "\\sw\\|\\s_") ;; same as nil
   (setq dabbrev-abbrev-skip-leading-regexp "[$*/=~']")
   (setq dabbrev-backward-only nil)
   (setq dabbrev-case-distinction 'case-replace)
@@ -1786,14 +1802,7 @@ prefix the string with a "bang" =!=.
   (add-to-list 'completion-at-point-functions #'cape-abbrev)
   (add-to-list 'completion-at-point-functions #'cape-ispell)
   (add-to-list 'completion-at-point-functions #'cape-dict)
-  (add-to-list 'completion-at-point-functions #'cape-symbol)
-  (add-to-list 'org-roam-completion-functions #'cape-file)
-  (add-to-list 'org-roam-completion-functions #'cape-dabbrev)
-  (add-to-list 'org-roam-completion-functions #'cape-keyword)
-  (add-to-list 'org-roam-completion-functions #'cape-abbrev)
-  (add-to-list 'org-roam-completion-functions #'cape-ispell)
-  (add-to-list 'org-roam-completion-functions #'cape-dict)
-  (add-to-list 'org-roam-completion-functions #'cape-symbol))
+  (add-to-list 'completion-at-point-functions #'cape-symbol))
 #+end_src
 ** yasnippet
 
