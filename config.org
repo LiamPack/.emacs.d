@@ -1467,7 +1467,12 @@ actions specified in the manual.
 (use-package flyspell
   :straight (:type built-in)
   :diminish flyspell-mode
-  :hook ((org-mode-hook markdown-mode-hook) . (lambda () (interactive) (flyspell-mode))))
+  :hook ((org-mode-hook markdown-mode-hook) . (lambda () (interactive) (flyspell-mode)))
+  :config
+  (setq flyspell-issue-message-flag nil)
+  (setq flyspell-issue-welcome-flag nil)
+  (define-key flyspell-mode-map (kbd "C-;") nil) ;; gets in the way of things.
+  )
 #+end_src
 
 * minibuffer, completion, and definitions
@@ -1770,19 +1775,21 @@ prefix the string with a "bang" =!=.
               ("SPC" . nil)
               ("?" . nil)))
 #+end_src
-** TODO dabbrev, corfu (capf / completion framework frontends)
+** abbrev, dabbrev, corfu (capf / completion framework front-ends)
 #+begin_src emacs-lisp
 (use-package abbrev
   :straight (:type built-in)
   :config
   (setq abbrev-suggest t)
-  (setq save-abbrevs 'silently))
+  (setq save-abbrevs 'silently)
+  (setq abbrev-file-name (locate-user-emacs-file "abbrevs"))
+  (setq only-global-abbrevs nil))
 
 (use-package dabbrev
   :config
   (define-key global-map (kbd "M-/") 'dabbrev-completion)
   (define-key global-map (kbd "C-M-/") 'dabbrev-expand)
-  (setq dabbrev-abbrev-char-regexp "\\sw\\|\\s_") ;; same as nil
+  (setq dabbrev-abbrev-char-regexp "\\sw\\|\\s_") ;; same as nil technically
   (setq dabbrev-abbrev-skip-leading-regexp "[$*/=~']")
   (setq dabbrev-backward-only nil)
   (setq dabbrev-case-distinction 'case-replace)
@@ -1790,31 +1797,28 @@ prefix the string with a "bang" =!=.
   (setq dabbrev-case-replace 'case-replace)
   (setq dabbrev-check-other-buffers t)
   (setq dabbrev-eliminate-newlines t)
-  (setq dabbrev-upcase-means-case-search t)
-  :bind (("C-M-/" . dabbrev-expand)
-         ("M-/" . dabbrev-completion))
-  )
+  (setq dabbrev-upcase-means-case-search t))
 
 (use-package corfu
   :disabled
-  :straight '(corfu :host github
-                    :repo "minad/corfu")
+  :straight t
   ;; Optional customizations
-  :custom
-  (corfu-cycle t)            ;; Enable cycling for `corfu-next/previous'
-  (corfu-auto t)             ;; Enable auto completion
-  (corfu-quit-at-boundary t) ;; Automatically quit at word boundary
-  (corfu-quit-no-match t)    ;; Automatically quit if there is no match
-  (corfu-auto-delay 0.7)
-  (corfu-echo-documentation t)
+  :config
+  (setq corfu-cycle t)            ;; Enable cycling for `corfu-next/previous'
+  (setq corfu-auto t)             ;; Enable auto completion
+  (setq corfu-quit-at-boundary t) ;; Automatically quit at word boundary
+  (setq corfu-quit-no-match t)    ;; Automatically quit if there is no match
+  (setq corfu-auto-delay 0.7)
+  (setq corfu-echo-documentation t)
   (setq tab-always-indent 'complete)
-  :init
+
   ;; Enable indentation+completion using the TAB key.
   ;; `completion-at-point' is often bound to M-TAB.
   (setq tab-always-indent 'complete)
   (corfu-global-mode))
 
 (use-package cape
+  :disabled
   :straight (:type git :host github :repo "minad/cape")
   :config
   (add-to-list 'completion-at-point-functions #'cape-file)
