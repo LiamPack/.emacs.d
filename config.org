@@ -639,6 +639,10 @@ Currently =popper= is lightly used in dealing with evanescent buffers.
   ;; [2021-12-21 Tue] C-x C-{p,n} go to next/previous buffer (new to me)
   (setq display-buffer-alist
         `(
+          ;; below current window
+          ("\\*.*\\(e?shell\\|v?term\\|.*geiser.*\\|\\).*"
+           (display-buffer-below-selected)
+           (window-height . 0.3))
           ("\\*Org Agenda\\*"
            (display-buffer-reuse-window display-buffer-same-window))
           (".*eww.*"
@@ -681,15 +685,12 @@ Currently =popper= is lightly used in dealing with evanescent buffers.
            (window-parameters . ((no-other-window . t))))
           ("\\*\\(Output\\|Register Preview\\).*"
            (display-buffer-reuse-mode-window display-buffer-at-bottom))
-          ;; below current window
-          ("\\*.*\\(e?shell\\|v?term\\|.*geiser.*\\|\\).*"
-           (display-buffer-reuse-mode-window display-buffer-below-selected)
-           (window-height 0.2))
+
           ("\\*\\vc-\\(incoming\\|outgoing\\|git : \\).*"
            (display-buffer-reuse-mode-window display-buffer-below-selected)
            ;; NOTE 2021-10-06: we cannot `fit-window-to-buffer' because
            ;; the height is not known in advance.
-           (window-height . 0.3u))
+           (window-height . 0.4))
           ("magit: .*"
            (display-buffer-reuse-mode-window display-buffer-below-selected)
            (window-height . 0.4))
@@ -755,7 +756,7 @@ Currently =popper= is lightly used in dealing with evanescent buffers.
           geiser-repl-mode
           magit-mode
           compilation-mode))
-  (setq popper-display-control nil) ;; already have rules set up
+  (setq popper-display-control nil) ;; let display-buffer handle it    
   (popper-mode +1)
   (popper-echo-mode +1))
 #+end_src
