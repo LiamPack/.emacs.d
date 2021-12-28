@@ -168,6 +168,60 @@ long and needs to be broken up. Some sanity includes:
   (define-key Man-mode-map (kbd "g") #'Man-update-manpage)
   )
 #+end_src
+** relating to saving the state of emacs
+*** emacs server
+
+Starting a server will allow the quick access of emacs through a server connection rather
+than having to open and load a full configuration every time.
+
+#+begin_src emacs-lisp
+(use-package server
+  :straight (:type built-in)
+  :init
+  (add-hook 'after-init-hook #'server-start))
+#+end_src
+*** desktop
+I have a love-hate relationship with =desktop=. I haven't read the manual enough to
+find the right configuration required to have a more seamless start-up and shut-down. But
+it remains. At the moment I store no buffers or frames to load from since that generates
+too much friction on startup.
+
+#+begin_src emacs-lisp
+(use-package desktop
+  :straight (:type built-in)
+  :config
+  (setq desktop-auto-save-timeout 300)
+  (setq desktop-path `(,user-emacs-directory))
+  (setq desktop-base-file-name "desktop")
+  (setq desktop-files-not-to-save ".*")
+  (setq desktop-buffers-not-to-save ".*")
+  (setq desktop-globals-to-clear nil)
+  (setq desktop-load-locked-desktop t)
+  (setq desktop-missing-file-warning nil)
+  (setq desktop-restore-eager 0)
+  (setq desktop-restore-frames nil)
+  (setq desktop-save 'ask-if-new)
+  (dolist (symbol '(kill-ring log-edit-comment-ring))
+    (add-to-list 'desktop-globals-to-save symbol))
+
+  (desktop-save-mode 1)
+  )
+#+end_src
+
+*** saveplace
+Saving the cursor position in a file is a subtle hint of what you were doing. Its also
+relatively convenient
+
+#+begin_src emacs-lisp
+(use-package saveplace
+  :straight (:type built-in)
+  :diminish
+  :init
+  (setq save-place-file (locate-user-emacs-file "saveplace"))
+  (setq save-place-forget-unreadable-files t)
+  (save-place-mode 1)
+  )
+#+end_src
 * aesthetics
 ** solid themes
 General aesthetic configurations for emacs
@@ -533,69 +587,15 @@ For a more interactive search+replace experience
    '(anzu-replace-threshold 50)
    '(anzu-replace-to-string-separator " => ")))
 #+end_src
-** relating to saving the state of emacs
-*** emacs server
-
-Starting a server will allow the quick access of emacs through a server connection rather
-than having to open and load a full configuration every time.
-
-#+begin_src emacs-lisp
-(use-package server
-  :straight (:type built-in)
-  :init
-  (add-hook 'after-init-hook #'server-start))
-#+end_src
-*** desktop
-I have a love-hate relationship with =desktop=. I haven't read the manual enough to
-find the right configuration required to have a more seamless start-up and shut-down. But
-it remains. At the moment I store no buffers or frames to load from since that generates
-too much friction on startup. 
-
-#+begin_src emacs-lisp
-(use-package desktop
-  :straight (:type built-in)
-  :config
-  (setq desktop-auto-save-timeout 300)
-  (setq desktop-path `(,user-emacs-directory))
-  (setq desktop-base-file-name "desktop")
-  (setq desktop-files-not-to-save ".*")
-  (setq desktop-buffers-not-to-save ".*")
-  (setq desktop-globals-to-clear nil)
-  (setq desktop-load-locked-desktop t)
-  (setq desktop-missing-file-warning nil)
-  (setq desktop-restore-eager 0)
-  (setq desktop-restore-frames nil)
-  (setq desktop-save 'ask-if-new)
-  (dolist (symbol '(kill-ring log-edit-comment-ring))
-    (add-to-list 'desktop-globals-to-save symbol))
-
-  (desktop-save-mode 1)
-  )
-#+end_src
-
-*** saveplace
-Saving the cursor position in a file is a subtle hint of what you were doing. Its also
-relatively convenient
-
-#+begin_src emacs-lisp
-(use-package saveplace
-  :straight (:type built-in)
-  :diminish
-  :init
-  (setq save-place-file (locate-user-emacs-file "saveplace"))
-  (setq save-place-forget-unreadable-files t)
-  (save-place-mode 1)
-  )
-#+end_src
-
 ** window+buffer management utilities
 Without good window management, there cannot be a good editor. The imperative is to
 provide a malleable, predictable, and adaptable environment built from the basics. For
 this, =display-buffer= plays a key role. Perhaps more should play a larger role, but
 alas.
 
-=ibuffer= remains a time-tested classic. It does exactly its job: logical grouping of
-buffers with some enhanced information over =list-buffers=.
+=ibuffer= remains a time-tested classic. It does its job well: logical grouping of buffers
+with some enhanced information over =list-buffers=, packaged with advanced marking and
+acting over the listed buffers (much like =dired{,-x}=).
 
 =tab-bar= is an interesting addition to the Emacs built-ins. I'd guess the experience
 should emulate a typical tab system in, say, VS-Code. But I don't have much experience
@@ -801,7 +801,7 @@ Currently =popper= is lightly used in dealing with evanescent buffers.
           geiser-repl-mode
           magit-mode
           compilation-mode))
-  (setq popper-display-control nil) ;; let display-buffer handle it    
+  (setq popper-display-control nil) ;; let display-buffer handle it
   (popper-mode +1)
   (popper-echo-mode +1))
 #+end_src
@@ -1520,7 +1520,53 @@ actions specified in the manual.
 #+end_src
 
 * minibuffer, completion, and definitions
-** mct, minimalist completion
+** general minibuffer completion configuration
+completion options, minibuffer options, minibuffer history options, prompt faces, ...
+#+begin_src emacs-lisp
+(setq completion-show-inline-help t)
+(setq completions-detailed t)
+(setq completion-ignore-case t)
+
+(setq completion-cycle-threshold 3) ;; always allow tab cycle
+;; emacs28 completion stuff
+(setq completions-group t)
+(setq completions-group-sort nil)
+
+
+(setq enable-recursive-minibuffers t)
+(setq minibuffer-eldef-shorten-default t) ;; default completion in [bracks]
+
+(setq read-buffer-completion-ignore-case t)
+(setq read-file-name-completion-ignore-case t)
+
+(setq resize-mini-windows t)
+
+(file-name-shadow-mode 1)
+(minibuffer-depth-indicate-mode 1)
+(minibuffer-electric-default-mode 1) ;; update default completion if change
+
+     ;;; Minibuffer history
+(use-package savehist
+  :straight (:type built-in)
+  :config
+  (setq savehist-file (locate-user-emacs-file "savehist"))
+  (setq history-length 10000)
+  (setq history-delete-duplicates t)
+  (setq savehist-save-minibuffer-history t)
+  (add-hook 'after-init-hook #'savehist-mode))
+
+;; Add prompt indicator to `completing-read-multiple'.
+;; Alternatively try `consult-completing-read-multiple'.
+(defun crm-indicator (args)
+  (cons (concat "[CRM] " (car args)) (cdr args)))
+(advice-add #'completing-read-multiple :filter-args #'crm-indicator)
+
+;; Do not allow the cursor in the minibuffer prompt
+(setq minibuffer-prompt-properties
+      '(read-only t cursor-intangible t face minibuffer-prompt))
+#+end_src
+
+** mct        -- minimalist minibuffer completion visualization
 [2021-12-06] I gave it a serious try but MCT isn't gonna cut it. I'd like my
 completions to be done quicker.
 
@@ -1572,53 +1618,7 @@ completions to be done quicker.
   )
 #+end_src
 
-** general minibuffer completion configuration
-completion options, minibuffer options, minibuffer history options, prompt faces, ...
-#+begin_src emacs-lisp
-(setq completion-show-inline-help t)
-(setq completions-detailed t)
-(setq completion-ignore-case t)
-
-(setq completion-cycle-threshold 3) ;; always allow tab cycle
-;; emacs28 completion stuff
-(setq completions-group t)
-(setq completions-group-sort nil)
-
-
-(setq enable-recursive-minibuffers t)
-(setq minibuffer-eldef-shorten-default t) ;; default completion in [bracks]
-
-(setq read-buffer-completion-ignore-case t)
-(setq read-file-name-completion-ignore-case t)
-
-(setq resize-mini-windows t)
-
-(file-name-shadow-mode 1)
-(minibuffer-depth-indicate-mode 1)
-(minibuffer-electric-default-mode 1) ;; update default completion if change
-
-     ;;; Minibuffer history
-(use-package savehist
-  :straight (:type built-in)
-  :config
-  (setq savehist-file (locate-user-emacs-file "savehist"))
-  (setq history-length 10000)
-  (setq history-delete-duplicates t)
-  (setq savehist-save-minibuffer-history t)
-  (add-hook 'after-init-hook #'savehist-mode))
-
-;; Add prompt indicator to `completing-read-multiple'.
-;; Alternatively try `consult-completing-read-multiple'.
-(defun crm-indicator (args)
-  (cons (concat "[CRM] " (car args)) (cdr args)))
-(advice-add #'completing-read-multiple :filter-args #'crm-indicator)
-
-;; Do not allow the cursor in the minibuffer prompt
-(setq minibuffer-prompt-properties
-      '(read-only t cursor-intangible t face minibuffer-prompt))
-#+end_src
-
-** consult
+** consult    -- enhanced minibuffer completion functions and utilities
 consult is an important set of utilities that extend a number of important built-in
 functions (like =list-buffers=, =goto-line=), where comprehensive completions and
 additional utilities are provided within-command.
@@ -1718,7 +1718,7 @@ doesn't play well with lsp, but i haven't heard anything about =eglot=.
     (add-to-list 'embark-keymap-alist '(bibtex-completion . consult-bibtex-embark-map)))
   (setq consult-bibtex-default-action #'consult-bibtex-edit-notes))
 #+end_src
-** embark
+** embark     -- Mini-buffer actions rooted in Keymaps (contextual actions)
 
 An absolute beast of a package in its design and possible use-cases. Whether you're
 unmarked, in minibuffer, in an =info-mode= buffer, Embark will gather useful actions for
@@ -1746,7 +1746,7 @@ shine, but for now I'm using it mostly for =embark-export= for batched editing o
   )
 #+end_src
 
-** marginalia
+** marginalia -- enhanced minibuffer detail display
 
 Enhanced minibuffer information when using =switch-to-buffer=, =find-file=,
 =describe-variable=, etc.
@@ -1758,19 +1758,7 @@ Enhanced minibuffer information when using =switch-to-buffer=, =find-file=,
   (setq marginalia-max-relative-age 0)  ; time is absolute here!
   (marginalia-mode 1))
 #+end_src
-** which-key
-
-I use =which-key= to discover new useful commands hiding in a keymap prefix. That's pretty
-much it, but its proven itself tremendously helpful for exploring features of the built-in
-or of a new package.
-
-#+begin_src emacs-lisp
-(use-package which-key
-  :straight t
-  :diminish which-key-mode
-  :config (which-key-mode 1))
-#+end_src
-** orderless
+** orderless  -- orderless filtering and mapping of symbols
 
 For matching symbols without regard for order, we use =orderless=.
 
@@ -1819,7 +1807,19 @@ prefix the string with a "bang" =!=.
               ("SPC" . nil)
               ("?" . nil)))
 #+end_src
-** abbrev, dabbrev, corfu (capf / completion framework front-ends)
+** which-key
+
+I use =which-key= to discover new useful commands hiding in a keymap prefix. That's pretty
+much it, but its proven itself tremendously helpful for exploring features of the built-in
+or of a new package.
+
+#+begin_src emacs-lisp
+(use-package which-key
+  :straight t
+  :diminish which-key-mode
+  :config (which-key-mode 1))
+#+end_src
+** completion frameworks and utilities (abbrev, dabbrev, corfu)
 #+begin_src emacs-lisp
 (use-package abbrev
   :straight (:type built-in)
@@ -1875,7 +1875,8 @@ prefix the string with a "bang" =!=.
 #+end_src
 ** yasnippet
 
-nice snippets. they'll never go out of fashion
+nice snippets. they'll never go out of fashion. for when cursor placement and more
+advanced expansions than =abbrev= are needed.
 
 #+begin_src emacs-lisp
 ;; configuration
@@ -1894,7 +1895,9 @@ nice snippets. they'll never go out of fashion
 #+end_src
 
 ** xref
-Its debateable whether xref should be in this section. May re-evaluate in future
+Its debatable whether xref should be in this section. May re-evaluate in future.
+
+
 
 #+BEGIN_SRC emacs-lisp
 (use-package xref
@@ -1917,6 +1920,16 @@ Its debateable whether xref should be in this section. May re-evaluate in future
             (font-lock-add-keywords
              nil
              '(("\\<\\(FIXME\\|TODO\\|BUG\\)" 1 font-lock-warning-face prepend)))))
+(use-package compile
+  :straight (:type built-in)
+  :config
+  (setq compilation-ask-about-save nil)
+  (setq compilation-scroll-output 'next-error)
+  (setq compilation-skip-threshold 2)
+  (setq compilation-scroll-output 'first-error)
+  (setq compilation-always-kill t)
+  (setq compilation-auto-jump-to-first-error t)
+  )
 #+end_src
 ** eglot
 #+begin_src emacs-lisp
@@ -2020,10 +2033,6 @@ Its debateable whether xref should be in this section. May re-evaluate in future
   (c-common-mode-hook . hs-minor-mode)
   :config
   (setq gdb-many-windows 't)
-  (setq compilation-ask-about-save nil)
-  (setq compilation-scroll-output 'next-error)
-  (setq compilation-skip-threshold 2)
-
   (setq tab-width 4)
   (setq c-basic-offset 4)
   (setq-default indent-tabs-mode nil)
@@ -2131,7 +2140,7 @@ Its debateable whether xref should be in this section. May re-evaluate in future
              '("\\.sps\\'" . scheme-mode))
 (unbind-key (kbd "C-M-q") scheme-mode-map)
 #+end_src
-** flymake, proselint (!) 
+** flymake, proselint (!)
 
 Writing prose is tough and proselint is a nice tool. To install, run =sudo apt install
 python3-proselint=
@@ -2465,7 +2474,7 @@ TRAMP does so the user doesn't have to. The most sensible methods that I use are
 (unix based) and =smb= (windows, samba).
 
 There's a couple of typical uses that are nice to have written down (more examples in [[info:tramp#File name
- syntax][tramp#File name syntax]]):
+syntax][tramp#File name syntax]]):
 - =/-::= -- Use the default TRAMP method and connect to the local host with the current
   username
 - =/ssh:domain:= -- Use the =ssh= method to connect to domain name =domain=. =domain= can be
@@ -2476,7 +2485,7 @@ There's a couple of typical uses that are nice to have written down (more exampl
   to then tunnel into a =localhost= connection for =sudo=.
 - =/ssh:username@domain#port:= -- Connect to =domain= for user =username= on the port
   =port=. This can be especially useful if tunneling occurs on specific open ports
-  (usually something like =:22= but could be different). Equivalent to =ssh -p PORT=. 
+  (usually something like =:22= but could be different). Equivalent to =ssh -p PORT=.
 
 There is a distinction between =inline= and =external= methods. The inline methods include
 the ubiquitous =ssh=. External methods include =scp=, =rsync=, =ftp=, =smb= and so
