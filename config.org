@@ -27,49 +27,50 @@ long and needs to be broken up. Some sanity includes:
 ;; hacky way to remove the =custom-variables= generation in =init.el=
 (setq custom-file (make-temp-file "emacs-custom-"))
 
-;; basics and better default
-;; from https://pastebin.com/MDagsZD7
+;; some from https://pastebin.com/MDagsZD7
 (use-package emacs
   :init
-  ;; why does this bind exist
+  ;; why do these binds exist
   (unbind-key (kbd "C-z") global-map)
   (unbind-key (kbd "C-x C-z") global-map)
-  ;; minimizes GC interferecen with user activity
+
+  ;; minimizes GC interference with user activity
   (setq gc-cons-threshold (* 16 1024 1024))
 
 
   ;; i fat-finger way too much to not have the confirmation
   (setq confirm-kill-emacs #'yes-or-no-p)
   (global-hl-line-mode t)               ; highlight current line
-  (setq-default fill-column 90)         ; column length
+  (setq-default fill-column 92)         ; column length
   (column-number-mode t)                ; show column number in the mode line
 
   ;; name on top of frame
   (setq-default frame-title-format '("%b [%m]"))
 
-  (setq warning-minimum-level :error)   ;avoid warning buffer
+  (setq warning-minimum-level :error)   ; avoid warning buffer
 
   ;; scroll
   (setq auto-window-vscroll nil)  ; avoid next-line to trigger line-move-partial
   (setq scroll-conservatively 10)
   (setq scroll-margin 7)
+  (setq scroll-step 0)                  ; see info of `scroll-step`: as long as `scroll-conservatively`
+                                        ; is a "large value" this should be fine
   (menu-bar-mode -1)
   (when (fboundp 'tool-bar-mode) (tool-bar-mode -1))
   (when (fboundp 'scroll-bar-mode) (scroll-bar-mode -1))
   (when (fboundp 'set-horizontal-scroll-bar-mode)
     (set-horizontal-scroll-bar-mode nil))
 
-  (setq mouse-wheel-scroll-amount '(3 ((shift) . 1) ((control) . nil)))
+  (setq mouse-wheel-scroll-amount '(1 ((shift) . 3) ((control) . nil)))
   (setq mouse-wheel-follow-mouse 't)
-  (setq scroll-step 1)
 
   ;; other basiscs
   (setq ring-bell-function 'ignore)
   (setq inhibit-startup-screen t)
 
   ;; create backups in separate folder
-  (setq backup-directory-alist `(("." . "~/.saves")))
-  (setq create-lockfiles nil)           ; files with # problem with onedrive...
+  (setq backup-directory-alist `(("." . "~/.emacs.d/saves")))
+  (setq create-lockfiles nil)
 
   ;; answering just 'y' or 'n' will do
   (defalias 'yes-or-no-p 'y-or-n-p)
@@ -78,7 +79,7 @@ long and needs to be broken up. Some sanity includes:
       (blink-cursor-mode 1)
     (progn
       (blink-cursor-mode -1)
-      (setq visible-cursor nil)))
+      (setq visible-cursor t)))
 
   (setq-default
    initial-scratch-message ";; Present Day
@@ -88,18 +89,18 @@ long and needs to be broken up. Some sanity includes:
 
   (show-paren-mode t)
   (setq show-paren-style 'parenthesis)
-  ;; do not allow the cursor in the minibuffer prompt
+
+  ;; cursor intangible in the minibuffer prompt
   (setq minibuffer-prompt-properties
         '(read-only t cursor-intangible t face minibuffer-prompt))
   (add-hook 'minibuffer-setup-hook #'cursor-intangible-mode)
 
-  (setq-default
-   indent-tabs-mode nil                 ; don't insert tab when indent
-   ;; this is giving me problems when creating new lines in org-mode source blocks
-   help-window-select t                 ; focus on help window when openend
-   window-combination-resize t)
+  (setq indent-tabs-mode nil                 ; don't insert tab when indent
+        help-window-select t                 ; focus on help window when openend
+        window-combination-resize nil)       ; i'd rather balance than have it auto-proportionally
+                                        ; balanace
 
-  (defun lp/clean-up-buffer-or-region ()
+  (defun lp--clean-up-buffer-or-region ()
     "Untabifies, indents and deletes trailing whitespace from buffer or region."
     (interactive)
     (save-excursion
@@ -108,7 +109,8 @@ long and needs to be broken up. Some sanity includes:
       (untabify (region-beginning) (region-end))
       (indent-region (region-beginning) (region-end))
       (save-restriction
-        (narrow-to-region (region-beginning) (region-end)) (delete-trailing-whitespace))))
+        (narrow-to-region (region-beginning) (region-end))
+        (delete-trailing-whitespace))))
 
   (define-key global-map (kbd "C-x k") #'(lambda () (interactive) (kill-buffer nil)))
   (define-key global-map (kbd "C-x K") #'(lambda () (interactive) (kill-buffer nil) (delete-window)))
@@ -135,7 +137,7 @@ long and needs to be broken up. Some sanity includes:
     (setq set-mark-command-repeat-pop t)
 
     (repeat-mode 1))
-  ) ; resize windows proportionaly
+  )
 
 (use-package focus-autosave-mode        ; Save buffers when focus is lost
   :straight t
@@ -154,10 +156,12 @@ long and needs to be broken up. Some sanity includes:
                                   ("America/Winnipeg" "Winnipeg (CA)")
                                   ("America/New_York" "New York (USA)")
                                   ("Asia/Tokyo"       "Tokyo (JP)")))
-  (setf display-time-default-load-average nil
+  (setq display-time-default-load-average nil
         display-time-use-mail-icon t
-        display-time-24hr-format t)
-  (display-time-mode))
+        display-time-24hr-format t
+        display-time-day-and-date t)
+
+  (display-time-mode 1))
 #+end_src
 ** info mode, man mode
 #+begin_src emacs-lisp
@@ -356,141 +360,19 @@ General aesthetic configurations for emacs
 #+end_src
 
 * movement and editing
-** [experimental] meow (modular editing, not evil)
-- need to configure which modes this should be activated int
-- some keybindings are jank
-- i kinda like it
-
-#+begin_src emacs-lisp
-(use-package meow
-  :disabled
-  :straight (:type git :host github :repo "meow-edit/meow")
-  :config
-  (defun meow-setup ()
-    (setq meow-cheatsheet-layout meow-cheatsheet-layout-qwerty)
-    (meow-motion-overwrite-define-key
-     '("j" . meow-next)
-     '("k" . meow-prev))
-    (meow-leader-define-key
-     ;; SPC j/k will run the original command in MOTION state.
-     '("j" . "H-j")
-     '("k" . "H-k")
-     ;; Use SPC (0-9) for digit arguments.
-     '("1" . meow-digit-argument)
-     '("2" . meow-digit-argument)
-     '("3" . meow-digit-argument)
-     '("4" . meow-digit-argument)
-     '("5" . meow-digit-argument)
-     '("6" . meow-digit-argument)
-     '("7" . meow-digit-argument)
-     '("8" . meow-digit-argument)
-     '("9" . meow-digit-argument)
-     '("0" . meow-digit-argument)
-     '("/" . meow-keypad-describe-key)
-     '("?" . meow-cheatsheet))
-    (meow-normal-define-key
-     '("0" . meow-expand-0)
-     '("9" . meow-expand-9)
-     '("8" . meow-expand-8)
-     '("7" . meow-expand-7)
-     '("6" . meow-expand-6)
-     '("5" . meow-expand-5)
-     '("4" . meow-expand-4)
-     '("3" . meow-expand-3)
-     '("2" . meow-expand-2)
-     '("1" . meow-expand-1)
-     '("-" . negative-argument)
-     '(";" . meow-reverse)
-     '("," . meow-inner-of-thing)
-     '("." . meow-bounds-of-thing)
-     '("[" . meow-beginning-of-thing)
-     '("]" . meow-end-of-thing)
-     '("a" . meow-append)
-     '("A" . meow-open-below)
-     '("b" . meow-back-word)
-     '("B" . meow-back-symbol)
-     '("c" . meow-change)
-     '("d" . meow-delete)
-     '("D" . meow-backward-delete)
-     '("e" . meow-next-word)
-     '("E" . meow-next-symbol)
-     '("f" . meow-find)
-     '("g" . meow-cancel-selection)
-     '("G" . meow-grab)
-     '("h" . meow-left)
-     '("H" . meow-left-expand)
-     '("i" . meow-insert)
-     '("I" . meow-open-above)
-     '("j" . meow-next)
-     '("J" . meow-next-expand)
-     '("k" . meow-prev)
-     '("K" . meow-prev-expand)
-     '("l" . meow-right)
-     '("L" . meow-right-expand)
-     '("m" . meow-join)
-     '("n" . meow-search)
-     '("o" . meow-block)
-     '("O" . meow-to-block)
-     '("p" . meow-yank)
-     ;;     '("q" . meow-quit)
-     ;;     '("Q" . meow-goto-line)
-     '("r" . meow-replace)
-     '("R" . meow-swap-grab)
-     '("s" . meow-kill)
-     '("t" . meow-till)
-     '("u" . meow-undo)
-     '("U" . meow-undo-in-selection)
-     '("v" . meow-visit)
-     '("w" . meow-mark-word)
-     '("W" . meow-mark-symbol)
-     '("x" . meow-line)
-     '("X" . meow-goto-line)
-     '("y" . meow-save)
-     '("Y" . meow-sync-grab)
-     '("z" . meow-pop-selection)
-     '("'" . repeat)
-     '("<escape>" . mode-line-other-buffer)
-     '("/" . isearch-forward)
-     '("?" . isearch-backward)
-     '("$" . move-end-of-line)
-     '("0" . move-beginning-of-line)
-     '("<" . enlarge-window-horizontally)
-     '(">" . shrink-window-horizontally)
-     '("}" . enlarge-window)
-     '("{" . shrink-window)
-     ))
-
-  (meow-setup)
-
-  (add-to-list 'meow-mode-state-list
-               '((magit . motion)
-                 (dired . motion)
-                 (sly-mrepl-mode . normal)))
-  ;; (setq meow-char-thing-table
-  ;;       '((?\( . round)
-  ;;         (?\[ . square)
-  ;;         (?{ . curly)
-  ;;         (?\ . string)
-  ;;         (?s . symbol)
-  ;;         (?w . window)
-  ;;         (?b . buffer)
-  ;;         (?p . paragraph)
-  ;;         (?l . line)
-  ;;         (?d . defun)
-  ;;         (?i . indent)
-  ;;         (?e . extend)))
-
-  (meow-global-mode 1)
-  )
-#+end_src
-
 ** cursor positioning and duplicating
 Sometimes =undo= can be unwieldy to deal with. =undo-propose= provides a scratch buffer
 for that purpose. At least that's what I use it for. I understand its more powerful than
 that but I'm ignorant in many ways.
 
-=iedit= is a provides simple mark-and-multiedit capabilities. I haven't RTFM'd on
+=iedit= provides simple mark-and-multiedit capabilities. I haven't RTFM'd on
 rectangle mode to see if it provides that capability, so to the externals we go.
+
+=avy= provides useful text-query-and-jumping utilities that I've grown to like (and is the
+only dependency on =ivy= now).
+
+=expand-region= can be useful when I don't know the keybinding to mark a type of text
+object. That's really it.
 
 #+begin_src emacs-lisp
 (use-package undo-propose
@@ -528,10 +410,11 @@ match =.*?=, i.e all characters are whitespace.
   (setq isearch-lax-whitespace t)
   (setq isearch-regexp-lax-whitespace nil)
   (setq isearch-lazy-highlight t)
+
   ;; All of the following variables were introduced in Emacs 27.1.
   (setq isearch-lazy-count t)
-  (setq lazy-count-prefix-format nil)
-  (setq lazy-count-suffix-format " (%s/%s)")
+  (setq lazy-count-prefix-format "(%s/%s) ")
+  (setq lazy-count-suffix-format nil)
   (setq isearch-yank-on-move 'shift)
   (setq isearch-allow-scroll 'unlimited)
   ;; Emacs 28
@@ -549,16 +432,13 @@ match =.*?=, i.e all characters are whitespace.
 
 (use-package replace
   :straight (:type built-in)
-  :hook ((occur-mode-hook . hl-line-mode)
-         (occur-mode-hook . (lambda ()
-                              (toggle-truncate-lines t))))
-  :bind (("M-s M-o" . multi-occur)
-         :map occur-mode-map
-         ("t" . toggle-truncate-lines))
-  :config
-  (setq list-matching-lines-jump-to-current-line t)
-
-  )
+  :init
+  (global-set-key (kbd "M-s M-o") 'multi-occur)
+  (define-key occur-mode-map (kbd "t") 'toggle-truncate-lines)
+  (add-hook 'occur-mode-hook #'(lambda () (interactive) (toggle-truncate-lines t)))
+  (add-hook 'occur-mode-hook #'hl-line-mode)
+  
+  (setq list-matching-lines-jump-to-current-line t))
 
 #+end_src
 
@@ -647,32 +527,21 @@ Currently =popper= is lightly used in dealing with evanescent buffers.
 (use-package tab-bar
   :straight (:type built-in)
   :init
-  (setq tab-bar-close-button-show nil)
-  (setq tab-bar-close-last-tab-choice 'tab-bar-mode-disable)
+  ;; (setq tab-bar-close-button-show nil)
+  ;; (setq tab-bar-close-last-tab-choice 'tab-bar-mode-disable)
   (setq tab-bar-close-tab-select 'recent)
   (setq tab-bar-new-tab-choice t)
   (setq tab-bar-new-tab-to 'right)
-  (setq tab-bar-position nil)
-  (setq tab-bar-show nil)
-  (setq tab-bar-tab-hints nil)
+  ;; (setq tab-bar-position nil)
+  ;; (setq tab-bar-show nil)
+  ;; (setq tab-bar-tab-hints nil)
   (setq tab-bar-tab-name-function 'tab-bar-tab-name-all)
-
-  (setq tab-nav-map
-        (let ((map (make-sparse-keymap)))
-          (define-key map (kbd "b") 'switch-to-buffer-other-tab)
-          (define-key map (kbd "d") 'dired-other-tab)
-          (define-key map (kbd "f") 'find-file-other-tab)
-          (define-key map (kbd "n") 'tab-next)
-          (define-key map (kbd "p") 'tab-previous)
-          (define-key map (kbd "0") 'tab-close)
-          (define-key map (kbd "1") 'tab-close-other)
-          (define-key map (kbd "2") 'tab-bar-new-tab)
-          (define-key map (kbd "l") 'tab-list)
-          map))
-  (define-key global-map (kbd "C-c C-t") tab-nav-map)
+  ;; tab map bound to C-x t
   :config
-  (tab-bar-mode -1)
-  (tab-bar-history-mode -1)
+  (tab-bar-mode +1)
+  (tab-bar-history-mode +1)
+  ;; (tab-bar-mode -1)
+  ;; (tab-bar-history-mode -1)
   :bind (("<prior>" . tab-next)
          ("<next>" . tab-previous)))
 
