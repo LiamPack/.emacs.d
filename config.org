@@ -1332,7 +1332,6 @@ doesn't play well with lsp, but i haven't heard anything about =eglot=.
           map))
   (define-key global-map (kbd "M-s") consult-search-map)
   (define-key global-map (kbd "M-j") consult-goto-map)
-  (define-key global-map (kbd "M-r") consult-register-map)
   (define-key global-map (kbd "M-M") consult-mode-mode-map)
   (define-key global-map (kbd "C-c y l") 'consult-flymake)
   (setq consult-preview-key (kbd "C-o") ) ;; disable live preview
@@ -1706,6 +1705,7 @@ Its debatable whether xref should be in this section. May re-evaluate in future.
 
 (use-package eldoc-cmake
   :straight t
+  :config
   (add-hook 'cmake-mode-hook 'eldoc-cmake-enable))
 #+end_src
 ** symbolic math (maxima, calc)                                    :external:
