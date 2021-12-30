@@ -11,13 +11,7 @@ Outstanding things to do:
 
 * sane defaults and default emacs capabilities
 ** initial setup, keybinds, etc.
-Not all of the emacs defaults are quite sane. So here's to some sanity. This section is
-long and needs to be broken up. Some sanity includes:
-- high cap GC which doesn't intrude on user experience (=gcmh=)
-- tramp
-- buffer cleanup utility
-- autosaving
-- useful binds (ELisp evaluation)
+Not all of the emacs defaults are quite sane. So here's to some sanity.
 
 #+begin_src emacs-lisp
 ;; prevent emacs-provided org from being loaded
@@ -36,7 +30,6 @@ long and needs to be broken up. Some sanity includes:
 
   ;; minimizes GC interference with user activity
   (setq gc-cons-threshold (* 16 1024 1024))
-
 
   ;; i fat-finger way too much to not have the confirmation
   (setq confirm-kill-emacs #'yes-or-no-p)
@@ -115,7 +108,7 @@ long and needs to be broken up. Some sanity includes:
   (define-key global-map (kbd "C-x k") #'(lambda () (interactive) (kill-buffer nil)))
   (define-key global-map (kbd "C-x K") #'(lambda () (interactive) (kill-buffer nil) (delete-window)))
   (define-key emacs-lisp-mode-map (kbd "C-c C-k") #'eval-buffer)
-  (define-key global-map (kbd "C-c n") #'lp/clean-up-buffer-or-region)
+  (define-key global-map (kbd "C-c n") #'lp--clean-up-buffer-or-region)
   (define-key global-map (kbd "<f5>")  #'revert-buffer)
 
   (define-key global-map (kbd "M-z") #'zap-up-to-char) ;; i generally go up to a char non-inclusive
@@ -139,12 +132,16 @@ long and needs to be broken up. Some sanity includes:
     (repeat-mode 1))
   )
 
+
+#+end_src
+** auto-save when out of focus                                     :external:
+#+begin_src emacs-lisp
 (use-package focus-autosave-mode        ; Save buffers when focus is lost
   :straight t
   :init (focus-autosave-mode)
   :diminish focus-autosave-mode)
 #+end_src
-** time on mode-line
+** displaying the time
 #+begin_src emacs-lisp
 (use-package time
   :straight (:type built-in)
@@ -163,7 +160,7 @@ long and needs to be broken up. Some sanity includes:
 
   (display-time-mode 1))
 #+end_src
-** info mode, man mode
+** man mode, info mode, WoMan
 #+begin_src emacs-lisp
 (use-package man
   :straight (:type built-in)
@@ -226,8 +223,27 @@ relatively convenient
   (save-place-mode 1)
   )
 #+end_src
+** General Prog Mode
+#+begin_src emacs-lisp
+;; Mark TODOs , FIXME, BUG as red in src code
+(add-hook 'prog-mode-hook
+          (lambda ()
+            (font-lock-add-keywords
+             nil
+             '(("\\<\\(FIXME\\|TODO\\|BUG\\)" 1 font-lock-warning-face prepend)))))
+(use-package compile
+  :straight (:type built-in)
+  :config
+  (setq compilation-ask-about-save nil)
+  (setq compilation-scroll-output 'next-error)
+  (setq compilation-skip-threshold 2)
+  (setq compilation-scroll-output 'first-error)
+  (setq compilation-always-kill t)
+  (setq compilation-auto-jump-to-first-error t)
+  )
+#+end_src
 * aesthetics
-** solid themes
+** some themes i've liked
 General aesthetic configurations for emacs
 
 #+begin_verse
@@ -269,7 +285,7 @@ General aesthetic configurations for emacs
    * That one black theme i'm using right now (6/15/19)
 #+end_verse
 
-** modus themes, time on mode line
+** modus themes                                                    :external:
 =modus-themes= is simply the GOAT at this point. Not much more to say than that.
 
 #+begin_src emacs-lisp
@@ -360,7 +376,7 @@ General aesthetic configurations for emacs
 #+end_src
 
 * movement and editing
-** cursor positioning and duplicating
+** cursor positioning and duplicating                              :external:
 Sometimes =undo= can be unwieldy to deal with. =undo-propose= provides a scratch buffer
 for that purpose. At least that's what I use it for. I understand its more powerful than
 that but I'm ignorant in many ways.
@@ -394,7 +410,7 @@ object. That's really it.
   :straight t
   :bind ("C-=" . er/expand-region))
 #+end_src
-** isearch and replace (getting there, clean up)
+** isearch and replace
 =isearch= isn't gonna go out of style anytime soon that's for sure. And especially not if
 you know some of the configuration options. Below is configured for isearch to "fuzzy
 search" on its candidates. This is accomplished by setting =search-whitespace-regexp= to
@@ -437,266 +453,11 @@ match =.*?=, i.e all characters are whitespace.
   (define-key occur-mode-map (kbd "t") 'toggle-truncate-lines)
   (add-hook 'occur-mode-hook #'(lambda () (interactive) (toggle-truncate-lines t)))
   (add-hook 'occur-mode-hook #'hl-line-mode)
-  
+
   (setq list-matching-lines-jump-to-current-line t))
-
 #+end_src
 
-*** anzu
-For a more interactive search+replace experience
-#+begin_src emacs-lisp
-(use-package anzu                       ; Position/matches count for isearch
-  :disabled
-  :straight t
-  :diminish anzu-mode
-  :bind
-  (([remap query-replace] . anzu-query-replace)
-   ([remap query-replace-regexp] . anzu-query-replace-regexp)
-   :map isearch-mode-map
-   ([remap isearch-query-replace] . anzu-isearch-query-replace)
-   ([remap isearch-query-replace-regexp] . anzu-isearch-query-replace-regexp))
-  :config
-  (global-anzu-mode)
-  (setq anzu-cons-mode-line-p nil)
-  (set-face-attribute 'anzu-mode-line nil
-                      :foreground "yellow" :weight 'bold)
-  (custom-set-variables
-   '(anzu-mode-lighter "")
-   '(nvm-deactivate-region t)
-   '(anzu-search-threshold 1000)
-   '(anzu-replace-threshold 50)
-   '(anzu-replace-to-string-separator " => ")))
-#+end_src
-** window+buffer management utilities
-Without good window management, there cannot be a good editor. The imperative is to
-provide a malleable, predictable, and adaptable environment built from the basics. For
-this, =display-buffer= plays a key role. Perhaps more should play a larger role, but
-alas.
-
-=ibuffer= remains a time-tested classic. It does its job well: logical grouping of buffers
-with some enhanced information over =list-buffers=, packaged with advanced marking and
-acting over the listed buffers (much like =dired{,-x}=).
-
-=tab-bar= is an interesting addition to the Emacs built-ins. I'd guess the experience
-should emulate a typical tab system in, say, VS-Code. But I don't have much experience
-with this package so I have nothing intelligent to say about it yet.
-
-Currently =popper= is lightly used in dealing with evanescent buffers.
-
-#+begin_src emacs-lisp
-;; inputmono is my current font kick. DejaVu won't go out of style though.
-(set-frame-font "Deja Vu Sans Mono 12")
-(define-key global-map (kbd "M-o") 'other-window)
-(define-key global-map (kbd "M-O") (lambda () (interactive) (other-window -1)))
-
-(use-package ibuffer                    ; Better buffer list
-  :straight (:type built-in)
-  :bind (([remap list-buffers] . ibuffer))
-  :config
-  ;; as always, from prot:
-  (setq ibuffer-expert t)
-  (setq ibuffer-display-summary nil)
-  (setq ibuffer-show-empty-filter-groups nil)
-  (setq ibuffer-movement-cycle nil)
-  (setq ibuffer-default-sorting-mode 'filename/process)
-  (setq ibuffer-use-header-line t)
-  (setq ibuffer-default-shrink-to-minimum-size nil)
-  (setq ibuffer-formats
-        '((mark modified read-only locked " "
-                (name 40 40 :left :elide)
-                " "
-                (size 9 -1 :right)
-                " "
-                (mode 16 16 :left :elide)
-                " " filename-and-process)
-          (mark " "
-                (name 16 -1)
-                " " filename)))
-  (setq ibuffer-saved-filter-groups nil)
-  (setq ibuffer-old-time 48)
-  (add-hook 'ibuffer-mode-hook #'hl-line-mode)
-  (define-key global-map (kbd "C-x C-b") #'ibuffer)
-  (let ((map ibuffer-mode-map))
-    (define-key map (kbd "* f") #'ibuffer-mark-by-file-name-regexp)
-    (define-key map (kbd "* g") #'ibuffer-mark-by-content-regexp) ; "g" is for "grep"
-    (define-key map (kbd "* n") #'ibuffer-mark-by-name-regexp)
-    (define-key map (kbd "s n") #'ibuffer-do-sort-by-alphabetic)  ; "sort name" mnemonic
-    (define-key map (kbd "/ g") #'ibuffer-filter-by-content))
-  )
-
-(use-package tab-bar
-  :straight (:type built-in)
-  :init
-  ;; (setq tab-bar-close-button-show nil)
-  ;; (setq tab-bar-close-last-tab-choice 'tab-bar-mode-disable)
-  (setq tab-bar-close-tab-select 'recent)
-  (setq tab-bar-new-tab-choice t)
-  (setq tab-bar-new-tab-to 'right)
-  ;; (setq tab-bar-position nil)
-  ;; (setq tab-bar-show nil)
-  ;; (setq tab-bar-tab-hints nil)
-  (setq tab-bar-tab-name-function 'tab-bar-tab-name-all)
-  ;; tab map bound to C-x t
-  :config
-  (tab-bar-mode +1)
-  (tab-bar-history-mode +1)
-  ;; (tab-bar-mode -1)
-  ;; (tab-bar-history-mode -1)
-  :bind (("<prior>" . tab-next)
-         ("<next>" . tab-previous)))
-
-;; Thank you prot (see
-;; https://protesilaos.com/dotemacs/#h:c110e399-3f43-4555-8427-b1afe44c0779)
-(use-package window
-  :straight (:type built-in)
-  :init
-  (define-key global-map (kbd "C-x C-o") 'display-buffer)
-  ;; [2021-12-21 Tue] C-x C-{p,n} go to next/previous buffer (new to me)
-  (setq display-buffer-alist
-        `(
-          ;; below current window
-          ("\\*\\(e?shell\\|v?term\\|.*geiser.*\\|\\)\\*"
-           (display-buffer-below-selected)
-           (window-height . 0.3))
-          ("\\*Org Agenda\\*"
-           (display-buffer-reuse-window display-buffer-same-window))
-          (".*eww.*"
-           (display-buffer-reuse-window display-buffer-same-window))
-          ("\\*Org Src.*"
-           (display-buffer-reuse-window display-buffer-same-window)
-           (window-height . fit-window-to-buffer))
-          ("\\`\\*Async Shell Command\\*\\'"
-           (display-buffer-no-window))
-          ;; top side window
-          ("\\*\\(Flymake diagnostics\\|Package-Lint\\|flycheck\\).*"
-           (display-buffer-in-side-window)
-           (window-height . 0.16)
-           (side . top)
-           (slot . 0))
-          ("\\*Messages.*"
-           (display-buffer-in-side-window)
-           (window-height . 0.16)
-           (side . top)
-           (slot . 1))
-          ("\\*\\(Backtrace\\|Warnings\\|Compile-Log\\|Flymake log\\|compilation\\|\\)\\*"
-           (display-buffer-in-side-window)
-           (window-height . 0.16)
-           (side . top)
-           (slot . 2))
-          ;; left side window
-          ("\\*\\(.* # Help.*\\|Help\\)\\*" ; See the hooks for `visual-line-mode'
-           (display-buffer-reuse-mode-window display-buffer-in-side-window)
-           (window-width . 0.25)
-           (side . left)
-           (slot . 0))
-          ;; bottom buffer (NOT side window)
-          ("\\*Embark Actions\\*"
-           (display-buffer-reuse-mode-window display-buffer-at-bottom)
-           (window-height . fit-window-to-buffer)
-           (window-parameters . ((no-other-window . t)
-                                 (mode-line-format . none))))
-          ("\\*\\(Embark\\)?.*Completions.*"
-           (display-buffer-reuse-mode-window display-buffer-at-bottom)
-           (window-parameters . ((no-other-window . t))))
-          ("\\*\\(Output\\|Register Preview\\).*"
-           (display-buffer-reuse-mode-window display-buffer-at-bottom))
-
-          ("\\*\\vc-\\(incoming\\|outgoing\\|git : \\).*"
-           (display-buffer-reuse-mode-window display-buffer-below-selected)
-           ;; NOTE 2021-10-06: we cannot `fit-window-to-buffer' because
-           ;; the height is not known in advance.
-           (window-height . 0.4))
-          ("magit: .*"
-           (display-buffer-reuse-mode-window display-buffer-below-selected)
-           (window-height . 0.4))
-          ("\\*\\(Calendar\\|Bookmark Annotation\\).*"
-           (display-buffer-reuse-mode-window display-buffer-below-selected)
-           (window-height . fit-window-to-buffer))))
-
-  (defvar resize-window-repeat-map
-    (let ((map (make-sparse-keymap)))
-      ;; Standard keys:
-      (define-key map "^" 'enlarge-window)
-      (define-key map "}" 'enlarge-window-horizontally)
-      (define-key map "{" 'shrink-window-horizontally) ; prot note: those three are C-x KEY
-      ;; Additional keys:
-      (define-key map "v" 'shrink-window) ; prot note: this is not bound by default
-      map)
-    "Keymap to repeat window resizing commands.  Used in `repeat-mode'.")
-  (put 'enlarge-window 'repeat-map 'resize-window-repeat-map)
-  (put 'enlarge-window-horizontally 'repeat-map 'resize-window-repeat-map)
-  (put 'shrink-window-horizontally 'repeat-map 'resize-window-repeat-map)
-  (put 'shrink-window 'repeat-map 'resize-window-repeat-map)
-
-  (let ((map global-map))
-    (define-key map (kbd "C-x <down>") #'next-buffer)
-    (define-key map (kbd "C-x <up>") #'previous-buffer)
-    (define-key map (kbd "C-x C-n") #'next-buffer)     ; override `set-goal-column'
-    (define-key map (kbd "C-x C-p") #'previous-buffer) ; override `mark-page'
-    (define-key map (kbd "C-x !") #'delete-other-windows-vertically)
-    (define-key map (kbd "C-x _") #'balance-windows)      ; underscore
-    (define-key map (kbd "C-x -") #'fit-window-to-buffer) ; hyphen
-    (define-key map (kbd "C-x +") #'balance-windows-area)
-    (define-key map (kbd "C-x }") #'enlarge-window)
-    (define-key map (kbd "C-x {") #'shrink-window)
-    (define-key map (kbd "C-x >") #'enlarge-window-horizontally) ; override `scroll-right'
-    (define-key map (kbd "C-x <") #'shrink-window-horizontally)) ; override `scroll-left'
-  :hook ((help-mode-hook . visual-line-mode)
-         (custom-mode-hook . visual-line-mode)))
-
-(use-package winner
-  :config
-  (winner-mode t)     ; move between windows configuration
-  )
-
-;;; Directional window motions (windmove)
-(use-package popper
-  :straight t
-  :bind (("C-M-q"   . (lambda ()
-                        (interactive)
-                        (popper-toggle-latest)
-                        (other-window 1)))
-         ("M-`"   . popper-cycle)
-         ("C-M-`" . popper-toggle-type))
-  :init
-  (setq popper-reference-buffers
-        '("\\*Messages\\*"
-          "Output\\*$"
-          "\\*Async Shell Command\\*"
-          "magit: .*"
-          eshell-mode
-          shell-mode
-          help-mode
-          geiser-repl-mode
-          magit-mode
-          compilation-mode))
-  (setq popper-display-control nil) ;; let display-buffer handle it
-  (popper-mode +1)
-  (popper-echo-mode +1))
-#+end_src
-** outlines and outline mode
-#+begin_src emacs-lisp
-(use-package outline
-  :straight (:type built-in)
-  :diminish outline-minor-mode
-  :hook
-  (prog-mode . outline-minor-mode)
-  (markdown-mode . outline-minor-mode)
-  (conf-mode . outline-minor-mode)
-  (LaTeX-mode . outline-minor-mode)
-  :config
-  (setq outline-minor-mode-cycle t
-        outline-minor-mode-highlight 'append))
-#+end_src
-** really long lines
-#+begin_src emacs-lisp
-(use-package so-long
-  :straight (:type built-in)
-  :diminish
-  :config
-  (global-so-long-mode 1))
-#+end_src
-* reading, writing, and tasks
+* reading, writing, and task keeping
 ** org
 #+begin_src emacs-lisp
 (use-package org
@@ -809,7 +570,6 @@ Currently =popper= is lightly used in dealing with evanescent buffers.
 ;;; agenda
 ;;;;; Basic agenda setup
   (setq org-default-notes-file (thread-last org-directory (expand-file-name "notes.org")))
-  (setq org-agenda-files `(,org-directory "~/org/roam/"))
   (setq org-agenda-span 'week)
   (setq org-agenda-start-on-weekday 1)  ; Monday
   (setq org-agenda-confirm-kill t)
@@ -825,10 +585,10 @@ Currently =popper= is lightly used in dealing with evanescent buffers.
   (setq org-agenda-max-todos nil)
   (setq org-agenda-max-tags nil)
   (setq org-agenda-max-effort nil)
+  (setq org-agenda-files (list (org-file-path "tasks.org")))
 
   (run-at-time (* 60 5) nil #'org-agenda-to-appt)
 
-  (setq org-agenda-files (list (org-file-path "tasks.org")))
   (define-key global-map (kbd "C-c a") 'org-agenda)
 
   ;; Place tags close to the right-hand side of the window
@@ -1086,6 +846,10 @@ Currently =popper= is lightly used in dealing with evanescent buffers.
 
   )
 
+#+END_SRC
+
+*** roam                                                           :external:remove:
+#+BEGIN_SRC emacs-lisp
 (use-package org-roam
   :straight (:type git :host github
                    :repo "org-roam/org-roam-v1" :branch "master")
@@ -1230,7 +994,7 @@ Currently =popper= is lightly used in dealing with evanescent buffers.
 
   (run-at-time 10 nil #'appt-activate 1))
 
-;;; modified from prot. while its a great idea, it can be problematic to automatically email from different computers
+;;; modified from prot. while its a great idea, it can be problematic to automatically email from different (work) computers
 ;; The idea is to get a reminder via email when I launch Emacs in the
 ;; morning and this file is evaluated.  Obviously this is not a super
 ;; sophisticated approach, though I do not need one.
@@ -1250,7 +1014,8 @@ Currently =popper= is lightly used in dealing with evanescent buffers.
   (define-key map (kbd "C-c d m") #'diary-mail-entries))
 #+end_src
 
-** latex
+** latex and references/bibs
+** org-ref                                                         :external:
 #+begin_src emacs-lisp
 (use-package org-ref
   :straight t
@@ -1281,8 +1046,9 @@ Currently =popper= is lightly used in dealing with evanescent buffers.
   (setq
    bibtex-completion-library-path '("~/org/bib/bibtex-pdfs/")
    bibtex-completion-notes-path "~/org/roam/"))
-
-
+#+end_src
+** latex
+#+begin_src emacs-lisp
 (use-package tex-mode
   :config
   ;; revert pdf-view after compilation
@@ -1292,18 +1058,17 @@ Currently =popper= is lightly used in dealing with evanescent buffers.
         TeX-source-correlate-mode t
         TeX-source-correlate-method 'synctex)
 
-  (add-hook 'LaTeX-mode-hook 'TeX-source-correlate-mode)
-  (add-hook 'LaTeX-mode-hook 'auto-fill-mode)
-  (add-hook 'LaTeX-mode-hook 'flyspell-mode)
-  (add-hook 'LaTeX-mode-hook 'flyspell-buffer)
-  (add-hook 'LaTeX-mode-hook 'turn-on-reftex)
-  )
+  (setq lp--latex-hooks '(auto-fill-mode TeX-source-correlate-mode flyspell-mode flyspell-buffer turn-on-reftex))
+  (dolist (hook lp--latex-hooks)
+    (add-hook 'LaTeX-mode-hook hook)))
 #+end_src
-** markdown
+** markdown                                                        :external:
+
+A time-tested classic mark-up language. Not much more to say; the customizations are minimal.
+
 #+begin_src emacs-lisp
 (use-package markdown-mode
   :straight t
-  :defer t
   :diminish (markdown-mode gfm-mode)
   :commands (markdown-mode gfm-mode)
   :mode (("README\\.md\\'" . gfm-mode)
@@ -1311,7 +1076,7 @@ Currently =popper= is lightly used in dealing with evanescent buffers.
          ("\\.markdown\\'" . markdown-mode))
   :init (setq markdown-command "multimarkdown"))
 #+end_src
-** pdf-tools
+** pdf-tools                                                       :external:
 #+begin_src emacs-lisp
 (use-package pdf-tools
   :straight t
@@ -1354,7 +1119,7 @@ Currently =popper= is lightly used in dealing with evanescent buffers.
   (add-hook 'modus-themes-after-load-theme-hook #'prot/pdf-tools-midnight-mode-toggle))
 #+end_src
 
-** ispell+flyspell
+g** ispell+flyspell
 =ispell= and =flyspell= are built-in utilities to interface with externally installed
 spelling programs (=hunspell=, =aspell=, =ispell=, etc.). =flyspell= is much like
 =flymake= where, on the fly, misspelled words are highlighted as you type them or move
@@ -1436,7 +1201,7 @@ completion options, minibuffer options, minibuffer history options, prompt faces
 (setq suggest-key-bindings t)
 #+end_src
 
-** mct        -- minimalist minibuffer completion visualization
+** mct        -- minimalist minibuffer completion visualization    :external:
 [2021-12-06] I gave it a serious try but MCT isn't gonna cut it. I'd like my
 completions to be done quicker.
 
@@ -1445,7 +1210,7 @@ completions to be done quicker.
 =vertico= has this weird problem when using =<RET>= to complete: it still takes time to
 narrow down the larger list at completion time. With MCT, that penalty is up-front rather
 than at-completion-time, which I much prefer. Amortized, MCT actually ends up faster with
-larger =completing-read= calls. 
+larger =completing-read= calls.
 
 #+begin_src emacs-lisp
 (use-package mct
@@ -1497,7 +1262,7 @@ larger =completing-read= calls.
   )
 #+end_src
 
-** consult    -- enhanced minibuffer completion functions and utilities
+** consult    -- enhanced minibuffer completion functions and utilities :external:
 consult is an important set of utilities that extend a number of important built-in
 functions (like =list-buffers=, =goto-line=), where comprehensive completions and
 additional utilities are provided within-command.
@@ -1534,23 +1299,24 @@ doesn't play well with lsp, but i haven't heard anything about =eglot=.
           (define-key map (kbd "b") #'consult-bibtex)
           map))
 
-  (setq consult-register-map
-        (let ((map (make-sparse-keymap)))
-          ;; Custom M-# bindings for fast register access
-          (define-key map (kbd "l") 'consult-register-load)
-          (define-key map (kbd "s") 'consult-register-store)          ;; orig. abbrev-prefix-mark (unrelated)
-          (define-key map (kbd "r") 'consult-register)
-          (define-key map (kbd "b") 'consult-bookmark)
-          map))
+
+  (let ((map global-map))
+    ;; Custom M-# bindings for fast register access
+    (define-key map (kbd "C-x r l") 'consult-register-load)
+    (define-key map (kbd "C-x r s") 'consult-register-store)          ;; orig. abbrev-prefix-mark (unrelated)
+    (define-key map (kbd "C-x r r") 'consult-register)
+    (define-key map (kbd "C-x r b") 'consult-bookmark)
+    )
+
   (setq consult-mode-mode-map
-        (let ((map (make-sparse-keymap)))
+	(let ((map (make-sparse-keymap)))
           (define-key map (kbd "h") 'consult-history)
           (define-key map (kbd "m") 'consult-mode-command)
           (define-key map (kbd "k") 'consult-kmacro)
           map))
 
   (setq consult-search-map
-        (let ((map (make-sparse-keymap)))
+	(let ((map (make-sparse-keymap)))
           (define-key map (kbd "f") 'consult-find)
           (define-key map (kbd "F") 'consult-locate)
           (define-key map (kbd "g") 'consult-grep)
@@ -1568,6 +1334,7 @@ doesn't play well with lsp, but i haven't heard anything about =eglot=.
   (define-key global-map (kbd "M-j") consult-goto-map)
   (define-key global-map (kbd "M-r") consult-register-map)
   (define-key global-map (kbd "M-M") consult-mode-mode-map)
+  (define-key global-map (kbd "C-c y l") 'consult-flymake)
   (setq consult-preview-key (kbd "C-o") ) ;; disable live preview
   (setq consult-project-root-function #'projectile-project-root)
   (setq consult-async-min-input 3)
@@ -1576,7 +1343,7 @@ doesn't play well with lsp, but i haven't heard anything about =eglot=.
   (setq consult-narrow-key "<")
   :config
   (setf (alist-get 'slime-repl-mode consult-mode-histories)
-        'slime-repl-input-history)
+	'slime-repl-input-history)
   (setq xref-show-xrefs-function #'consult-xref)
   (setq xref-show-definitions-function #'consult-xref)
   (define-key completion-list-mode-map (kbd "C-o") #'consult-preview-at-point)
@@ -1597,7 +1364,7 @@ doesn't play well with lsp, but i haven't heard anything about =eglot=.
     (add-to-list 'embark-keymap-alist '(bibtex-completion . consult-bibtex-embark-map)))
   (setq consult-bibtex-default-action #'consult-bibtex-edit-notes))
 #+end_src
-** embark     -- Mini-buffer actions rooted in Keymaps (contextual actions)
+** embark     -- Mini-buffer actions rooted in Keymaps (contextual actions) :external:
 
 An absolute beast of a package in its design and possible use-cases. Whether you're
 unmarked, in minibuffer, in an =info-mode= buffer, Embark will gather useful actions for
@@ -1625,7 +1392,7 @@ shine, but for now I'm using it mostly for =embark-export= for batched editing o
   )
 #+end_src
 
-** marginalia -- enhanced minibuffer detail display
+** marginalia -- enhanced minibuffer detail display                :external:
 
 Enhanced minibuffer information when using =switch-to-buffer=, =find-file=,
 =describe-variable=, etc.
@@ -1637,7 +1404,7 @@ Enhanced minibuffer information when using =switch-to-buffer=, =find-file=,
   (setq marginalia-max-relative-age 0)  ; time is absolute here!
   (marginalia-mode 1))
 #+end_src
-** orderless  -- orderless filtering and mapping of symbols
+** orderless  -- orderless filtering and mapping of symbols        :external:
 
 For matching symbols without regard for order, we use =orderless=.
 
@@ -1686,7 +1453,7 @@ prefix the string with a "bang" =!=.
               ("SPC" . nil)
               ("?" . nil)))
 #+end_src
-** which-key
+** which-key                                                       :external:
 
 I use =which-key= to discover new useful commands hiding in a keymap prefix. That's pretty
 much it, but its proven itself tremendously helpful for exploring features of the built-in
@@ -1698,7 +1465,8 @@ or of a new package.
   :diminish which-key-mode
   :config (which-key-mode 1))
 #+end_src
-** completion frameworks and utilities (abbrev, dabbrev, corfu)
+** built-in completion utilities (abbrev, dabbrev)
+
 #+begin_src emacs-lisp
 (use-package abbrev
   :straight (:type built-in)
@@ -1721,6 +1489,10 @@ or of a new package.
   (setq dabbrev-check-other-buffers t)
   (setq dabbrev-eliminate-newlines t)
   (setq dabbrev-upcase-means-case-search t))
+
+#+end_src
+** external completion utilities (corfu, cape)                     :external:remove:
+#+begin_src emacs-lisp
 
 (use-package corfu
   :disabled
@@ -1752,7 +1524,7 @@ or of a new package.
   (add-to-list 'completion-at-point-functions #'cape-dict)
   (add-to-list 'completion-at-point-functions #'cape-symbol))
 #+end_src
-** yasnippet
+** yasnippet                                                       :external:
 
 nice snippets. they'll never go out of fashion. for when cursor placement and more
 advanced expansions than =abbrev= are needed.
@@ -1774,9 +1546,8 @@ advanced expansions than =abbrev= are needed.
 #+end_src
 
 ** xref
+
 Its debatable whether xref should be in this section. May re-evaluate in future.
-
-
 
 #+BEGIN_SRC emacs-lisp
 (use-package xref
@@ -1791,26 +1562,7 @@ Its debatable whether xref should be in this section. May re-evaluate in future.
 #+END_SRC
 
 * programming languages and environments
-** General Prog Mode
-#+begin_src emacs-lisp
-;; Mark TODOs , FIXME, BUG as red in src code
-(add-hook 'prog-mode-hook
-          (lambda ()
-            (font-lock-add-keywords
-             nil
-             '(("\\<\\(FIXME\\|TODO\\|BUG\\)" 1 font-lock-warning-face prepend)))))
-(use-package compile
-  :straight (:type built-in)
-  :config
-  (setq compilation-ask-about-save nil)
-  (setq compilation-scroll-output 'next-error)
-  (setq compilation-skip-threshold 2)
-  (setq compilation-scroll-output 'first-error)
-  (setq compilation-always-kill t)
-  (setq compilation-auto-jump-to-first-error t)
-  )
-#+end_src
-** eglot
+** eglot                                                           :external:
 #+begin_src emacs-lisp
 (use-package eglot
   :straight t
@@ -1821,7 +1573,6 @@ Its debatable whether xref should be in this section. May re-evaluate in future.
   (dolist (mode eglot-prog-mode-hooks)
     (add-hook mode 'eglot-ensure))
 
-  (define-key eglot-mode-map (kbd "C-c y n") #'eglot-rename)
   (define-key eglot-mode-map (kbd "C-c y n") #'eglot-rename)
   (define-key eglot-mode-map (kbd "C-c y o") #'eglot-reconnect)
   (define-key eglot-mode-map (kbd "C-c y a") #'eglot-code-actions)
@@ -1840,6 +1591,7 @@ Its debatable whether xref should be in this section. May re-evaluate in future.
 
       (add-hook 'eglot-mode-hook #'corfu-eglot-setup))))
 
+;; 4 julia
 (use-package eglot-jl
   :straight t
   :config
@@ -1853,7 +1605,7 @@ Its debatable whether xref should be in this section. May re-evaluate in future.
   (define-key eglot-mode-map [remap xref-find-apropos] #'consult-eglot-symbols)
   (define-key eglot-mode-map (kbd "C-c y l") #'consult-flymake))
 #+end_src
-** ocaml
+** ocaml                                                           :external:
 #+begin_src emacs-lisp
 (use-package tuareg
   :straight t)
@@ -1866,7 +1618,7 @@ Its debatable whether xref should be in this section. May re-evaluate in future.
   (add-hook 'tuareg-mode-hook 'utop-minor-mode)
   )
 #+end_src
-** python
+** python                                                          :external:
 #+begin_src emacs-lisp
 (use-package python
   :straight t
@@ -1891,7 +1643,7 @@ Its debatable whether xref should be in this section. May re-evaluate in future.
                                         ; optional: if Org Ref is not loaded anywhere else, load it here
 #+end_src
 
-** julia
+** julia                                                           :external:
 #+begin_src emacs-lisp
 (use-package julia-mode
   :straight t)
@@ -1945,14 +1697,19 @@ Its debatable whether xref should be in this section. May re-evaluate in future.
   (define-key c-mode-map (kbd "C-c C-g") gud-nav-map)
   (define-key c++-mode-map (kbd "C-c C-g") gud-nav-map))
 
+
+#+end_src
+*** cmake                                                          :external:
+#+begin_src emacs-lisp
 (use-package cmake-mode
   :straight t)
 
 (use-package eldoc-cmake
   :straight t
-  :hook (cmake-mode-hook . eldoc-cmake-enable))
+  (add-hook 'cmake-mode-hook 'eldoc-cmake-enable))
 #+end_src
-** symbolic math (maxima, calc)
+** symbolic math (maxima, calc)                                    :external:
+
 #+begin_src emacs-lisp
 (use-package calc)
 (use-package maxima
@@ -1965,13 +1722,23 @@ Its debatable whether xref should be in this section. May re-evaluate in future.
   :interpreter ("maxima" . maxima-mode))
 #+end_src
 
-** docker
+** docker                                                          :external:
+
+Docker is just too prevalent not to be ready for it. =docker-tramp= is an incredibly useful
+package providing an easy-to-use interface to use =tramp= in connecting to running docker
+containers. The syntax follows the usual tramp style: =/docker:{image_name, image_tag}:= and
+you're in (i think. as long as the =ssh= port is exposed? i have no clue its magic and i'm
+not gonna worry about it for now).
+
 #+begin_src emacs-lisp
 (use-package dockerfile-mode
   :straight t)
+
+(use-package docker-tramp
+  :straight t)
 #+end_src
 
-** lisp and scheme
+** (common) lisp and scheme                                        :external:
 #+begin_src emacs-lisp
 (use-package sly
   :straight t
@@ -2019,7 +1786,10 @@ Its debatable whether xref should be in this section. May re-evaluate in future.
              '("\\.sps\\'" . scheme-mode))
 (unbind-key (kbd "C-M-q") scheme-mode-map)
 #+end_src
-** flymake, proselint (!)
+** flymake and its extras
+
+=flymake= is a package that provides on-the-fly "make"-esque errors to the user. Similar to
+=flyspell= in spirit.
 
 Writing prose is tough and proselint is a nice tool. To install, run =sudo apt install
 python3-proselint=
@@ -2049,7 +1819,11 @@ python3-proselint=
     (define-key map (kbd "C-c y d") #'flymake-show-buffer-diagnostics) ; Emacs28
     (define-key map (kbd "C-c y n") #'flymake-goto-next-error)
     (define-key map (kbd "C-c y p") #'flymake-goto-prev-error)))
+#+END_SRC
 
+*** flymake extras (diagnostic, shellcheck, proselint)             :external:
+
+#+BEGIN_SRC emacs-lisp
 (use-package flymake-diagnostic-at-point
   :straight t
   :config
@@ -2073,7 +1847,7 @@ python3-proselint=
 #+end_src
 
 * unix environment interface
-** magit and vc
+** magit                                                           :external:
 #+begin_src emacs-lisp
 ;;; Magit
 ;; God bless magit and all that it does
@@ -2086,21 +1860,10 @@ python3-proselint=
    magit-default-tracking-name-function 'magit-default-tracking-name-branch-only
    magit-push-always-verify nil)
   (define-key global-map (kbd "C-x g") 'magit-status))
+#+END_SRC
 
-;; More info here: [[https://github.com/syohex/emacs-git-gutter]]
-(use-package git-gutter ; TODO - git gutter keybinds, going to different hunks and staging only certain portions!
-  :straight t
-  :diminish git-gutter-mode
-  :config
-  (global-git-gutter-mode +1))
-
-(use-package projectile
-  :straight t
-  :diminish
-  :config
-  (projectile-global-mode)
-  (define-key projectile-mode-map (kbd "C-c p") 'projectile-command-map))
-
+** vc
+#+BEGIN_SRC emacs-lisp
 (use-package vc
   :straight (:type built-in)
   :config
@@ -2206,27 +1969,56 @@ python3-proselint=
 
   )
 #+end_src
+** projectile and git-gutter                                :external:remove:
+#+begin_src emacs-lisp
+;; More info here: [[https://github.com/syohex/emacs-git-gutter]]
+(use-package git-gutter ; TODO - git gutter keybinds, going to different hunks and staging only certain portions!
+  :straight t
+  :diminish git-gutter-mode
+  :config
+  (global-git-gutter-mode +1))
+
+(use-package projectile
+  :straight t
+  :diminish
+  :config
+  (projectile-global-mode)
+  (define-key projectile-mode-map (kbd "C-c p") 'projectile-command-map))
+#+end_src
+** shell
+#+begin_src emacs-lisp
+(use-package shell
+  :straight (:type built-in)
+  :config
+  (setq shell-command-prompt-show-cwd t) ; Emacs 27.1
+  (setq ansi-color-for-comint-mode t))
+#+end_src
 ** eshell
+
+Slowly using eshell more, especially given its smooth interop with =tramp= as well as its
+intermingle of features between bash, csh, and zsh.
+
 #+begin_src emacs-lisp
 (use-package eshell
+  :straight (:type built-in)
   :init
   (require 'esh-mode)
   (require 'esh-module)
   (setq eshell-modules-list             ; It works but may need review
-        '(eshell-alias
+        '(eshell-alias                  ; aliases
           eshell-basic
-          eshell-cmpl
-          eshell-dirs
-          eshell-glob
-          eshell-hist
-          eshell-ls
-          eshell-pred
-          eshell-prompt
-          eshell-script
-          eshell-term
-          eshell-tramp
-          eshell-unix))
-  (setenv "PAGER" "cat") ; solves issues, such as with 'git log' and the default 'less'
+          eshell-cmpl                   ; tab completion
+          eshell-dirs                   ; view the ring with `cd =`
+          eshell-glob ; unix-style globbing (with recursive (**), not (~), {zero,one}-or-more (#, ##), ...)
+          eshell-hist ; unix-style history (!ls, !?ls, ...)
+          eshell-ls   ; ls
+          eshell-pred ; zsh-like argument predication (see its man page or zsh examples)
+          eshell-prompt       ; prompt navigation
+          eshell-script       ; running `eshell` script files (source, ./, ...)
+          eshell-term         ; for visual programs (vi, vim, top, ...)
+          eshell-tramp        ; u kno
+          eshell-unix))       ; standard unix commands
+  (setenv "PAGER" "cat")      ; solves issues, such as with 'git log' and the default 'less'
   (require 'em-cmpl)
   (require 'em-dirs)
   (setq eshell-cd-on-directory t)
@@ -2241,17 +2033,12 @@ python3-proselint=
 
   (setq eshell-buffer-shorthand t
         eshell-destroy-buffer-when-process-dies t)
-  :bind ("<f1>" . eshell))
+  (global-set-key (kbd "<f1>") 'eshell))
 #+end_src
-** shell
-#+begin_src emacs-lisp
-(use-package shell
-  :straight (:type built-in)
-  :config
-  (setq shell-command-prompt-show-cwd t) ; Emacs 27.1
-  (setq ansi-color-for-comint-mode t))
-#+end_src
-** proced (top for emacs)
+** proced
+
+A =top=-like interface for emacs.
+
 #+begin_src emacs-lisp
 (use-package proced
   :straight (:type built-in)
@@ -2263,9 +2050,13 @@ python3-proselint=
 #+end_src
 
 ** dired
-starting from prot's configuration since he always RTFMs. And I don't...
+
+starting from prot's configuration since he always RTFMs. There's a lot of configuration
+that I haven't dug my teeth into yet. I like the setup below.
+
 #+begin_src emacs-lisp
 (use-package dired
+  :straight (:type built-in)
   :config
   (add-hook 'dired-mode-hook
             (lambda ()
@@ -2305,9 +2096,15 @@ starting from prot's configuration since he always RTFMs. And I don't...
   (setq dired-bind-info nil)
   (define-key dired-mode-map (kbd "I") #'dired-info))
 #+end_src
-** recentf, wgrep
+** recentf
+
+Access recent files, where recents exclude the annoying =.git=, =.elpa=, etc. files.
+
+=wgrep= allows editing =grep=-style buffer for batched editing, much like =wdired=.
+
 #+begin_src emacs-lisp
 (use-package recentf                    ; Save recently visited files
+  :straight (:type built-in)
   :init (recentf-mode)
   :diminish recentf-mode
   :config
@@ -2323,6 +2120,10 @@ starting from prot's configuration since he always RTFMs. And I don't...
                          "/itsalltext/"      ; It's all text temp files
                          ;; And all other kinds of boring files
                          )))
+#+END_SRC
+
+** wgrep                                                           :external:
+#+BEGIN_SRC emacs-lisp
 
 (use-package wgrep
   :straight t
@@ -2338,7 +2139,7 @@ starting from prot's configuration since he always RTFMs. And I don't...
   :custom
   (ediff-diff-options "-w"))
 #+end_src
-** exec path from shell
+** exec path from shell                                            :external:
 #+begin_src emacs-lisp
 (use-package exec-path-from-shell
   :straight t
@@ -2405,11 +2206,6 @@ since =gdb= and =gdb-inferior= will not belong to the same process group on the 
 host. Relative file paths are possible as well, but when in doubt the full path should be
 the go-to.
 
-
-_Using tramp with docker_:
-...
-
-
 #+begin_src emacs-lisp
 (use-package tramp
   :straight (:type built-in)
@@ -2424,7 +2220,7 @@ _Using tramp with docker_:
   )
 #+end_src
 * external environment interface
-** notmuch, mail in emacs
+** notmuch -- mail in emacs                                        :external:
 #+begin_src emacs-lisp
 (use-package notmuch
   :straight t
@@ -2586,7 +2382,7 @@ _Using tramp with docker_:
   (setq send-mail-function 'smtpmail-send-it))
 #+END_SRC
 
-** eww, web browsing
+** eww -- web browsing
 #+begin_src emacs-lisp
 (use-package eww
   :straight (:type built-in)
@@ -2625,7 +2421,7 @@ _Using tramp with docker_:
   (define-key eww-bookmark-mode-map (kbd "d") #'eww-bookmark-kill) ; same
   )
 #+end_src
-** elfeed, RSS feed reader
+** elfeed -- RSS feed reader                                       :external:
 
 #+begin_src emacs-lisp
 (use-package elfeed
