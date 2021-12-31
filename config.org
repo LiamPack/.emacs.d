@@ -223,6 +223,51 @@ relatively convenient
   (save-place-mode 1)
   )
 #+end_src
+** adding sensible advice around built-in functions
+- Add advice to =kill-region= and =kill-ring-save= to kill/save the current line if there is
+  no active region
+- Add advice to =kmacro-*= calling functions to allow a block-undo operation. This allows
+  =undo= to undo an entire macro call rather than each atom of the macro.
+
+#+begin_src emacs-lisp
+(defun lp--provide-mark-line-or-region (&rest args)
+  "Force interactive arguments to provide (current line->current
+line + 1) if no active region. Otherwise, provide the original
+parameter specification (mark, point, 'region). `ARGS' discarded"
+  (interactive
+   (if mark-active
+       (list (mark) (point) 'region)
+     (list (line-beginning-position)
+           (line-beginning-position 2)))))
+
+(advice-add 'kill-ring-save :before #'lp--provide-mark-line-or-region)
+(advice-add 'kill-region :before #'lp--provide-mark-line-or-region)
+
+(define-advice load-theme (:before (&rest args) disable-active-themes)
+  "Disable all active themes before loading a new theme."
+  (mapc #'disable-theme custom-enabled-themes))
+
+(defun block-undo (fn &rest args)
+  "Wrap function `FN' with `ARGS' and allow block-undo of the the `FN'
+operation rather than atomized undo for each interactive emacs
+function."
+  (let ((marker (prepare-change-group)))
+    (unwind-protect (apply fn args)
+      (undo-amalgamate-change-group marker))))
+
+(dolist (fn '(kmacro-call-macro
+              kmacro-exec-ring-item
+              dot-mode-execute
+              apply-macro-to-region-lines))
+  (advice-add fn :around #'block-undo))
+#+end_src
+** project management
+Instead of using =projectile=, there's now a wonderful built-in library, =project=, which
+has lots of overlap with =projectile=. Might as well remove a dependency.
+#+begin_src emacs-lisp
+(use-package project
+  :straight (:type built-in))
+#+end_src
 ** General Prog Mode
 #+begin_src emacs-lisp
 ;; Mark TODOs , FIXME, BUG as red in src code
@@ -466,6 +511,7 @@ match =.*?=, i.e all characters are whitespace.
   :config
   ;; (unbind-key (kbd "C-'") org-mode-map)
   ;; (unbind-key (kbd "C-c C-j") org-mode-map)
+  
   (defun org-file-path (filename)
     "Return absolute address of an org file give its relative name."
     (concat (file-name-as-directory org-directory) filename))
@@ -1336,7 +1382,7 @@ doesn't play well with lsp, but i haven't heard anything about =eglot=.
   (define-key global-map (kbd "M-g M-g") 'consult-goto-line)             ;; orig. goto-line
 
   (setq consult-preview-key (kbd "C-o") ) ;; disable live preview
-  (setq consult-project-root-function #'projectile-project-root)
+  (setq consult-project-root-function #'project-root)
   (setq consult-async-min-input 3)
   (setq consult-async-input-debounce 0.5)
   (setq consult-async-input-throttle 0.8)
@@ -1966,22 +2012,6 @@ python3-proselint=
 
 
   )
-#+end_src
-** projectile and git-gutter                                :external:remove:
-#+begin_src emacs-lisp
-;; More info here: [[https://github.com/syohex/emacs-git-gutter]]
-(use-package git-gutter ; TODO - git gutter keybinds, going to different hunks and staging only certain portions!
-  :straight t
-  :diminish git-gutter-mode
-  :config
-  (global-git-gutter-mode +1))
-
-(use-package projectile
-  :straight t
-  :diminish
-  :config
-  (projectile-global-mode)
-  (define-key projectile-mode-map (kbd "C-c p") 'projectile-command-map))
 #+end_src
 ** shell
 #+begin_src emacs-lisp
