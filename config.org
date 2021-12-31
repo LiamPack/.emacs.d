@@ -1290,7 +1290,6 @@ doesn't play well with lsp, but i haven't heard anything about =eglot=.
           (define-key map (kbd "e") 'consult-compile-error)
           (define-key map (kbd "l") 'consult-flymake)
           (define-key map (kbd "f") 'consult-flymake)               ;; Alternative: consult-flycheck
-          (define-key map (kbd "g") 'consult-goto-line)             ;; orig. goto-line
           (define-key map (kbd "o") 'consult-outline)               ;; Alternative: consult-org-heading
           (define-key map (kbd "m") 'consult-mark)
           (define-key map (kbd "k") 'consult-global-mark)
@@ -1334,6 +1333,8 @@ doesn't play well with lsp, but i haven't heard anything about =eglot=.
   (define-key global-map (kbd "M-j") consult-goto-map)
   (define-key global-map (kbd "M-M") consult-mode-mode-map)
   (define-key global-map (kbd "C-c y l") 'consult-flymake)
+  (define-key global-map (kbd "M-g M-g") 'consult-goto-line)             ;; orig. goto-line
+
   (setq consult-preview-key (kbd "C-o") ) ;; disable live preview
   (setq consult-project-root-function #'projectile-project-root)
   (setq consult-async-min-input 3)
@@ -1659,8 +1660,6 @@ Its debatable whether xref should be in this section. May re-evaluate in future.
 ** c{,++} environment
 #+begin_src emacs-lisp
 (use-package cc-mode
-  :hook
-  (c-common-mode-hook . hs-minor-mode)
   :config
   (setq gdb-many-windows 't)
   (setq tab-width 4)
@@ -1678,7 +1677,6 @@ Its debatable whether xref should be in this section. May re-evaluate in future.
   )
 
 (use-package gud
-  :after cc-mode
   :config
   (setq gud-nav-map
         (let ((map (make-sparse-keymap)))
