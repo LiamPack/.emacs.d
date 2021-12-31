@@ -1342,11 +1342,6 @@ doesn't play well with lsp, but i haven't heard anything about =eglot=.
 #+begin_src emacs-lisp
 (use-package consult
   :straight t
-  :bind
-  (("C-x b" . consult-buffer)
-   ("C-M-y" . consult-yank-pop)
-   ("C-:" . consult-complex-command)
-   ([remap apropos-command] . consult-apropos))
   :init
   (setq consult-goto-map
         (let ((map (make-sparse-keymap)))
@@ -1371,14 +1366,14 @@ doesn't play well with lsp, but i haven't heard anything about =eglot=.
     )
 
   (setq consult-mode-mode-map
-	(let ((map (make-sparse-keymap)))
+        (let ((map (make-sparse-keymap)))
           (define-key map (kbd "h") 'consult-history)
           (define-key map (kbd "m") 'consult-mode-command)
           (define-key map (kbd "k") 'consult-kmacro)
           map))
 
   (setq consult-search-map
-	(let ((map (make-sparse-keymap)))
+        (let ((map (make-sparse-keymap)))
           (define-key map (kbd "f") 'consult-find)
           (define-key map (kbd "F") 'consult-locate)
           (define-key map (kbd "g") 'consult-grep)
@@ -1398,15 +1393,20 @@ doesn't play well with lsp, but i haven't heard anything about =eglot=.
   (define-key global-map (kbd "C-c y l") 'consult-flymake)
   (define-key global-map (kbd "M-g M-g") 'consult-goto-line)             ;; orig. goto-line
 
+  (define-key global-map (kbd "C-x b") 'consult-buffer)
+  (define-key global-map (kbd "C-M-y") 'consult-yank-pop)
+  (define-key global-map (kbd "C-:") 'consult-complex-command)
+  (define-key global-map [remap apropos-command] 'consult-apropos)
+
   (setq consult-preview-key (kbd "C-o") ) ;; disable live preview
-  (setq consult-project-root-function #'project-root)
+  ;; (setq consult-project-root-function #'project-roots)
   (setq consult-async-min-input 3)
   (setq consult-async-input-debounce 0.5)
   (setq consult-async-input-throttle 0.8)
   (setq consult-narrow-key "<")
   :config
   (setf (alist-get 'slime-repl-mode consult-mode-histories)
-	'slime-repl-input-history)
+        'slime-repl-input-history)
   (setq xref-show-xrefs-function #'consult-xref)
   (setq xref-show-definitions-function #'consult-xref)
   (define-key completion-list-mode-map (kbd "C-o") #'consult-preview-at-point)
