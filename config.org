@@ -1122,6 +1122,23 @@ A time-tested classic mark-up language. Not much more to say; the customizations
          ("\\.markdown\\'" . markdown-mode))
   :init (setq markdown-command "multimarkdown"))
 #+end_src
+** USLS
+#+begin_src emacs-lisp
+(use-package usls
+  :disabled
+  :straight (:type git :host gitlab :repo "protesilaos/usls")
+  :config
+  (setq usls-directory (expand-file-name "~/org/usls/"))
+  (setq usls-known-categories '())
+  (setq usls-file-type-extension ".org")
+  (setq usls-subdir-support nil)
+  (setq usls-file-region-separator 'line)
+  (setq usls-file-region-separator-heading-level 1)
+  (setq usls-custom-header-function nil)
+  (let ((mode-map usls-mode-map))
+    (define-key mode-map (kbd "C-c n i") 'usls-id-insert)
+    (define-key mode-map (kbd "C-c n l") 'usls-follow-link)))
+#+end_src
 ** pdf-tools                                                       :external:
 #+begin_src emacs-lisp
 (use-package pdf-tools
@@ -1199,7 +1216,7 @@ actions specified in the manual.
   )
 #+end_src
 
-* minibuffer, completion, and definitions
+* minibuffer, completion, and symbol definitions
 ** general minibuffer completion configuration
 completion options, minibuffer options, minibuffer history options, prompt faces, ...
 #+begin_src emacs-lisp
@@ -1801,12 +1818,6 @@ not gonna worry about it for now).
   :diminish eldoc-mode
   :config
   (global-eldoc-mode 1))
-
-;; paren stuff
-(use-package lispy
-  :straight t
-  :diminish lispy-mode
-  :hook ((emacs-lisp-mode-hook scheme-mode-hook lisp-mode-hook) . lispy-mode))
 
 (use-package rainbow-delimiters
   :straight t

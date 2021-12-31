@@ -8,7 +8,7 @@
          (year (nth 2 date-string-list))
          (day (nth 1 date-string-list))
          (month (nth 0 date-string-list))
-         (date-string (concat  year "-" month "-" day)))
+         (date-string (concat year "-" month "-" day)))
     (find-file
      (concat journal-dir date-string ".org"))
     (insert (format "#+TITLE: %s\n" date-string))))
