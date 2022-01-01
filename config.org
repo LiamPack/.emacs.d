@@ -1406,9 +1406,11 @@ larger =completing-read= calls.
   ;;               (slot . 99)
   ;;               (window-width . 0.3))))
 
-  (mct-mode 1)
+  (mct-minibuffer-mode +1)
+  (mct-region-global-mode +1)
   ;; (define-key vertico-map (kbd "M-RET") #'minibuffer-force-complete-and-exit)
   ;; (define-key vertico-map (kbd "M-TAB") #'minibuffer-complete)
+
   )
 #+end_src
 
@@ -1625,7 +1627,7 @@ or of a new package.
 
 #+end_src
 ** external completion utilities (corfu, cape)                     :external:remove:
-#+begin_src emacs-lisp
+#+begin_verbatim emacs-lisp
 (lp-emacs-elpa-package corfu
   (setq corfu-cycle t)            ;; Enable cycling for `corfu-next/previous'
   (setq corfu-auto t)             ;; Enable auto completion
@@ -1647,7 +1649,7 @@ or of a new package.
   (add-to-list 'completion-at-point-functions #'cape-ispell)
   (add-to-list 'completion-at-point-functions #'cape-dict)
   (add-to-list 'completion-at-point-functions #'cape-symbol))
-#+end_src
+#+end_verbatim
 ** yasnippet                                                       :external:
 
 nice snippets. they'll never go out of fashion. for when cursor placement and more
