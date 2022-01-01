@@ -14,19 +14,14 @@ Outstanding things to do:
 Not all of the emacs defaults are quite sane. So here's to some sanity.
 
 #+begin_src emacs-lisp
-;; prevent emacs-provided org from being loaded
-(straight-register-package 'org)
-(straight-register-package 'org-contrib)
-
 ;; hacky way to remove the =custom-variables= generation in =init.el=
 (setq custom-file (make-temp-file "emacs-custom-"))
 
 ;; some from https://pastebin.com/MDagsZD7
-(use-package emacs
-  :init
+(lp-emacs-builtin-package emacs
   ;; why do these binds exist
-  (unbind-key (kbd "C-z") global-map)
-  (unbind-key (kbd "C-x C-z") global-map)
+  (global-unset-key (kbd "C-z"))
+  (global-unset-key (kbd "C-x C-z"))
 
   ;; minimizes GC interference with user activity
   (setq gc-cons-threshold (* 16 1024 1024))
@@ -123,14 +118,12 @@ Not all of the emacs defaults are quite sane. So here's to some sanity.
   (define-key global-map (kbd "C-c C-j") 'join-line)
   (define-key global-map (kbd "C-S-p") #'(lambda () (interactive) (previous-line 7)))
   (define-key global-map (kbd "C-S-n") #'(lambda () (interactive) (next-line 7)))
-  (use-package repeat
-    :straight (:type built-in)
-    :config
-    (setq repeat-on-final-keystroke t)
-    (setq set-mark-command-repeat-pop t)
-
-    (repeat-mode 1))
   )
+
+(lp-emacs-builtin-package repeat
+  (setq repeat-on-final-keystroke t)
+  (setq set-mark-command-repeat-pop t)
+  (repeat-mode 1))
 
 
 #+end_src
@@ -139,10 +132,8 @@ Not all of the emacs defaults are quite sane. So here's to some sanity.
 (define-key global-map (kbd "M-o") 'other-window)
 (define-key global-map (kbd "M-O") (lambda () (interactive) (other-window -1)))
 
-(use-package ibuffer                    ; Better buffer list
-  :straight (:type built-in)
-  :bind (([remap list-buffers] . ibuffer))
-  :config
+(lp-emacs-builtin-package ibuffer                    ; Better buffer list
+  (define-key global-map [remap list-buffers] #'ibuffer)
   ;; as always, from prot:
   (setq ibuffer-expert t)
   (setq ibuffer-display-summary nil)
@@ -174,9 +165,7 @@ Not all of the emacs defaults are quite sane. So here's to some sanity.
     (define-key map (kbd "/ g") #'ibuffer-filter-by-content))
   )
 
-(use-package tab-bar
-  :straight (:type built-in)
-  :init
+(lp-emacs-builtin-package tab-bar
   ;; (setq tab-bar-close-button-show nil)
   ;; (setq tab-bar-close-last-tab-choice 'tab-bar-mode-disable)
   (setq tab-bar-close-tab-select 'recent)
@@ -186,20 +175,16 @@ Not all of the emacs defaults are quite sane. So here's to some sanity.
   ;; (setq tab-bar-show nil)
   ;; (setq tab-bar-tab-hints nil)
   (setq tab-bar-tab-name-function 'tab-bar-tab-name-all)
-  ;; tab map bound to C-x t
-  :config
   (tab-bar-mode +1)
   (tab-bar-history-mode +1)
   ;; (tab-bar-mode -1)
   ;; (tab-bar-history-mode -1)
-  :bind (("<prior>" . tab-next)
-         ("<next>" . tab-previous)))
+  (define-key global-map (kbd "<prior>") #'tab-previous)
+  (define-key global-map (kbd "<next>") #'tab-next))
 
 ;; Thank you prot (see
 ;; https://protesilaos.com/dotemacs/#h:c110e399-3f43-4555-8427-b1afe44c0779)
-(use-package window
-  :straight (:type built-in)
-  :init
+(lp-emacs-builtin-package window
   (define-key global-map (kbd "C-x C-o") 'display-buffer)
   ;; [2021-12-21 Tue] C-x C-{p,n} go to next/previous buffer (new to me)
   (setq display-buffer-alist
@@ -291,27 +276,18 @@ Not all of the emacs defaults are quite sane. So here's to some sanity.
     (define-key map (kbd "C-x {") #'shrink-window)
     (define-key map (kbd "C-x >") #'enlarge-window-horizontally) ; override `scroll-right'
     (define-key map (kbd "C-x <") #'shrink-window-horizontally)) ; override `scroll-left'
-  :hook ((help-mode-hook . visual-line-mode)
-         (custom-mode-hook . visual-line-mode)))
 
-(use-package winner
-  :straight (:type built-in)
-  :config
+  (add-hook 'help-mode-hook #'visual-line-mode)
+  (add-hook 'custom-mode-hook #'visual-line-mode)
+  (add-hook 'eww-mode-hook #'visual-line-mode))
+
+(lp-emacs-builtin-package winner
   (winner-mode t)     ; move between windows configuration
   )
 #+end_src
-** auto-save when out of focus                                     :external:
-#+begin_src emacs-lisp
-(use-package focus-autosave-mode        ; Save buffers when focus is lost
-  :straight t
-  :init (focus-autosave-mode)
-  :diminish focus-autosave-mode)
-#+end_src
 ** displaying the time
 #+begin_src emacs-lisp
-(use-package time
-  :straight (:type built-in)
-  :config
+(lp-emacs-builtin-package time
   (setq display-time-world-time-format "%H:%M %Z, %d. %b"
         display-time-world-list '(("Europe/Berlin"    "Berlin")
                                   ("Europe/London"    "London")
@@ -328,9 +304,7 @@ Not all of the emacs defaults are quite sane. So here's to some sanity.
 #+end_src
 ** man mode, info mode, WoMan
 #+begin_src emacs-lisp
-(use-package man
-  :straight (:type built-in)
-  :config
+(lp-emacs-builtin-package man
   (define-key Man-mode-map (kbd "i") #'Man-goto-section)
   (define-key Man-mode-map (kbd "g") #'Man-update-manpage)
   )
@@ -342,9 +316,7 @@ Starting a server will allow the quick access of emacs through a server connecti
 than having to open and load a full configuration every time.
 
 #+begin_src emacs-lisp
-(use-package server
-  :straight (:type built-in)
-  :init
+(lp-emacs-builtin-package server
   (add-hook 'after-init-hook #'server-start))
 #+end_src
 *** desktop
@@ -354,9 +326,7 @@ it remains. At the moment I store no buffers or frames to load from since that g
 too much friction on startup.
 
 #+begin_src emacs-lisp
-(use-package desktop
-  :straight (:type built-in)
-  :config
+(lp-emacs-builtin-package desktop
   (setq desktop-auto-save-timeout 300)
   (setq desktop-path `(,user-emacs-directory))
   (setq desktop-base-file-name "desktop")
@@ -371,8 +341,7 @@ too much friction on startup.
   (dolist (symbol '(kill-ring log-edit-comment-ring))
     (add-to-list 'desktop-globals-to-save symbol))
 
-  (desktop-save-mode 1)
-  )
+  (desktop-save-mode 1))
 #+end_src
 
 *** saveplace
@@ -380,10 +349,8 @@ Saving the cursor position in a file is a subtle hint of what you were doing. It
 relatively convenient
 
 #+begin_src emacs-lisp
-(use-package saveplace
-  :straight (:type built-in)
-  :diminish
-  :init
+(lp-emacs-builtin-package saveplace
+  ;; :diminish
   (setq save-place-file (locate-user-emacs-file "saveplace"))
   (setq save-place-forget-unreadable-files t)
   (save-place-mode 1)
@@ -431,20 +398,19 @@ function."
 Instead of using =projectile=, there's now a wonderful built-in library, =project=, which
 has lots of overlap with =projectile=. Might as well remove a dependency.
 #+begin_src emacs-lisp
-(use-package project
-  :straight (:type built-in))
+(lp-emacs-builtin-package project)
 #+end_src
 ** General Prog Mode
 #+begin_src emacs-lisp
-;; Mark TODOs , FIXME, BUG as red in src code
-(add-hook 'prog-mode-hook
-          (lambda ()
-            (font-lock-add-keywords
-             nil
-             '(("\\<\\(FIXME\\|TODO\\|BUG\\)" 1 font-lock-warning-face prepend)))))
-(use-package compile
-  :straight (:type built-in)
-  :config
+(lp-emacs-builtin-package prog-mode
+  ;; Mark TODOs , FIXME, BUG as red in src code
+  (add-hook 'prog-mode-hook
+            (lambda ()
+              (font-lock-add-keywords
+               nil
+               '(("\\<\\(FIXME\\|TODO\\|BUG\\)" 1 font-lock-warning-face prepend))))))
+
+(lp-emacs-builtin-package compile
   (setq compilation-ask-about-save nil)
   (setq compilation-scroll-output 'next-error)
   (setq compilation-skip-threshold 2)
@@ -500,9 +466,7 @@ General aesthetic configurations for emacs
 =modus-themes= is simply the GOAT at this point. Not much more to say than that.
 
 #+begin_src emacs-lisp
-(use-package modus-themes
-  :straight t
-  :init
+(lp-emacs-elpa-package modus-themes
   (setq modus-themes-italic-constructs t
         modus-themes-bold-constructs t
         modus-themes-mixed-fonts t
@@ -588,10 +552,6 @@ General aesthetic configurations for emacs
 
 * movement and editing
 ** cursor positioning and duplicating                              :external:
-Sometimes =undo= can be unwieldy to deal with. =undo-propose= provides a scratch buffer
-for that purpose. At least that's what I use it for. I understand its more powerful than
-that but I'm ignorant in many ways.
-
 =iedit= provides simple mark-and-multiedit capabilities. I haven't RTFM'd on
 rectangle mode to see if it provides that capability, so to the externals we go.
 
@@ -602,24 +562,15 @@ only dependency on =ivy= now).
 object. That's really it.
 
 #+begin_src emacs-lisp
-(use-package undo-propose
-  :straight t
-  :config
-  (setq undo-propose-pop-to-buffer t))
+;; (lp-emacs-elpa-package iedit) ;; default bind is C-;
 
-(use-package iedit
-  :straight t) ;; default bind is C-;
+;; (lp-emacs-elpa-package avy
+;;   (avy-setup-default)
+;;   (define-key global-map (kbd "C-'") 'avy-goto-char-timer)
+;;   (define-key global-map (kbd "C-\"") 'avy-resume))
 
-(use-package avy
-  :straight t
-  :config
-  (avy-setup-default)
-  (define-key global-map (kbd "C-'") 'avy-goto-char-timer)
-  (define-key global-map (kbd "C-\"") 'avy-resume))
-
-(use-package expand-region
-  :straight t
-  :bind ("C-=" . er/expand-region))
+(lp-emacs-elpa-package expand-region
+  (define-key global-map (kbd "C-=") 'er/expand-region))
 #+end_src
 ** isearch and replace
 =isearch= isn't gonna go out of style anytime soon that's for sure. And especially not if
@@ -628,10 +579,8 @@ search" on its candidates. This is accomplished by setting =search-whitespace-re
 match =.*?=, i.e all characters are whitespace.
 
 #+begin_src emacs-lisp
-(use-package isearch
-  :straight (:type built-in)
-  :diminish
-  :config
+(lp-emacs-builtin-package isearch
+  ;; :diminish
   (setq search-highlight t)
   (setq search-whitespace-regexp ".*?")
   (setq isearch-lax-whitespace t)
@@ -657,9 +606,7 @@ match =.*?=, i.e all characters are whitespace.
     (define-key map (kbd "C-g") #'isearch-abort)
     (define-key map (kbd "M-/") #'isearch-complete)))
 
-(use-package replace
-  :straight (:type built-in)
-  :init
+(lp-emacs-builtin-package replace
   (global-set-key (kbd "M-s M-o") 'multi-occur)
   (define-key occur-mode-map (kbd "t") 'toggle-truncate-lines)
   (add-hook 'occur-mode-hook #'(lambda () (interactive) (toggle-truncate-lines t)))
@@ -671,13 +618,11 @@ match =.*?=, i.e all characters are whitespace.
 * reading, writing, and task keeping
 ** org
 #+begin_src emacs-lisp
-(use-package org
+(lp-emacs-builtin-package org
   ;; TODO: fix this with the right straight source
-  :straight t
-  :config
   ;; (unbind-key (kbd "C-'") org-mode-map)
   ;; (unbind-key (kbd "C-c C-j") org-mode-map)
-  
+
   (defun org-file-path (filename)
     "Return absolute address of an org file give its relative name."
     (concat (file-name-as-directory org-directory) filename))
@@ -1054,82 +999,78 @@ match =.*?=, i.e all characters are whitespace.
   (define-key org-mode-map (kbd "C-c q") 'auto-fill-mode)
 
 ;;; making links to other contexts
-  (define-key global-map (kbd "C-c l") 'org-store-link)
-
-  )
+  (define-key global-map (kbd "C-c l") 'org-store-link))
 
 #+END_SRC
 
-*** roam                                                           :external:remove:
-#+BEGIN_SRC emacs-lisp
+*** roam                                                           :external:remove:noexport:
+#+BEGIN_VERBATIM
 (use-package org-roam
-  :straight (:type git :host github
-                   :repo "org-roam/org-roam-v1" :branch "master")
-  :diminish
-  :custom
-  (org-roam-directory (file-truename "~/org/roam/"))
-  (org-roam-graph-exclude-matcher '("physics" "textbook" "quote" "paper" "private" "daily" "index" "Index"))
-  (org-roam-dailies-directory "daily/")
-  (org-roam-db-update-idle-seconds 20)
-  :init
-  (add-hook 'after-init-hook 'org-roam-mode)
-  :config
-  (define-key org-roam-dailies-map (kbd "l") 'org-roam-dailies-find-today)
-  (define-key org-roam-dailies-map (kbd "j") 'org-roam-dailies-find-tomorrow)
-  (define-key org-roam-dailies-map (kbd "d") 'org-roam-dailies-find-date)
-  (define-key org-roam-dailies-map (kbd "k") 'org-roam-dailies-find-yesterday)
-  (define-key org-roam-dailies-map (kbd "p") 'org-roam-dailies-find-previous-note)
-  (define-key org-roam-dailies-map (kbd "n") 'org-roam-dailies-find-next-note)
+:straight (:type git :host github
+:repo "org-roam/org-roam-v1" :branch "master")
+:diminish
+:custom
+(org-roam-directory (file-truename "~/org/roam/"))
+(org-roam-graph-exclude-matcher '("physics" "textbook" "quote" "paper" "private" "daily" "index" "Index"))
+(org-roam-dailies-directory "daily/")
+(org-roam-db-update-idle-seconds 20)
+:init
+(add-hook 'after-init-hook 'org-roam-mode)
+:config
+(define-key org-roam-dailies-map (kbd "l") 'org-roam-dailies-find-today)
+(define-key org-roam-dailies-map (kbd "j") 'org-roam-dailies-find-tomorrow)
+(define-key org-roam-dailies-map (kbd "d") 'org-roam-dailies-find-date)
+(define-key org-roam-dailies-map (kbd "k") 'org-roam-dailies-find-yesterday)
+(define-key org-roam-dailies-map (kbd "p") 'org-roam-dailies-find-previous-note)
+(define-key org-roam-dailies-map (kbd "n") 'org-roam-dailies-find-next-note)
 
-  (setq roam-nav-map
-        (let ((map (make-sparse-keymap)))
-          (define-key map (kbd "f") 'org-roam-find-file)
-          (define-key map (kbd "c") 'org-roam-capture)
-          (define-key map (kbd "i") 'org-roam-insert)
-          (define-key map (kbd "r") 'org-roam)
-          (define-key map (kbd "I") 'org-roam-insert-immediate)
-          (define-key map (kbd "g") 'org-roam-graph)
-          (define-key map (kbd "o") 'org-roam-jump-to-index)
-          (define-key map (kbd "t") 'org-roam-tag-add)
-          map))
-  (define-key global-map (kbd "C-c C-u") roam-nav-map)
+(setq roam-nav-map
+(let ((map (make-sparse-keymap)))
+(define-key map (kbd "f") 'org-roam-find-file)
+(define-key map (kbd "c") 'org-roam-capture)
+(define-key map (kbd "i") 'org-roam-insert)
+(define-key map (kbd "r") 'org-roam)
+(define-key map (kbd "I") 'org-roam-insert-immediate)
+(define-key map (kbd "g") 'org-roam-graph)
+(define-key map (kbd "o") 'org-roam-jump-to-index)
+(define-key map (kbd "t") 'org-roam-tag-add)
+map))
+(define-key global-map (kbd "C-c C-u") roam-nav-map)
 
-  (eval-after-load "cape"
-    (progn
-      (add-to-list 'org-roam-completion-functions #'cape-file)
-      (add-to-list 'org-roam-completion-functions #'cape-dabbrev)
-      (add-to-list 'org-roam-completion-functions #'cape-keyword)
-      (add-to-list 'org-roam-completion-functions #'cape-abbrev)
-      (add-to-list 'org-roam-completion-functions #'cape-ispell)
-      (add-to-list 'org-roam-completion-functions #'cape-dict)
-      (add-to-list 'org-roam-completion-functions #'cape-symbol)))
-  :bind (("\C-c i" . org-roam-insert-immediate)
-         ("\C-c o" . org-roam-jump-to-index)
-         ("\C-c t" . org-roam-tag-add)
-         ("\C-c f" . org-roam-find-file)
-         ("\C-c d" . org-roam-dailies-map)))
+(eval-after-load "cape"
+(progn
+(add-to-list 'org-roam-completion-functions #'cape-file)
+(add-to-list 'org-roam-completion-functions #'cape-dabbrev)
+(add-to-list 'org-roam-completion-functions #'cape-keyword)
+(add-to-list 'org-roam-completion-functions #'cape-abbrev)
+(add-to-list 'org-roam-completion-functions #'cape-ispell)
+(add-to-list 'org-roam-completion-functions #'cape-dict)
+(add-to-list 'org-roam-completion-functions #'cape-symbol)))
+:bind (("\C-c i" . org-roam-insert-immediate)
+("\C-c o" . org-roam-jump-to-index)
+("\C-c t" . org-roam-tag-add)
+("\C-c f" . org-roam-find-file)
+("\C-c d" . org-roam-dailies-map)))
 
 (use-package org-roam-server
-  :straight t
-  :config
-  (setq org-roam-server-host "localhost"
-        org-roam-server-port 8080
-        org-roam-server-authenticate nil
-        org-roam-server-export-inline-images t
-        org-roam-server-serve-files nil
-        org-roam-server-served-file-extensions '("pdf" "mp4" "ogv")
-        org-roam-server-network-poll t
-        org-roam-server-network-arrows nil
-        org-roam-server-network-label-truncate t
-        org-roam-server-network-label-truncate-length 60
-        org-roam-server-network-label-wrap-length 20))
-#+end_src
+:straight t
+:config
+(setq org-roam-server-host "localhost"
+org-roam-server-port 8080
+org-roam-server-authenticate nil
+org-roam-server-export-inline-images t
+org-roam-server-serve-files nil
+org-roam-server-served-file-extensions '("pdf" "mp4" "ogv")
+org-roam-server-network-poll t
+org-roam-server-network-arrows nil
+org-roam-server-network-label-truncate t
+org-roam-server-network-label-truncate-length 60
+org-roam-server-network-label-wrap-length 20))
+#+end_VERBATIM
 
 ** diary, calendar
 #+begin_src emacs-lisp
-(use-package calendar
-  :straight (:type built-in)
-  :config
+(lp-emacs-builtin-package calendar
   ;; lots ripped from prot
   (setq calendar-mark-diary-entries-flag t)
   (setq calendar-mark-holidays-flag t)
@@ -1163,8 +1104,8 @@ match =.*?=, i.e all characters are whitespace.
   (setq diary-display-function #'diary-fancy-display) ; better than its alternative
   (setq diary-header-line-format nil)
   (setq diary-list-include-blanks nil)
-  (setq diary-number-of-entries 2)
-  (setq diary-mail-days 2)
+  (setq diary-number-of-entries 3)
+  (setq diary-mail-days 3)
   (setq diary-abbreviated-year-flag nil)
 
   (add-hook 'calendar-today-visible-hook #'calendar-mark-today)
@@ -1193,16 +1134,14 @@ match =.*?=, i.e all characters are whitespace.
     (define-key map (kbd "M-n") #'calendar-forward-month)
     (define-key map (kbd "M-p") #'calendar-backward-month)))
 
-(use-package appt
-  :straight (:type built-in)
-  :config
+(lp-emacs-builtin-package appt
   (setq appt-display-diary nil)
   (setq appt-disp-window-function #'appt-disp-window)
   (setq appt-display-mode-line t)
-  (setq appt-display-interval 3)
+  (setq appt-display-interval 5)
   (setq appt-audible nil)
   (setq appt-warning-time-regexp "appt \\([0-9]+\\)")
-  (setq appt-message-warning-time 6)
+  (setq appt-message-warning-time 15)
 
   (run-at-time 10 nil #'appt-activate 1))
 
@@ -1229,14 +1168,8 @@ match =.*?=, i.e all characters are whitespace.
 ** latex and references/bibs
 ** org-ref                                                         :external:
 #+begin_src emacs-lisp
-(use-package org-ref
-  :straight t
-  :config
-
-  (use-package async
-    :straight t)
-
-  (require 'async)
+(lp-emacs-elpa-package async)
+(lp-emacs-elpa-package org-ref
   (require 'org-ref-bibtex)
   (require 'doi-utils)
   (require 'org-ref-arxiv)
@@ -1261,8 +1194,7 @@ match =.*?=, i.e all characters are whitespace.
 #+end_src
 ** latex
 #+begin_src emacs-lisp
-(use-package tex-mode
-  :config
+(lp-emacs-builtin-package tex-mode
   ;; revert pdf-view after compilation
   (add-hook 'TeX-after-compilation-finished-functions #'TeX-revert-document-buffer)
   (setq TeX-view-program-selection '((output-pdf "PDF Tools"))
@@ -1279,37 +1211,33 @@ match =.*?=, i.e all characters are whitespace.
 A time-tested classic mark-up language. Not much more to say; the customizations are minimal.
 
 #+begin_src emacs-lisp
-(use-package markdown-mode
-  :straight t
-  :diminish (markdown-mode gfm-mode)
-  :commands (markdown-mode gfm-mode)
-  :mode (("README\\.md\\'" . gfm-mode)
-         ("\\.md\\'" . markdown-mode)
-         ("\\.markdown\\'" . markdown-mode))
-  :init (setq markdown-command "multimarkdown"))
+(lp-emacs-elpa-package markdown-mode
+  ;;  :diminish (markdown-mode gfm-mode)
+  ;; :mode (("README\\.md\\'" . gfm-mode)
+  ;;        ("\\.md\\'" . markdown-mode)
+  ;;        ("\\.markdown\\'" . markdown-mode))
+  (setq markdown-command "multimarkdown"))
 #+end_src
-** USLS
-#+begin_src emacs-lisp
-(use-package usls
-  :disabled
-  :straight (:type git :host gitlab :repo "protesilaos/usls")
-  :config
-  (setq usls-directory (expand-file-name "~/org/usls/"))
-  (setq usls-known-categories '())
-  (setq usls-file-type-extension ".org")
-  (setq usls-subdir-support nil)
-  (setq usls-file-region-separator 'line)
-  (setq usls-file-region-separator-heading-level 1)
-  (setq usls-custom-header-function nil)
-  (let ((mode-map usls-mode-map))
-    (define-key mode-map (kbd "C-c n i") 'usls-id-insert)
-    (define-key mode-map (kbd "C-c n l") 'usls-follow-link)))
+** USLS :noexport:
+#+begin_verbatim emacs-lisp
+(lp-emacs-elpa-package usls
+:disabled
+:straight (:type git :host gitlab :repo "protesilaos/usls")
+:config
+(setq usls-directory (expand-file-name "~/org/usls/"))
+(setq usls-known-categories '())
+(setq usls-file-type-extension ".org")
+(setq usls-subdir-support nil)
+(setq usls-file-region-separator 'line)
+(setq usls-file-region-separator-heading-level 1)
+(setq usls-custom-header-function nil)
+(let ((mode-map usls-mode-map))
+(define-key mode-map (kbd "C-c n i") 'usls-id-insert)
+(define-key mode-map (kbd "C-c n l") 'usls-follow-link)))
 #+end_src
 ** pdf-tools                                                       :external:
 #+begin_src emacs-lisp
-(use-package pdf-tools
-  :straight t
-  :config
+(lp-emacs-elpa-package pdf-tools
   (setq pdf-tools-enabled-modes
         '(pdf-history-minor-mode
           pdf-isearch-minor-mode
@@ -1348,7 +1276,7 @@ A time-tested classic mark-up language. Not much more to say; the customizations
   (add-hook 'modus-themes-after-load-theme-hook #'prot/pdf-tools-midnight-mode-toggle))
 #+end_src
 
-g** ispell+flyspell
+** ispell+flyspell
 =ispell= and =flyspell= are built-in utilities to interface with externally installed
 spelling programs (=hunspell=, =aspell=, =ispell=, etc.). =flyspell= is much like
 =flymake= where, on the fly, misspelled words are highlighted as you type them or move
@@ -1365,17 +1293,14 @@ replace all occurrences of the word at point (=R NEW <RET>=), accept the incorre
 actions specified in the manual.
 
 #+begin_src emacs-lisp
-(use-package ispell
-  :straight (:type built-in)
-  :init
+(lp-emacs-builtin-package ispell
   (setq ispell-dictionary "en_US")
   (setq ispell-silently-savep t))
 
-(use-package flyspell
-  :straight (:type built-in)
-  :diminish flyspell-mode
-  :hook ((org-mode-hook markdown-mode-hook) . (lambda () (interactive) (flyspell-mode)))
-  :config
+(lp-emacs-builtin-package flyspell
+  ;; :diminish flyspell-mode
+  (dolist (mode-hook '(org-mode-hook markdown-mode-hook))
+    (add-hook mode-hook #'flyspell-mode))
   (setq flyspell-issue-message-flag nil)
   (setq flyspell-issue-welcome-flag nil)
   (define-key flyspell-mode-map (kbd "C-;") nil) ;; gets in the way of things.
@@ -1409,9 +1334,7 @@ completion options, minibuffer options, minibuffer history options, prompt faces
 (minibuffer-electric-default-mode 1) ;; update default completion if change
 
      ;;; Minibuffer history
-(use-package savehist
-  :straight (:type built-in)
-  :config
+(lp-emacs-builtin-package savehist
   (setq savehist-file (locate-user-emacs-file "savehist"))
   (setq history-length 10000)
   (setq history-delete-duplicates t)
@@ -1442,9 +1365,7 @@ than at-completion-time, which I much prefer. Amortized, MCT actually ends up fa
 larger =completing-read= calls.
 
 #+begin_src emacs-lisp
-(use-package mct
-  :straight t
-  :config
+(lp-emacs-elpa-package mct
   (setq mct-remove-shadowed-file-names t) ; works when `file-name-shadow-mode' is enabled
   (setq mct-hide-completion-mode-line t)
   (setq mct-show-completion-line-numbers nil)
@@ -1506,9 +1427,7 @@ posframe-based or frame-based completion utility, e.g. =corfu= can't be displaye
 doesn't play well with lsp, but i haven't heard anything about =eglot=.
 
 #+begin_src emacs-lisp
-(use-package consult
-  :straight t
-  :init
+(lp-emacs-elpa-package consult
   (setq consult-goto-map
         (let ((map (make-sparse-keymap)))
           (define-key map (kbd "e") 'consult-compile-error)
@@ -1579,19 +1498,18 @@ doesn't play well with lsp, but i haven't heard anything about =eglot=.
 
   (setq completion-in-region-function #'consult-completion-in-region))
 
-(use-package consult-dir
-  :straight t
-  :bind (("C-x C-d" . consult-dir)
-         :map minibuffer-local-completion-map
-         ("C-x C-d" . consult-dir)
-         ("C-x C-j" . consult-dir-jump-file)))
+(lp-emacs-elpa-package consult-dir
+  (define-key global-map (kbd "C-x C-d") 'consult-dir)
+  (define-key minibuffer-local-completion-map (kbd "C-x C-d") 'consult-dir)
+  (define-key minibuffer-local-completion-map (kbd "C-x C-j") 'consult-dir-jump-file))
 
-(use-package consult-bibtex
-  :straight (:type git :host github :repo "mohkale/consult-bibtex")
-  :config
-  (with-eval-after-load 'embark
-    (add-to-list 'embark-keymap-alist '(bibtex-completion . consult-bibtex-embark-map)))
-  (setq consult-bibtex-default-action #'consult-bibtex-edit-notes))
+;; TODO this might break
+(shell-command "cd ~/.emacs.d/elpa && git clone https://github.com/mohkale/consult-bibtex.git")
+(add-to-list 'load-path "~/.emacs.d/elpa/consult-bibtex")
+(require 'consult-bibtex)
+(with-eval-after-load 'embark
+  (add-to-list 'embark-keymap-alist '(bibtex-completion . consult-bibtex-embark-map)))
+(setq consult-bibtex-default-action #'consult-bibtex-edit-notes)
 #+end_src
 ** embark     -- Mini-buffer actions rooted in Keymaps (contextual actions) :external:
 
@@ -1603,19 +1521,13 @@ Over time I hope to have a better intuition for the situations in which this pac
 shine, but for now I'm using it mostly for =embark-export= for batched editing operations.
 
 #+begin_src emacs-lisp
-(use-package embark
-  :straight t
-  :bind (("C->" . embark-become)
-         ("M-a" . embark-act))
-  :config
+(lp-emacs-elpa-package embark
+  (define-key global-map (kbd "C->") 'embark-become)
+  (define-key global-map (kbd "M-a") 'embark-act)
   (define-key completion-list-mode-map (kbd "M-a")
     #'(lambda () (interactive) () (mct-focus-mini-or-completions) (embark-act))))
 
-(use-package embark-consult
-  :straight t
-  :after (embark consult)
-  :demand t
-  :config
+(lp-emacs-elpa-package embark-consult
   (define-key embark-collect-mode-map (kbd "o") 'consult-preview-at-point)
   ;; :hook (embark-collect-mode . embark-consult-preview-minor-mode)
   )
@@ -1627,9 +1539,7 @@ Enhanced minibuffer information when using =switch-to-buffer=, =find-file=,
 =describe-variable=, etc.
 
 #+begin_src emacs-lisp
-(use-package marginalia
-  :straight (:host github :repo "minad/marginalia" :branch "main")
-  :config
+(lp-emacs-elpa-package marginalia
   (setq marginalia-max-relative-age 0)  ; time is absolute here!
   (marginalia-mode 1))
 #+end_src
@@ -1646,9 +1556,7 @@ string, defined by the function =literal-if-comma=. To match everything but a st
 prefix the string with a "bang" =!=.
 
 #+begin_src emacs-lisp
-(use-package orderless
-  :straight t
-  :config
+(lp-emacs-elpa-package orderless
   (setq completion-styles '(orderless))
   (setq  completion-category-defaults nil
          completion-category-overrides '((file (styles . (partial-completion)))))
@@ -1677,10 +1585,10 @@ prefix the string with a "bang" =!=.
 
   (setq orderless-style-dispatchers '(literal-if-comma without-if-bang flex-if-tilde initialism-if-eql))
 
+  (define-key minibuffer-local-completion-map (kbd "SPC") nil)
+  (define-key minibuffer-local-completion-map (kbd "?") nil)
   ;; SPC should never complete: use it for `orderless' groups.
-  :bind (:map minibuffer-local-completion-map
-              ("SPC" . nil)
-              ("?" . nil)))
+  )
 #+end_src
 ** which-key                                                       :external:
 
@@ -1689,24 +1597,20 @@ much it, but its proven itself tremendously helpful for exploring features of th
 or of a new package.
 
 #+begin_src emacs-lisp
-(use-package which-key
-  :straight t
-  :diminish which-key-mode
-  :config (which-key-mode 1))
+(lp-emacs-elpa-package which-key
+  ;;:diminish which-key-mode
+  (which-key-mode 1))
 #+end_src
 ** built-in completion utilities (abbrev, dabbrev)
 
 #+begin_src emacs-lisp
-(use-package abbrev
-  :straight (:type built-in)
-  :config
+(lp-emacs-builtin-package abbrev
   (setq abbrev-suggest t)
   (setq save-abbrevs 'silently)
   (setq abbrev-file-name (locate-user-emacs-file "abbrevs"))
   (setq only-global-abbrevs nil))
 
-(use-package dabbrev
-  :config
+(lp-emacs-builtin-package dabbrev
   (define-key global-map (kbd "M-/") 'dabbrev-completion)
   (define-key global-map (kbd "C-M-/") 'dabbrev-expand)
   (setq dabbrev-abbrev-char-regexp "\\sw\\|\\s_") ;; same as nil technically
@@ -1722,29 +1626,20 @@ or of a new package.
 #+end_src
 ** external completion utilities (corfu, cape)                     :external:remove:
 #+begin_src emacs-lisp
-
-(use-package corfu
-  :disabled
-  :straight t
-  ;; Optional customizations
-  :config
+(lp-emacs-elpa-package corfu
   (setq corfu-cycle t)            ;; Enable cycling for `corfu-next/previous'
   (setq corfu-auto t)             ;; Enable auto completion
   (setq corfu-quit-at-boundary t) ;; Automatically quit at word boundary
   (setq corfu-quit-no-match t)    ;; Automatically quit if there is no match
   (setq corfu-auto-delay 0.7)
   (setq corfu-echo-documentation t)
-  (setq tab-always-indent 'complete)
 
   ;; Enable indentation+completion using the TAB key.
   ;; `completion-at-point' is often bound to M-TAB.
-  (setq tab-always-indent 'complete)
+  ;; (setq tab-always-indent 'complete)
   (corfu-global-mode))
 
-(use-package cape
-  :disabled
-  :straight (:type git :host github :repo "minad/cape")
-  :config
+(lp-emacs-elpa-package cape
   (add-to-list 'completion-at-point-functions #'cape-file)
   (add-to-list 'completion-at-point-functions #'cape-dabbrev)
   (add-to-list 'completion-at-point-functions #'cape-keyword)
@@ -1760,18 +1655,14 @@ advanced expansions than =abbrev= are needed.
 
 #+begin_src emacs-lisp
 ;; configuration
-(use-package yasnippet
-  :straight t
-  :functions yas-global-mode yas-expand
-  :diminish yas-minor-mode
-  :config
+(lp-emacs-elpa-package yasnippet
+  ;;:diminish yas-minor-mode
   (yas-global-mode 1)
   (setq yas-fallback-behavior 'return-nil)
   (setq yas-triggers-in-field t)
   (setq yas-verbosity 0))
 
-(use-package yasnippet-snippets
-  :straight t)
+(lp-emacs-elpa-package yasnippet-snippets)
 #+end_src
 
 ** xref
@@ -1779,9 +1670,7 @@ advanced expansions than =abbrev= are needed.
 Its debatable whether xref should be in this section. May re-evaluate in future.
 
 #+BEGIN_SRC emacs-lisp
-(use-package xref
-  :straight (:type built-in)
-  :config
+(lp-emacs-builtin-package xref
   ;; All those have been changed for Emacs 28
   (setq xref-show-definitions-function #'xref-show-definitions-completing-read) ; for M-.
   (setq xref-show-xrefs-function #'xref-show-definitions-buffer) ; for grep and the like
@@ -1793,9 +1682,7 @@ Its debatable whether xref should be in this section. May re-evaluate in future.
 * programming languages and environments
 ** eglot                                                           :external:
 #+begin_src emacs-lisp
-(use-package eglot
-  :straight t
-  :config
+(lp-emacs-elpa-package eglot
   (defvar eglot-prog-mode-hooks '(python-mode-hook cc-mode-hook c-mode-hook c++-mode-hook cuda-mode-hook
                                                    c-common-mode-hook julia-mode-hook rjsx-mode-hook
                                                    typescript-mode-hook tuareg-mode-hook))
@@ -1821,39 +1708,27 @@ Its debatable whether xref should be in this section. May re-evaluate in future.
       (add-hook 'eglot-mode-hook #'corfu-eglot-setup))))
 
 ;; 4 julia
-(use-package eglot-jl
-  :straight t
-  :config
+(lp-emacs-elpa-package eglot-jl
   (eglot-jl-init)
-  (setq eglot-connect-timeout 100)
-  )
+  (setq eglot-connect-timeout 100))
 
-(use-package consult-eglot
-  :straight t
-  :config
-  (define-key eglot-mode-map [remap xref-find-apropos] #'consult-eglot-symbols)
-  (define-key eglot-mode-map (kbd "C-c y l") #'consult-flymake))
+(lp-emacs-elpa-package consult-eglot
+  (define-key eglot-mode-map [remap xref-find-apropos] #'consult-eglot-symbols))
 #+end_src
 ** ocaml                                                           :external:
 #+begin_src emacs-lisp
-(use-package tuareg
-  :straight t)
+(lp-emacs-elpa-package tuareg)
 
-(use-package utop
-  :straight t
-  :config
+(lp-emacs-elpa-package utop
   (setq utop-command "opam config exec -- utop -emacs")
   (autoload 'utop-minor-mode "utop" "Minor mode for utop" t)
-  (add-hook 'tuareg-mode-hook 'utop-minor-mode)
-  )
+  (add-hook 'tuareg-mode-hook 'utop-minor-mode))
 #+end_src
 ** python                                                          :external:
 #+begin_src emacs-lisp
-(use-package python
-  :straight t
-  :mode ("\\.py\\'" . python-mode)
-  :interpreter ("python" . python-mode)
-  :config
+(lp-emacs-elpa-package python
+  ;; :mode ("\\.py\\'" . python-mode)
+  ;; :interpreter ("python" . python-mode)
   (setq python-indent-offset 4)
   (setq python-shell-interpreter "ipython"
         ;; python-shell-interpreter-args "console --simple-prompt"
@@ -1867,28 +1742,23 @@ Its debatable whether xref should be in this section. May re-evaluate in future.
   ;; (flycheck-add-next-checker 'python-flake8 'python-mypy t)
   )
 
-(use-package pyvenv
-  :straight t)
+(lp-emacs-elpa-package pyvenv)
                                         ; optional: if Org Ref is not loaded anywhere else, load it here
 #+end_src
 
 ** julia                                                           :external:
 #+begin_src emacs-lisp
-(use-package julia-mode
-  :straight t)
+(lp-emacs-elpa-package julia-mode)
 
-(use-package vterm
-  :straight t)
+(lp-emacs-elpa-package vterm)
 
-(use-package julia-snail
-  :straight t
-  :config
+(lp-emacs-elpa-package julia-snail
   (add-hook 'julia-mode-hook 'julia-snail-mode))
 #+end_src
 
 ** c{,++} environment
 #+begin_src emacs-lisp
-(use-package cc-mode
+(lp-emacs-builtin-package cc-mode
   :config
   (setq gdb-many-windows 't)
   (setq tab-width 4)
@@ -1901,12 +1771,11 @@ Its debatable whether xref should be in this section. May re-evaluate in future.
             #'(lambda ()
                 (setq compile-command "cmake .. -DCMAKE_EXRORT_COMPILE_COMMANDS=1 -DCMAKE_BUILD_TYPE=Debug; make clean; cmake --build . -j8")
                 ))
-  (unbind-key (kbd "C-M-q") c-mode-map)
-  (unbind-key (kbd "C-M-q") c++-mode-map)
+  (define-key c-mode-map (kbd "C-M-q") nil)
+  (define-key c-mode-map (kbd "C-M-q") nil)
   )
 
-(use-package gud
-  :config
+(lp-emacs-builtin-package gud
   (setq gud-nav-map
         (let ((map (make-sparse-keymap)))
           (define-key map (kbd "g b") 'gud-break)
@@ -1927,26 +1796,23 @@ Its debatable whether xref should be in this section. May re-evaluate in future.
 #+end_src
 *** cmake                                                          :external:
 #+begin_src emacs-lisp
-(use-package cmake-mode
-  :straight t)
+(lp-emacs-elpa-package cmake-mode)
 
-(use-package eldoc-cmake
-  :straight t
-  :config
+(lp-emacs-elpa-package eldoc-cmake
   (add-hook 'cmake-mode-hook 'eldoc-cmake-enable))
 #+end_src
 ** symbolic math (maxima, calc)                                    :external:
 
 #+begin_src emacs-lisp
-(use-package calc)
-(use-package maxima
-  :straight (:type git :host gitlab :repo "sasanidas/maxima")
-  :init
+(lp-emacs-builtin-package calc)
+(lp-emacs-elpa-package maxima
   (add-hook 'maxima-mode-hook #'maxima-hook-function)
   (add-hook 'maxima-inferior-mode-hook #'maxima-hook-function)
   (setq maxima-display-maxima-buffer t)
-  :mode ("\\.mac\\'" . maxima-mode)
-  :interpreter ("maxima" . maxima-mode))
+  ;; :mode ("\\.mac\\'" . maxima-mode)
+  ;; :interpreter ("maxima" . maxima-mode)
+
+  )
 #+end_src
 
 ** docker                                                          :external:
@@ -1958,46 +1824,32 @@ you're in (i think. as long as the =ssh= port is exposed? i have no clue its mag
 not gonna worry about it for now).
 
 #+begin_src emacs-lisp
-(use-package dockerfile-mode
-  :straight t)
+(lp-emacs-elpa-package dockerfile-mode)
 
-(use-package docker-tramp
-  :straight t)
+(lp-emacs-elpa-package docker-tramp)
 #+end_src
 
 ** (common) lisp and scheme                                        :external:
 #+begin_src emacs-lisp
-(use-package sly
-  :straight t
-  :config
+(lp-emacs-elpa-package sly
   (setq inferior-lisp-program "/usr/bin/sbcl"))
 
-(use-package sly-asdf
-  :straight t)
+(lp-emacs-elpa-package sly-asdf)
 
-(use-package sly-quicklisp
-  :straight t)
+(lp-emacs-elpa-package sly-quicklisp)
 
 ;; eldoc provides minibuffer hints for elisp things. it's super nice
-(use-package eldoc
-  :straight t
-  :diminish eldoc-mode
-  :config
+(lp-emacs-elpa-package eldoc
+  ;;:diminish eldoc-mode
   (global-eldoc-mode 1))
 
-(use-package rainbow-delimiters
-  :straight t
-  :diminish rainbow-delimiters-mode
-  :init
+(lp-emacs-elpa-package rainbow-delimiters
+  ;; :diminish rainbow-delimiters-mode
   (add-hook 'prog-mode-hook 'rainbow-delimiters-mode))
 
-(use-package geiser
-  :straight t)
+(lp-emacs-elpa-package geiser)
 
-(use-package geiser-chez
-  :straight t
-  :config
-  (require 'geiser-chez))
+(lp-emacs-elpa-package geiser-chez)
 
 (add-to-list 'auto-mode-alist
              '("\\.sc\\'" . scheme-mode))
@@ -2005,7 +1857,9 @@ not gonna worry about it for now).
 (add-to-list 'auto-mode-alist
              '("\\.sls\\'" . scheme-mode)
              '("\\.sps\\'" . scheme-mode))
-(unbind-key (kbd "C-M-q") scheme-mode-map)
+
+;; for popper..
+(define-key scheme-mode-map (kbd "C-M-q") nil)
 #+end_src
 ** flymake and its extras
 
@@ -2016,9 +1870,7 @@ Writing prose is tough and proselint is a nice tool. To install, run =sudo apt i
 python3-proselint=
 
 #+begin_src emacs-lisp
-(use-package flymake
-  :straight (:type built-in)
-  :config
+(lp-emacs-builtin-package flymake
   (setq flymake-fringe-indicator-position 'left-fringe)
   (setq flymake-suppress-zero-counters t)
   (setq flymake-start-on-flymake-mode t)
@@ -2045,23 +1897,17 @@ python3-proselint=
 *** flymake extras (diagnostic, shellcheck, proselint)             :external:
 
 #+BEGIN_SRC emacs-lisp
-(use-package flymake-diagnostic-at-point
-  :straight t
-  :config
+(lp-emacs-elpa-package flymake-diagnostic-at-point
   (setq flymake-diagnostic-at-point-display-diagnostic-function
         'flymake-diagnostic-at-point-display-minibuffer))
 
 ;;; Flymake + Shellcheck
-(use-package flymake-shellcheck
-  :straight t
-  :init
+(lp-emacs-elpa-package flymake-shellcheck
   (add-hook 'sh-mode-hook 'flymake-shellcheck-load))
 
 
 ;;; Flymake + Proselint
-(use-package flymake-proselint
-  :straight t
-  :init
+(lp-emacs-elpa-package flymake-proselint
   (add-hook 'markdown-mode-hook #'flymake-proselint-setup)
   (add-hook 'org-mode-hook #'flymake-proselint-setup)
   (add-hook 'text-mode-hook #'flymake-proselint-setup))
@@ -2072,10 +1918,7 @@ python3-proselint=
 #+begin_src emacs-lisp
 ;;; Magit
 ;; God bless magit and all that it does
-(use-package magit
-  :straight t
-  :commands magit-status magit-blame
-  :config
+(lp-emacs-elpa-package magit
   (setq
    ;; don't put "origin-" in front of new branch names by default
    magit-default-tracking-name-function 'magit-default-tracking-name-branch-only
@@ -2085,9 +1928,7 @@ python3-proselint=
 
 ** vc
 #+BEGIN_SRC emacs-lisp
-(use-package vc
-  :straight (:type built-in)
-  :config
+(lp-emacs-builtin-package vc
   (setq vc-handled-backends '(SVN Git))
   ;;;  As always, from Prot. Directly copied. No shame. See https://protesilaos.com/emacs/dotemacs#h:31deeff4-dfae-48d9-a906-1f3272f29bc9
 
@@ -2192,9 +2033,7 @@ python3-proselint=
 #+end_src
 ** shell
 #+begin_src emacs-lisp
-(use-package shell
-  :straight (:type built-in)
-  :config
+(lp-emacs-builtin-package shell
   (setq shell-command-prompt-show-cwd t) ; Emacs 27.1
   (setq ansi-color-for-comint-mode t))
 #+end_src
@@ -2204,9 +2043,7 @@ Slowly using eshell more, especially given its smooth interop with =tramp= as we
 intermingle of features between bash, csh, and zsh.
 
 #+begin_src emacs-lisp
-(use-package eshell
-  :straight (:type built-in)
-  :init
+(lp-emacs-builtin-package eshell
   (require 'esh-mode)
   (require 'esh-module)
   (setq eshell-modules-list             ; It works but may need review
@@ -2245,9 +2082,7 @@ intermingle of features between bash, csh, and zsh.
 A =top=-like interface for emacs.
 
 #+begin_src emacs-lisp
-(use-package proced
-  :straight (:type built-in)
-  :init
+(lp-emacs-builtin-package proced
   (setq proced-auto-update-flag t)
   (setq proced-auto-update-interval 5)
   (setq proced-descend t)
@@ -2260,9 +2095,7 @@ starting from prot's configuration since he always RTFMs. There's a lot of confi
 that I haven't dug my teeth into yet. I like the setup below.
 
 #+begin_src emacs-lisp
-(use-package dired
-  :straight (:type built-in)
-  :config
+(lp-emacs-builtin-package dired
   (add-hook 'dired-mode-hook
             (lambda ()
               (dired-hide-details-mode 1)))
@@ -2276,9 +2109,7 @@ that I haven't dug my teeth into yet. I like the setup below.
   (add-hook 'dired-mode-hook #'dired-hide-details-mode)
   (add-hook 'dired-mode-hook #'hl-line-mode))
 
-(use-package dired-aux
-  :straight (:type built-in)
-  :config
+(lp-emacs-builtin-package dired-aux
   (setq dired-isearch-filenames 'dwim)
   ;; The following variables were introduced in Emacs 27.1
   (setq dired-create-destination-dirs 'ask)
@@ -2291,9 +2122,7 @@ that I haven't dug my teeth into yet. I like the setup below.
     (define-key map (kbd "M-s f") #'nil)
     (define-key map (kbd "C-x v v") #'dired-vc-next-action))
   )
-(use-package dired-x
-  :straight (:type built-in)
-  :config
+(lp-emacs-builtin-package dired-x
   (setq dired-clean-up-buffers-too t)
   (setq dired-clean-confirm-killing-deleted-buffers t)
   (setq dired-x-hands-off-my-keys t)    ; easier to show the keys I use
@@ -2308,11 +2137,9 @@ Access recent files, where recents exclude the annoying =.git=, =.elpa=, etc. fi
 =wgrep= allows editing =grep=-style buffer for batched editing, much like =wdired=.
 
 #+begin_src emacs-lisp
-(use-package recentf                    ; Save recently visited files
-  :straight (:type built-in)
-  :init (recentf-mode)
-  :diminish recentf-mode
-  :config
+(lp-emacs-builtin-package recentf                    ; Save recently visited files
+  ;; :diminish recentf-mode
+  (recentf-mode)
   (setq
    recentf-max-saved-items 200
    recentf-max-menu-items 15
@@ -2329,26 +2156,18 @@ Access recent files, where recents exclude the annoying =.git=, =.elpa=, etc. fi
 
 ** wgrep                                                           :external:
 #+BEGIN_SRC emacs-lisp
-
-(use-package wgrep
-  :straight t
-  :bind
-  (:map grep-mode-map
-        ("C-x C-q" . wgrep-change-to-wgrep-mode)
-        ("C-c C-p" . wgrep-change-to-wgrep-mode)))
+(lp-emacs-elpa-package wgrep
+  (define-key grep-mode-map (kbd "C-x C-q") 'wgrep-change-to-wgrep-mode))
 #+end_src
 ** ediff
 #+begin_src emacs-lisp
-(use-package ediff
-  :diminish ediff-mode
-  :custom
-  (ediff-diff-options "-w"))
+(lp-emacs-elpa-package ediff
+  ;; :diminish ediff-mode
+  (setq ediff-diff-options "-w"))
 #+end_src
 ** exec path from shell                                            :external:
 #+begin_src emacs-lisp
-(use-package exec-path-from-shell
-  :straight t
-  :config
+(lp-emacs-elpa-package exec-path-from-shell
   (exec-path-from-shell-initialize))
 #+end_src
 
@@ -2412,9 +2231,7 @@ host. Relative file paths are possible as well, but when in doubt the full path 
 the go-to.
 
 #+begin_src emacs-lisp
-(use-package tramp
-  :straight (:type built-in)
-  :config
+(lp-emacs-builtin-package tramp
   ;;; I'm actually going to give scp a try as the default method for now. There might be benefits due to the encryption overhead required of ssh in =external= use cases.
 
   ;; ssh > scp (the default).
@@ -2427,9 +2244,7 @@ the go-to.
 * external environment interface
 ** notmuch -- mail in emacs                                        :external:
 #+begin_src emacs-lisp
-(use-package notmuch
-  :straight t
-  :config
+(lp-emacs-elpa-package notmuch
   (setq notmuch-show-logo nil)
   (setq notmuch-column-control t)
   (setq notmuch-hello-auto-refresh t)
@@ -2571,8 +2386,7 @@ the go-to.
 
 
 ;;; Sending email (SMTP)
-(use-package smtpmail
-  :config
+(lp-emacs-builtin-package smtpmail
   (setq smtpmail-stream-type 'ssl)
   (setq smtpmail-smtp-service 465)
   (setq smtpmail-queue-mail nil)
@@ -2582,16 +2396,13 @@ the go-to.
   (setq smtpmail-debug-verb t)
   )
 
-(use-package sendmail
-  :config
+(lp-emacs-builtin-package sendmail
   (setq send-mail-function 'smtpmail-send-it))
 #+END_SRC
 
 ** eww -- web browsing
 #+begin_src emacs-lisp
-(use-package eww
-  :straight (:type built-in)
-  :config
+(lp-emacs-builtin-package eww
   (define-key global-map (kbd "<f12>") 'eww)
   (setq shr-use-colors nil)             ; t is bad for accessibility
   (setq shr-use-fonts nil)              ; t is not for me
@@ -2629,9 +2440,7 @@ the go-to.
 ** elfeed -- RSS feed reader                                       :external:
 
 #+begin_src emacs-lisp
-(use-package elfeed
-  :straight t
-  :config
+(lp-emacs-elpa-package elfeed
   (define-key global-map (kbd "C-c e") #'elfeed)
 
   (setq elfeed-use-curl t)

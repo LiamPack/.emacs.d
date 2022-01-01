@@ -1,64 +1,51 @@
 (add-to-list 'load-path "~/.emacs.d/lisp/personal-packages/")
 (add-to-list 'load-path "~/.emacs.d/lisp/")
 (add-to-list 'custom-theme-load-path "~/.emacs.d/personal-packages/")
-;; Do not initialise installed packages (I use `straight.el')
-(setq package-enable-at-startup nil)
 
-;; Do not allow loading from the package cache (same reason).
-(setq package-quickstart nil)
+(require 'package)
+
+;; automatic package installation
+(setq package-enable-at-startup t)
+(setq package-quickstart t)
+
+(add-to-list 'package-archives '("elpa-devel" . "https://elpa.gnu.org/devel/") t)
+(add-to-list 'package-archives '("melpa" . "https://melpa.org/packages/") t)
+
+(package-initialize)
 
 ;; Do not resize the frame at this early stage.
 (setq frame-inhibit-implied-resize t)
 (setq use-dialog-box t)               ; only for mouse events
 (setq use-file-dialog nil)
 
-(setq straight-use-package-by-default nil)
+(setq native-comp-async-report-warnings-errors 'silent)
 
-(defvar bootstrap-version)
-(let ((bootstrap-file
-       (expand-file-name "straight/repos/straight.el/bootstrap.el" user-emacs-directory))
-      (bootstrap-version 5))
-  (unless (file-exists-p bootstrap-file)
-    (with-current-buffer
-        (url-retrieve-synchronously
-         "https://raw.githubusercontent.com/raxod502/straight.el/develop/install.el"
-         'silent 'inhibit-cookies)
-      (goto-char (point-max))
-      (eval-print-last-sexp)))
-  (load bootstrap-file nil 'nomessage))
+;; inspired by prot, but quoting the package name isn't necessary. Look for
+;; `prot-emacs-builtin-package'
+(defmacro lp-emacs-builtin-package (package &rest body)
+  (declare (indent 1))
+  `(progn
+     (unless (require ',package nil 'noerror)
+       (display-warning 'lp-emacs (format "Loading `%s' failed" ',package) :warning))
+     ,@body))
 
-(straight-use-package 'use-package)
 
-;; Configure `use-package' prior to loading it.
-(eval-and-compile
-  (setq use-package-always-ensure nil)  ; ESSENTIAL for `straight.el'
-  (setq use-package-always-defer nil)
-  (setq use-package-always-demand nil)
-  (setq use-package-expand-minimally nil)
-  (setq use-package-enable-imenu-support t)
-  (setq use-package-compute-statistics nil)
-  ;; The following is VERY IMPORTANT.  Write hooks using their real name
-  ;; instead of a shorter version: after-init ==> `after-init-hook'.
-  ;;
-  ;; This is to empower help commands with their contextual awareness,
-  ;; such as `describe-symbol'.
-  (setq use-package-hook-name-suffix nil))
+(defvar lp-emacs-ensure-install-missed '()
+  "A set of packages which failed a `package-install' call.")
 
-;; provides `straight-x-clean-unused-repos' (part of `straight.el')
-(use-package straight-x)
-
-(use-package vc
-  :config
-  (setq vc-follow-symlinks t)) ; Because my dotfiles are managed that way
-(use-package diminish
-  :straight t)
-(use-package server
-  :hook (after-init-hook . server-start))
-(defun save-all ()
-  (interactive)
-  (save-some-buffers t))
-
-(add-hook 'focus-out-hook 'save-all)
+(defmacro lp-emacs-elpa-package (package &rest body)
+  (declare (indent 1))
+  `(progn
+     (when (not (package-installed-p ',package))
+       (package-install ',package))
+     (if (require ',package nil 'noerror)
+         (progn ,@body)
+       (display-warning 'lp-emacs (format "Loading `%s' failed" ',package) :warning)
+       (add-to-list 'lp-emacs-ensure-install-missed ',package)
+       (display-warning
+        'lp-emacs
+        "See `lp-emacs-ensure-installed-missed' for a set of missed packages that failed install"
+        :warning))))
 
 ;; Mark safe variables early so that tangling won't break
 (put 'after-save-hook 'safe-local-variable
@@ -75,6 +62,3 @@
     (require 'ob-tangle)
     (org-babel-tangle-file .org .el "emacs-lisp"))
   (load-file .el))
-
-;; Collect garbage when all else is done
-(garbage-collect)
