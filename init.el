@@ -20,13 +20,19 @@
 
 (setq native-comp-async-report-warnings-errors 'silent)
 
+
+(defvar lp-emacs-ensure-builtin-missed '()
+  "A set of built-in packages which failed a `require' call.")
 ;; inspired by prot, but quoting the package name isn't necessary. Look for
 ;; `prot-emacs-builtin-package'
 (defmacro lp-emacs-builtin-package (package &rest body)
   (declare (indent 1))
   `(progn
-     (unless (require ',package nil 'noerror)
-       (display-warning 'lp-emacs (format "Loading `%s' failed" ',package) :warning))
+     (unless (require ,package nil 'noerror)
+       (progn
+         (add-to-list 'lp-emacs-ensure-builtin-missed ,package)
+         (print (format "[Warning]: Loading `%s' failed" ,package))
+         (display-warning 'lp-emacs (format "Loading `%s' failed" ,package) :warning)))
      ,@body))
 
 
@@ -36,12 +42,13 @@
 (defmacro lp-emacs-elpa-package (package &rest body)
   (declare (indent 1))
   `(progn
-     (when (not (package-installed-p ',package))
-       (package-install ',package))
-     (if (require ',package nil 'noerror)
+     (when (not (package-installed-p ,package))
+       (package-install ,package))
+     (if (require ,package nil 'noerror)
          (progn ,@body)
-       (display-warning 'lp-emacs (format "Loading `%s' failed" ',package) :warning)
-       (add-to-list 'lp-emacs-ensure-install-missed ',package)
+       (print (format "[Warning]: Loading `%s' failed" ,package))
+       (display-warning 'lp-emacs (format "Loading `%s' failed" ,package) :warning)
+       (add-to-list 'lp-emacs-ensure-install-missed ,package)
        (display-warning
         'lp-emacs
         "See `lp-emacs-ensure-installed-missed' for a set of missed packages that failed install"
@@ -50,6 +57,7 @@
 ;; Mark safe variables early so that tangling won't break
 (put 'after-save-hook 'safe-local-variable
      (lambda (value) (equal value '(org-babel-tangle t))))
+
 (put 'display-line-numbers-width 'safe-local-variable 'integerp)
 
 ;; Tangle and compile if necessary only, then load the configuration
