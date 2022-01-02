@@ -1495,7 +1495,10 @@ Enhanced minibuffer information when using =switch-to-buffer=, =find-file=,
 #+begin_verbatim emacs-lisp
 (lp-emacs-elpa-package marginalia
   (setq marginalia-max-relative-age 0)  ; time is absolute here!
-  (marginalia-mode 1))
+  (marginalia-mode 1)
+  (with-eval-after-load 'mct
+    (progn
+      (setq mct-apply-completion-stripes t)))
 #+end_verbatim
 ** orderless  -- orderless filtering and mapping of symbols        :external:
 
@@ -1511,9 +1514,9 @@ prefix the string with a "bang" =!=.
 
 #+begin_src emacs-lisp
 (lp-emacs-elpa-package orderless
-  (setq completion-styles '(orderless))
-  (setq  completion-category-defaults nil
-         completion-category-overrides '((file (styles . (partial-completion)))))
+  (setq completion-styles '(basic substring initials flex partial-completion orderless))
+  (setq completion-category-defaults nil
+        completion-category-overrides '((file (styles . (basic partial-completion initials substring)))))
   (setq orderless-matching-styles '(orderless-prefixes
                                     orderless-strict-leading-initialism
                                     orderless-regexp))
@@ -1560,10 +1563,10 @@ larger =completing-read= calls.
   (setq mct-remove-shadowed-file-names t) ; works when `file-name-shadow-mode' is enabled
   (setq mct-hide-completion-mode-line t)
   (setq mct-show-completion-line-numbers nil)
-  (setq mct-apply-completion-stripes t)
   (setq mct-minimum-input 4)
   (setq mct-live-update-delay 0.6)
   (setq mct-completions-format 'one-column)
+  (setq mct-live-completion 'visible)
 
   ;; NOTE: `mct-completion-blocklist' can be used for commands with lots
   ;; of candidates, depending also on how low `mct-minimum-input' is.
