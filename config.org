@@ -1219,21 +1219,33 @@ A time-tested classic mark-up language. Not much more to say; the customizations
   (setq markdown-command "multimarkdown"))
 #+end_src
 ** USLS :noexport:
-#+begin_verbatim emacs-lisp
-(lp-emacs-elpa-package usls
-:disabled
-:straight (:type git :host gitlab :repo "protesilaos/usls")
-:config
-(setq usls-directory (expand-file-name "~/org/usls/"))
+#+begin_src emacs-lisp
+(shell-command "cd ~/.emacs.d/elpa && git clone https://gitlab.com/protesilaos/usls.git")
+(add-to-list 'load-path "~/.emacs.d/elpa/usls")
+
+(require 'usls)
+(setq usls-directory (expand-file-name "~/org/roam/"))
 (setq usls-known-categories '())
 (setq usls-file-type-extension ".org")
 (setq usls-subdir-support nil)
 (setq usls-file-region-separator 'line)
 (setq usls-file-region-separator-heading-level 1)
 (setq usls-custom-header-function nil)
+(let ((mode-map global-map))
+  (define-key mode-map (kbd "C-c f d") 'usls-dired)
+  (define-key mode-map (kbd "C-c f f") 'usls-find-file)
+  (define-key mode-map (kbd "C-c f a") 'usls-append-region-buffer-or-file)
+  (define-key mode-map (kbd "C-c f n") 'usls-new-note))
+
 (let ((mode-map usls-mode-map))
-(define-key mode-map (kbd "C-c n i") 'usls-id-insert)
-(define-key mode-map (kbd "C-c n l") 'usls-follow-link)))
+  (define-key mode-map (kbd "C-c n i") 'usls-id-insert)
+  (define-key mode-map (kbd "C-c n l") 'usls-follow-link))
+#+end_src
+*** extensions...
+#+begin_src emacs-lisp
+(load-file "~/.emacs.d/lisp/lp-scratch.el")
+(setq journal-dir (file-truename "~/org/roam/daily/"))
+(define-key global-map (kbd "C-c f j") 'lp--visit-today-journal-file)
 #+end_src
 ** pdf-tools                                                       :external:
 #+begin_src emacs-lisp
@@ -1353,67 +1365,6 @@ completion options, minibuffer options, minibuffer history options, prompt faces
 (setq suggest-key-bindings t)
 #+end_src
 
-** mct        -- minimalist minibuffer completion visualization    :external:
-[2021-12-06] I gave it a serious try but MCT isn't gonna cut it. I'd like my
-completions to be done quicker.
-
-[2021-12-28 Tue] hoho just kidding im back at it :)
-
-=vertico= has this weird problem when using =<RET>= to complete: it still takes time to
-narrow down the larger list at completion time. With MCT, that penalty is up-front rather
-than at-completion-time, which I much prefer. Amortized, MCT actually ends up faster with
-larger =completing-read= calls.
-
-#+begin_src emacs-lisp
-(lp-emacs-elpa-package mct
-  (setq mct-remove-shadowed-file-names t) ; works when `file-name-shadow-mode' is enabled
-  (setq mct-hide-completion-mode-line t)
-  (setq mct-show-completion-line-numbers nil)
-  (setq mct-apply-completion-stripes t)
-  (setq mct-minimum-input 4)
-  (setq mct-live-update-delay 0.6)
-  (setq mct-completions-format 'one-column)
-
-  ;; NOTE: `mct-completion-blocklist' can be used for commands with lots
-  ;; of candidates, depending also on how low `mct-minimum-input' is.
-  ;; With the settings shown here this is not required, otherwise I would
-  ;; use something like this:
-  ;;
-  (setq mct-completion-blocklist
-        '( describe-symbol describe-function describe-variable
-           execute-extended-command insert-char))
-
-  ;; This is for commands that should always pop up the completions'
-  ;; buffer.  It circumvents the default method of waiting for some user
-  ;; input (see `mct-minimum-input') before displaying and updating the
-  ;; completions' buffer.
-  (setq mct-completion-passlist
-        '(imenu
-          Info-goto-node
-          Info-index
-          Info-menu
-          vc-retrieve-tag
-          Man-follow-manual-reference
-          Man-goto-section))
-
-  ;; You can place the Completions' buffer wherever you want, by following
-  ;; the syntax of `display-buffer'.  For example, try this:
-
-  ;; (setq mct-display-buffer-action
-  ;;       (quote ((display-buffer-reuse-window
-  ;;                display-buffer-in-side-window)
-  ;;               (side . left)
-  ;;               (slot . 99)
-  ;;               (window-width . 0.3))))
-
-  (mct-minibuffer-mode +1)
-  (mct-region-global-mode +1)
-  ;; (define-key vertico-map (kbd "M-RET") #'minibuffer-force-complete-and-exit)
-  ;; (define-key vertico-map (kbd "M-TAB") #'minibuffer-complete)
-
-  )
-#+end_src
-
 ** consult    -- enhanced minibuffer completion functions and utilities :external:
 consult is an important set of utilities that extend a number of important built-in
 functions (like =list-buffers=, =goto-line=), where comprehensive completions and
@@ -1498,7 +1449,8 @@ doesn't play well with lsp, but i haven't heard anything about =eglot=.
   (setq xref-show-definitions-function #'consult-xref)
   (define-key completion-list-mode-map (kbd "C-o") #'consult-preview-at-point)
 
-  (setq completion-in-region-function #'consult-completion-in-region))
+  ;; (setq completion-in-region-function #'consult-completion-in-region)
+  )
 
 (lp-emacs-elpa-package consult-dir
   (define-key global-map (kbd "C-x C-d") 'consult-dir)
@@ -1540,11 +1492,11 @@ shine, but for now I'm using it mostly for =embark-export= for batched editing o
 Enhanced minibuffer information when using =switch-to-buffer=, =find-file=,
 =describe-variable=, etc.
 
-#+begin_src emacs-lisp
+#+begin_verbatim emacs-lisp
 (lp-emacs-elpa-package marginalia
   (setq marginalia-max-relative-age 0)  ; time is absolute here!
   (marginalia-mode 1))
-#+end_src
+#+end_verbatim
 ** orderless  -- orderless filtering and mapping of symbols        :external:
 
 For matching symbols without regard for order, we use =orderless=.
@@ -1592,6 +1544,67 @@ prefix the string with a "bang" =!=.
   ;; SPC should never complete: use it for `orderless' groups.
   )
 #+end_src
+** mct        -- minimalist minibuffer completion visualization    :external:
+[2021-12-06] I gave it a serious try but MCT isn't gonna cut it. I'd like my
+completions to be done quicker.
+
+[2021-12-28 Tue] hoho just kidding im back at it :)
+
+=vertico= has this weird problem when using =<RET>= to complete: it still takes time to
+narrow down the larger list at completion time. With MCT, that penalty is up-front rather
+than at-completion-time, which I much prefer. Amortized, MCT actually ends up faster with
+larger =completing-read= calls.
+
+#+begin_src emacs-lisp
+(lp-emacs-elpa-package mct
+  (setq mct-remove-shadowed-file-names t) ; works when `file-name-shadow-mode' is enabled
+  (setq mct-hide-completion-mode-line t)
+  (setq mct-show-completion-line-numbers nil)
+  (setq mct-apply-completion-stripes t)
+  (setq mct-minimum-input 4)
+  (setq mct-live-update-delay 0.6)
+  (setq mct-completions-format 'one-column)
+
+  ;; NOTE: `mct-completion-blocklist' can be used for commands with lots
+  ;; of candidates, depending also on how low `mct-minimum-input' is.
+  ;; With the settings shown here this is not required, otherwise I would
+  ;; use something like this:
+  ;;
+  (setq mct-completion-blocklist
+        '( describe-symbol describe-function describe-variable
+           execute-extended-command insert-char))
+
+  ;; This is for commands that should always pop up the completions'
+  ;; buffer.  It circumvents the default method of waiting for some user
+  ;; input (see `mct-minimum-input') before displaying and updating the
+  ;; completions' buffer.
+  (setq mct-completion-passlist
+        '(imenu
+          Info-goto-node
+          Info-index
+          Info-menu
+          vc-retrieve-tag
+          Man-follow-manual-reference
+          Man-goto-section))
+
+  ;; You can place the Completions' buffer wherever you want, by following
+  ;; the syntax of `display-buffer'.  For example, try this:
+
+  ;; (setq mct-display-buffer-action
+  ;;       (quote ((display-buffer-reuse-window
+  ;;                display-buffer-in-side-window)
+  ;;               (side . left)
+  ;;               (slot . 99)
+  ;;               (window-width . 0.3))))
+
+  (mct-minibuffer-mode +1)
+  (mct-region-global-mode +1)
+  ;; (define-key vertico-map (kbd "M-RET") #'minibuffer-force-complete-and-exit)
+  ;; (define-key vertico-map (kbd "M-TAB") #'minibuffer-complete)
+
+  )
+#+end_src
+
 ** which-key                                                       :external:
 
 I use =which-key= to discover new useful commands hiding in a keymap prefix. That's pretty
@@ -1629,26 +1642,26 @@ or of a new package.
 ** external completion utilities (corfu, cape)                     :external:remove:
 #+begin_verbatim emacs-lisp
 (lp-emacs-elpa-package corfu
-  (setq corfu-cycle t)            ;; Enable cycling for `corfu-next/previous'
-  (setq corfu-auto t)             ;; Enable auto completion
-  (setq corfu-quit-at-boundary t) ;; Automatically quit at word boundary
-  (setq corfu-quit-no-match t)    ;; Automatically quit if there is no match
-  (setq corfu-auto-delay 0.7)
-  (setq corfu-echo-documentation t)
+(setq corfu-cycle t)            ;; Enable cycling for `corfu-next/previous'
+(setq corfu-auto t)             ;; Enable auto completion
+(setq corfu-quit-at-boundary t) ;; Automatically quit at word boundary
+(setq corfu-quit-no-match t)    ;; Automatically quit if there is no match
+(setq corfu-auto-delay 0.7)
+(setq corfu-echo-documentation t)
 
-  ;; Enable indentation+completion using the TAB key.
-  ;; `completion-at-point' is often bound to M-TAB.
-  ;; (setq tab-always-indent 'complete)
-  (corfu-global-mode))
+;; Enable indentation+completion using the TAB key.
+;; `completion-at-point' is often bound to M-TAB.
+;; (setq tab-always-indent 'complete)
+(corfu-global-mode))
 
 (lp-emacs-elpa-package cape
-  (add-to-list 'completion-at-point-functions #'cape-file)
-  (add-to-list 'completion-at-point-functions #'cape-dabbrev)
-  (add-to-list 'completion-at-point-functions #'cape-keyword)
-  (add-to-list 'completion-at-point-functions #'cape-abbrev)
-  (add-to-list 'completion-at-point-functions #'cape-ispell)
-  (add-to-list 'completion-at-point-functions #'cape-dict)
-  (add-to-list 'completion-at-point-functions #'cape-symbol))
+(add-to-list 'completion-at-point-functions #'cape-file)
+(add-to-list 'completion-at-point-functions #'cape-dabbrev)
+(add-to-list 'completion-at-point-functions #'cape-keyword)
+(add-to-list 'completion-at-point-functions #'cape-abbrev)
+(add-to-list 'completion-at-point-functions #'cape-ispell)
+(add-to-list 'completion-at-point-functions #'cape-dict)
+(add-to-list 'completion-at-point-functions #'cape-symbol))
 #+end_verbatim
 ** yasnippet                                                       :external:
 
