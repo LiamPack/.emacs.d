@@ -998,9 +998,12 @@ match =.*?=, i.e all characters are whitespace.
 
 ;;; autofill
   ;; Auto wrap paragraphs in some modes (auto-fill-mode)
-  (add-hook 'text-mode-hook 'turn-on-auto-fill)
-  (add-hook 'org-mode-hook 'turn-on-auto-fill)
+  (add-hook 'text-mode-hook #'turn-on-auto-fill)
+  (add-hook 'org-mode-hook #'turn-on-auto-fill)
   (define-key org-mode-map (kbd "C-c q") 'auto-fill-mode)
+
+;;; cdlatex is very useful for math-related editing
+  (add-hook 'org-mode-hook #'turn-on-org-cdlatex)
 
 ;;; making links to other contexts
   (define-key global-map (kbd "C-c l") 'org-store-link))
@@ -1198,17 +1201,43 @@ org-roam-server-network-label-wrap-length 20))
 #+end_src
 ** latex
 #+begin_src emacs-lisp
-(lp-emacs-builtin-package 'tex-mode
+(lp-emacs-builtin-package 'tex-mode)
+
+(lp-emacs-builtin-package 'reftex)
+(lp-emacs-elpa-package 'cdlatex
+  (add-hook 'latex-mode-hook 'turn-on-cdlatex))
+
+;; auctex requires special configuration..
+;;
+;; system needs:
+;; - tex installation
+;; - texinfo
+;; - ghostscript
+;; not yet convinced auctex is a necessary component of my workflow. it provides
+;; utilities that could easily be provided by snippets and cdlatex. Time will tell
+;;
+;; set dont-use-auctex-scope to NIL if you want to use auctex
+(if-let ((dont-use-auctex-scope t))
+    nil
+  (when (not (package-installed-p 'auctex))
+    (package-install 'auctex))
+  (setq reftex-plug-into-AUCTeX t)
   ;; revert pdf-view after compilation
   (add-hook 'TeX-after-compilation-finished-functions #'TeX-revert-document-buffer)
+  ;; for syncing output compilation to buffer
   (setq TeX-view-program-selection '((output-pdf "PDF Tools"))
         TeX-source-correlate-start-server t
         TeX-source-correlate-mode t
         TeX-source-correlate-method 'synctex)
 
-  (setq lp--latex-hooks '(auto-fill-mode TeX-source-correlate-mode flyspell-mode flyspell-buffer turn-on-reftex))
-  (dolist (hook lp--latex-hooks)
-    (add-hook 'LaTeX-mode-hook hook)))
+  (setq TeX-auto-save t)
+  (setq TeX-parse-self t)
+  (setq-default TeX-master nil)
+
+  ;; most crucial: turn-on-reftex
+  (setq lp--latex-hooks-fns '(auto-fill-mode TeX-source-correlate-mode flyspell-mode flyspell-buffer turn-on-reftex))
+  (dolist (fn lp--latex-hooks-fns)
+    (add-hook 'LaTeX-mode-hook fn)))
 #+end_src
 ** markdown                                                        :external:
 
