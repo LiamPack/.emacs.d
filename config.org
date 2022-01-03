@@ -5,11 +5,25 @@ environment. This could serve as an entry-point for someone (bless their heart) 
 see what this configuration has to offer, but primarily this is (somewhat
 counter intuitively) for selfish reasons.
 
-Outstanding things to do:
-- [ ] Evaluate Tree-Sitter instead of font-lock for syntax highlighting
-- [ ] update org-roam to v2
+There's an emphasis on simple utilities and packages. This logically leads to relying on
+many of the wonderful, but perhaps not-as-well-understood, built-in packages (winner, tab bar,
+bibtex, dabbrev+abbrev, xref, ...), and some external-but-necessary packages
+({mct,embark,consult}, yasnippet, ...). Simple packages allow composability: "dedication to
+its craft" means that packages won't be stepping on each-others toes which reduces the
+cognitive overhead of evaluating, say, which search+jump function to use.
 
-* sane defaults and default emacs capabilities
+More complex packages are no doubt useful and have their place (Helm, Ivy). But in the past
+I relied too much on these big strong tools without the underlying systems and methodology
+in place to effectively use them, rendering my productivity much lower than it could have
+been. The first brain needs to work well before the second brain can be effective. Also I
+incessantly yak-shaving since I had no laws about which packages to install, so keeping a
+simple-,-preferred-built-in approach forces me to think twice about whether I really need
+the new shiny docker buffer editing package (YAGNI after all).
+
+Inspiration is, as always, taken from those more experienced and more wise than
+myself. Credits to configurations I took inspiration from are linked at the end.
+
+* sane defaults and general emacs capabilities
 ** initial setup, keybinds, etc.
 Not all of the emacs defaults are quite sane. So here's to some sanity.
 
@@ -309,8 +323,7 @@ Not all of the emacs defaults are quite sane. So here's to some sanity.
 #+begin_src emacs-lisp
 (lp-emacs-builtin-package 'man
   (define-key Man-mode-map (kbd "i") #'Man-goto-section)
-  (define-key Man-mode-map (kbd "g") #'Man-update-manpage)
-  )
+  (define-key Man-mode-map (kbd "g") #'Man-update-manpage))
 #+end_src
 ** relating to saving the state of emacs
 *** emacs server
@@ -397,31 +410,6 @@ function."
               apply-macro-to-region-lines))
   (advice-add fn :around #'block-undo))
 #+end_src
-** project management
-Instead of using =projectile=, there's now a wonderful built-in library, =project=, which
-has lots of overlap with =projectile=. Might as well remove a dependency.
-#+begin_src emacs-lisp
-(lp-emacs-builtin-package 'project)
-#+end_src
-** General Prog Mode
-#+begin_src emacs-lisp
-(lp-emacs-builtin-package 'prog-mode
-  ;; Mark TODOs , FIXME, BUG as red in src code
-  (add-hook 'prog-mode-hook
-            (lambda ()
-              (font-lock-add-keywords
-               nil
-               '(("\\<\\(FIXME\\|TODO\\|BUG\\)" 1 font-lock-warning-face prepend))))))
-
-(lp-emacs-builtin-package 'compile
-  (setq compilation-ask-about-save nil)
-  (setq compilation-scroll-output 'next-error)
-  (setq compilation-skip-threshold 2)
-  (setq compilation-scroll-output 'first-error)
-  (setq compilation-always-kill t)
-  (setq compilation-auto-jump-to-first-error t)
-  )
-#+end_src
 * aesthetics
 ** some themes i've liked
 General aesthetic configurations for emacs
@@ -465,7 +453,7 @@ General aesthetic configurations for emacs
    * That one black theme i'm using right now (6/15/19)
 #+end_verse
 
-** modus themes                                                    :external:
+** modus themes
 =modus-themes= is simply the GOAT at this point. Not much more to say than that.
 
 #+begin_src emacs-lisp
@@ -554,27 +542,6 @@ General aesthetic configurations for emacs
 #+end_src
 
 * movement and editing
-** cursor positioning and duplicating                              :external:
-=iedit= provides simple mark-and-multiedit capabilities. I haven't RTFM'd on
-rectangle mode to see if it provides that capability, so to the externals we go.
-
-=avy= provides useful text-query-and-jumping utilities that I've grown to like (and is the
-only dependency on =ivy= now).
-
-=expand-region= can be useful when I don't know the keybinding to mark a type of text
-object. That's really it.
-
-#+begin_src emacs-lisp
-;; (lp-emacs-elpa-package 'iedit) ;; default bind is C-;
-
-;; (lp-emacs-elpa-package 'avy
-;;   (avy-setup-default)
-;;   (define-key global-map (kbd "C-'") 'avy-goto-char-timer)
-;;   (define-key global-map (kbd "C-\"") 'avy-resume))
-
-(lp-emacs-elpa-package 'expand-region
-  (define-key global-map (kbd "C-=") 'er/expand-region))
-#+end_src
 ** isearch and replace
 =isearch= isn't gonna go out of style anytime soon that's for sure. And especially not if
 you know some of the configuration options. Below is configured for isearch to "fuzzy
@@ -620,6 +587,380 @@ match =.*?=, i.e all characters are whitespace.
 
 #+end_src
 
+** expand region
+
+#+begin_src emacs-lisp
+;; (lp-emacs-elpa-package 'iedit) ;; default bind is C-;
+
+;; (lp-emacs-elpa-package 'avy
+;;   (avy-setup-default)
+;;   (define-key global-map (kbd "C-'") 'avy-goto-char-timer)
+;;   (define-key global-map (kbd "C-\"") 'avy-resume))
+
+(lp-emacs-elpa-package 'expand-region
+  (define-key global-map (kbd "C-=") 'er/expand-region))
+#+end_src
+* minibuffer, completion, and symbol definitions
+** general minibuffer completion configuration
+completion options, minibuffer options, minibuffer history options, prompt faces, ...
+#+begin_src emacs-lisp
+(lp-emacs-builtin-package 'minibuffer
+
+  (setq completion-show-inline-help t)
+  (setq completions-detailed t)
+  (setq completion-ignore-case t)
+
+  (setq completion-cycle-threshold 3) ;; always allow tab cycle
+  ;; emacs28 completion stuff
+  (setq completions-group t)
+  (setq completions-group-sort nil)
+
+
+  (setq enable-recursive-minibuffers t)
+  (setq minibuffer-eldef-shorten-default t) ;; default completion in [bracks]
+
+  (setq read-buffer-completion-ignore-case t)
+  (setq read-file-name-completion-ignore-case t)
+
+  (setq resize-mini-windows t)
+
+  (file-name-shadow-mode 1)
+  (minibuffer-depth-indicate-mode 1)
+  (minibuffer-electric-default-mode 1) ;; update default completion if change
+
+  ;; Add prompt indicator to `completing-read-multiple'.
+  ;; Alternatively try `consult-completing-read-multiple'.
+  (defun crm-indicator (args)
+    (cons (concat "[CRM] " (car args)) (cdr args)))
+  (advice-add #'completing-read-multiple :filter-args #'crm-indicator)
+
+  ;; Do not allow the cursor in the minibuffer prompt
+  (setq minibuffer-prompt-properties
+        '(read-only t cursor-intangible t face minibuffer-prompt))
+  (setq suggest-key-bindings t))
+
+     ;;; Minibuffer history
+(lp-emacs-builtin-package 'savehist
+  (setq savehist-file (locate-user-emacs-file "savehist"))
+  (setq history-length 10000)
+  (setq history-delete-duplicates t)
+  (setq savehist-save-minibuffer-history t)
+  (add-hook 'after-init-hook #'savehist-mode))
+#+end_src
+
+** consult    -- enhanced minibuffer completion functions and utilities
+consult is an important set of utilities that extend a number of important built-in
+functions (like =list-buffers=, =goto-line=), where comprehensive completions and
+additional utilities are provided within-command.
+
+I set up a number of consult maps for quick access to important commands. Notable maps are
+the =consult-goto-map= containing any "jumping" commands such as =imenu=, =outline=, and
+so forth, and the =consult-search-map= containing any "searching" commands such as
+=ripgrep=, =isearch=, and so forth.
+
+Importantly: =consult= is can be used for word completion in terminal mode when a visual
+posframe-based or frame-based completion utility, e.g. =corfu= can't be displayed. It
+doesn't play well with lsp, but i haven't heard anything about =eglot=.
+
+#+begin_src emacs-lisp
+(lp-emacs-elpa-package 'consult
+  (setq consult-goto-map
+        (let ((map (make-sparse-keymap)))
+          (define-key map (kbd "e") 'consult-compile-error)
+          (define-key map (kbd "l") 'consult-flymake)
+          (define-key map (kbd "f") 'consult-flymake)               ;; Alternative: consult-flycheck
+          (define-key map (kbd "o") 'consult-outline)               ;; Alternative: consult-org-heading
+          (define-key map (kbd "m") 'consult-mark)
+          (define-key map (kbd "k") 'consult-global-mark)
+          (define-key map (kbd "i") 'consult-imenu)
+          (define-key map (kbd "I") 'consult-imenu-multi)
+          (define-key map (kbd "b") #'consult-bibtex)               ;; Needs to be done here else we need to re-create and bind the keymap. w/e.
+          map))
+
+  (let ((map global-map))
+    ;; Custom M-# bindings for fast register access
+    (define-key map (kbd "C-x r l") 'consult-register-load)
+    (define-key map (kbd "C-x r s") 'consult-register-store)          ;; orig. abbrev-prefix-mark (unrelated)
+    (define-key map (kbd "C-x r r") 'consult-register)
+    (define-key map (kbd "C-x r b") 'consult-bookmark))
+
+  (setq consult-mode-mode-map
+        (let ((map (make-sparse-keymap)))
+          (define-key map (kbd "h") 'consult-history)
+          (define-key map (kbd "m") 'consult-mode-command)
+          (define-key map (kbd "k") 'consult-kmacro)
+          map))
+
+  (setq consult-search-map
+        (let ((map (make-sparse-keymap)))
+          (define-key map (kbd "f") 'consult-find)
+          (define-key map (kbd "F") 'consult-locate)
+          (define-key map (kbd "g") 'consult-grep)
+          (define-key map (kbd "G") 'consult-git-grep)
+          (define-key map (kbd "r") 'consult-ripgrep)
+          (define-key map (kbd "l") 'consult-line)
+          (define-key map (kbd "L") 'consult-line-multi)
+          (define-key map (kbd "m") 'consult-multi-occur)
+          (define-key map (kbd "k") 'consult-keep-lines)
+          (define-key map (kbd "u") 'consult-focus-lines)
+          (define-key map (kbd "j") 'consult-recent-file)
+          (define-key map (kbd "s") 'consult-isearch)
+          map))
+  (define-key global-map (kbd "M-s") consult-search-map)
+  (define-key global-map (kbd "M-j") consult-goto-map)
+  (define-key global-map (kbd "M-M") consult-mode-mode-map)
+  (define-key global-map (kbd "C-c y l") 'consult-flymake)
+  (define-key global-map (kbd "M-g M-g") 'consult-goto-line)             ;; orig. goto-line
+
+  (define-key global-map (kbd "C-x b") 'consult-buffer)
+  (define-key global-map (kbd "C-M-y") 'consult-yank-pop)
+  (define-key global-map (kbd "C-:") 'consult-complex-command)
+  (define-key global-map [remap apropos-command] 'consult-apropos)
+
+  (setq consult-preview-key (kbd "C-o") ) ;; disable live preview
+  ;; (setq consult-project-root-function #'project-roots)
+  (setq consult-async-min-input 3)
+  (setq consult-async-input-debounce 0.5)
+  (setq consult-async-input-throttle 0.8)
+  (setq consult-narrow-key "<")
+  :config
+  (setf (alist-get 'slime-repl-mode consult-mode-histories)
+        'slime-repl-input-history)
+  (setq xref-show-xrefs-function #'consult-xref)
+  (setq xref-show-definitions-function #'consult-xref)
+  (define-key completion-list-mode-map (kbd "C-o") #'consult-preview-at-point)
+
+  ;; (setq completion-in-region-function #'consult-completion-in-region)
+  )
+
+(lp-emacs-elpa-package 'consult-dir
+  (define-key global-map (kbd "C-x C-d") 'consult-dir)
+  (define-key minibuffer-local-completion-map (kbd "C-x C-d") 'consult-dir)
+  (define-key minibuffer-local-completion-map (kbd "C-x C-j") 'consult-dir-jump-file))
+
+;; TODO this might break
+(when (not (directory-name-p "~/.emacs.d/consult-bibtex"))
+  (shell-command "cd ~/.emacs.d/elpa && git clone https://github.com/mohkale/consult-bibtex.git"))
+(add-to-list 'load-path "~/.emacs.d/elpa/consult-bibtex/" t)
+
+(lp-emacs-builtin-package 'consult-bibtex
+  (with-eval-after-load 'embark
+    (add-to-list 'embark-keymap-alist '(bibtex-completion . consult-bibtex-embark-map)))
+  (setq consult-bibtex-default-action #'consult-bibtex-edit-notes))
+#+end_src
+** embark     -- Mini-buffer actions rooted in Keymaps (contextual actions)
+
+An absolute beast of a package in its design and possible use-cases. Whether you're
+unmarked, in minibuffer, in an =info-mode= buffer, Embark will gather useful actions for
+you to execute.
+
+Over time I hope to have a better intuition for the situations in which this package can
+shine, but for now I'm using it mostly for =embark-export= for batched editing operations.
+
+#+begin_src emacs-lisp
+(lp-emacs-elpa-package 'embark
+  (define-key global-map (kbd "C->") 'embark-become)
+  (define-key global-map (kbd "M-a") 'embark-act)
+  (define-key completion-list-mode-map (kbd "M-a")
+    #'(lambda () (interactive) () (mct-focus-mini-or-completions) (embark-act))))
+
+(lp-emacs-elpa-package 'embark-consult
+  (define-key embark-collect-mode-map (kbd "o") 'consult-preview-at-point)
+  ;; :hook (embark-collect-mode . embark-consult-preview-minor-mode)
+  )
+#+end_src
+
+** marginalia -- enhanced minibuffer detail display
+
+Enhanced minibuffer information when using =switch-to-buffer=, =find-file=,
+=describe-variable=, etc.
+
+#+begin_verbatim emacs-lisp
+(lp-emacs-elpa-package 'marginalia
+(setq marginalia-max-relative-age 0)  ; time is absolute here!
+(marginalia-mode 1)
+(with-eval-after-load 'mct
+(progn
+(setq mct-apply-completion-stripes t)))
+#+end_verbatim
+** orderless  -- orderless filtering and mapping of symbols
+
+For matching symbols without regard for order, we use =orderless=.
+
+Can be not very performant depending on the matching styles (=orderless-flex= being the
+worst offender). A big configuration dream is for =orderless= to work as seamlessly as the
+usual completion utilities.
+
+When =orderless-flex= is enabled, a postfixed =,= can be used to match a literal
+string, defined by the function =literal-if-comma=. To match everything but a string,
+prefix the string with a "bang" =!=.
+
+#+begin_src emacs-lisp
+(lp-emacs-elpa-package 'orderless
+  (setq completion-styles '(basic substring initials flex partial-completion orderless))
+  (setq completion-category-defaults nil
+        completion-category-overrides '((file (styles . (basic partial-completion initials substring)))))
+  (setq orderless-matching-styles '(orderless-prefixes
+                                    orderless-strict-leading-initialism
+                                    orderless-regexp))
+
+  (defun literal-if-comma (pattern _index _total)
+    (when (string-suffix-p "," pattern)
+      `(orderless-literal . ,(substring pattern 0 -1))))
+
+  (defun flex-if-tilde (pattern _index _total)
+    (when (string-suffix-p "~" pattern)
+      `(orderless-flex . ,(substring pattern 0 -1))))
+
+  (defun initialism-if-eql (pattern _index _total)
+    (when (string-suffix-p "=" pattern)
+      `(orderless-strict-leading-initialism . ,(substring pattern 0 -1))))
+
+  (defun without-if-bang (pattern _index _total)
+    (cond
+     ((equal "!" pattern)
+      '(orderless-literal . ""))
+     ((string-prefix-p "!" pattern)
+      `(orderless-without-literal . ,(substring pattern 1)))))
+
+  (setq orderless-style-dispatchers '(literal-if-comma without-if-bang flex-if-tilde initialism-if-eql))
+
+  (define-key minibuffer-local-completion-map (kbd "SPC") nil)
+  (define-key minibuffer-local-completion-map (kbd "?") nil)
+  ;; SPC should never complete: use it for `orderless' groups.
+  )
+#+end_src
+** mct        -- minimalist minibuffer completion visualization
+[2021-12-06] I gave it a serious try but MCT isn't gonna cut it. I'd like my
+completions to be done quicker.
+
+[2021-12-28 Tue] hoho just kidding im back at it :)
+
+=vertico= has this weird problem when using =<RET>= to complete: it still takes time to
+narrow down the larger list at completion time. With MCT, that penalty is up-front rather
+than at-completion-time, which I much prefer. Amortized, MCT actually ends up faster with
+larger =completing-read= calls.
+
+=mct= now has a =completion-in-region= substitute to rival =corfu= with only built-in
+capabilities of the =*Completions*= buffer. Very exciting, this is my go-to now. Especially
+since =completion-at-point= with =mct= allows orderless style dispatching (e.g. =fffa==
+completes to =face-font-family-alternatives= with my === style dispatch to "strict leading
+initialism"
+
+#+begin_src emacs-lisp
+(lp-emacs-elpa-package 'mct
+  (setq mct-remove-shadowed-file-names t) ; works when `file-name-shadow-mode' is enabled
+  (setq mct-hide-completion-mode-line t)
+  (setq mct-show-completion-line-numbers nil)
+  (setq mct-minimum-input 4)
+  (setq mct-live-update-delay 0.6)
+  (setq mct-completions-format 'one-column)
+  (setq mct-live-completion 'visible)
+
+  ;; NOTE: `mct-completion-blocklist' can be used for commands with lots
+  ;; of candidates, depending also on how low `mct-minimum-input' is.
+  ;; With the settings shown here this is not required, otherwise I would
+  ;; use something like this:
+  ;;
+  (setq mct-completion-blocklist
+        '( describe-symbol describe-function describe-variable
+           execute-extended-command insert-char))
+
+  ;; This is for commands that should always pop up the completions'
+  ;; buffer.  It circumvents the default method of waiting for some user
+  ;; input (see `mct-minimum-input') before displaying and updating the
+  ;; completions' buffer.
+  (setq mct-completion-passlist
+        '(imenu
+          Info-goto-node
+          Info-index
+          Info-menu
+          vc-retrieve-tag
+          Man-follow-manual-reference
+          Man-goto-section))
+
+  ;; You can place the Completions' buffer wherever you want, by following
+  ;; the syntax of `display-buffer'.  For example, try this:
+
+  ;; (setq mct-display-buffer-action
+  ;;       (quote ((display-buffer-reuse-window
+  ;;                display-buffer-in-side-window)
+  ;;               (side . left)
+  ;;               (slot . 99)
+  ;;               (window-width . 0.3))))
+
+  (mct-minibuffer-mode +1)
+  (mct-region-global-mode +1)
+  ;; (define-key vertico-map (kbd "M-RET") #'minibuffer-force-complete-and-exit)
+  ;; (define-key vertico-map (kbd "M-TAB") #'minibuffer-complete)
+
+  )
+#+end_src
+
+** which-key
+
+I use =which-key= to discover new useful commands hiding in a keymap prefix. That's pretty
+much it, but its proven itself tremendously helpful for exploring features of the built-in
+or of a new package.
+
+#+begin_src emacs-lisp
+(lp-emacs-elpa-package 'which-key
+  ;;:diminish which-key-mode
+  (which-key-mode 1))
+#+end_src
+** built-in completion utilities (abbrev, dabbrev)
+
+#+begin_src emacs-lisp
+(lp-emacs-builtin-package 'abbrev
+  (setq abbrev-suggest t)
+  (setq save-abbrevs 'silently)
+  (setq abbrev-file-name (locate-user-emacs-file "abbrevs"))
+  (setq only-global-abbrevs nil))
+
+(lp-emacs-builtin-package 'dabbrev
+  (define-key global-map (kbd "M-/") 'dabbrev-completion)
+  (define-key global-map (kbd "C-M-/") 'dabbrev-expand)
+  (setq dabbrev-abbrev-char-regexp "\\sw\\|\\s_") ;; same as nil technically
+  (setq dabbrev-abbrev-skip-leading-regexp "[$*/=~']")
+  (setq dabbrev-backward-only nil)
+  (setq dabbrev-case-distinction 'case-replace)
+  (setq dabbrev-case-fold-search nil)
+  (setq dabbrev-case-replace 'case-replace)
+  (setq dabbrev-check-other-buffers t)
+  (setq dabbrev-eliminate-newlines t)
+  (setq dabbrev-upcase-means-case-search t))
+
+#+end_src
+** yasnippet
+
+nice snippets. they'll never go out of fashion. for when cursor placement and more
+advanced expansions than =abbrev= are needed.
+
+#+begin_src emacs-lisp
+;; configuration
+(lp-emacs-elpa-package 'yasnippet
+  ;;:diminish yas-minor-mode
+  (yas-global-mode 1)
+  (setq yas-fallback-behavior 'return-nil)
+  (setq yas-triggers-in-field t)
+  (setq yas-verbosity 0))
+
+(lp-emacs-elpa-package 'yasnippet-snippets)
+#+end_src
+
+** xref
+
+Its debatable whether xref should be in this section. May re-evaluate in future.
+
+#+BEGIN_SRC emacs-lisp
+(lp-emacs-builtin-package 'xref
+  ;; All those have been changed for Emacs 28
+  (setq xref-show-definitions-function #'xref-show-definitions-completing-read) ; for M-.
+  (setq xref-show-xrefs-function #'xref-show-definitions-buffer) ; for grep and the like
+  (setq xref-file-name-display 'project-relative)
+  (setq xref-search-program 'ripgrep)
+  )
+#+END_SRC
 * reading, writing, and task keeping
 ** org
 #+begin_src emacs-lisp
@@ -1011,7 +1352,7 @@ match =.*?=, i.e all characters are whitespace.
 
 #+END_SRC
 
-*** roam                                                           :external:remove:noexport:
+*** roam                                                           :remove:noexport:
 #+BEGIN_VERBATIM
 (use-package org-roam
 :straight (:type git :host github
@@ -1173,8 +1514,47 @@ org-roam-server-network-label-wrap-length 20))
   (define-key map (kbd "C-c d m") #'diary-mail-entries))
 #+end_src
 
-** latex and references/bibs
-** org-ref                                                         :external:
+** latex
+#+begin_src emacs-lisp
+(lp-emacs-builtin-package 'tex-mode)
+
+(lp-emacs-builtin-package 'reftex)
+(lp-emacs-elpa-package 'cdlatex
+  (add-hook 'latex-mode-hook 'turn-on-cdlatex))
+
+;; auctex requires special configuration..
+;;
+;; system needs:
+;; - tex installation
+;; - texinfo
+;; - ghostscript
+;; not yet convinced auctex is a necessary component of my workflow. it provides
+;; utilities that could easily be provided by snippets and cdlatex. Time will tell
+;;
+;; set dont-use-auctex-scope to NIL if you want to use auctex
+(if-let ((dont-use-auctex-scope t))
+    nil
+  (when (not (package-installed-p 'auctex))
+    (package-install 'auctex))
+  (setq reftex-plug-into-AUCTeX t)
+  ;; revert pdf-view after compilation
+  (add-hook 'TeX-after-compilation-finished-functions #'TeX-revert-document-buffer)
+  ;; for syncing output compilation to buffer
+  (setq TeX-view-program-selection '((output-pdf "PDF Tools"))
+        TeX-source-correlate-start-server t
+        TeX-source-correlate-mode t
+        TeX-source-correlate-method 'synctex)
+
+  (setq TeX-auto-save t)
+  (setq TeX-parse-self t)
+  (setq-default TeX-master nil)
+
+  ;; most crucial: turn-on-reftex
+  (setq lp--latex-hooks-fns '(auto-fill-mode TeX-source-correlate-mode flyspell-mode flyspell-buffer turn-on-reftex))
+  (dolist (fn lp--latex-hooks-fns)
+    (add-hook 'LaTeX-mode-hook fn)))
+#+end_src
+** org-ref
 #+begin_src emacs-lisp
 (lp-emacs-elpa-package 'async)
 
@@ -1218,47 +1598,7 @@ org-roam-server-network-label-wrap-length 20))
   ;; (define-key org-mode-map (kbd "s-[") 'org-ref-insert-link-hydra/body)
   (define-key org-mode-map (kbd "C-c ]") 'org-ref-insert-link))
 #+end_src
-** latex
-#+begin_src emacs-lisp
-(lp-emacs-builtin-package 'tex-mode)
-
-(lp-emacs-builtin-package 'reftex)
-(lp-emacs-elpa-package 'cdlatex
-  (add-hook 'latex-mode-hook 'turn-on-cdlatex))
-
-;; auctex requires special configuration..
-;;
-;; system needs:
-;; - tex installation
-;; - texinfo
-;; - ghostscript
-;; not yet convinced auctex is a necessary component of my workflow. it provides
-;; utilities that could easily be provided by snippets and cdlatex. Time will tell
-;;
-;; set dont-use-auctex-scope to NIL if you want to use auctex
-(if-let ((dont-use-auctex-scope t))
-    nil
-  (when (not (package-installed-p 'auctex))
-    (package-install 'auctex))
-  (setq reftex-plug-into-AUCTeX t)
-  ;; revert pdf-view after compilation
-  (add-hook 'TeX-after-compilation-finished-functions #'TeX-revert-document-buffer)
-  ;; for syncing output compilation to buffer
-  (setq TeX-view-program-selection '((output-pdf "PDF Tools"))
-        TeX-source-correlate-start-server t
-        TeX-source-correlate-mode t
-        TeX-source-correlate-method 'synctex)
-
-  (setq TeX-auto-save t)
-  (setq TeX-parse-self t)
-  (setq-default TeX-master nil)
-
-  ;; most crucial: turn-on-reftex
-  (setq lp--latex-hooks-fns '(auto-fill-mode TeX-source-correlate-mode flyspell-mode flyspell-buffer turn-on-reftex))
-  (dolist (fn lp--latex-hooks-fns)
-    (add-hook 'LaTeX-mode-hook fn)))
-#+end_src
-** markdown                                                        :external:
+** markdown
 
 A time-tested classic mark-up language. Not much more to say; the customizations are minimal.
 
@@ -1270,7 +1610,7 @@ A time-tested classic mark-up language. Not much more to say; the customizations
   ;;        ("\\.markdown\\'" . markdown-mode))
   (setq markdown-command "multimarkdown"))
 #+end_src
-** USLS :noexport:
+** USLS
 #+begin_src emacs-lisp
 (when (not (directory-name-p "~/.emacs.d/usls"))
   (shell-command "cd ~/.emacs.d/elpa && git clone https://gitlab.com/protesilaos/usls.git"))
@@ -1302,7 +1642,7 @@ A time-tested classic mark-up language. Not much more to say; the customizations
 (define-key global-map (kbd "C-c f j n") 'lp-journal-visit-forward-one-day)
 (define-key global-map (kbd "C-c f j p") 'lp-journal-visit-backward-one-day)
 #+end_src
-** pdf-tools                                                       :external:
+** pdf-tools
 #+begin_src emacs-lisp
 (lp-emacs-elpa-package 'pdf-tools
   (setq pdf-tools-enabled-modes
@@ -1375,392 +1715,27 @@ actions specified in the manual.
   )
 #+end_src
 
-* minibuffer, completion, and symbol definitions
-** general minibuffer completion configuration
-completion options, minibuffer options, minibuffer history options, prompt faces, ...
-#+begin_src emacs-lisp
-(setq completion-show-inline-help t)
-(setq completions-detailed t)
-(setq completion-ignore-case t)
-
-(setq completion-cycle-threshold 3) ;; always allow tab cycle
-;; emacs28 completion stuff
-(setq completions-group t)
-(setq completions-group-sort nil)
-
-
-(setq enable-recursive-minibuffers t)
-(setq minibuffer-eldef-shorten-default t) ;; default completion in [bracks]
-
-(setq read-buffer-completion-ignore-case t)
-(setq read-file-name-completion-ignore-case t)
-
-(setq resize-mini-windows t)
-
-(file-name-shadow-mode 1)
-(minibuffer-depth-indicate-mode 1)
-(minibuffer-electric-default-mode 1) ;; update default completion if change
-
-     ;;; Minibuffer history
-(lp-emacs-builtin-package 'savehist
-  (setq savehist-file (locate-user-emacs-file "savehist"))
-  (setq history-length 10000)
-  (setq history-delete-duplicates t)
-  (setq savehist-save-minibuffer-history t)
-  (add-hook 'after-init-hook #'savehist-mode))
-
-;; Add prompt indicator to `completing-read-multiple'.
-;; Alternatively try `consult-completing-read-multiple'.
-(defun crm-indicator (args)
-  (cons (concat "[CRM] " (car args)) (cdr args)))
-(advice-add #'completing-read-multiple :filter-args #'crm-indicator)
-
-;; Do not allow the cursor in the minibuffer prompt
-(setq minibuffer-prompt-properties
-      '(read-only t cursor-intangible t face minibuffer-prompt))
-(setq suggest-key-bindings t)
-#+end_src
-
-** consult    -- enhanced minibuffer completion functions and utilities :external:
-consult is an important set of utilities that extend a number of important built-in
-functions (like =list-buffers=, =goto-line=), where comprehensive completions and
-additional utilities are provided within-command.
-
-I set up a number of consult maps for quick access to important commands. Notable maps are
-the =consult-goto-map= containing any "jumping" commands such as =imenu=, =outline=, and
-so forth, and the =consult-search-map= containing any "searching" commands such as
-=ripgrep=, =isearch=, and so forth.
-
-Importantly: =consult= is can be used for word completion in terminal mode when a visual
-posframe-based or frame-based completion utility, e.g. =corfu= can't be displayed. It
-doesn't play well with lsp, but i haven't heard anything about =eglot=.
-
-#+begin_src emacs-lisp
-(lp-emacs-elpa-package 'consult
-  (setq consult-goto-map
-        (let ((map (make-sparse-keymap)))
-          (define-key map (kbd "e") 'consult-compile-error)
-          (define-key map (kbd "l") 'consult-flymake)
-          (define-key map (kbd "f") 'consult-flymake)               ;; Alternative: consult-flycheck
-          (define-key map (kbd "o") 'consult-outline)               ;; Alternative: consult-org-heading
-          (define-key map (kbd "m") 'consult-mark)
-          (define-key map (kbd "k") 'consult-global-mark)
-          (define-key map (kbd "i") 'consult-imenu)
-          (define-key map (kbd "I") 'consult-imenu-multi)
-          (define-key map (kbd "b") #'consult-bibtex)               ;; Needs to be done here else we need to re-create and bind the keymap. w/e.
-          map))
-
-  (let ((map global-map))
-    ;; Custom M-# bindings for fast register access
-    (define-key map (kbd "C-x r l") 'consult-register-load)
-    (define-key map (kbd "C-x r s") 'consult-register-store)          ;; orig. abbrev-prefix-mark (unrelated)
-    (define-key map (kbd "C-x r r") 'consult-register)
-    (define-key map (kbd "C-x r b") 'consult-bookmark))
-
-  (setq consult-mode-mode-map
-        (let ((map (make-sparse-keymap)))
-          (define-key map (kbd "h") 'consult-history)
-          (define-key map (kbd "m") 'consult-mode-command)
-          (define-key map (kbd "k") 'consult-kmacro)
-          map))
-
-  (setq consult-search-map
-        (let ((map (make-sparse-keymap)))
-          (define-key map (kbd "f") 'consult-find)
-          (define-key map (kbd "F") 'consult-locate)
-          (define-key map (kbd "g") 'consult-grep)
-          (define-key map (kbd "G") 'consult-git-grep)
-          (define-key map (kbd "r") 'consult-ripgrep)
-          (define-key map (kbd "l") 'consult-line)
-          (define-key map (kbd "L") 'consult-line-multi)
-          (define-key map (kbd "m") 'consult-multi-occur)
-          (define-key map (kbd "k") 'consult-keep-lines)
-          (define-key map (kbd "u") 'consult-focus-lines)
-          (define-key map (kbd "j") 'consult-recent-file)
-          (define-key map (kbd "s") 'consult-isearch)
-          map))
-  (define-key global-map (kbd "M-s") consult-search-map)
-  (define-key global-map (kbd "M-j") consult-goto-map)
-  (define-key global-map (kbd "M-M") consult-mode-mode-map)
-  (define-key global-map (kbd "C-c y l") 'consult-flymake)
-  (define-key global-map (kbd "M-g M-g") 'consult-goto-line)             ;; orig. goto-line
-
-  (define-key global-map (kbd "C-x b") 'consult-buffer)
-  (define-key global-map (kbd "C-M-y") 'consult-yank-pop)
-  (define-key global-map (kbd "C-:") 'consult-complex-command)
-  (define-key global-map [remap apropos-command] 'consult-apropos)
-
-  (setq consult-preview-key (kbd "C-o") ) ;; disable live preview
-  ;; (setq consult-project-root-function #'project-roots)
-  (setq consult-async-min-input 3)
-  (setq consult-async-input-debounce 0.5)
-  (setq consult-async-input-throttle 0.8)
-  (setq consult-narrow-key "<")
-  :config
-  (setf (alist-get 'slime-repl-mode consult-mode-histories)
-        'slime-repl-input-history)
-  (setq xref-show-xrefs-function #'consult-xref)
-  (setq xref-show-definitions-function #'consult-xref)
-  (define-key completion-list-mode-map (kbd "C-o") #'consult-preview-at-point)
-
-  ;; (setq completion-in-region-function #'consult-completion-in-region)
-  )
-
-(lp-emacs-elpa-package 'consult-dir
-  (define-key global-map (kbd "C-x C-d") 'consult-dir)
-  (define-key minibuffer-local-completion-map (kbd "C-x C-d") 'consult-dir)
-  (define-key minibuffer-local-completion-map (kbd "C-x C-j") 'consult-dir-jump-file))
-
-;; TODO this might break
-(when (not (directory-name-p "~/.emacs.d/consult-bibtex"))
-  (shell-command "cd ~/.emacs.d/elpa && git clone https://github.com/mohkale/consult-bibtex.git"))
-(add-to-list 'load-path "~/.emacs.d/elpa/consult-bibtex/" t)
-
-(lp-emacs-builtin-package 'consult-bibtex
-  (with-eval-after-load 'embark
-    (add-to-list 'embark-keymap-alist '(bibtex-completion . consult-bibtex-embark-map)))
-  (setq consult-bibtex-default-action #'consult-bibtex-edit-notes))
-#+end_src
-** embark     -- Mini-buffer actions rooted in Keymaps (contextual actions) :external:
-
-An absolute beast of a package in its design and possible use-cases. Whether you're
-unmarked, in minibuffer, in an =info-mode= buffer, Embark will gather useful actions for
-you to execute.
-
-Over time I hope to have a better intuition for the situations in which this package can
-shine, but for now I'm using it mostly for =embark-export= for batched editing operations.
-
-#+begin_src emacs-lisp
-(lp-emacs-elpa-package 'embark
-  (define-key global-map (kbd "C->") 'embark-become)
-  (define-key global-map (kbd "M-a") 'embark-act)
-  (define-key completion-list-mode-map (kbd "M-a")
-    #'(lambda () (interactive) () (mct-focus-mini-or-completions) (embark-act))))
-
-(lp-emacs-elpa-package 'embark-consult
-  (define-key embark-collect-mode-map (kbd "o") 'consult-preview-at-point)
-  ;; :hook (embark-collect-mode . embark-consult-preview-minor-mode)
-  )
-#+end_src
-
-** marginalia -- enhanced minibuffer detail display                :external:
-
-Enhanced minibuffer information when using =switch-to-buffer=, =find-file=,
-=describe-variable=, etc.
-
-#+begin_verbatim emacs-lisp
-(lp-emacs-elpa-package 'marginalia
-(setq marginalia-max-relative-age 0)  ; time is absolute here!
-(marginalia-mode 1)
-(with-eval-after-load 'mct
-(progn
-(setq mct-apply-completion-stripes t)))
-#+end_verbatim
-** orderless  -- orderless filtering and mapping of symbols        :external:
-
-For matching symbols without regard for order, we use =orderless=.
-
-Can be not very performant depending on the matching styles (=orderless-flex= being the
-worst offender). A big configuration dream is for =orderless= to work as seamlessly as the
-usual completion utilities.
-
-When =orderless-flex= is enabled, a postfixed =,= can be used to match a literal
-string, defined by the function =literal-if-comma=. To match everything but a string,
-prefix the string with a "bang" =!=.
-
-#+begin_src emacs-lisp
-(lp-emacs-elpa-package 'orderless
-  (setq completion-styles '(basic substring initials flex partial-completion orderless))
-  (setq completion-category-defaults nil
-        completion-category-overrides '((file (styles . (basic partial-completion initials substring)))))
-  (setq orderless-matching-styles '(orderless-prefixes
-                                    orderless-strict-leading-initialism
-                                    orderless-regexp))
-
-  (defun literal-if-comma (pattern _index _total)
-    (when (string-suffix-p "," pattern)
-      `(orderless-literal . ,(substring pattern 0 -1))))
-
-  (defun flex-if-tilde (pattern _index _total)
-    (when (string-suffix-p "~" pattern)
-      `(orderless-flex . ,(substring pattern 0 -1))))
-
-  (defun initialism-if-eql (pattern _index _total)
-    (when (string-suffix-p "=" pattern)
-      `(orderless-strict-leading-initialism . ,(substring pattern 0 -1))))
-
-  (defun without-if-bang (pattern _index _total)
-    (cond
-     ((equal "!" pattern)
-      '(orderless-literal . ""))
-     ((string-prefix-p "!" pattern)
-      `(orderless-without-literal . ,(substring pattern 1)))))
-
-  (setq orderless-style-dispatchers '(literal-if-comma without-if-bang flex-if-tilde initialism-if-eql))
-
-  (define-key minibuffer-local-completion-map (kbd "SPC") nil)
-  (define-key minibuffer-local-completion-map (kbd "?") nil)
-  ;; SPC should never complete: use it for `orderless' groups.
-  )
-#+end_src
-** mct        -- minimalist minibuffer completion visualization    :external:
-[2021-12-06] I gave it a serious try but MCT isn't gonna cut it. I'd like my
-completions to be done quicker.
-
-[2021-12-28 Tue] hoho just kidding im back at it :)
-
-=vertico= has this weird problem when using =<RET>= to complete: it still takes time to
-narrow down the larger list at completion time. With MCT, that penalty is up-front rather
-than at-completion-time, which I much prefer. Amortized, MCT actually ends up faster with
-larger =completing-read= calls.
-
-=mct= now has a =completion-in-region= substitute to rival =corfu= with only built-in
-capabilities of the =*Completions*= buffer. Very exciting, this is my go-to now. Especially
-since =completion-at-point= with =mct= allows orderless style dispatching (e.g. =fffa==
-completes to =face-font-family-alternatives= with my === style dispatch to "strict leading
-initialism"
-
-#+begin_src emacs-lisp
-(lp-emacs-elpa-package 'mct
-  (setq mct-remove-shadowed-file-names t) ; works when `file-name-shadow-mode' is enabled
-  (setq mct-hide-completion-mode-line t)
-  (setq mct-show-completion-line-numbers nil)
-  (setq mct-minimum-input 4)
-  (setq mct-live-update-delay 0.6)
-  (setq mct-completions-format 'one-column)
-  (setq mct-live-completion 'visible)
-
-  ;; NOTE: `mct-completion-blocklist' can be used for commands with lots
-  ;; of candidates, depending also on how low `mct-minimum-input' is.
-  ;; With the settings shown here this is not required, otherwise I would
-  ;; use something like this:
-  ;;
-  (setq mct-completion-blocklist
-        '( describe-symbol describe-function describe-variable
-           execute-extended-command insert-char))
-
-  ;; This is for commands that should always pop up the completions'
-  ;; buffer.  It circumvents the default method of waiting for some user
-  ;; input (see `mct-minimum-input') before displaying and updating the
-  ;; completions' buffer.
-  (setq mct-completion-passlist
-        '(imenu
-          Info-goto-node
-          Info-index
-          Info-menu
-          vc-retrieve-tag
-          Man-follow-manual-reference
-          Man-goto-section))
-
-  ;; You can place the Completions' buffer wherever you want, by following
-  ;; the syntax of `display-buffer'.  For example, try this:
-
-  ;; (setq mct-display-buffer-action
-  ;;       (quote ((display-buffer-reuse-window
-  ;;                display-buffer-in-side-window)
-  ;;               (side . left)
-  ;;               (slot . 99)
-  ;;               (window-width . 0.3))))
-
-  (mct-minibuffer-mode +1)
-  (mct-region-global-mode +1)
-  ;; (define-key vertico-map (kbd "M-RET") #'minibuffer-force-complete-and-exit)
-  ;; (define-key vertico-map (kbd "M-TAB") #'minibuffer-complete)
-
-  )
-#+end_src
-
-** which-key                                                       :external:
-
-I use =which-key= to discover new useful commands hiding in a keymap prefix. That's pretty
-much it, but its proven itself tremendously helpful for exploring features of the built-in
-or of a new package.
-
-#+begin_src emacs-lisp
-(lp-emacs-elpa-package 'which-key
-  ;;:diminish which-key-mode
-  (which-key-mode 1))
-#+end_src
-** built-in completion utilities (abbrev, dabbrev)
-
-#+begin_src emacs-lisp
-(lp-emacs-builtin-package 'abbrev
-  (setq abbrev-suggest t)
-  (setq save-abbrevs 'silently)
-  (setq abbrev-file-name (locate-user-emacs-file "abbrevs"))
-  (setq only-global-abbrevs nil))
-
-(lp-emacs-builtin-package 'dabbrev
-  (define-key global-map (kbd "M-/") 'dabbrev-completion)
-  (define-key global-map (kbd "C-M-/") 'dabbrev-expand)
-  (setq dabbrev-abbrev-char-regexp "\\sw\\|\\s_") ;; same as nil technically
-  (setq dabbrev-abbrev-skip-leading-regexp "[$*/=~']")
-  (setq dabbrev-backward-only nil)
-  (setq dabbrev-case-distinction 'case-replace)
-  (setq dabbrev-case-fold-search nil)
-  (setq dabbrev-case-replace 'case-replace)
-  (setq dabbrev-check-other-buffers t)
-  (setq dabbrev-eliminate-newlines t)
-  (setq dabbrev-upcase-means-case-search t))
-
-#+end_src
-** external completion utilities (corfu, cape)                     :external:remove:
-#+begin_verbatim emacs-lisp
-(lp-emacs-elpa-package 'corfu
-(setq corfu-cycle t)            ;; Enable cycling for `corfu-next/previous'
-(setq corfu-auto t)             ;; Enable auto completion
-(setq corfu-quit-at-boundary t) ;; Automatically quit at word boundary
-(setq corfu-quit-no-match t)    ;; Automatically quit if there is no match
-(setq corfu-auto-delay 0.7)
-(setq corfu-echo-documentation t)
-
-;; Enable indentation+completion using the TAB key.
-;; `completion-at-point' is often bound to M-TAB.
-;; (setq tab-always-indent 'complete)
-(corfu-global-mode))
-
-(lp-emacs-elpa-package 'cape
-(add-to-list 'completion-at-point-functions #'cape-file)
-(add-to-list 'completion-at-point-functions #'cape-dabbrev)
-(add-to-list 'completion-at-point-functions #'cape-keyword)
-(add-to-list 'completion-at-point-functions #'cape-abbrev)
-(add-to-list 'completion-at-point-functions #'cape-ispell)
-(add-to-list 'completion-at-point-functions #'cape-dict)
-(add-to-list 'completion-at-point-functions #'cape-symbol))
-#+end_verbatim
-** yasnippet                                                       :external:
-
-nice snippets. they'll never go out of fashion. for when cursor placement and more
-advanced expansions than =abbrev= are needed.
-
-#+begin_src emacs-lisp
-;; configuration
-(lp-emacs-elpa-package 'yasnippet
-  ;;:diminish yas-minor-mode
-  (yas-global-mode 1)
-  (setq yas-fallback-behavior 'return-nil)
-  (setq yas-triggers-in-field t)
-  (setq yas-verbosity 0))
-
-(lp-emacs-elpa-package 'yasnippet-snippets)
-#+end_src
-
-** xref
-
-Its debatable whether xref should be in this section. May re-evaluate in future.
-
-#+BEGIN_SRC emacs-lisp
-(lp-emacs-builtin-package 'xref
-  ;; All those have been changed for Emacs 28
-  (setq xref-show-definitions-function #'xref-show-definitions-completing-read) ; for M-.
-  (setq xref-show-xrefs-function #'xref-show-definitions-buffer) ; for grep and the like
-  (setq xref-file-name-display 'project-relative)
-  (setq xref-search-program 'ripgrep)
-  )
-#+END_SRC
-
 * programming languages and environments
-** eglot                                                           :external:
+** programming mode
+#+begin_src emacs-lisp
+(lp-emacs-builtin-package 'prog-mode
+  ;; Mark TODOs , FIXME, BUG as red in src code
+  (add-hook 'prog-mode-hook
+            (lambda ()
+              (font-lock-add-keywords
+               nil
+               '(("\\<\\(FIXME\\|TODO\\|BUG\\)" 1 font-lock-warning-face prepend))))))
+
+(lp-emacs-builtin-package 'compile
+  (setq compilation-ask-about-save nil)
+  (setq compilation-scroll-output 'next-error)
+  (setq compilation-skip-threshold 2)
+  (setq compilation-scroll-output 'first-error)
+  (setq compilation-always-kill t)
+  (setq compilation-auto-jump-to-first-error t)
+  )
+#+end_src
+** eglot
 #+begin_src emacs-lisp
 (lp-emacs-elpa-package 'eglot
   (defvar eglot-prog-mode-hooks '(python-mode-hook cc-mode-hook c-mode-hook c++-mode-hook cuda-mode-hook
@@ -1795,7 +1770,58 @@ Its debatable whether xref should be in this section. May re-evaluate in future.
 (lp-emacs-elpa-package 'consult-eglot
   (define-key eglot-mode-map [remap xref-find-apropos] #'consult-eglot-symbols))
 #+end_src
-** ocaml                                                           :external:
+** flymake and its extras
+
+=flymake= is a package that provides on-the-fly "make"-esque errors to the user. Similar to
+=flyspell= in spirit.
+
+Writing prose is tough and proselint is a nice tool. To install, run =sudo apt install
+python3-proselint=
+
+#+begin_src emacs-lisp
+(lp-emacs-builtin-package 'flymake
+  (setq flymake-fringe-indicator-position 'left-fringe)
+  (setq flymake-suppress-zero-counters t)
+  (setq flymake-start-on-flymake-mode t)
+  (setq flymake-no-changes-timeout nil)
+  (setq flymake-start-on-save-buffer t)
+  (setq flymake-proc-compilation-prevents-syntax-check t)
+  (setq flymake-wrap-around nil)
+  (setq flymake-mode-line-format
+        '("" flymake-mode-line-exception flymake-mode-line-counters))
+  (setq flymake-mode-line-counter-format
+        '(" " flymake-mode-line-error-counter
+          flymake-mode-line-warning-counter
+          flymake-mode-line-note-counter ""))
+
+  (add-hook 'prog-mode-hook 'flymake-mode)
+
+  (let ((map flymake-mode-map))
+    (define-key map (kbd "C-c y s") #'flymake-start)
+    (define-key map (kbd "C-c y d") #'flymake-show-buffer-diagnostics) ; Emacs28
+    (define-key map (kbd "C-c y n") #'flymake-goto-next-error)
+    (define-key map (kbd "C-c y p") #'flymake-goto-prev-error)))
+#+END_SRC
+
+*** flymake extras (diagnostic, shellcheck, proselint)
+
+#+BEGIN_SRC emacs-lisp
+(lp-emacs-elpa-package 'flymake-diagnostic-at-point
+  (setq flymake-diagnostic-at-point-display-diagnostic-function
+        'flymake-diagnostic-at-point-display-minibuffer))
+
+;;; Flymake + Shellcheck
+(lp-emacs-elpa-package 'flymake-shellcheck
+  (add-hook 'sh-mode-hook 'flymake-shellcheck-load))
+
+
+;;; Flymake + Proselint
+(lp-emacs-elpa-package 'flymake-proselint
+  (add-hook 'markdown-mode-hook #'flymake-proselint-setup)
+  (add-hook 'org-mode-hook #'flymake-proselint-setup)
+  (add-hook 'text-mode-hook #'flymake-proselint-setup))
+#+end_src
+** ocaml
 #+begin_src emacs-lisp
 (lp-emacs-elpa-package 'tuareg)
 
@@ -1804,7 +1830,7 @@ Its debatable whether xref should be in this section. May re-evaluate in future.
   (autoload 'utop-minor-mode "utop" "Minor mode for utop" t)
   (add-hook 'tuareg-mode-hook 'utop-minor-mode))
 #+end_src
-** python                                                          :external:
+** python
 #+begin_src emacs-lisp
 (lp-emacs-elpa-package 'python
   ;; :mode ("\\.py\\'" . python-mode)
@@ -1826,7 +1852,7 @@ Its debatable whether xref should be in this section. May re-evaluate in future.
                                         ; optional: if Org Ref is not loaded anywhere else, load it here
 #+end_src
 
-** julia                                                           :external:
+** julia
 #+begin_src emacs-lisp
 (lp-emacs-elpa-package 'julia-mode)
 
@@ -1874,42 +1900,14 @@ Its debatable whether xref should be in this section. May re-evaluate in future.
 
 
 #+end_src
-*** cmake                                                          :external:
+*** cmake
 #+begin_src emacs-lisp
 (lp-emacs-elpa-package 'cmake-mode)
 
 (lp-emacs-elpa-package 'eldoc-cmake
   (add-hook 'cmake-mode-hook 'eldoc-cmake-enable))
 #+end_src
-** symbolic math (maxima, calc)                                    :external:
-
-#+begin_src emacs-lisp
-(lp-emacs-builtin-package 'calc)
-(lp-emacs-elpa-package 'maxima
-  (add-hook 'maxima-mode-hook #'maxima-hook-function)
-  (add-hook 'maxima-inferior-mode-hook #'maxima-hook-function)
-  (setq maxima-display-maxima-buffer t)
-  ;; :mode ("\\.mac\\'" . maxima-mode)
-  ;; :interpreter ("maxima" . maxima-mode)
-
-  )
-#+end_src
-
-** docker                                                          :external:
-
-Docker is just too prevalent not to be ready for it. =docker-tramp= is an incredibly useful
-package providing an easy-to-use interface to use =tramp= in connecting to running docker
-containers. The syntax follows the usual tramp style: =/docker:{image_name, image_tag}:= and
-you're in (i think. as long as the =ssh= port is exposed? i have no clue its magic and i'm
-not gonna worry about it for now).
-
-#+begin_src emacs-lisp
-(lp-emacs-elpa-package 'dockerfile-mode)
-
-(lp-emacs-elpa-package 'docker-tramp)
-#+end_src
-
-** (common) lisp and scheme                                        :external:
+** (common) lisp and scheme
 #+begin_src emacs-lisp
 (lp-emacs-elpa-package 'sly
   (setq inferior-lisp-program "/usr/bin/sbcl"))
@@ -1941,60 +1939,42 @@ not gonna worry about it for now).
 ;; for popper..
 (define-key scheme-mode-map (kbd "C-M-q") nil)
 #+end_src
-** flymake and its extras
-
-=flymake= is a package that provides on-the-fly "make"-esque errors to the user. Similar to
-=flyspell= in spirit.
-
-Writing prose is tough and proselint is a nice tool. To install, run =sudo apt install
-python3-proselint=
+** symbolic math (maxima, calc)
 
 #+begin_src emacs-lisp
-(lp-emacs-builtin-package 'flymake
-  (setq flymake-fringe-indicator-position 'left-fringe)
-  (setq flymake-suppress-zero-counters t)
-  (setq flymake-start-on-flymake-mode t)
-  (setq flymake-no-changes-timeout nil)
-  (setq flymake-start-on-save-buffer t)
-  (setq flymake-proc-compilation-prevents-syntax-check t)
-  (setq flymake-wrap-around nil)
-  (setq flymake-mode-line-format
-        '("" flymake-mode-line-exception flymake-mode-line-counters))
-  (setq flymake-mode-line-counter-format
-        '(" " flymake-mode-line-error-counter
-          flymake-mode-line-warning-counter
-          flymake-mode-line-note-counter ""))
+(lp-emacs-builtin-package 'calc)
+(lp-emacs-elpa-package 'maxima
+  (add-hook 'maxima-mode-hook #'maxima-hook-function)
+  (add-hook 'maxima-inferior-mode-hook #'maxima-hook-function)
+  (setq maxima-display-maxima-buffer t)
+  ;; :mode ("\\.mac\\'" . maxima-mode)
+  ;; :interpreter ("maxima" . maxima-mode)
 
-  (add-hook 'prog-mode-hook 'flymake-mode)
+  )
+#+end_src
 
-  (let ((map flymake-mode-map))
-    (define-key map (kbd "C-c y s") #'flymake-start)
-    (define-key map (kbd "C-c y d") #'flymake-show-buffer-diagnostics) ; Emacs28
-    (define-key map (kbd "C-c y n") #'flymake-goto-next-error)
-    (define-key map (kbd "C-c y p") #'flymake-goto-prev-error)))
-#+END_SRC
+** docker
 
-*** flymake extras (diagnostic, shellcheck, proselint)             :external:
+Docker is just too prevalent not to be ready for it. =docker-tramp= is an incredibly useful
+package providing an easy-to-use interface to use =tramp= in connecting to running docker
+containers. The syntax follows the usual tramp style: =/docker:{image_name, image_tag}:= and
+you're in (i think. as long as the =ssh= port is exposed? i have no clue its magic and i'm
+not gonna worry about it for now).
 
-#+BEGIN_SRC emacs-lisp
-(lp-emacs-elpa-package 'flymake-diagnostic-at-point
-  (setq flymake-diagnostic-at-point-display-diagnostic-function
-        'flymake-diagnostic-at-point-display-minibuffer))
+#+begin_src emacs-lisp
+(lp-emacs-elpa-package 'dockerfile-mode)
 
-;;; Flymake + Shellcheck
-(lp-emacs-elpa-package 'flymake-shellcheck
-  (add-hook 'sh-mode-hook 'flymake-shellcheck-load))
-
-
-;;; Flymake + Proselint
-(lp-emacs-elpa-package 'flymake-proselint
-  (add-hook 'markdown-mode-hook #'flymake-proselint-setup)
-  (add-hook 'org-mode-hook #'flymake-proselint-setup)
-  (add-hook 'text-mode-hook #'flymake-proselint-setup))
+(lp-emacs-elpa-package 'docker-tramp)
 #+end_src
 
 * unix environment interface
-** magit                                                           :external:
+** project management
+Instead of using =projectile=, there's now a wonderful built-in library, =project=, which
+has lots of overlap with =projectile=. Might as well remove a dependency.
+#+begin_src emacs-lisp
+(lp-emacs-builtin-package 'project)
+#+end_src
+** magit
 #+begin_src emacs-lisp
 ;;; Magit
 ;; God bless magit and all that it does
@@ -2234,7 +2214,7 @@ Access recent files, where recents exclude the annoying =.git=, =.elpa=, etc. fi
                          )))
 #+END_SRC
 
-** wgrep                                                           :external:
+** wgrep
 #+BEGIN_SRC emacs-lisp
 (lp-emacs-elpa-package 'wgrep
   (define-key grep-mode-map (kbd "C-x C-q") 'wgrep-change-to-wgrep-mode))
@@ -2245,7 +2225,7 @@ Access recent files, where recents exclude the annoying =.git=, =.elpa=, etc. fi
   ;; :diminish ediff-mode
   (setq ediff-diff-options "-w"))
 #+end_src
-** exec path from shell                                            :external:
+** exec path from shell
 #+begin_src emacs-lisp
 (lp-emacs-elpa-package 'exec-path-from-shell
   (exec-path-from-shell-initialize))
@@ -2322,7 +2302,7 @@ the go-to.
   )
 #+end_src
 * external environment interface
-** notmuch -- mail in emacs                                        :external:
+** notmuch -- mail in emacs
 #+begin_src emacs-lisp
 (lp-emacs-elpa-package 'notmuch
   (setq notmuch-show-logo nil)
@@ -2517,7 +2497,7 @@ the go-to.
   (define-key eww-bookmark-mode-map (kbd "d") #'eww-bookmark-kill) ; same
   )
 #+end_src
-** elfeed -- RSS feed reader                                       :external:
+** elfeed -- RSS feed reader
 
 #+begin_src emacs-lisp
 (lp-emacs-elpa-package 'elfeed
@@ -2591,3 +2571,9 @@ the go-to.
                        ("https://lacker.io/feed.xml" ai tech)
                        ("https://graymirror.substack.com/feed" leftist))))
 #+end_src
+
+* Configurations and People I took Inspiration from
+- Prot, of course. [[potesilaos.com/emacs/dotemacs]].
+- Sacha Chua
+- Howardisms 
+- TODO there's a lot more ...
