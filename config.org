@@ -789,7 +789,7 @@ prefix the string with a "bang" =!=.
 
 #+begin_src emacs-lisp
 (lp-emacs-elpa-package 'orderless
-  (setq completion-styles '(basic substring initials flex partial-completion orderless))
+  (setq completion-styles '(basic substring initials partial-completion orderless))
   (setq completion-category-defaults nil
         completion-category-overrides '((file (styles . (basic partial-completion initials substring)))))
   (setq orderless-matching-styles '(orderless-prefixes
@@ -956,13 +956,6 @@ Its debatable whether xref should be in this section. May re-evaluate in future.
 * reading, writing, and task keeping
 ** latex
 #+begin_src emacs-lisp
-(lp-emacs-builtin-package 'tex-mode)
-
-(lp-emacs-builtin-package 'reftex)
-
-(lp-emacs-elpa-package 'cdlatex
-  (add-hook 'latex-mode-hook 'turn-on-cdlatex))
-
 ;; auctex requires special configuration..
 ;;
 ;; system needs:
@@ -994,6 +987,14 @@ Its debatable whether xref should be in this section. May re-evaluate in future.
   (setq lp--latex-hooks-fns '(auto-fill-mode TeX-source-correlate-mode flyspell-mode flyspell-buffer turn-on-reftex))
   (dolist (fn lp--latex-hooks-fns)
     (add-hook 'LaTeX-mode-hook fn)))
+  
+(lp-emacs-builtin-package 'tex-mode)
+
+(lp-emacs-builtin-package 'reftex)
+
+(lp-emacs-elpa-package 'cdlatex
+  (add-hook 'latex-mode-hook 'turn-on-cdlatex))
+
 #+end_src
 ** org
 #+begin_src emacs-lisp
