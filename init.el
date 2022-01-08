@@ -18,6 +18,7 @@
 (setq use-dialog-box t)               ; only for mouse events
 (setq use-file-dialog nil)
 
+(require 'comp)
 (setq native-comp-async-report-warnings-errors 'silent)
 
 

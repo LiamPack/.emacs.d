@@ -92,11 +92,6 @@ Not all of the emacs defaults are quite sane. So here's to some sanity.
   (show-paren-mode t)
   (setq show-paren-style 'parenthesis)
 
-  ;; cursor intangible in the minibuffer prompt
-  (setq minibuffer-prompt-properties
-        '(read-only t cursor-intangible t face minibuffer-prompt))
-  (add-hook 'minibuffer-setup-hook #'cursor-intangible-mode)
-
   (setq indent-tabs-mode nil                 ; don't insert tab when indent
         help-window-select t                 ; focus on help window when openend
         window-combination-resize nil)       ; i'd rather balance than have it auto-proportionally
@@ -126,8 +121,7 @@ Not all of the emacs defaults are quite sane. So here's to some sanity.
   (define-key global-map (kbd "C-<tab>") 'next-window-any-frame)
   (define-key global-map (kbd "<backtab>") 'previous-window-any-frame)
   (define-key global-map (kbd "C-x C-M-e") 'pp-macroexpand-last-sexp)
-  (define-key global-map (kbd "C-x C-e") 'eval-defun)
-  (define-key global-map (kbd "C-x e") 'eval-last-sexp)
+  ;; (define-key global-map (kbd "C-x C-e") 'eval-defun) ;; already bound to C-M-x
   (define-key global-map (kbd "C-h j") 'describe-keymap)
   (define-key global-map (kbd "C-c C-j") 'join-line)
   (define-key global-map (kbd "C-S-p") #'(lambda () (interactive) (previous-line 7)))
@@ -138,8 +132,6 @@ Not all of the emacs defaults are quite sane. So here's to some sanity.
   (setq repeat-on-final-keystroke t)
   (setq set-mark-command-repeat-pop t)
   (repeat-mode 1))
-
-
 #+end_src
 ** window management
 #+begin_src emacs-lisp
@@ -186,9 +178,9 @@ Not all of the emacs defaults are quite sane. So here's to some sanity.
   (setq tab-bar-new-tab-choice t)
   (setq tab-bar-new-tab-to 'right)
   (setq tab-bar-position nil)
-  (setq tab-bar-show t)
-  (setq tab-bar-tab-hints nil)
-  (setq tab-bar-tab-name-function 'tab-bar-tab-name-all)
+  (setq tab-bar-show 1)
+  (setq tab-bar-tab-hints t)
+  (setq tab-bar-tab-name-function 'tab-bar-tab-name-current)
   (tab-bar-mode +1)
   (tab-bar-history-mode +1)
   ;; (tab-bar-mode -1)
@@ -306,13 +298,13 @@ Not all of the emacs defaults are quite sane. So here's to some sanity.
 #+begin_src emacs-lisp
 (lp-emacs-builtin-package 'time
   (setq display-time-world-time-format "%H:%M %Z, %d. %b"
-        display-time-world-list '(("Europe/Berlin"    "Berlin")
+        display-time-world-list '(("America/New_York" "New York (USA)")
+                                  ("America/Winnipeg" "Winnipeg (CA)")
+                                  ("Asia/Tokyo"       "Tokyo (JP)")
                                   ("Europe/London"    "London")
                                   ("Europe/Istanbul"  "Istanbul")
-                                  ("America/Winnipeg" "Winnipeg (CA)")
-                                  ("America/New_York" "New York (USA)")
-                                  ("Asia/Tokyo"       "Tokyo (JP)")))
-  (setq display-time-default-load-average nil
+                                  ))
+  (setq display-time-default-load-average 0
         display-time-use-mail-icon t
         display-time-24hr-format t
         display-time-day-and-date t)
@@ -325,7 +317,7 @@ Not all of the emacs defaults are quite sane. So here's to some sanity.
   (define-key Man-mode-map (kbd "i") #'Man-goto-section)
   (define-key Man-mode-map (kbd "g") #'Man-update-manpage))
 #+end_src
-** relating to saving the state of emacs
+** saving the state of emacs
 *** emacs server
 
 Starting a server will allow the quick access of emacs through a server connection rather
@@ -413,7 +405,16 @@ function."
 * aesthetics
 ** some themes i've liked
 General aesthetic configurations for emacs
+*** new ones
+#+begin_src org
+  - ~eziam-theme~ -- monochrome based on leuven
+  - ~poet~ -- writing-optimized theme
+  - ~faff~ -- nice lil paper theme
+  - ~autumn-theme~ -- autumn theme and all that, similar to faff
+  - ~green-screen~ -- oldschool hilarity. too ridiculous
+#+end_src
 
+*** old ones
 #+begin_verse
   espresso ; cyberpunk ; moe-light ;
  * good themes
@@ -534,13 +535,14 @@ General aesthetic configurations for emacs
         ;;   (t . (no-bold)))
 
         modus-themes-variable-pitch-ui nil
-        ))
-
-(load-theme 'modus-vivendi)
-
-
+        )
+  (load-theme 'modus-vivendi))
 #+end_src
 
+** zenburn, a soft low-contrast theme
+#+begin_src emacs-lisp
+(lp-emacs-elpa-package 'zenburn)
+#+end_src
 * movement and editing
 ** isearch and replace
 =isearch= isn't gonna go out of style anytime soon that's for sure. And especially not if
@@ -610,13 +612,25 @@ completion options, minibuffer options, minibuffer history options, prompt faces
   (setq completions-detailed t)
   (setq completion-ignore-case t)
 
-  (setq completion-cycle-threshold 3) ;; always allow tab cycle
+  ;; always allow tab cycle, except if you're running `completion-at-point', in which case
+  ;; we want to always allow completion to help us. If we invoke `c-a-p', then set the
+  ;; threshold to `nil' in the current buffer.
+  (setq completion-cycle-threshold t)
+  (defun lp--no-cycle-for-completion-at-point (&rest args)
+    "Set `completion-cycle-threshold' to NIL for the current buffer
+if we invoke `completion-at-point'. `completion-cycle-threshold'
+will retain its original value in any invoked minibuffer commands
+since the value is set locally."
+    (setq-local completion-cycle-threshold nil))
+  (advice-add 'completion-at-point :before #'lp--no-cycle-for-completion-at-point)
+
   ;; emacs28 completion stuff
   (setq completions-group t)
   (setq completions-group-sort nil)
 
 
   (setq enable-recursive-minibuffers t)
+  (require 'minibuf-eldef)
   (setq minibuffer-eldef-shorten-default t) ;; default completion in [bracks]
 
   (setq read-buffer-completion-ignore-case t)
@@ -630,9 +644,9 @@ completion options, minibuffer options, minibuffer history options, prompt faces
 
   ;; Add prompt indicator to `completing-read-multiple'.
   ;; Alternatively try `consult-completing-read-multiple'.
-  (defun crm-indicator (args)
-    (cons (concat "[CRM] " (car args)) (cdr args)))
-  (advice-add #'completing-read-multiple :filter-args #'crm-indicator)
+  ;; (defun crm-indicator (args)
+  ;;   (cons (concat "[CRM] " (car args)) (cdr args)))
+  ;; (advice-add #'completing-read-multiple :filter-args #'crm-indicator)
 
   ;; Do not allow the cursor in the minibuffer prompt
   (setq minibuffer-prompt-properties
@@ -966,7 +980,7 @@ Its debatable whether xref should be in this section. May re-evaluate in future.
 ;; utilities that could easily be provided by snippets and cdlatex. Time will tell
 ;;
 ;; set dont-use-auctex-scope to NIL if you want to use auctex
-(if-let ((dont-use-auctex-scope t))
+(if-let ((dont-use-auctex-scope nil))
     nil
   (when (not (package-installed-p 'auctex))
     (package-install 'auctex))
@@ -987,7 +1001,7 @@ Its debatable whether xref should be in this section. May re-evaluate in future.
   (setq lp--latex-hooks-fns '(auto-fill-mode TeX-source-correlate-mode flyspell-mode flyspell-buffer turn-on-reftex))
   (dolist (fn lp--latex-hooks-fns)
     (add-hook 'LaTeX-mode-hook fn)))
-  
+
 (lp-emacs-builtin-package 'tex-mode)
 
 (lp-emacs-builtin-package 'reftex)
@@ -1640,7 +1654,7 @@ A time-tested classic mark-up language. Not much more to say; the customizations
     (define-key mode-map (kbd "C-c n i") 'usls-id-insert)
     (define-key mode-map (kbd "C-c n l") 'usls-follow-link)))
 #+end_src
-*** extensions...
+** ~lp-journal~ for simple, low-cost journal management
 #+begin_src emacs-lisp
 (load-file "~/.emacs.d/lisp/lp-scratch.el")
 (setq journal-dir (file-truename "~/org/roam/daily/"))
@@ -1901,8 +1915,8 @@ python3-proselint=
           (define-key map (kbd "g l") 'gud-refresh)
           (define-key map (kbd "g e") 'gud-statement)
           map))
-  (define-key c-mode-map (kbd "C-c C-g") gud-nav-map)
-  (define-key c++-mode-map (kbd "C-c C-g") gud-nav-map))
+  (define-key c-mode-map (kbd "C-c g") gud-nav-map)
+  (define-key c++-mode-map (kbd "C-c g") gud-nav-map))
 
 
 #+end_src
@@ -1931,6 +1945,8 @@ python3-proselint=
   ;; :diminish rainbow-delimiters-mode
   (add-hook 'prog-mode-hook 'rainbow-delimiters-mode))
 
+;; since chez has no docs implemented for geiser, i'd rather just generate tags and use
+;; xref-etags-mode to do most of the heavy lifting.
 (lp-emacs-elpa-package 'geiser)
 
 (lp-emacs-elpa-package 'geiser-chez)
@@ -1941,9 +1957,6 @@ python3-proselint=
 (add-to-list 'auto-mode-alist
              '("\\.sls\\'" . scheme-mode)
              '("\\.sps\\'" . scheme-mode))
-
-;; for popper..
-(define-key scheme-mode-map (kbd "C-M-q") nil)
 #+end_src
 ** symbolic math (maxima, calc)
 
@@ -2581,5 +2594,5 @@ the go-to.
 * Configurations and People I took Inspiration from
 - Prot, of course. [[potesilaos.com/emacs/dotemacs]].
 - Sacha Chua
-- Howardisms 
+- Howardisms
 - TODO there's a lot more ...
