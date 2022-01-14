@@ -21,7 +21,8 @@ simple-,-preferred-built-in approach forces me to think twice about whether I re
 the new shiny docker buffer editing package (YAGNI after all).
 
 Inspiration is, as always, taken from those more experienced and more wise than
-myself. Credits to configurations I took inspiration from are linked at the end.
+myself. Credits to the (many) configurations I took inspiration from over the years, which
+are linked at the end.
 
 * sane defaults and general emacs capabilities
 ** initial setup, keybinds, etc.
@@ -407,11 +408,11 @@ function."
 General aesthetic configurations for emacs
 *** new ones
 #+begin_src org
-  - ~eziam-theme~ -- monochrome based on leuven
-  - ~poet~ -- writing-optimized theme
-  - ~faff~ -- nice lil paper theme
-  - ~autumn-theme~ -- autumn theme and all that, similar to faff
-  - ~green-screen~ -- oldschool hilarity. too ridiculous
+    - ~eziam-theme~ -- monochrome based on leuven
+    - ~poet~ -- writing-optimized theme
+    - ~faff~ -- nice lil paper theme
+    - ~autumn-theme~ -- autumn theme and all that, similar to faff
+    - ~green-screen~ -- oldschool hilarity. too ridiculous
 #+end_src
 
 *** old ones
@@ -1399,71 +1400,6 @@ Its debatable whether xref should be in this section. May re-evaluate in future.
   (define-key global-map (kbd "C-c l") 'org-store-link))
 
 #+END_SRC
-
-*** roam                                                           :remove:noexport:
-#+BEGIN_VERBATIM
-(use-package org-roam
-:straight (:type git :host github
-:repo "org-roam/org-roam-v1" :branch "master")
-:diminish
-:custom
-(org-roam-directory (file-truename "~/org/roam/"))
-(org-roam-graph-exclude-matcher '("physics" "textbook" "quote" "paper" "private" "daily" "index" "Index"))
-(org-roam-dailies-directory "daily/")
-(org-roam-db-update-idle-seconds 20)
-:init
-(add-hook 'after-init-hook 'org-roam-mode)
-:config
-(define-key org-roam-dailies-map (kbd "l") 'org-roam-dailies-find-today)
-(define-key org-roam-dailies-map (kbd "j") 'org-roam-dailies-find-tomorrow)
-(define-key org-roam-dailies-map (kbd "d") 'org-roam-dailies-find-date)
-(define-key org-roam-dailies-map (kbd "k") 'org-roam-dailies-find-yesterday)
-(define-key org-roam-dailies-map (kbd "p") 'org-roam-dailies-find-previous-note)
-(define-key org-roam-dailies-map (kbd "n") 'org-roam-dailies-find-next-note)
-
-(setq roam-nav-map
-(let ((map (make-sparse-keymap)))
-(define-key map (kbd "f") 'org-roam-find-file)
-(define-key map (kbd "c") 'org-roam-capture)
-(define-key map (kbd "i") 'org-roam-insert)
-(define-key map (kbd "r") 'org-roam)
-(define-key map (kbd "I") 'org-roam-insert-immediate)
-(define-key map (kbd "g") 'org-roam-graph)
-(define-key map (kbd "o") 'org-roam-jump-to-index)
-(define-key map (kbd "t") 'org-roam-tag-add)
-map))
-(define-key global-map (kbd "C-c C-u") roam-nav-map)
-
-(eval-after-load "cape"
-(progn
-(add-to-list 'org-roam-completion-functions #'cape-file)
-(add-to-list 'org-roam-completion-functions #'cape-dabbrev)
-(add-to-list 'org-roam-completion-functions #'cape-keyword)
-(add-to-list 'org-roam-completion-functions #'cape-abbrev)
-(add-to-list 'org-roam-completion-functions #'cape-ispell)
-(add-to-list 'org-roam-completion-functions #'cape-dict)
-(add-to-list 'org-roam-completion-functions #'cape-symbol)))
-:bind (("\C-c i" . org-roam-insert-immediate)
-("\C-c o" . org-roam-jump-to-index)
-("\C-c t" . org-roam-tag-add)
-("\C-c f" . org-roam-find-file)
-("\C-c d" . org-roam-dailies-map)))
-
-(use-package org-roam-server
-:straight t
-:config
-(setq org-roam-server-host "localhost"
-org-roam-server-port 8080
-org-roam-server-authenticate nil
-org-roam-server-export-inline-images t
-org-roam-server-serve-files nil
-org-roam-server-served-file-extensions '("pdf" "mp4" "ogv")
-org-roam-server-network-poll t
-org-roam-server-network-arrows nil
-org-roam-server-network-label-truncate t
-org-roam-server-network-label-truncate-length 60
-org-roam-server-network-label-wrap-length 20))
-#+end_VERBATIM
 
 ** diary, calendar
 #+begin_src emacs-lisp
@@ -2591,8 +2527,15 @@ the go-to.
                        ("https://graymirror.substack.com/feed" leftist))))
 #+end_src
 
-* Configurations and People I took Inspiration from
-- Prot, of course. [[potesilaos.com/emacs/dotemacs]].
+* configurations and people i took inspiration from
+- Skeeto's configuration, https://github.com/skeeto/.emacs.d. This is the first
+  configuration which I tried to modify for my own means back when I first started to take
+  courses in CS at college. It's where it all began, and I intend to look back to see where
+  he's traveled with it sometime soon.
+- Prot, of course. [[potesilaos.com/emacs/dotemacs]]. So much of the little things he picks up
+  on in the manuals and specifications is incredibly useful in day-to-day use. That's not
+  even mentioning his incredibly informative youtube videos and insightful posts on his
+  website, both emacs-related or otherwise.
 - Sacha Chua
 - Howardisms
 - TODO there's a lot more ...
