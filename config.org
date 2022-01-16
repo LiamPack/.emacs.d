@@ -542,7 +542,7 @@ General aesthetic configurations for emacs
 
 ** zenburn, a soft low-contrast theme
 #+begin_src emacs-lisp
-(lp-emacs-elpa-package 'zenburn)
+(lp-emacs-elpa-package 'zenburn-theme)
 #+end_src
 * movement and editing
 ** isearch and replace
@@ -1077,7 +1077,16 @@ Its debatable whether xref should be in this section. May re-evaluate in future.
   (setq org-tags-match-list-sublevels t)
 
   ;; refile
-  (setq org-refile-targets '((all-org-files :maxlevel . 3)))
+  ;; (setq org-refile-targets `(,(mapcar
+  ;;                              (lambda (x)
+  ;;                                (mapcar (lambda (f) (cons f '(:maxlevel . 2)))
+  ;;                                        (directory-files x t ".*.org$")))
+  ;;                              '("~/org/roam/" "~/org/roam/daily/"))
+  ;;                            (nil . (:maxlevel . 2))))
+
+  (setq org-refile-targets nil)
+
+
   (setq org-refile-use-outline-path 'file)
   (setq org-outline-path-complete-in-steps t)
   (setq org-refile-allow-creating-parent-nodes 'confirm) ; allow creating new parents on refile
@@ -1398,7 +1407,6 @@ Its debatable whether xref should be in this section. May re-evaluate in future.
 
 ;;; making links to other contexts
   (define-key global-map (kbd "C-c l") 'org-store-link))
-
 #+END_SRC
 
 ** diary, calendar
