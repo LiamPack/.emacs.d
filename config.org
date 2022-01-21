@@ -720,6 +720,8 @@ doesn't play well with lsp, but i haven't heard anything about =eglot=.
           (define-key map (kbd "u") 'consult-focus-lines)
           (define-key map (kbd "j") 'consult-recent-file)
           (define-key map (kbd "s") 'consult-isearch)
+          (define-key map (kbd "o") 'occur)
+          (define-key map (kbd "C-o") 'occur)          
           map))
   (define-key global-map (kbd "M-s") consult-search-map)
   (define-key global-map (kbd "M-j") consult-goto-map)
