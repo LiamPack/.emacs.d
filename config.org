@@ -16,8 +16,8 @@ More complex packages are no doubt useful and have their place (Helm, Ivy). But 
 I relied too much on these big strong tools without the underlying systems and methodology
 in place to effectively use them, rendering my productivity much lower than it could have
 been. The first brain needs to work well before the second brain can be effective. Also I
-incessantly yak-shaving since I had no laws about which packages to install, so keeping a
-simple-,-preferred-built-in approach forces me to think twice about whether I really need
+was incessantly yak-shaving since I had no laws about which packages to install, so keeping
+a simple-and-preferred-built-in approach forces me to think twice about whether I really need
 the new shiny docker buffer editing package (YAGNI after all).
 
 Inspiration is, as always, taken from those more experienced and more wise than
@@ -540,10 +540,17 @@ General aesthetic configurations for emacs
   (load-theme 'modus-vivendi))
 #+end_src
 
-** zenburn, a soft low-contrast theme
+** zenburn, a soft low-contrast dark-ish theme
 #+begin_src emacs-lisp
 (lp-emacs-elpa-package 'zenburn-theme)
 #+end_src
+** Anti-Bright theme, a soft low-contrast light theme
+#+begin_src emacs-lisp
+;; only enable when not terminal mode?
+(lp-emacs-elpa-package 'twilight-anti-bright-theme)
+(lp-emacs-elpa-package 'twilight-bright-theme)
+#+end_src
+
 * movement and editing
 ** isearch and replace
 =isearch= isn't gonna go out of style anytime soon that's for sure. And especially not if
@@ -1875,6 +1882,16 @@ python3-proselint=
 #+end_src
 ** (common) lisp and scheme
 #+begin_src emacs-lisp
+(lp-emacs-elpa-package 'paredit
+  (defun activate-paredit ()
+    (interactive)
+    (paredit-mode +1))
+  (add-hook 'emacs-lisp-mode-hook #'activate-paredit)
+  (add-hook 'lisp-mode-hook #'activate-paredit)
+  (add-hook 'scheme-mode-hook #'activate-paredit)  
+  (add-hook 'geiser-mode-hook #'activate-paredit)  
+  (add-hook 'geiser-mode-hook #'activate-paredit))
+
 (lp-emacs-elpa-package 'sly
   (setq inferior-lisp-program "/usr/bin/sbcl"))
 
