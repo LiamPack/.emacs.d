@@ -408,11 +408,11 @@ function."
 General aesthetic configurations for emacs
 *** new ones
 #+begin_src org
-    - ~eziam-theme~ -- monochrome based on leuven
-    - ~poet~ -- writing-optimized theme
-    - ~faff~ -- nice lil paper theme
-    - ~autumn-theme~ -- autumn theme and all that, similar to faff
-    - ~green-screen~ -- oldschool hilarity. too ridiculous
+            - ~eziam-theme~ -- monochrome based on leuven
+            - ~poet~ -- writing-optimized theme
+            - ~faff~ -- nice lil paper theme
+            - ~autumn-theme~ -- autumn theme and all that, similar to faff
+            - ~green-screen~ -- oldschool hilarity. too ridiculous
 #+end_src
 
 *** old ones
@@ -540,11 +540,7 @@ General aesthetic configurations for emacs
   (load-theme 'modus-vivendi))
 #+end_src
 
-** zenburn, a soft low-contrast dark-ish theme
-#+begin_src emacs-lisp
-(lp-emacs-elpa-package 'zenburn-theme)
-#+end_src
-** Anti-Bright theme, a soft low-contrast light theme
+** Anti-Bright themes, a soft low-contrast light theme
 #+begin_src emacs-lisp
 ;; only enable when not terminal mode?
 (lp-emacs-elpa-package 'twilight-anti-bright-theme)
@@ -597,19 +593,6 @@ match =.*?=, i.e all characters are whitespace.
 
 #+end_src
 
-** expand region
-
-#+begin_src emacs-lisp
-;; (lp-emacs-elpa-package 'iedit) ;; default bind is C-;
-
-;; (lp-emacs-elpa-package 'avy
-;;   (avy-setup-default)
-;;   (define-key global-map (kbd "C-'") 'avy-goto-char-timer)
-;;   (define-key global-map (kbd "C-\"") 'avy-resume))
-
-(lp-emacs-elpa-package 'expand-region
-  (define-key global-map (kbd "C-=") 'er/expand-region))
-#+end_src
 * minibuffer, completion, and symbol definitions
 ** general minibuffer completion configuration
 completion options, minibuffer options, minibuffer history options, prompt faces, ...
@@ -728,7 +711,7 @@ doesn't play well with lsp, but i haven't heard anything about =eglot=.
           (define-key map (kbd "j") 'consult-recent-file)
           (define-key map (kbd "s") 'consult-isearch)
           (define-key map (kbd "o") 'occur)
-          (define-key map (kbd "C-o") 'occur)          
+          (define-key map (kbd "C-o") 'occur)
           map))
   (define-key global-map (kbd "M-s") consult-search-map)
   (define-key global-map (kbd "M-j") consult-goto-map)
@@ -817,7 +800,7 @@ prefix the string with a "bang" =!=.
   (setq completion-category-defaults nil
         completion-category-overrides '((file (styles . (basic partial-completion initials substring)))))
   (setq orderless-matching-styles '(orderless-prefixes
-                                    orderless-strict-leading-initialism
+                                    orderless-initialism
                                     orderless-regexp))
 
   (defun literal-if-comma (pattern _index _total)
@@ -830,7 +813,7 @@ prefix the string with a "bang" =!=.
 
   (defun initialism-if-eql (pattern _index _total)
     (when (string-suffix-p "=" pattern)
-      `(orderless-strict-leading-initialism . ,(substring pattern 0 -1))))
+      `(orderless-initialism . ,(substring pattern 0 -1))))
 
   (defun without-if-bang (pattern _index _total)
     (cond
@@ -906,7 +889,7 @@ initialism"
   ;;               (window-width . 0.3))))
 
   (mct-minibuffer-mode +1)
-  (mct-region-global-mode +1)
+  (mct-region-mode +1)
   ;; (define-key vertico-map (kbd "M-RET") #'minibuffer-force-complete-and-exit)
   ;; (define-key vertico-map (kbd "M-TAB") #'minibuffer-complete)
 
@@ -960,8 +943,6 @@ advanced expansions than =abbrev= are needed.
   (setq yas-fallback-behavior 'return-nil)
   (setq yas-triggers-in-field t)
   (setq yas-verbosity 0))
-
-(lp-emacs-elpa-package 'yasnippet-snippets)
 #+end_src
 
 ** xref
@@ -970,13 +951,21 @@ Its debatable whether xref should be in this section. May re-evaluate in future.
 
 #+BEGIN_SRC emacs-lisp
 (lp-emacs-builtin-package 'xref
-  ;; All those have been changed for Emacs 28
+  ;; All these have been changed for Emacs 28
   (setq xref-show-definitions-function #'xref-show-definitions-completing-read) ; for M-.
   (setq xref-show-xrefs-function #'xref-show-definitions-buffer) ; for grep and the like
   (setq xref-file-name-display 'project-relative)
   (setq xref-search-program 'ripgrep)
   )
 #+END_SRC
+** dumb jump
+#+begin_src emacs-lisp
+(lp-emacs-elpa-package 'dumb-jump
+  (add-hook 'xref-backend-functions #'dumb-jump-xref-activate)
+  (setq xref-show-definitions-function #'xref-show-definitions-completing-read)
+  (setq dumb-jump-prefer-searcher 'rg))
+#+end_src
+
 * reading, writing, and task keeping
 ** latex
 #+begin_src emacs-lisp
@@ -1349,7 +1338,7 @@ Its debatable whether xref should be in this section. May re-evaluate in future.
                           (org-agenda-show-all-dates nil)
                           (org-deadline-warning-days 0)
                           (org-agenda-block-separator nil)
-                          (org-agenda-entry-types '(:deadline))
+                          (org-agenda-entry-types '(:deadline :scheduled))
                           (org-agenda-skip-function '(org-agenda-skip-entry-if 'todo 'done))
                           (org-agenda-overriding-header "\nUpcoming deadlines (+14d)\n"))))
            )))
@@ -1722,18 +1711,7 @@ actions specified in the manual.
   (define-key eglot-mode-map (kbd "C-c y a") #'eglot-code-actions)
   (define-key eglot-mode-map (kbd "C-c y b") #'eglot-format-buffer)
   (define-key eglot-mode-map (kbd "C-c y h") #'eldoc)
-
-  ;; i don't relaly like flymake, this issue
-  ;; https://github.com/joaotavora/eglot/issues/42
-
-  ;; corfu can be weird man.
-  (eval-after-load "corfu"
-    (progn
-      (defun corfu-eglot-setup ()
-        (setq-local completion-styles '(orderless)
-                    completion-category-defaults nil))
-
-      (add-hook 'eglot-mode-hook #'corfu-eglot-setup))))
+  )
 
 ;; 4 julia
 (lp-emacs-elpa-package 'eglot-jl
@@ -1806,23 +1784,13 @@ python3-proselint=
 ** python
 #+begin_src emacs-lisp
 (lp-emacs-elpa-package 'python
-  ;; :mode ("\\.py\\'" . python-mode)
-  ;; :interpreter ("python" . python-mode)
   (setq python-indent-offset 4)
   (setq python-shell-interpreter "ipython"
         ;; python-shell-interpreter-args "console --simple-prompt"
         python-shell-prompt-detect-failure-warning nil)
-  ;; (add-to-list 'python-shell-completion-native-disabled-interpreters
-  ;;              "jupyter")
-  ;; (custom-set-variables
-  ;;  '(flycheck-python-flake8-executable "python3")
-  ;;  '(flycheck-python-pycompile-executable "python3")
-  ;;  '(flycheck-python-pylint-executable "python3"))
-  ;; (flycheck-add-next-checker 'python-flake8 'python-mypy t)
   )
 
 (lp-emacs-elpa-package 'pyvenv)
-                                        ; optional: if Org Ref is not loaded anywhere else, load it here
 #+end_src
 
 ** julia
@@ -1848,10 +1816,8 @@ python3-proselint=
   (define-key c++-mode-map (kbd "C-j") 'c-indent-new-comment-line)
   (add-hook 'c++-mode-hook
             #'(lambda ()
-                (setq compile-command "cmake .. -DCMAKE_EXRORT_COMPILE_COMMANDS=1 -DCMAKE_BUILD_TYPE=Debug; make clean; cmake --build . -j8")
+                (setq compile-command "cmake .. -DCMAKE_EXRORT_COMPILE_COMMANDS=1 -DCMAKE_BUILD_TYPE=Debug; cmake --build . -j8")
                 ))
-  (define-key c-mode-map (kbd "C-M-q") nil)
-  (define-key c-mode-map (kbd "C-M-q") nil)
   )
 
 (lp-emacs-builtin-package 'gud
@@ -1870,10 +1836,8 @@ python3-proselint=
           map))
   (define-key c-mode-map (kbd "C-c g") gud-nav-map)
   (define-key c++-mode-map (kbd "C-c g") gud-nav-map))
-
-
 #+end_src
-*** cmake
+** cmake
 #+begin_src emacs-lisp
 (lp-emacs-elpa-package 'cmake-mode)
 
@@ -1883,14 +1847,15 @@ python3-proselint=
 ** (common) lisp and scheme
 #+begin_src emacs-lisp
 (lp-emacs-elpa-package 'paredit
-  (defun activate-paredit ()
+  (defun lp--activate-paredit ()
+    "Activates `paredit-mode'"
     (interactive)
     (paredit-mode +1))
-  (add-hook 'emacs-lisp-mode-hook #'activate-paredit)
-  (add-hook 'lisp-mode-hook #'activate-paredit)
-  (add-hook 'scheme-mode-hook #'activate-paredit)  
-  (add-hook 'geiser-mode-hook #'activate-paredit)  
-  (add-hook 'geiser-mode-hook #'activate-paredit))
+
+  (add-hook 'emacs-lisp-mode-hook #'lp--activate-paredit)
+  (add-hook 'lisp-mode-hook #'lp--activate-paredit)
+  (add-hook 'scheme-mode-hook #'lp--activate-paredit)
+  (add-hook 'sly-mode-hook #'lp--activate-paredit))
 
 (lp-emacs-elpa-package 'sly
   (setq inferior-lisp-program "/usr/bin/sbcl"))
@@ -1901,26 +1866,24 @@ python3-proselint=
 
 ;; eldoc provides minibuffer hints for elisp things. it's super nice
 (lp-emacs-elpa-package 'eldoc
-  ;;:diminish eldoc-mode
   (global-eldoc-mode 1))
 
 (lp-emacs-elpa-package 'rainbow-delimiters
-  ;; :diminish rainbow-delimiters-mode
   (add-hook 'prog-mode-hook 'rainbow-delimiters-mode))
 
 ;; since chez has no docs implemented for geiser, i'd rather just generate tags and use
-;; xref-etags-mode to do most of the heavy lifting.
-(lp-emacs-elpa-package 'geiser)
+;; xref-etags-mode to do most of the heavy lifting...
+(lp-emacs-elpa-package 'geiser
+  (add-hook 'geiser-mode-hook #'lp--activate-paredit))
 
 (lp-emacs-elpa-package 'geiser-chez)
 
 (add-to-list 'auto-mode-alist
-             '("\\.sc\\'" . scheme-mode))
-
-(add-to-list 'auto-mode-alist
+             '("\\.sc\\'" . scheme-mode)
              '("\\.sls\\'" . scheme-mode)
              '("\\.sps\\'" . scheme-mode))
 #+end_src
+
 ** symbolic math (maxima, calc)
 
 #+begin_src emacs-lisp
@@ -1929,9 +1892,6 @@ python3-proselint=
   (add-hook 'maxima-mode-hook #'maxima-hook-function)
   (add-hook 'maxima-inferior-mode-hook #'maxima-hook-function)
   (setq maxima-display-maxima-buffer t)
-  ;; :mode ("\\.mac\\'" . maxima-mode)
-  ;; :interpreter ("maxima" . maxima-mode)
-
   )
 #+end_src
 
@@ -1964,7 +1924,7 @@ has lots of overlap with =projectile=. Might as well remove a dependency.
   (setq
    ;; don't put "origin-" in front of new branch names by default
    magit-default-tracking-name-function 'magit-default-tracking-name-branch-only
-   magit-push-always-verify nil)
+   magit-push-always-verify t)
   (define-key global-map (kbd "C-x g") 'magit-status))
 #+END_SRC
 
@@ -2126,7 +2086,7 @@ A =top=-like interface for emacs.
 #+begin_src emacs-lisp
 (lp-emacs-builtin-package 'proced
   (setq proced-auto-update-flag t)
-  (setq proced-auto-update-interval 5)
+  (setq proced-auto-update-interval 2)
   (setq proced-descend t)
   (setq prcoed-filter 'user))
 #+end_src
