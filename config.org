@@ -1877,11 +1877,6 @@ python3-proselint=
   (add-hook 'geiser-mode-hook #'lp--activate-paredit))
 
 (lp-emacs-elpa-package 'geiser-chez)
-
-(add-to-list 'auto-mode-alist
-             '("\\.sc\\'" . scheme-mode)
-             '("\\.sls\\'" . scheme-mode)
-             '("\\.sps\\'" . scheme-mode))
 #+end_src
 
 ** symbolic math (maxima, calc)
@@ -1914,7 +1909,8 @@ not gonna worry about it for now).
 Instead of using =projectile=, there's now a wonderful built-in library, =project=, which
 has lots of overlap with =projectile=. Might as well remove a dependency.
 #+begin_src emacs-lisp
-(lp-emacs-builtin-package 'project)
+(lp-emacs-builtin-package 'project
+  (define-key global-map (kbd "C-x p a") 'ff-find-other-file))
 #+end_src
 ** magit
 #+begin_src emacs-lisp
