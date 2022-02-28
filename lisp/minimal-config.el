@@ -454,6 +454,7 @@ with an old syntax that accepted only one binding."
     (list 'if-let* spec then (macroexp-progn else))))
 
 
+(require 'calendar)
 (setq-local calendar-date-display-form calendar-iso-date-display-form)
 (load-file "~/.emacs.d/lisp/lp-scratch.el")
 (setq journal-dir (file-truename "~/org/roam/daily/"))
@@ -733,4 +734,4 @@ with an old syntax that accepted only one binding."
   (setq tramp-verbose 3) ;; can go up to 11! 3 is the default.
   )
 
-(provide 'config-minimal)
+(provide 'minimal-config)
