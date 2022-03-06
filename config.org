@@ -2,27 +2,29 @@
 
 Documenting this configuration is a way to consolidate the knowledge of my own
 environment. This could serve as an entry-point for someone (bless their heart) to try to
-see what this configuration has to offer, but primarily this is (somewhat
-counter intuitively) for selfish reasons.
+see what this configuration has to offer, but this is primarily (and perhaps
+counter-intuitively) for selfish reasons.
 
 There's an emphasis on simple utilities and packages. This logically leads to relying on
-many of the wonderful, but perhaps not-as-well-understood, built-in packages (winner, tab bar,
-bibtex, dabbrev+abbrev, xref, ...), and some external-but-necessary packages
-({mct,embark,consult}, yasnippet, ...). Simple packages allow composability: "dedication to
-its craft" means that packages won't be stepping on each-others toes which reduces the
-cognitive overhead of evaluating, say, which search+jump function to use.
+many of the wonderful, but perhaps not-as-well-understood, built-in packages (~winner~, ~tab
+bar~, ~bibtex~, ~dabbrev+abbrev~, ~xref~, ...), and some external-but-necessary packages
+({~mct~, ~embark~, ~consult~}, ~yasnippet~, ...). Simple packages allow composability:
+"dedication to its craft" means that packages won't be stepping on each-others toes, which
+reduces the cognitive overhead of evaluating, say, which search+jump function to use.
 
 More complex packages are no doubt useful and have their place (Helm, Ivy). But in the past
 I relied too much on these big strong tools without the underlying systems and methodology
 in place to effectively use them, rendering my productivity much lower than it could have
 been. The first brain needs to work well before the second brain can be effective. Also I
 was incessantly yak-shaving since I had no laws about which packages to install, so keeping
-a simple-and-preferred-built-in approach forces me to think twice about whether I really need
-the new shiny docker buffer editing package (YAGNI after all).
+a simple-and-preferred-built-in approach forces me to think twice about whether I really
+need the new shiny docker buffer editing package, or a SCSS-specific color-mapping mode. An
+end-goal may be to someday rely on no external packages, but that doesn't seem likely unless
+~orderless~ somehow makes it into ~emacs.git~.
 
 Inspiration is, as always, taken from those more experienced and more wise than
 myself. Credits to the (many) configurations I took inspiration from over the years, which
-are linked at the end.
+are linked in a final section.
 
 * sane defaults and general emacs capabilities
 ** initial setup, keybinds, etc.
@@ -2514,7 +2516,10 @@ the go-to.
 - Prot, of course. [[potesilaos.com/emacs/dotemacs]]. So much of the little things he picks up
   on in the manuals and specifications is incredibly useful in day-to-day use. That's not
   even mentioning his incredibly informative youtube videos and insightful posts on his
-  website, both emacs-related or otherwise.
+  website, both emacs-related or otherwise. His communication of the "software-freedom
+  philosophy" is best-in-class and inspired me to sit down, minimize, and really understand
+  my tools. In this way, I am free from the standards and specifications of those who wish
+  to indoctrinate me into a state of reliance on their sub-par and opaque products.
+- Howardisms is an OG. 
 - Sacha Chua
-- Howardisms
-- TODO there's a lot more ...
+- TODO: I'm sure there's a lot more ...
