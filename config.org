@@ -547,6 +547,10 @@ General aesthetic configurations for emacs
 (lp-emacs-elpa-package 'twilight-bright-theme)
 #+end_src
 
+** Cursor and fine-grained theme-ing
+#+begin_src emacs-lisp
+(set-cursor-color "IndianRed")
+#+end_src
 * movement and editing
 ** isearch and replace
 =isearch= isn't gonna go out of style anytime soon that's for sure. And especially not if
@@ -774,14 +778,14 @@ shine, but for now I'm using it mostly for =embark-export= for batched editing o
 Enhanced minibuffer information when using =switch-to-buffer=, =find-file=,
 =describe-variable=, etc.
 
-#+begin_verbatim emacs-lisp
+#+begin_src emacs-lisp :tangle no
 (lp-emacs-elpa-package 'marginalia
-(setq marginalia-max-relative-age 0)  ; time is absolute here!
-(marginalia-mode 1)
-(with-eval-after-load 'mct
-(progn
-(setq mct-apply-completion-stripes t)))
-#+end_verbatim
+  (setq marginalia-max-relative-age 0)  ; time is absolute here!
+  (marginalia-mode 1)
+  (with-eval-after-load 'mct
+    (progn
+      (setq mct-apply-completion-stripes t))))
+#+end_src
 ** orderless  -- orderless filtering and mapping of symbols
 
 For matching symbols without regard for order, we use =orderless=.
@@ -949,7 +953,7 @@ advanced expansions than =abbrev= are needed.
 
 Its debatable whether xref should be in this section. May re-evaluate in future.
 
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
 (lp-emacs-builtin-package 'xref
   ;; All these have been changed for Emacs 28
   (setq xref-show-definitions-function #'xref-show-definitions-completing-read) ; for M-.
@@ -1006,8 +1010,7 @@ Its debatable whether xref should be in this section. May re-evaluate in future.
 (lp-emacs-builtin-package 'reftex)
 
 (lp-emacs-elpa-package 'cdlatex
-  (add-hook 'latex-mode-hook 'turn-on-cdlatex))
-
+  (add-hook 'latex-mode-hook #'cdlatex-mode))
 #+end_src
 ** org
 #+begin_src emacs-lisp
@@ -1504,60 +1507,40 @@ Its debatable whether xref should be in this section. May re-evaluate in future.
   (define-key map (kbd "C-c d m") #'diary-mail-entries))
 #+end_src
 
-** org-ref
+** bibtex and citation management
 #+begin_src emacs-lisp
-(lp-emacs-elpa-package 'async)
-
-(lp-emacs-builtin-package 'bibtex
-
-  (setq bibtex-autokey-year-length 4
-        bibtex-autokey-name-year-separator "-"
-        bibtex-autokey-year-title-separator "-"
-        bibtex-autokey-titleword-separator "-"
-        bibtex-autokey-titlewords 2
-        bibtex-autokey-titlewords-stretch 1
-        bibtex-autokey-titleword-length 5))
+(lp-emacs-builtin-package 'bibtex)
 (lp-emacs-elpa-package 'bibtex-completion
   (setq bibtex-completion-bibliography '(
                                          "~/org/bib/index.bib"
-                                         ;; "~/org/bib/references.bib"
-                                         ;; "~/org/bib/dei.bib"
-                                         ;; "~/org/bib/master.bib"
                                          "~/org/bib/archive.bib"
                                          )
         bibtex-completion-library-path '("~/org/bib/pdfs/")
-        bibtex-completion-notes-path "~/org/roam/"
-        bibtex-completion-notes-template-multiple-files "* ${author-or-editor}, ${title}, ${journal}, (${year}) :${=type=}: \n\nSee [[cite:&${=key=}]]\n"
+        bibtex-completion-notes-path "~/org/bib/notes/"
+        bibtex-completion-notes-template-multiple-files "* ${author-or-editor}, ${title}, ${journal}, (${year}) :${=type=}: \n\nSee [[cite:&${=key=}]]\n"))
 
-        bibtex-completion-additional-search-fields '(keywords)
-        bibtex-completion-display-formats
-        '((article       . "${=has-pdf=:1}${=has-note=:1} ${year:4} ${author:36} ${title:*} ${journal:40}")
-          (inbook        . "${=has-pdf=:1}${=has-note=:1} ${year:4} ${author:36} ${title:*} Chapter ${chapter:32}")
-          (incollection  . "${=has-pdf=:1}${=has-note=:1} ${year:4} ${author:36} ${title:*} ${booktitle:40}")
-          (inproceedings . "${=has-pdf=:1}${=has-note=:1} ${year:4} ${author:36} ${title:*} ${booktitle:40}")
-          (t             . "${=has-pdf=:1}${=has-note=:1} ${year:4} ${author:36} ${title:*}"))
-        bibtex-completion-pdf-open-function
-        (lambda (fpath)
-          (call-process "open" nil 0 nil fpath))))
-
-;; TODO this might break
+;; TODO this might break someday. might just want to implement this by hand instead of rely
+;; on small external package
 (when (not (directory-name-p "~/.emacs.d/consult-bibtex"))
   (shell-command "cd ~/.emacs.d/elpa && git clone https://github.com/mohkale/consult-bibtex.git"))
 (add-to-list 'load-path "~/.emacs.d/elpa/consult-bibtex/" t)
 
+;; TODO Technically a built-in at this point i guess with the above sneaky git clone. not great
 (lp-emacs-builtin-package 'consult-bibtex
   (with-eval-after-load 'embark
     (add-to-list 'embark-keymap-alist '(bibtex-completion . consult-bibtex-embark-map)))
   (setq consult-bibtex-default-action #'consult-bibtex-edit-notes))
+#+end_src
 
+*** org-ref :disabled:
+#+begin_src emacs-lisp :tangle no
+(lp-emacs-elpa-package 'async)
 (lp-emacs-elpa-package 'org-ref
   (require 'org-ref-bibtex)
   (require 'doi-utils)
   (require 'org-ref-arxiv)
 
-  ;; (define-key bibtex-mode-map (kbd "H-b") 'org-ref-bibtex-hydra/body)
   (define-key org-mode-map (kbd "C-c ]") 'org-ref-insert-link)
-  ;; (define-key org-mode-map (kbd "s-[") 'org-ref-insert-link-hydra/body)
   (define-key org-mode-map (kbd "C-c ]") 'org-ref-insert-link))
 #+end_src
 ** markdown
@@ -1756,7 +1739,7 @@ python3-proselint=
 
 *** flymake extras (diagnostic, shellcheck, proselint)
 
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
 (lp-emacs-elpa-package 'flymake-diagnostic-at-point
   (setq flymake-diagnostic-at-point-display-diagnostic-function
         'flymake-diagnostic-at-point-display-minibuffer))
@@ -1925,7 +1908,7 @@ has lots of overlap with =projectile=. Might as well remove a dependency.
 #+END_SRC
 
 ** vc
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
 (lp-emacs-builtin-package 'vc
   (setq vc-handled-backends '(SVN Git))
   ;;;  As always, from Prot. Directly copied. No shame. See https://protesilaos.com/emacs/dotemacs#h:31deeff4-dfae-48d9-a906-1f3272f29bc9
@@ -2153,7 +2136,7 @@ Access recent files, where recents exclude the annoying =.git=, =.elpa=, etc. fi
 #+END_SRC
 
 ** wgrep
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
 (lp-emacs-elpa-package 'wgrep
   (define-key grep-mode-map (kbd "C-x C-q") 'wgrep-change-to-wgrep-mode))
 #+end_src
