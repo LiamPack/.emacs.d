@@ -408,11 +408,11 @@ function."
 General aesthetic configurations for emacs
 *** new ones
 #+begin_src org
-            - ~eziam-theme~ -- monochrome based on leuven
-            - ~poet~ -- writing-optimized theme
-            - ~faff~ -- nice lil paper theme
-            - ~autumn-theme~ -- autumn theme and all that, similar to faff
-            - ~green-screen~ -- oldschool hilarity. too ridiculous
+                  - ~eziam-theme~ -- monochrome based on leuven
+                  - ~poet~ -- writing-optimized theme
+                  - ~faff~ -- nice lil paper theme
+                  - ~autumn-theme~ -- autumn theme and all that, similar to faff
+                  - ~green-screen~ -- oldschool hilarity. too ridiculous
 #+end_src
 
 *** old ones
@@ -455,10 +455,26 @@ General aesthetic configurations for emacs
    * That one black theme i'm using right now (6/15/19)
 #+end_verse
 
+** personal theme
+Some modifications to the built-in theme I'm playing with. Playing around with some [[https://protesilaos.com/codelog/2020-08-28-notes-emacs-theme-devs/][advice
+from Prot]] in building my own kind of theme. Right now its a direct rip of the [[https://github.com/rocher/ubuntu-theme][ubuntu-theme]]
+package (last updated 2015 as of writing [2022-03-06 Sun 15:16]).
+#+begin_src emacs-lisp
+(add-to-list 'load-path "~/.emacs.d/lisp/")
+(require 'lp-theme)
+(load-theme 'lp)
+(set-cursor-color "IndianRed")
+
+(set-frame-font "Quicksand Medium 14")
+
+;; (face-attribute 'default :font)
+;; #<font-object "-PfEd-Quicksand Medium-normal-normal-normal-*-16-*-*-*-*-0-iso10646-1"> funny font that auto-loaded somehow which i'm kinda vibing with
+#+end_src
+
 ** modus themes
 =modus-themes= is simply the GOAT at this point. Not much more to say than that.
 
-#+begin_src emacs-lisp
+#+begin_src emacs-lisp :tangle no
 (lp-emacs-elpa-package 'modus-themes
   (setq modus-themes-italic-constructs t
         modus-themes-bold-constructs t
@@ -540,16 +556,11 @@ General aesthetic configurations for emacs
   (load-theme 'modus-vivendi))
 #+end_src
 
-** Anti-Bright themes, a soft low-contrast light theme
-#+begin_src emacs-lisp
+** anti-bright themes, a soft low-contrast light theme
+#+begin_src emacs-lisp :tangle no
 ;; only enable when not terminal mode?
 (lp-emacs-elpa-package 'twilight-anti-bright-theme)
 (lp-emacs-elpa-package 'twilight-bright-theme)
-#+end_src
-
-** Cursor and fine-grained theme-ing
-#+begin_src emacs-lisp
-(set-cursor-color "IndianRed")
 #+end_src
 * movement and editing
 ** isearch and replace
@@ -1606,26 +1617,28 @@ A time-tested classic mark-up language. Not much more to say; the customizations
 
   (pdf-loader-install)
 
+  (with-eval-after-load 'modus-themes
   ;;; credits to prot as always!
-  ;; Those functions and hooks are adapted from the manual of my modus-themes.
-  ;; The idea is to (i) add a backdrop that is distinct from the background of
-  ;; the PDF's page and (ii) make pdf-tools adapt to theme switching via, e.g.,
-  ;; `modus-themes-toggle'.
-  (defun prot/pdf-tools-backdrop ()
-    (face-remap-add-relative
-     'default `(:background
-                ,(modus-themes-color
-                  'bg-alt))))
+    ;; Those functions and hooks are adapted from the manual of my modus-themes.
+    ;; The idea is to (i) add a backdrop that is distinct from the background of
+    ;; the PDF's page and (ii) make pdf-tools adapt to theme switching via, e.g.,
+    ;; `modus-themes-toggle'.
+    (defun prot/pdf-tools-backdrop ()
+      (face-remap-add-relative
+       'default `(:background
+                  ,(modus-themes-color
+                    'bg-alt))))
 
-  (defun prot/pdf-tools-midnight-mode-toggle ()
-    (when (derived-mode-p 'pdf-view-mode)
-      (if (eq (car custom-enabled-themes) 'modus-vivendi)
-          (pdf-view-midnight-minor-mode 1)
-        (pdf-view-midnight-minor-mode -1))
-      (prot/pdf-tools-backdrop)))
+    (defun prot/pdf-tools-midnight-mode-toggle ()
+      (when (derived-mode-p 'pdf-view-mode)
+        (if (eq (car custom-enabled-themes) 'modus-vivendi)
+            (pdf-view-midnight-minor-mode 1)
+          (pdf-view-midnight-minor-mode -1))
+        (prot/pdf-tools-backdrop)))
 
-  (add-hook 'pdf-tools-enabled-hook #'prot/pdf-tools-midnight-mode-toggle)
-  (add-hook 'modus-themes-after-load-theme-hook #'prot/pdf-tools-midnight-mode-toggle))
+    (add-hook 'pdf-tools-enabled-hook #'prot/pdf-tools-midnight-mode-toggle)
+    (add-hook 'modus-themes-after-load-theme-hook #'prot/pdf-tools-midnight-mode-toggle)
+    ))
 #+end_src
 
 ** ispell+flyspell

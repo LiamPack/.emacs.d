@@ -68,3 +68,5 @@
   ""
   (interactive)
   (lp--get-journal-files-next-date #'string< (lp--get-journal-file-date)))
+
+(provide 'lp-scratch)
