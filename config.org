@@ -8,7 +8,7 @@ counter-intuitively) for selfish reasons.
 There's an emphasis on simple utilities and packages. This logically leads to relying on
 many of the wonderful, but perhaps not-as-well-understood, built-in packages (~winner~, ~tab
 bar~, ~bibtex~, ~dabbrev+abbrev~, ~xref~, ...), and some external-but-necessary packages
-({~mct~, ~embark~, ~consult~}, ~yasnippet~, ...). Simple packages allow composability:
+({~mct~, ~embark~, ~consult~}, ...). Simple packages allow composability:
 "dedication to its craft" means that packages won't be stepping on each-others toes, which
 reduces the cognitive overhead of evaluating, say, which search+jump function to use.
 
@@ -410,11 +410,11 @@ function."
 General aesthetic configurations for emacs
 *** new ones
 #+begin_src org
-                  - ~eziam-theme~ -- monochrome based on leuven
-                  - ~poet~ -- writing-optimized theme
-                  - ~faff~ -- nice lil paper theme
-                  - ~autumn-theme~ -- autumn theme and all that, similar to faff
-                  - ~green-screen~ -- oldschool hilarity. too ridiculous
+                      - ~eziam-theme~ -- monochrome based on leuven
+                      - ~poet~ -- writing-optimized theme
+                      - ~faff~ -- nice lil paper theme
+                      - ~autumn-theme~ -- autumn theme and all that, similar to faff
+                      - ~green-screen~ -- oldschool hilarity. too ridiculous
 #+end_src
 
 *** old ones
@@ -458,16 +458,21 @@ General aesthetic configurations for emacs
 #+end_verse
 
 ** personal theme
-Some modifications to the built-in theme I'm playing with. Playing around with some [[https://protesilaos.com/codelog/2020-08-28-notes-emacs-theme-devs/][advice
-from Prot]] in building my own kind of theme. Right now its a direct rip of the [[https://github.com/rocher/ubuntu-theme][ubuntu-theme]]
-package (last updated 2015 as of writing [2022-03-06 Sun 15:16]).
+Some modifications to the built-in theme I'm playing with. Playing around with some
+[[https://protesilaos.com/codelog/2020-08-28-notes-emacs-theme-devs/][advice from Prot]] in
+building my own kind of theme. Right now its a direct rip of the [[https://github.com/rocher/ubuntu-theme][ubuntu-theme]] package (last
+updated 2015 as of writing [2022-03-06 Sun 15:16]).
+
+- [ ] variable-pitch with ~Quicksand~ as the non-monospaced font
+
 #+begin_src emacs-lisp
 (add-to-list 'load-path "~/.emacs.d/lisp/")
 (require 'lp-theme)
 (load-theme 'lp)
 (set-cursor-color "IndianRed")
 
-(set-frame-font "Quicksand Medium 14")
+(set-frame-font "DejaVu Sans Mono 14")
+;; (set-frame-font "Quicksand Medium 14")
 
 ;; (face-attribute 'default :font)
 ;; #<font-object "-PfEd-Quicksand Medium-normal-normal-normal-*-16-*-*-*-*-0-iso10646-1"> funny font that auto-loaded somehow which i'm kinda vibing with
@@ -502,7 +507,7 @@ package (last updated 2015 as of writing [2022-03-06 Sun 15:16]).
         ;; Options for `modus-themes-syntax' are either nil (the default),
         ;; or a list of properties that may include any of those symbols:
         ;; `faint', `yellow-comments', `green-strings', `alt-syntax'
-        modus-themes-syntax '(yellow-comments green-strings alt-syntax)
+        modus-themes-syntax '(yellow-comments green-strings)
 
         ;; Options for `modus-themes-hl-line' are either nil (the default),
         ;; or a list of properties that may include any of those symbols:
@@ -947,21 +952,6 @@ or of a new package.
   (setq dabbrev-upcase-means-case-search t))
 
 #+end_src
-** yasnippet
-
-nice snippets. they'll never go out of fashion. for when cursor placement and more
-advanced expansions than =abbrev= are needed.
-
-#+begin_src emacs-lisp
-;; configuration
-(lp-emacs-elpa-package 'yasnippet
-  ;;:diminish yas-minor-mode
-  (yas-global-mode 1)
-  (setq yas-fallback-behavior 'return-nil)
-  (setq yas-triggers-in-field t)
-  (setq yas-verbosity 0))
-#+end_src
-
 ** xref
 
 Its debatable whether xref should be in this section. May re-evaluate in future.
@@ -1529,12 +1519,11 @@ Its debatable whether xref should be in this section. May re-evaluate in future.
                                          "~/org/bib/archive.bib"
                                          )
         bibtex-completion-library-path '("~/org/bib/pdfs/")
-        bibtex-completion-notes-path "~/org/bib/notes/"
-        bibtex-completion-notes-template-multiple-files "* ${author-or-editor}, ${title}, ${journal}, (${year}) :${=type=}: \n\nSee [[cite:&${=key=}]]\n"))
+        bibtex-completion-notes-path "~/org/bib/notes/"))
 
 ;; TODO this might break someday. might just want to implement this by hand instead of rely
 ;; on small external package
-(when (not (directory-name-p "~/.emacs.d/consult-bibtex"))
+(when (not (directory-name-p "~/.emacs.d/elpa/consult-bibtex"))
   (shell-command "cd ~/.emacs.d/elpa && git clone https://github.com/mohkale/consult-bibtex.git"))
 (add-to-list 'load-path "~/.emacs.d/elpa/consult-bibtex/" t)
 
@@ -1561,16 +1550,11 @@ Its debatable whether xref should be in this section. May re-evaluate in future.
 A time-tested classic mark-up language. Not much more to say; the customizations are minimal.
 
 #+begin_src emacs-lisp
-(lp-emacs-elpa-package 'markdown-mode
-  ;;  :diminish (markdown-mode gfm-mode)
-  ;; :mode (("README\\.md\\'" . gfm-mode)
-  ;;        ("\\.md\\'" . markdown-mode)
-  ;;        ("\\.markdown\\'" . markdown-mode))
-  (setq markdown-command "multimarkdown"))
+(lp-emacs-elpa-package 'markdown-mode)
 #+end_src
 ** USLS
 #+begin_src emacs-lisp
-(when (not (directory-name-p "~/.emacs.d/usls"))
+(when (not (directory-name-p "~/.emacs.d/elpa/usls"))
   (shell-command "cd ~/.emacs.d/elpa && git clone https://gitlab.com/protesilaos/usls.git"))
 
 (add-to-list 'load-path "~/.emacs.d/elpa/usls/" t)
@@ -2503,11 +2487,24 @@ the go-to.
                        ("http://timharford.com/feed/" econ)
                        ("https://www.bennee.com/~alex/blog/feeds/all.atom.xml" infrequent)
                        ("https://sive.rs/podcast.rss" infrequent)
-                       ("https://jack-clark.net/feed/" ai tech)
                        ("https://lacker.io/feed.xml" ai tech)
                        ("https://graymirror.substack.com/feed" leftist))))
 #+end_src
 
+* hyper experimental, toxic zone
+In the below, I'm testing things out. No commentary, no thoughts, no brain on how i feel
+about them is detailed. that's for the main packages. this is the hyper-safe toxic-waste
+testing zone
+** moldable emacs
+In the
+#+begin_src emacs-lisp
+(when (not (directory-name-p "~/.emacs.d/elpa/moldable-emacs"))
+  (shell-command "cd ~/.emacs.d/elpa && git clone git@github.com:ag91/moldable-emacs.git"))
+(add-to-list 'load-path "~/.emacs.d/elpa/moldable-emacs")
+(require 'moldable-emacs)
+(add-to-list 'me-files-with-molds (concat (file-name-directory (symbol-file 'me-mold)) "molds/experiments.el")) ;; TODO this is relevant only if you have private molds
+(me-setup-molds)
+#+end_src
 * configurations and people i took inspiration from
 - Skeeto's configuration, https://github.com/skeeto/.emacs.d. This is the first
   configuration which I tried to modify for my own means back when I first started to take
@@ -2520,6 +2517,6 @@ the go-to.
   philosophy" is best-in-class and inspired me to sit down, minimize, and really understand
   my tools. In this way, I am free from the standards and specifications of those who wish
   to indoctrinate me into a state of reliance on their sub-par and opaque products.
-- Howardisms is an OG. 
+- Howardisms is an OG.
 - Sacha Chua
 - TODO: I'm sure there's a lot more ...
