@@ -1439,7 +1439,7 @@ Its debatable whether xref should be in this section. May re-evaluate in future.
 
   (require 'diary-lib)
   (setq diary-file (file-truename "~/org/diary"))
-  (setq user-mail-address "liampacker@gmail.com")
+  (setq user-mail-address "liamp@TheCave")
   (setq diary-mail-addr user-mail-address)
   (setq diary-date-forms diary-iso-date-forms)
   (setq diary-comment-start ";;")
@@ -1552,38 +1552,23 @@ A time-tested classic mark-up language. Not much more to say; the customizations
 #+begin_src emacs-lisp
 (lp-emacs-elpa-package 'markdown-mode)
 #+end_src
-** USLS
-#+begin_src emacs-lisp
-(when (not (directory-name-p "~/.emacs.d/elpa/usls"))
-  (shell-command "cd ~/.emacs.d/elpa && git clone https://gitlab.com/protesilaos/usls.git"))
-
-(add-to-list 'load-path "~/.emacs.d/elpa/usls/" t)
-(lp-emacs-builtin-package 'usls
-  (setq usls-directory (expand-file-name "~/org/roam/"))
-  (setq usls-known-categories '())
-  (setq usls-file-type-extension ".org")
-  (setq usls-subdir-support nil)
-  (setq usls-file-region-separator 'line)
-  (setq usls-file-region-separator-heading-level 1)
-  (setq usls-custom-header-function nil)
-  (let ((mode-map global-map))
-    (define-key mode-map (kbd "C-c f d") 'usls-dired)
-    (define-key mode-map (kbd "C-c f f") 'usls-find-file)
-    (define-key mode-map (kbd "C-c f a") 'usls-append-region-buffer-or-file)
-    (define-key mode-map (kbd "C-c f n") 'usls-new-note))
-
-  (let ((mode-map usls-mode-map))
-    (define-key mode-map (kbd "C-c n i") 'usls-id-insert)
-    (define-key mode-map (kbd "C-c n l") 'usls-follow-link)))
-#+end_src
 ** ~lp-journal~ for simple, low-cost journal management
 #+begin_src emacs-lisp
-(load-file "~/.emacs.d/lisp/lp-scratch.el")
-(setq journal-dir (file-truename "~/org/roam/daily/"))
+(require 'lp-scratch)
+(setq lp--journal-dir (file-truename "~/org/roam/daily/"))
 (define-key global-map (kbd "C-c f j j") 'lp-journal-visit-today)
 (define-key global-map (kbd "C-c f j n") 'lp-journal-visit-forward-one-day)
 (define-key global-map (kbd "C-c f j p") 'lp-journal-visit-backward-one-day)
 #+end_src
+** ~lp-notes~ for simple, low-cost notes management
+#+begin_src emacs-lisp
+(require 'lp-scratch)
+(setq lp--notes-dir (file-truename "~/org/roam/"))
+(define-key global-map (kbd "C-c f d") 'lp-notes-dired)
+(define-key global-map (kbd "C-c f f") 'lp-notes-find-file)
+(define-key global-map (kbd "C-c f n") 'lp-notes-make-file)
+#+end_src
+
 ** pdf-tools
 #+begin_src emacs-lisp
 (lp-emacs-elpa-package 'pdf-tools
@@ -2370,7 +2355,7 @@ the go-to.
   (setq smtpmail-stream-type 'ssl)
   (setq smtpmail-smtp-service 465)
   (setq smtpmail-queue-mail nil)
-  (setq smtpmail-smtp-server "smtp.gmail.com")
+  ;; (setq smtpmail-smtp-server "smtp.gmail.com")
   ;; (setq smtpmail-auth-credentials '(("smtp.gmail.com" 465 "liampacker@gmail.com" "acydhqtbgeudyvxm")))
   (setq smtpmail-debug-info t)
   (setq smtpmail-debug-verb t)

@@ -456,11 +456,16 @@ with an old syntax that accepted only one binding."
 
 (require 'calendar)
 (setq-local calendar-date-display-form calendar-iso-date-display-form)
-(load-file "~/.emacs.d/lisp/lp-scratch.el")
-(setq journal-dir (file-truename "~/org/roam/daily/"))
+(require 'lp-scratch)
+(setq lp--journal-dir (file-truename "~/org/roam/daily/"))
+(setq lp--notes-dir (file-truename "~/org/roam/"))
 (define-key global-map (kbd "C-c f j j") 'lp-journal-visit-today)
 (define-key global-map (kbd "C-c f j n") 'lp-journal-visit-forward-one-day)
 (define-key global-map (kbd "C-c f j p") 'lp-journal-visit-backward-one-day)
+
+(define-key global-map (kbd "C-c f d") 'lp-notes-dired)
+(define-key global-map (kbd "C-c f f") 'lp-notes-find-file)
+(define-key global-map (kbd "C-c f n") 'lp-notes-make-file)
 
 (let (prog-mode)
   ;; Mark TODOs , FIXME, BUG as red in src code

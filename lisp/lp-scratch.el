@@ -1,5 +1,6 @@
 (require 'calendar)
 
+;;; LP Journal -- simple journal management
 (defvar lp--journal-dir (file-truename "~/org/roam/daily/"))
 
 (defun lp--time-to-string (T)
@@ -9,6 +10,17 @@
          (month (nth 4 time))
          (year (nth 5 time)))
     (calendar-date-string (list month day year))))
+
+(defun lp--time-to-string-verbose (T)
+  ""
+  (let* ((time (decode-time T))
+         (second (nth 0 time))
+         (minute (nth 1 time))
+         (hour (nth 2 time))
+         (day (nth 3 time))
+         (month (nth 4 time))
+         (year (nth 5 time)))
+    (format "%4s%.2d%.2d_%.2d%.2d%.2d" year month day hour minute second)))
 
 (defun lp--string-to-time (s)
   ""
@@ -68,5 +80,50 @@
   ""
   (interactive)
   (lp--get-journal-files-next-date #'string< (lp--get-journal-file-date)))
+
+
+;;; LP Notes -- Simple note management
+(defvar lp--notes-dir (file-truename "~/org/roam/"))
+
+(defun lp-notes-dired ()
+  ""
+  (interactive)
+  (dired lp--notes-dir))
+
+(defun lp-notes-find-file ()
+  ""
+  (interactive)
+  (let* ((filename (completing-read "Filename: " (directory-files lp--notes-dir nil ".org") nil t)))
+    (find-file (concat (file-name-as-directory lp--notes-dir) filename))))
+
+(defun lp-notes-make-file ()
+  ""
+  (interactive)
+  (let* ((note-name (completing-read "File Title: " '()))
+         (note-filename (replace-regexp-in-string (regexp-quote "[ ,.&%$#@!]") "-" (downcase note-name) t t))
+         (note-tags (completing-read-multiple "Tags: " '()))
+         (unique-time (lp--time-to-string-verbose (current-time)))
+         (note-full-filename (concat (file-name-as-directory lp--notes-dir)
+                                     (string-join (list unique-time
+                                                        (string-join note-tags "+")
+                                                        note-filename)
+                                                  "--")
+                                     ".org")))
+    (switch-to-buffer
+     (find-file
+      note-full-filename))
+    (insert
+     (format
+      "#+title:     %s
+#+date:      %s
+#+category:  %s
+#+orig_name: %s
+#+orig_id:   %s
+"
+      (upcase note-name)
+      (lp--time-to-string (current-time))
+      note-tags
+      note-full-filename
+      unique-time))))
 
 (provide 'lp-scratch)
