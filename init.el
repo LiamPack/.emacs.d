@@ -71,5 +71,3 @@
     (require 'ob-tangle)
     (org-babel-tangle-file .org .el "emacs-lisp"))
   (load-file .el))
-
-(set-frame-font "DejaVu Sans Mono 12")

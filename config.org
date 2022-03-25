@@ -1811,18 +1811,14 @@ python3-proselint=
 (lp-emacs-elpa-package 'eldoc-cmake
   (add-hook 'cmake-mode-hook 'eldoc-cmake-enable))
 #+end_src
-** (common) lisp and scheme
+** (common) lisp, scheme, and racket
 #+begin_src emacs-lisp
 (lp-emacs-elpa-package 'paredit
-  (defun lp--activate-paredit ()
-    "Activates `paredit-mode'"
-    (interactive)
-    (paredit-mode +1))
-
-  (add-hook 'emacs-lisp-mode-hook #'lp--activate-paredit)
-  (add-hook 'lisp-mode-hook #'lp--activate-paredit)
-  (add-hook 'scheme-mode-hook #'lp--activate-paredit)
-  (add-hook 'sly-mode-hook #'lp--activate-paredit))
+  (add-hook 'emacs-lisp-mode-hook #'paredit-mode)
+  (add-hook 'lisp-mode-hook #'paredit-mode)
+  (add-hook 'scheme-mode-hook #'paredit-mode)
+  (add-hook 'sly-mode-hook #'paredit-mode)
+  (add-hook 'racket-mode-hook #'paredit-mode))
 
 (lp-emacs-elpa-package 'sly
   (setq inferior-lisp-program "/usr/bin/sbcl"))
@@ -1841,11 +1837,14 @@ python3-proselint=
 ;; since chez has no docs implemented for geiser, i'd rather just generate tags and use
 ;; xref-etags-mode to do most of the heavy lifting...
 (lp-emacs-elpa-package 'geiser
-  (add-hook 'geiser-mode-hook #'lp--activate-paredit))
+  (add-hook 'geiser-mode-hook #'paredit-mode))
 
 (lp-emacs-elpa-package 'geiser-chez)
+(lp-emacs-elpa-package 'racket-mode
+  (add-hook 'racket-mode-hook #'racket-xp-mode)
+  (lp-emacs-elpa-package 'flymake-racket
+    (flymake-racket-setup)))
 #+end_src
-
 ** symbolic math (maxima, calc)
 
 #+begin_src emacs-lisp
