@@ -4,7 +4,8 @@
 (deftheme lp
   "A theme.")
 
-(custom-theme-set-faces 'lp
+(custom-theme-set-faces
+ 'lp
  '(button ((t (:inherit (link)))))
  '(cursor ((t (:background "pink"))))
  '(custom-button ((t (:background "bisque1" :foreground "black" :box (:line-width 2 :style released-button)))))
@@ -14,11 +15,11 @@
  '(custom-button-pressed ((t (:background "bisque4" :foreground "black" :box (:line-width 2 :style pressed-button)))))
  '(custom-button-pressed ((t (:background "bisque4" :foreground "black" :box (:line-width 2 :style pressed-button)))))
  '(custom-documentation ((t (:inherit default))))
- '(custom-group-subtitle ((t (:foreground "orange2" :underline t :weight normal :height 1.1 :family "Ubuntu Condensed"))))
- '(custom-group-tag ((t (:inherit default :foreground "orange red" :height 1.6 :family "Ubuntu Condensed"))))
- '(custom-variable-tag ((t (:foreground "orange1" :weight normal :height 1.2 :family "Ubuntu Condensed"))))
+ '(custom-group-subtitle ((t (:foreground "orange2" :underline t :weight normal :height 1.1 ))))
+ '(custom-group-tag ((t (:inherit default :foreground "orange red" :height 1.6 ))))
+ '(custom-variable-tag ((t (:foreground "orange1" :weight normal :height 1.2 ))))
  '(custom-visibility ((t (:inherit link :height 0.9))))
- '(default ((t (:inherit nil :stipple nil :background "#300a24" :foreground "#e0e0e0" :inverse-video nil :box nil :strike-through nil :overline nil :underline nil :slant normal :weight normal :width normal :foundry "unknown" :family "Ubuntu Mono"))))
+ '(default ((t (:inherit nil :stipple nil :background "#300a24" :foreground "#e0e0e0" :inverse-video nil :box nil :strike-through nil :overline nil :underline nil :slant normal :weight normal :width normal))))
  '(diff-file-header ((t (:background "grey60" :foreground "black" :weight bold))))
  '(diff-refine-added ((t (:inherit diff-refine-change :background "#114411" :foreground "#11ff11"))))
  '(diff-refine-changed ((t (:background "#444411" :foreground "#ffff11"))))
@@ -39,7 +40,7 @@
  '(ediff-odd-diff-B ((t (:background "light grey" :foreground "dim gray"))))
  '(ediff-odd-diff-C ((t (:background "dim grey" :foreground "light grey"))))
  '(escape-glyph ((((background dark)) (:foreground "cyan")) (((type pc)) (:foreground "magenta")) (t (:foreground "brown"))))
- '(fixed-pitch ((t (:family "Ubuntu Mono"))))
+ ;; '(fixed-pitch ((t (:family "Ubuntu Mono"))))
  '(flycheck-fringe-error ((t (:background "#600000" :foreground "#ff4444" :weight bold))))
  '(flycheck-fringe-info ((t (:background "#006600" :foreground "green" :weight bold))))
  '(flycheck-fringe-warning ((t (:background "saddle brown" :foreground "yellow2" :weight bold))))
@@ -63,11 +64,11 @@
  '(header-line ((t (:box nil :foreground "grey90" :background "grey20" :inherit (mode-line)))))
  '(highlight ((t (:background "#441133"))))
  '(hs-face ((t (:background "dark orange" :foreground "black"))))
- '(info-menu-header ((t (:foreground "bisque" :underline t :weight normal :height 1.2 :family "Ubuntu Condensed"))))
+ '(info-menu-header ((t (:foreground "bisque" :underline t :weight normal :height 1.2 ))))
  '(info-title-1 ((t (:inherit info-title-2 :height 1.25))))
  '(info-title-2 ((t (:inherit info-title-3 :height 1.25))))
  '(info-title-3 ((t (:inherit info-title-4 :height 1.25))))
- '(info-title-4 ((t (:foreground "bisque" :weight normal :height 1.25 :family "Ubuntu Condensed"))))
+ '(info-title-4 ((t (:foreground "bisque" :weight normal :height 1.25 ))))
  '(isearch ((t (:background "palevioletred1" :foreground "brown4"))))
  '(isearch ((t (:background "palevioletred1" :foreground "brown4"))))
  '(isearch-fail ((t (:background "red4" :foreground "white"))))
@@ -99,7 +100,7 @@
  '(term-color-yellow ((t (:background "yellow4" :foreground "yellow2"))))
  '(tooltip ((t (:foreground "black" :background "lightyellow" :inherit (variable-pitch)))))
  '(trailing-whitespace ((((class color) (background light)) (:background "red1")) (((class color) (background dark)) (:background "red1")) (t (:inverse-video t))))
- '(variable-pitch ((t (:family "Ubuntu"))))
+ ;; '(variable-pitch ((t (:family "Ubuntu"))))
  )
 
 ;;;###autoload

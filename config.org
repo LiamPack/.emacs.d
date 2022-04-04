@@ -272,6 +272,8 @@ Not all of the emacs defaults are quite sane. So here's to some sanity.
   (put 'shrink-window-horizontally 'repeat-map 'resize-window-repeat-map)
   (put 'shrink-window 'repeat-map 'resize-window-repeat-map)
 
+  (setq fit-window-to-buffer-horizontally t)
+
   (let ((map global-map))
     (define-key map (kbd "C-x <down>") #'next-buffer)
     (define-key map (kbd "C-x <up>") #'previous-buffer)
@@ -410,11 +412,14 @@ function."
 General aesthetic configurations for emacs
 *** new ones
 #+begin_src org
-                      - ~eziam-theme~ -- monochrome based on leuven
-                      - ~poet~ -- writing-optimized theme
-                      - ~faff~ -- nice lil paper theme
-                      - ~autumn-theme~ -- autumn theme and all that, similar to faff
-                      - ~green-screen~ -- oldschool hilarity. too ridiculous
+                                    - ~eziam-theme~ -- monochrome based on leuven
+                                    - ~poet~ -- writing-optimized theme
+                                    - ~faff~ -- nice lil paper theme
+                                    - ~autumn-theme~ -- autumn theme and all that, similar to faff
+                                    - ~green-screen~ -- oldschool hilarity. too ridiculous
+                                    - soft stone
+                                    - plan9
+                                    - solarized gruvbox light f
 #+end_src
 
 *** old ones
@@ -457,6 +462,13 @@ General aesthetic configurations for emacs
    * That one black theme i'm using right now (6/15/19)
 #+end_verse
 
+** color design
+#+begin_src emacs-lisp
+(lp-emacs-elpa-package 'ct)
+(lp-emacs-elpa-package 'rainbow-mode
+  (setq rainbow-ansi-colors nil)
+  (setq rainbow-x-colors nil))
+#+end_src
 ** personal theme
 Some modifications to the built-in theme I'm playing with. Playing around with some
 [[https://protesilaos.com/codelog/2020-08-28-notes-emacs-theme-devs/][advice from Prot]] in
@@ -467,11 +479,21 @@ updated 2015 as of writing [2022-03-06 Sun 15:16]).
 
 #+begin_src emacs-lisp :tangle no
 (add-to-list 'load-path "~/.emacs.d/lisp/")
+
 (require 'lp-theme)
 (load-theme 'modus-vivendi)
-(set-cursor-color "IndianRed")
+(set-frame-font "Monaco 18")
 
-(set-frame-font "DejaVu Sans Mono 14")
+;; (modify-all-frames-parameters
+;;  '((right-divider-width . 40)
+;;    (internal-border-width . 40)))
+;; (dolist (face '(window-divider
+;;                 window-divider-first-pixel
+;;                 window-divider-last-pixel))
+;;   (face-spec-reset-face face)
+;;   (set-face-foreground face (face-attribute 'default :background)))
+;; (set-face-background 'fringe (face-attribute 'default :background))
+
 ;; (set-frame-font "Quicksand Medium 14")
 
 ;; (face-attribute 'default :font)
@@ -490,7 +512,7 @@ updated 2015 as of writing [2022-03-06 Sun 15:16]).
         modus-themes-subtle-line-numbers t
         modus-themes-success-deuteranopia nil
 
-        modus-themes-fringes 'subtle ; {nil,'subtle,'intense}
+        modus-themes-fringes nil ; {nil,'subtle,'intense}
 
         ;; Options for `modus-themes-lang-checkers' are either nil (the
         ;; default), or a list of properties that may include any of those
@@ -502,12 +524,12 @@ updated 2015 as of writing [2022-03-06 Sun 15:16]).
         ;; that can combine any of `3d' OR `moody', `borderless',
         ;; `accented'.  The variable's doc string shows all possible
         ;; combinations.
-        modus-themes-mode-line '()
+        modus-themes-mode-line '(3d)
 
         ;; Options for `modus-themes-syntax' are either nil (the default),
         ;; or a list of properties that may include any of those symbols:
         ;; `faint', `yellow-comments', `green-strings', `alt-syntax'
-        modus-themes-syntax '(yellow-comments green-strings)
+        modus-themes-syntax '(yellow-comments green-strings )
 
         ;; Options for `modus-themes-hl-line' are either nil (the default),
         ;; or a list of properties that may include any of those symbols:
@@ -530,7 +552,7 @@ updated 2015 as of writing [2022-03-06 Sun 15:16]).
         ;; symbols: `background', `bold', `gray', `intense', `italic'
         modus-themes-prompts '(background italic)
 
-        modus-themes-completions 'opinionated ; {nil,'moderate,'opinionated}
+        modus-themes-completions 'moderate ; {nil,'moderate,'opinionated}
 
         modus-themes-mail-citations nil ; {nil,'faint,'monochrome}
 
@@ -558,7 +580,7 @@ updated 2015 as of writing [2022-03-06 Sun 15:16]).
         ;;   (2 . (rainbow overline))
         ;;   (t . (no-bold)))
         )
-  (load-theme 'modus-vivendi))
+  )
 #+end_src
 
 ** anti-bright themes, a soft low-contrast light theme
@@ -781,7 +803,7 @@ shine, but for now I'm using it mostly for =embark-export= for batched editing o
   (define-key global-map (kbd "C->") 'embark-become)
   (define-key global-map (kbd "M-a") 'embark-act)
   (define-key completion-list-mode-map (kbd "M-a")
-    #'(lambda () (interactive) () (mct-focus-mini-or-completions) (embark-act))))
+              #'(lambda () (interactive) () (mct-focus-mini-or-completions) (embark-act))))
 
 (lp-emacs-elpa-package 'embark-consult
   (define-key embark-collect-mode-map (kbd "o") 'consult-preview-at-point)
@@ -1019,7 +1041,6 @@ Its debatable whether xref should be in this section. May re-evaluate in future.
   ;; TODO: fix this with the right straight source
   ;; (unbind-key (kbd "C-'") org-mode-map)
   ;; (unbind-key (kbd "C-c C-j") org-mode-map)
-
   (defun org-file-path (filename)
     "Return absolute address of an org file give its relative name."
     (concat (file-name-as-directory org-directory) filename))
@@ -1031,6 +1052,8 @@ Its debatable whether xref should be in this section. May re-evaluate in future.
   (setq org-pretty-entities t)
   (setq org-pretty-entities-include-sub-superscripts nil) ; not a fan of hidden characters
   (setq org-indirect-buffer-display #'current-window)
+  (setq org-format-latex-options (plist-put org-format-latex-options :scale 2.0))
+
 
 ;;; babel
   ;; NOTE: If this isn't working, make sure to delete /
@@ -1097,7 +1120,7 @@ Its debatable whether xref should be in this section. May re-evaluate in future.
   ;; todos
   (setq org-reverse-note-order nil)
   (setq org-todo-keywords
-        '((sequence "TODO(t)" "MAYBE(m)" "WAIT(w@/!)" "|" "CANCEL(c@)" "DONE(d!)")))
+        '((sequence "TODO(t)" "MAYBE(m)" "NEXT(n)" "WAIT(w@/!)" "|" "CANCEL(c@)" "DONE(d!)")))
   (setq org-todo-keyword-faces
         '(("WAIT" . '(bold org-todo))
           ("MAYBE" . '(bold shadow))
@@ -1106,7 +1129,8 @@ Its debatable whether xref should be in this section. May re-evaluate in future.
   (setq org-priority-faces
         '((?A . '(bold org-priority))
           (?B . org-priority)
-          (?C . '(shadow org-priority))))
+          (?C . org-priority)
+          (?D . '(shadow org-priority))))
   (setq org-fontify-done-headline nil)
   (setq org-fontify-quote-and-verse-blocks t)
   (setq org-fontify-whole-heading-line nil)
@@ -1116,7 +1140,7 @@ Its debatable whether xref should be in this section. May re-evaluate in future.
   (setq org-enforce-todo-checkbox-dependencies t)
   (setq org-track-ordered-property-with-tag t)
   (setq org-highest-priority ?A)
-  (setq org-lowest-priority ?C)
+  (setq org-lowest-priority ?D)
   (setq org-default-priority ?A)
 
 ;;; logging
@@ -1299,8 +1323,8 @@ Its debatable whether xref should be in this section. May re-evaluate in future.
            ,`((tags-todo "*"
                          ((org-agenda-skip-function '(org-agenda-skip-if nil '(timestamp)))
                           (org-agenda-skip-function
-                           `(org-agenda-skip-entry-if
-                             'notregexp ,(format "\\[#%s\\]" (char-to-string org-priority-highest))))
+                           '(org-agenda-skip-entry-if
+                             'notregexp "\\[#[ABCDEFG]\\]"))
                           (org-agenda-block-separator nil)
                           (org-agenda-overriding-header "Important tasks without a date\n")))
               (agenda "" ((org-agenda-time-grid nil)
@@ -1328,24 +1352,14 @@ Its debatable whether xref should be in this section. May re-evaluate in future.
                           (org-agenda-overriding-header "\nToday's agenda\n")))
               (agenda "" ((org-agenda-start-on-weekday nil)
                           (org-agenda-start-day "+1d")
-                          (org-agenda-span 3)
+                          (org-agenda-span 5)
                           (org-deadline-warning-days 0)
                           (org-agenda-block-separator nil)
                           (org-agenda-skip-function '(org-agenda-skip-entry-if 'todo 'done))
-                          (org-agenda-overriding-header "\nNext three days\n")))
-              (agenda "" ((org-agenda-time-grid nil)
-                          (org-agenda-start-on-weekday nil)
-                          ;; We don't want to replicate the previous section's
-                          ;; three days, so we start counting from the day after.
-                          (org-agenda-start-day "+4d")
-                          (org-agenda-span 14)
-                          (org-agenda-show-all-dates nil)
-                          (org-deadline-warning-days 0)
+                          (org-agenda-overriding-header "\nNext five days\n")))
+              (tags "*" ((org-agenda-skip-function '(org-agenda-skip-entry-if 'todo 'todo))
                           (org-agenda-block-separator nil)
-                          (org-agenda-entry-types '(:deadline :scheduled))
-                          (org-agenda-skip-function '(org-agenda-skip-entry-if 'todo 'done))
-                          (org-agenda-overriding-header "\nUpcoming deadlines (+14d)\n"))))
-           )))
+                          (org-agenda-overriding-header "Un-prioritized tasks\n")))))))
 
   ;; Bind C-c C-x C-s to mark todo as done and archive it
   (defun lp/mark-done-and-archive ()
@@ -1393,11 +1407,6 @@ Its debatable whether xref should be in this section. May re-evaluate in future.
                     "%a\n%i%?")
            :empty-lines-after 1)))
 
-  (setq org-capture-templates-contexts
-        '(("e" ((in-mode . "notmuch-search-mode")
-                (in-mode . "notmuch-show-mode")
-                (in-mode . "notmuch-tree-mode")))))
-
 ;;; autofill
   ;; Auto wrap paragraphs in some modes (auto-fill-mode)
   (add-hook 'text-mode-hook #'turn-on-auto-fill)
@@ -1411,6 +1420,12 @@ Its debatable whether xref should be in this section. May re-evaluate in future.
   (define-key global-map (kbd "C-c l") 'org-store-link))
 #+END_SRC
 
+*** org-modern
+#+begin_src emacs-lisp
+(lp-emacs-elpa-package 'org-modern
+  (add-hook 'org-mode-hook #'org-modern-mode)
+  (add-hook 'org-agenda-finalize-hook #'org-modern-agenda))
+#+end_src
 ** diary, calendar
 #+begin_src emacs-lisp
 (lp-emacs-builtin-package 'calendar
@@ -1662,11 +1677,33 @@ actions specified in the manual.
   (setq compilation-auto-jump-to-first-error t)
   )
 #+end_src
+** lsp lol
+#+begin_src emacs-lisp :tangle no
+(lp-emacs-elpa-package 'lsp-mode
+  (setq lsp-keymap-prefix "C-c l")
+  (setq lsp-auto-guess-root nil)
+  (setq lsp-prefer-flymake t) ; Use flycheck instead of flymake
+  (setq lsp-enable-file-watchers nil)
+  (setq lsp-enable-folding nil)
+  (setq read-process-output-max (* 1024 1024))
+  (setq lsp-keep-workspace-alive nil)
+  (setq lsp-eldoc-hook nil)
+  (add-hook 'java-mode-hook #'lsp))
+
+;; ;; LSPJavaPac
+(lp-emacs-elpa-package 'lsp-java
+  ;;(executable-find "mvn")
+  (setq lsp-java-server-install-dir (expand-file-name "~/.emacs.d/share/eclipse.jdt.ls/"))
+  (setq lsp-java-workspace-dir (expand-file-name "~/.emacs.d/share/eclipse.jdt.ls/workspace/")))
+;; ;; -LSPJavaPac
+
+
+#+end_src
 ** eglot
 #+begin_src emacs-lisp
 (lp-emacs-elpa-package 'eglot
   (defvar eglot-prog-mode-hooks '(python-mode-hook cc-mode-hook c-mode-hook c++-mode-hook cuda-mode-hook
-                                                   c-common-mode-hook julia-mode-hook rjsx-mode-hook
+                                                   julia-mode-hook rjsx-mode-hook
                                                    typescript-mode-hook tuareg-mode-hook))
   (dolist (mode eglot-prog-mode-hooks)
     (add-hook mode 'eglot-ensure))
@@ -1678,10 +1715,17 @@ actions specified in the manual.
   (define-key eglot-mode-map (kbd "C-c y h") #'eldoc)
   )
 
+(lp-emacs-elpa-package 'eglot-java
+  (eglot-java-init)
+  (setcdr (assq 'java-mode eglot-server-programs) '("/Users/packell1/.emacs.d/share/eclipse.jdt.ls/bin/jdtls"))
+  (add-hook 'java-mode-hook #'eglot-ensure)
+  )
+
 ;; 4 julia
 (lp-emacs-elpa-package 'eglot-jl
   (eglot-jl-init)
   (setq eglot-connect-timeout 100))
+;; for the crashes https://github.com/non-Jedi/eglot-jl/issues/30
 
 (lp-emacs-elpa-package 'consult-eglot
   (define-key eglot-mode-map [remap xref-find-apropos] #'consult-eglot-symbols))
@@ -2064,6 +2108,8 @@ that I haven't dug my teeth into yet. I like the setup below.
 
   ;; disable ls by default
   (setq delete-by-moving-to-trash t)
+  (setq insert-directory-program "gls"
+        dired-use-ls-dired t)
   (setq dired-listing-switches
         "-AGFhlv --group-directories-first --time-style=long-iso")
   (setq dired-dwim-target t)
@@ -2130,6 +2176,7 @@ Access recent files, where recents exclude the annoying =.git=, =.elpa=, etc. fi
 ** exec path from shell
 #+begin_src emacs-lisp
 (lp-emacs-elpa-package 'exec-path-from-shell
+  (setq exec-path-from-shell-variables '("PATH" "JAVA_HOME"))
   (exec-path-from-shell-initialize))
 #+end_src
 
@@ -2477,16 +2524,6 @@ the go-to.
 In the below, I'm testing things out. No commentary, no thoughts, no brain on how i feel
 about them is detailed. that's for the main packages. this is the hyper-safe toxic-waste
 testing zone
-** moldable emacs
-In the
-#+begin_src emacs-lisp
-(when (not (directory-name-p "~/.emacs.d/elpa/moldable-emacs"))
-  (shell-command "cd ~/.emacs.d/elpa && git clone git@github.com:ag91/moldable-emacs.git"))
-(add-to-list 'load-path "~/.emacs.d/elpa/moldable-emacs")
-(require 'moldable-emacs)
-(add-to-list 'me-files-with-molds (concat (file-name-directory (symbol-file 'me-mold)) "molds/experiments.el")) ;; TODO this is relevant only if you have private molds
-(me-setup-molds)
-#+end_src
 * configurations and people i took inspiration from
 - Skeeto's configuration, https://github.com/skeeto/.emacs.d. This is the first
   configuration which I tried to modify for my own means back when I first started to take

@@ -120,7 +120,7 @@
 #+orig_name: %s
 #+orig_id:   %s
 "
-      (upcase note-name)
+      (capitalize note-name)
       (lp--time-to-string (current-time))
       note-tags
       note-full-filename
