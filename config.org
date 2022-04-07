@@ -1120,7 +1120,7 @@ Its debatable whether xref should be in this section. May re-evaluate in future.
   ;; todos
   (setq org-reverse-note-order nil)
   (setq org-todo-keywords
-        '((sequence "TODO(t)" "MAYBE(m)" "NEXT(n)" "WAIT(w@/!)" "|" "CANCEL(c@)" "DONE(d!)")))
+        '((sequence "TODO(t)" "MAYBE(m)" "WAIT(w@/!)" "|" "CANCEL(c@)" "DONE(d!)")))
   (setq org-todo-keyword-faces
         '(("WAIT" . '(bold org-todo))
           ("MAYBE" . '(bold shadow))
@@ -1320,13 +1320,13 @@ Its debatable whether xref should be in this section. May re-evaluate in future.
 
   (setq org-agenda-custom-commands
         `(("a" "What's Going On"
-           ,`((tags-todo "*"
-                         ((org-agenda-skip-function '(org-agenda-skip-if nil '(timestamp)))
-                          (org-agenda-skip-function
-                           '(org-agenda-skip-entry-if
-                             'notregexp "\\[#[ABCDEFG]\\]"))
-                          (org-agenda-block-separator nil)
-                          (org-agenda-overriding-header "Important tasks without a date\n")))
+           ,`((tags "*"
+                    ((org-agenda-skip-function
+                      '(org-agenda-skip-entry-if
+                        'notregexp "\\[#[ABCDEFG]\\]"
+                        'timestamp))
+                     (org-agenda-block-separator nil)
+                     (org-agenda-overriding-header "Important tasks without a date\n")))
               (agenda "" ((org-agenda-time-grid nil)
                           (org-agenda-start-on-weekday nil)
                           (org-agenda-span 1)
@@ -1357,9 +1357,16 @@ Its debatable whether xref should be in this section. May re-evaluate in future.
                           (org-agenda-block-separator nil)
                           (org-agenda-skip-function '(org-agenda-skip-entry-if 'todo 'done))
                           (org-agenda-overriding-header "\nNext five days\n")))
-              (tags "*" ((org-agenda-skip-function '(org-agenda-skip-entry-if 'todo 'todo))
-                          (org-agenda-block-separator nil)
-                          (org-agenda-overriding-header "Un-prioritized tasks\n")))))))
+              (tags "*" ((org-agenda-skip-function '(org-agenda-skip-entry-if 'regexp "\\(\\* Tasks.*\\|\\[#[ABCDEFG]\\]\\|.*TODO.*\\)"))
+                         (org-agenda-block-separator nil)
+                         (org-agenda-overriding-header "Un-prioritized tasks\n")))
+              (agenda "" ((org-agenda-skip-function
+                           '(org-agenda-skip-entry-if 'nottodo 'done))
+                          (org-agenda-start-with-log-mode '(closed clock state))
+                          (org-agenda-archives-mode t)
+                          (org-agenda-span 14)
+                          (org-agenda-start-on-weekday -7)
+                          (org-agenda-overriding-header "Tasks completed in the past two weeks\n")))))))
 
   ;; Bind C-c C-x C-s to mark todo as done and archive it
   (defun lp/mark-done-and-archive ()
@@ -1713,6 +1720,7 @@ actions specified in the manual.
   (define-key eglot-mode-map (kbd "C-c y a") #'eglot-code-actions)
   (define-key eglot-mode-map (kbd "C-c y b") #'eglot-format-buffer)
   (define-key eglot-mode-map (kbd "C-c y h") #'eldoc)
+  (define-key eglot-mode-map (kbd "C-c y d") #'xref-find-definitions)
   )
 
 (lp-emacs-elpa-package 'eglot-java
@@ -1723,8 +1731,14 @@ actions specified in the manual.
 
 ;; 4 julia
 (lp-emacs-elpa-package 'eglot-jl
+  (setq lsp-julia-package-dir nil)
+  (setq eglot-jl-language-server-project "~/.julia/environments/v1.7")
+  (setq eglot-connect-timeout 5000)
+
+  (setq julia-repl-switches "-p NCORES")
+
   (eglot-jl-init)
-  (setq eglot-connect-timeout 100))
+  )
 ;; for the crashes https://github.com/non-Jedi/eglot-jl/issues/30
 
 (lp-emacs-elpa-package 'consult-eglot
