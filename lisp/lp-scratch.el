@@ -100,7 +100,7 @@
   ""
   (interactive)
   (let* ((note-name (completing-read "File Title: " '()))
-         (note-filename (replace-regexp-in-string (regexp-quote "[ ,.&%$#@!]") "-" (downcase note-name) t t))
+         (note-filename (string-replace " " "-" (downcase note-name)))
          (note-tags (completing-read-multiple "Tags: " '()))
          (unique-time (lp--time-to-string-verbose (current-time)))
          (note-full-filename (concat (file-name-as-directory lp--notes-dir)
