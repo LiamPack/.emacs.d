@@ -378,8 +378,8 @@ relatively convenient
 #+begin_src emacs-lisp
 (defun lp--provide-mark-line-or-region (&rest args)
   "Force interactive arguments to provide (current line->current
-line + 1) if no active region. Otherwise, provide the original
-parameter specification (mark, point, 'region). `ARGS' discarded"
+  line + 1) if no active region. Otherwise, provide the original
+  parameter specification (mark, point, 'region). `ARGS' discarded"
   (interactive
    (if mark-active
        (list (mark) (point) 'region)
@@ -395,8 +395,8 @@ parameter specification (mark, point, 'region). `ARGS' discarded"
 
 (defun block-undo (fn &rest args)
   "Wrap function `FN' with `ARGS' and allow block-undo of the the `FN'
-operation rather than atomized undo for each interactive emacs
-function."
+  operation rather than atomized undo for each interactive emacs
+  function."
   (let ((marker (prepare-change-group)))
     (unwind-protect (apply fn args)
       (undo-amalgamate-change-group marker))))
@@ -412,14 +412,14 @@ function."
 General aesthetic configurations for emacs
 *** new ones
 #+begin_src org
-                                    - ~eziam-theme~ -- monochrome based on leuven
-                                    - ~poet~ -- writing-optimized theme
-                                    - ~faff~ -- nice lil paper theme
-                                    - ~autumn-theme~ -- autumn theme and all that, similar to faff
-                                    - ~green-screen~ -- oldschool hilarity. too ridiculous
-                                    - soft stone
-                                    - plan9
-                                    - solarized gruvbox light f
+      - ~eziam-theme~ -- monochrome based on leuven
+      - ~poet~ -- writing-optimized theme
+      - ~faff~ -- nice lil paper theme
+      - ~autumn-theme~ -- autumn theme and all that, similar to faff
+      - ~green-screen~ -- oldschool hilarity. too ridiculous
+      - soft stone
+      - plan9
+      - solarized gruvbox light f
 #+end_src
 
 *** old ones
@@ -480,9 +480,9 @@ updated 2015 as of writing [2022-03-06 Sun 15:16]).
 #+begin_src emacs-lisp
 (add-to-list 'load-path "~/.emacs.d/lisp/")
 
-(require 'lp-theme)
-;;(load-theme 'modus-vivendi)
-(set-frame-font "Monaco 18")
+;; (require 'lp-theme)
+(load-theme 'modus-vivendi)
+(set-frame-font "DejaVu Sans Mono 14")
 
 ;; (modify-all-frames-parameters
 ;;  '((right-divider-width . 40)
@@ -648,14 +648,14 @@ completion options, minibuffer options, minibuffer history options, prompt faces
   ;; always allow tab cycle, except if you're running `completion-at-point', in which case
   ;; we want to always allow completion to help us. If we invoke `c-a-p', then set the
   ;; threshold to `nil' in the current buffer.
-  (setq completion-cycle-threshold t)
-  (defun lp--no-cycle-for-completion-at-point (&rest args)
-    "Set `completion-cycle-threshold' to NIL for the current buffer
-if we invoke `completion-at-point'. `completion-cycle-threshold'
-will retain its original value in any invoked minibuffer commands
-since the value is set locally."
-    (setq-local completion-cycle-threshold nil))
-  (advice-add 'completion-at-point :before #'lp--no-cycle-for-completion-at-point)
+  (setq completion-cycle-threshold 3)
+  ;;   (defun lp--no-cycle-for-completion-at-point (&rest args)
+  ;;     "Set `completion-cycle-threshold' to NIL for the current buffer
+  ;; if we invoke `completion-at-point'. `completion-cycle-threshold'
+  ;; will retain its original value in any invoked minibuffer commands
+  ;; since the value is set locally."
+  ;;     (setq-local completion-cycle-threshold nil))
+  ;;   (advice-add 'completion-at-point :before #'lp--no-cycle-for-completion-at-point)
 
   ;; emacs28 completion stuff
   (setq completions-group t)
@@ -686,7 +686,7 @@ since the value is set locally."
         '(read-only t cursor-intangible t face minibuffer-prompt))
   (setq suggest-key-bindings t))
 
-     ;;; Minibuffer history
+       ;;; Minibuffer history
 (lp-emacs-builtin-package 'savehist
   (setq savehist-file (locate-user-emacs-file "savehist"))
   (setq history-length 10000)
@@ -803,7 +803,7 @@ shine, but for now I'm using it mostly for =embark-export= for batched editing o
   (define-key global-map (kbd "C->") 'embark-become)
   (define-key global-map (kbd "M-a") 'embark-act)
   (define-key completion-list-mode-map (kbd "M-a")
-              #'(lambda () (interactive) () (mct-focus-mini-or-completions) (embark-act))))
+    #'(lambda () (interactive) () (mct-focus-mini-or-completions) (embark-act))))
 
 (lp-emacs-elpa-package 'embark-consult
   (define-key embark-collect-mode-map (kbd "o") 'consult-preview-at-point)
@@ -871,11 +871,139 @@ prefix the string with a "bang" =!=.
   ;; SPC should never complete: use it for `orderless' groups.
   )
 #+end_src
-** mct        -- minimalist minibuffer completion visualization
+** vertico    -- VERTical Interactive COmpletion
+I'm kind of sick of the acronyms that only take pieces of words, but I like the package so
+it gets a pass.
+
+TODOs:
+- [ ] Minad has gone super hard on this package since I've last used it (around Jan2022),
+  with tons of extensions for fine-grained tweaking of the interface
+  (e.g. {~ivy~,~ido~,~helm~}-like interface possibilities)
+#+begin_src emacs-lisp
+(lp-emacs-elpa-package 'vertico
+  (vertico-mode)
+  (setq vertico-resize nil)
+  (setq vertico-cycle t))
+#+end_src
+** corfu      -- Completion Overlay Region FUnction
+Again, hate the multi-letter-per-word acronym but its a good package.
+
+TODOs:
+- [ ] Lots of really good documentation and information in the README and documentation of ~corfu~.
+- [ ] Lots of really good documentation on making ~corfu~ play nice with LSP and Eglot,
+  something I've had a problem with in the past.
+
+#+begin_src emacs-lisp
+(lp-emacs-elpa-package 'corfu
+  ;; Optional customizations
+  ;; :custom
+  ;; (corfu-cycle t)                ;; Enable cycling for `corfu-next/previous'
+  ;; (corfu-auto t)                 ;; Enable auto completion
+  ;; (corfu-separator ?\s)          ;; Orderless field separator
+  ;; (corfu-quit-at-boundary nil)   ;; Never quit at completion boundary
+  ;; (corfu-quit-no-match nil)      ;; Never quit, even if there is no match
+  ;; (corfu-preview-current nil)    ;; Disable current candidate preview
+  ;; (corfu-preselect-first nil)    ;; Disable candidate preselection
+  ;; (corfu-on-exact-match nil)     ;; Configure handling of exact matches
+  ;; (corfu-echo-documentation nil) ;; Disable documentation in the echo area
+  ;; (corfu-scroll-margin 5)        ;; Use scroll margin
+
+  ;; Recommended: Enable Corfu globally.
+  ;; This is recommended since Dabbrev can be used globally (M-/).
+  ;; See also `corfu-excluded-modes'.
+  (global-corfu-mode)
+
+    ;;;;; Experimental corfu activation when vertico/mct aren't active
+  (defun corfu-enable-always-in-minibuffer ()
+    "Enable Corfu in the minibuffer if Vertico/Mct are not active."
+    (unless (or (bound-and-true-p mct--active)
+                (bound-and-true-p vertico--input))
+      ;; (setq-local corfu-auto nil) Enable/disable auto completion
+      (corfu-mode 1)))
+  (add-hook 'minibuffer-setup-hook #'corfu-enable-always-in-minibuffer 1)
+
+    ;;;;; corfu in eshell
+  (add-hook 'eshell-mode-hook
+            (lambda ()
+              (setq-local corfu-auto nil)
+              (corfu-mode)))
+  (defun corfu-send-shell (&rest _)
+    "Send completion candidate when inside comint/eshell."
+    (cond
+     ((and (derived-mode-p 'eshell-mode) (fboundp 'eshell-send-input))
+      (eshell-send-input))
+     ((and (derived-mode-p 'comint-mode)  (fboundp 'comint-send-input))
+      (comint-send-input))))
+
+  (advice-add #'corfu-insert :after #'corfu-send-shell)
+
+  ;; Silence the pcomplete capf, no errors or messages!
+  (advice-add 'pcomplete-completions-at-point :around #'cape-wrap-silent)
+
+  ;; Ensure that pcomplete does not write to the buffer
+  ;; and behaves as a pure `completion-at-point-function'.
+  (advice-add 'pcomplete-completions-at-point :around #'cape-wrap-purify)
+
+    ;;;;; Allow moving of the current Corfu completion to the minibuffer (!!!)
+  (defun corfu-move-to-minibuffer ()
+    (interactive)
+    (let ((completion-extra-properties corfu--extra)
+          completion-cycle-threshold completion-cycling)
+      (apply #'consult-completion-in-region completion-in-region--data)))
+  (define-key corfu-map "\M-m" #'corfu-move-to-minibuffer)
+  )
+
+#+end_src
+
+*** corfu-popup -- corfu using ~popup~ / ~popon~, allowing terminal use
+#+begin_src emacs-lisp
+(when (not (directory-name-p "~/.emacs.d/elpa/emacs-popon"))
+  (shell-command "cd ~/.emacs.d/elpa && git clone https://codeberg.org/akib/emacs-popon.git")
+  (add-to-list 'load-path "~/.emacs.d/elpa/emacs-popon/" t))
+
+(lp-emacs-builtin-package 'popon)
+
+
+;; TODO this might break someday. might just want to implement this by hand instead of rely
+;; on small external package
+(when (not (directory-name-p "~/.emacs.d/elpa/emacs-corfu-popup"))
+  (shell-command "cd ~/.emacs.d/elpa && git clone https://codeberg.org/akib/emacs-corfu-popup"))
+(add-to-list 'load-path "~/.emacs.d/elpa/emacs-corfu-popup/" t)
+
+(lp-emacs-builtin-package 'corfu-popup
+  (unless (display-graphic-p)
+    (corfu-popup-mode +1)))
+#+end_src
+
+*** Cape -- Completion At Point Extensions
+#+begin_src emacs-lisp
+(lp-emacs-elpa-package 'cape
+  (add-to-list 'completion-at-point-functions #'cape-file)
+  (add-to-list 'completion-at-point-functions #'cape-dabbrev)
+  ;;(add-to-list 'completion-at-point-functions #'cape-history)
+  ;;(add-to-list 'completion-at-point-functions #'cape-keyword)
+  ;;(add-to-list 'completion-at-point-functions #'cape-tex)
+  ;;(add-to-list 'completion-at-point-functions #'cape-sgml)
+  ;;(add-to-list 'completion-at-point-functions #'cape-rfc1345)
+  ;;(add-to-list 'completion-at-point-functions #'cape-abbrev)
+  ;;(add-to-list 'completion-at-point-functions #'cape-ispell)
+  ;;(add-to-list 'completion-at-point-functions #'cape-dict)
+  ;;(add-to-list 'completion-at-point-functions #'cape-symbol)
+  ;;(add-to-list 'completion-at-point-functions #'cape-line)
+  )
+#+end_src
+
+** [NOEXPORT] mct  -- minimalist minibuffer completion visualization :noexport:
 [2021-12-06] I gave it a serious try but MCT isn't gonna cut it. I'd like my
 completions to be done quicker.
 
 [2021-12-28 Tue] hoho just kidding im back at it :)
+
+[2022-05-15 Sun 17:21] Update: ~MCT~ development has now been discontinued, so to
+speak. Prot will no longer support this package as Emacs 29 will have built-in functionality
+providing much of what this package set out to accomplish. Leaving this here for historical
+purposes. I'll be moving back to ~vertico~ and ~corfu~ for completion utility and removing
+this section soon.
 
 =vertico= has this weird problem when using =<RET>= to complete: it still takes time to
 narrow down the larger list at completion time. With MCT, that penalty is up-front rather
@@ -888,7 +1016,7 @@ since =completion-at-point= with =mct= allows orderless style dispatching (e.g. 
 completes to =face-font-family-alternatives= with my === style dispatch to "strict leading
 initialism"
 
-#+begin_src emacs-lisp
+#+begin_src emacs-lisp :tangle no
 (lp-emacs-elpa-package 'mct
   (setq mct-remove-shadowed-file-names t) ; works when `file-name-shadow-mode' is enabled
   (setq mct-hide-completion-mode-line t)
@@ -1045,7 +1173,7 @@ Its debatable whether xref should be in this section. May re-evaluate in future.
     "Return absolute address of an org file give its relative name."
     (concat (file-name-as-directory org-directory) filename))
 
-;;; org latex interplay
+  ;;; org latex interplay
   (setq-default org-highlight-latex-and-related '(native latex script entities))
   (setq org-latex-listings 'minted) ;; export source code with color+font
   (setq org-startup-folded t)
@@ -1055,7 +1183,7 @@ Its debatable whether xref should be in this section. May re-evaluate in future.
   (setq org-format-latex-options (plist-put org-format-latex-options :scale 2.0))
 
 
-;;; babel
+  ;;; babel
   ;; NOTE: If this isn't working, make sure to delete /
   ;; byte-recompile the /elpa/org/.. directory.
   ;; enable language compiles
@@ -1072,7 +1200,7 @@ Its debatable whether xref should be in this section. May re-evaluate in future.
   (setq org-src-tab-acts-natively t)
   (setq org-edit-src-content-indentation 0)
 
-;;; general org configuration. Lots of inspiration and discovery from Prot's org configuration (glad he RTFM!)
+  ;;; general org configuration. Lots of inspiration and discovery from Prot's org configuration (glad he RTFM!)
   (setq org-directory "~/org/")
   (setq org-inbox-directory org-directory)
   (setq org-imenu-depth 7)
@@ -1143,7 +1271,7 @@ Its debatable whether xref should be in this section. May re-evaluate in future.
   (setq org-lowest-priority ?D)
   (setq org-default-priority ?A)
 
-;;; logging
+  ;;; logging
   (setq org-log-done 'time)             ; also record when the TODO was archived
   (setq org-log-into-drawer t)
   (setq org-log-note-clock-out nil)
@@ -1151,11 +1279,11 @@ Its debatable whether xref should be in this section. May re-evaluate in future.
   (setq org-log-reschedule 'time)
   (setq org-read-date-prefer-future 'time)
 
-;;; links
+  ;;; links
   (setq org-link-keep-stored-after-insertion nil)
 
-;;; agenda
-;;;;; Basic agenda setup
+  ;;; agenda
+  ;;;;; Basic agenda setup
   (setq org-default-notes-file (thread-last org-directory (expand-file-name "notes.org")))
   (setq org-agenda-span 'week)
   (setq org-agenda-start-on-weekday 1)  ; Monday
@@ -1200,28 +1328,28 @@ Its debatable whether xref should be in this section. May re-evaluate in future.
   (setq org-agenda-compact-blocks nil)
   (setq org-agenda-block-separator ?—)
 
-;;;;; Agenda marks
+  ;;;;; Agenda marks
   (setq org-agenda-bulk-mark-char ">")
   (setq org-agenda-persistent-marks nil)
 
-;;;;; Agenda diary entries
+  ;;;;; Agenda diary entries
   (setq org-agenda-insert-diary-strategy 'date-tree)
   (setq org-agenda-insert-diary-extract-time nil)
   (setq org-agenda-include-diary t) ;; TODO: i'm not so sure about this yet
 
-;;;;; Agenda follow mode
+  ;;;;; Agenda follow mode
   (setq org-agenda-start-with-follow-mode nil)
   (setq org-agenda-follow-indirect t)
 
-;;;;; Agenda multi-item tasks
+  ;;;;; Agenda multi-item tasks
   (setq org-agenda-dim-blocked-tasks t)
   (setq org-agenda-todo-list-sublevels t)
 
-;;;;; Agenda filters and restricted views
+  ;;;;; Agenda filters and restricted views
   (setq org-agenda-persistent-filter nil)
   (setq org-agenda-restriction-lock-highlight-subtree t)
 
-;;;;; Agenda items with deadline and scheduled timestamps
+  ;;;;; Agenda items with deadline and scheduled timestamps
   (setq org-agenda-include-deadlines t)
   (setq org-deadline-warning-days 5)
   (setq org-agenda-skip-scheduled-if-done nil)
@@ -1260,7 +1388,7 @@ Its debatable whether xref should be in this section. May re-evaluate in future.
           " ....." "-----------------"))
   (setq org-agenda-default-appointment-duration nil)
 
-;;;;; Agenda global to-do list
+  ;;;;; Agenda global to-do list
   (setq org-agenda-todo-ignore-with-date t)
   (setq org-agenda-todo-ignore-timestamp t)
   (setq org-agenda-todo-ignore-scheduled t)
@@ -1268,7 +1396,7 @@ Its debatable whether xref should be in this section. May re-evaluate in future.
   (setq org-agenda-todo-ignore-time-comparison-use-seconds t)
   (setq org-agenda-tags-todo-honor-ignore-options nil)
 
-;;;;; Agenda tagged items
+  ;;;;; Agenda tagged items
   (setq org-agenda-show-inherited-tags t)
   (setq org-agenda-use-tag-inheritance
         '(todo search agenda))
@@ -1276,7 +1404,7 @@ Its debatable whether xref should be in this section. May re-evaluate in future.
   (setq org-agenda-remove-tags nil)
   (setq org-agenda-tags-column -100)
 
-;;;;; Agenda entry
+  ;;;;; Agenda entry
   ;; NOTE: I do not use this right now.  Leaving everything to its
   ;; default value.
   (setq org-agenda-start-with-entry-text-mode nil)
@@ -1284,7 +1412,7 @@ Its debatable whether xref should be in this section. May re-evaluate in future.
   (setq org-agenda-entry-text-exclude-regexps nil)
   (setq org-agenda-entry-text-leaders "    > ")
 
-;;;;; Agenda logging and clocking
+  ;;;;; Agenda logging and clocking
   ;; NOTE: I do not use these yet, though I plan to.  Leaving everything
   ;; to its default value for the time being.
   (setq org-agenda-log-mode-items '(closed clock))
@@ -1309,7 +1437,7 @@ Its debatable whether xref should be in this section. May re-evaluate in future.
   (setq org-agenda-sort-notime-is-late t)   ; Org 9.4
   (setq org-agenda-sort-noeffort-is-high t) ; Org 9.4
 
-;;;;; Agenda column view
+  ;;;;; Agenda column view
   ;; NOTE I do not use these, but may need them in the future.
   (setq org-agenda-view-columns-initially nil)
   (setq org-agenda-columns-show-summaries t)
@@ -1363,12 +1491,12 @@ Its debatable whether xref should be in this section. May re-evaluate in future.
 
           ("c" "Tasks completed in past two weeks"
            ,'((agenda "" ((org-agenda-skip-function
-                          '(org-agenda-skip-entry-if 'nottodo 'done))
-                         (org-agenda-start-with-log-mode '(closed clock state))
-                         (org-agenda-archives-mode t)
-                         (org-agenda-span 14)
-                         (org-agenda-start-on-weekday -7)
-                         (org-agenda-overriding-header "Tasks completed in the past two weeks\n")))))))
+                           '(org-agenda-skip-entry-if 'nottodo 'done))
+                          (org-agenda-start-with-log-mode '(closed clock state))
+                          (org-agenda-archives-mode t)
+                          (org-agenda-span 14)
+                          (org-agenda-start-on-weekday -7)
+                          (org-agenda-overriding-header "Tasks completed in the past two weeks\n")))))))
 
   ;; Bind C-c C-x C-s to mark todo as done and archive it
   (defun lp/mark-done-and-archive ()
@@ -1379,7 +1507,7 @@ Its debatable whether xref should be in this section. May re-evaluate in future.
 
   (define-key org-mode-map (kbd "C-c C-x C-s") 'lp/mark-done-and-archive)
 
-;;; capturing
+  ;;; capturing
   (define-key global-map (kbd "C-c c") 'org-capture)
   (setq org-capture-templates
         `(("b" "Basic task for future review" entry
@@ -1416,16 +1544,16 @@ Its debatable whether xref should be in this section. May re-evaluate in future.
                     "%a\n%i%?")
            :empty-lines-after 1)))
 
-;;; autofill
+  ;;; autofill
   ;; Auto wrap paragraphs in some modes (auto-fill-mode)
   (add-hook 'text-mode-hook #'turn-on-auto-fill)
   (add-hook 'org-mode-hook #'turn-on-auto-fill)
   (define-key org-mode-map (kbd "C-c q") 'auto-fill-mode)
 
-;;; cdlatex is very useful for math-related editing
+  ;;; cdlatex is very useful for math-related editing
   (add-hook 'org-mode-hook #'turn-on-org-cdlatex)
 
-;;; making links to other contexts
+  ;;; making links to other contexts
   (define-key global-map (kbd "C-c l") 'org-store-link))
 #+END_SRC
 
@@ -1512,7 +1640,7 @@ Its debatable whether xref should be in this section. May re-evaluate in future.
 
   (run-at-time 10 nil #'appt-activate 1))
 
-;;; modified from prot. while its a great idea, it can be problematic to automatically email from different (work) computers
+  ;;; modified from prot. while its a great idea, it can be problematic to automatically email from different (work) computers
 ;; The idea is to get a reminder via email when I launch Emacs in the
 ;; morning and this file is evaluated.  Obviously this is not a super
 ;; sophisticated approach, though I do not need one.
@@ -1611,7 +1739,7 @@ A time-tested classic mark-up language. Not much more to say; the customizations
   (pdf-loader-install)
 
   (with-eval-after-load 'modus-themes
-  ;;; credits to prot as always!
+    ;;; credits to prot as always!
     ;; Those functions and hooks are adapted from the manual of my modus-themes.
     ;; The idea is to (i) add a backdrop that is distinct from the background of
     ;; the PDF's page and (ii) make pdf-tools adapt to theme switching via, e.g.,
@@ -1699,7 +1827,9 @@ actions specified in the manual.
 
   (define-key lsp-mode-map (kbd "C-c y a") #'lsp-execute-code-action)
 
-  (setq read-process-output-max (* 1024 1024)))
+  (setq read-process-output-max (* 1024 1024))
+  (add-hook 'typescript-mode-hook #'lsp)
+  (add-hook 'tuareg-mode-hook #'lsp))
 
 (lp-emacs-elpa-package 'lsp-ui
   ;; sideline visualization of idagonstics, actions, hover info
@@ -1721,8 +1851,7 @@ actions specified in the manual.
   (define-key lsp-ui-mode-map (kbd "C-c y i") 'lsp-ui-imenu)
 
   (define-key lsp-ui-mode-map (kbd "C-c C-y d") 'lsp-ui-doc-show)
-  (define-key lsp-ui-mode-map (kbd "C-c C-y C-d") 'lsp-ui-doc-hide)
-  )
+  (define-key lsp-ui-mode-map (kbd "C-c C-y C-d") 'lsp-ui-doc-hide))
 
 
 ;; ;; LSPJavaPac
@@ -1739,14 +1868,14 @@ actions specified in the manual.
 #+end_src
 
 #+RESULTS:
-: /Users/packell1/.emacs.d/share/eclipse.jdt.ls/workspace/
+| lsp | julia-snail-mode | eglot-ensure |
 
 ** eglot
 #+begin_src emacs-lisp
 (lp-emacs-elpa-package 'eglot
   (defvar eglot-prog-mode-hooks '(python-mode-hook cc-mode-hook c-mode-hook c++-mode-hook cuda-mode-hook
                                                    rjsx-mode-hook
-                                                   typescript-mode-hook tuareg-mode-hook))
+                                                   tuareg-mode-hook))
   (dolist (mode eglot-prog-mode-hooks)
     (add-hook mode 'eglot-ensure))
 
@@ -1819,12 +1948,12 @@ python3-proselint=
   (setq flymake-diagnostic-at-point-display-diagnostic-function
         'flymake-diagnostic-at-point-display-minibuffer))
 
-;;; Flymake + Shellcheck
+  ;;; Flymake + Shellcheck
 (lp-emacs-elpa-package 'flymake-shellcheck
   (add-hook 'sh-mode-hook 'flymake-shellcheck-load))
 
 
-;;; Flymake + Proselint
+  ;;; Flymake + Proselint
 (lp-emacs-elpa-package 'flymake-proselint
   (add-hook 'markdown-mode-hook #'flymake-proselint-setup)
   (add-hook 'org-mode-hook #'flymake-proselint-setup)
@@ -1836,8 +1965,11 @@ python3-proselint=
 
 (lp-emacs-elpa-package 'utop
   (setq utop-command "opam config exec -- utop -emacs")
+  ;; (setq utop-command "opam config exec -- dune utop . -- -emacs")
+
   (autoload 'utop-minor-mode "utop" "Minor mode for utop" t)
   (add-hook 'tuareg-mode-hook 'utop-minor-mode))
+(lp-emacs-elpa-package 'dune)
 #+end_src
 ** python
 #+begin_src emacs-lisp
@@ -1971,7 +2103,7 @@ has lots of overlap with =projectile=. Might as well remove a dependency.
 #+end_src
 ** magit
 #+begin_src emacs-lisp
-;;; Magit
+  ;;; Magit
 ;; God bless magit and all that it does
 (lp-emacs-elpa-package 'magit
   (setq
@@ -1985,7 +2117,7 @@ has lots of overlap with =projectile=. Might as well remove a dependency.
 #+begin_src emacs-lisp
 (lp-emacs-builtin-package 'vc
   (setq vc-handled-backends '(SVN Git))
-  ;;;  As always, from Prot. Directly copied. No shame. See https://protesilaos.com/emacs/dotemacs#h:31deeff4-dfae-48d9-a906-1f3272f29bc9
+    ;;;  As always, from Prot. Directly copied. No shame. See https://protesilaos.com/emacs/dotemacs#h:31deeff4-dfae-48d9-a906-1f3272f29bc9
 
   ;; Those offer various types of functionality, such as blaming,
   ;; viewing logs, showing a dedicated buffer with changes to affected
@@ -2025,9 +2157,9 @@ has lots of overlap with =projectile=. Might as well remove a dependency.
           ;; We use numbered groups because `log-view-message-re' wants the
           ;; revision number to be group 1.
           "^\\(?:[*/\\|]+\\)\\(?:[*/\\| ]+\\)?\
-\\(?2: ([^)]+) \\)?\\(?1:[0-9a-z]+\\) \
-\\(?4:[0-9]\\{4\\}-[0-9]\\{2\\}-[0-9]\\{2\\}\\) \
-\\(?3:.*?\\):"
+  \\(?2: ([^)]+) \\)?\\(?1:[0-9a-z]+\\) \
+  \\(?4:[0-9]\\{4\\}-[0-9]\\{2\\}-[0-9]\\{2\\}\\) \
+  \\(?3:.*?\\):"
           ((1 'log-view-message)
            (2 'change-log-list nil lax)
            (3 'change-log-name)
@@ -2290,7 +2422,7 @@ the go-to.
 
 #+begin_src emacs-lisp
 (lp-emacs-builtin-package 'tramp
-  ;;; I'm actually going to give scp a try as the default method for now. There might be benefits due to the encryption overhead required of ssh in =external= use cases.
+    ;;; I'm actually going to give scp a try as the default method for now. There might be benefits due to the encryption overhead required of ssh in =external= use cases.
 
   ;; ssh > scp (the default).
   ;; (setq tramp-default-method "ssh")
@@ -2395,7 +2527,7 @@ the go-to.
         '(("unread" (notmuch-apply-face bare-tag `notmuch-tag-deleted))
           (".*" (notmuch-apply-face tag `notmuch-tag-deleted))))
 
-;;; Email composition
+  ;;; Email composition
   (setq notmuch-mua-compose-in 'current-window)
   (setq notmuch-mua-hidden-headers nil) ; TODO 2021-05-12: Review hidden headers
   (setq notmuch-address-command nil)    ; FIXME 2021-05-13: Make it work with EBDB
@@ -2410,7 +2542,7 @@ the go-to.
         (concat "\\b\\(attache\?ment\\|attached\\|attach\\)"
                 "\\b"))
 
-;;; Reading messages
+  ;;; Reading messages
   (setq notmuch-show-relative-dates t)
   (setq notmuch-show-all-multipart/alternative-parts nil)
   (setq notmuch-show-indent-messages-width 0)
@@ -2424,7 +2556,7 @@ the go-to.
   (setq notmuch-message-headers '("To" "Cc" "Subject" "Date"))
   (setq notmuch-message-headers-visible t)
 
-;;; Hooks and key bindings
+  ;;; Hooks and key bindings
   (add-hook 'notmuch-mua-send-hook #'notmuch-mua-attachment-check)
   (remove-hook 'notmuch-show-hook #'notmuch-show-turn-on-visual-line-mode)
   (add-hook 'notmuch-show-hook (lambda () (setq-local header-line-format nil)))
@@ -2445,7 +2577,7 @@ the go-to.
   )
 
 
-;;; Sending email (SMTP)
+  ;;; Sending email (SMTP)
 (lp-emacs-builtin-package 'smtpmail
   (setq smtpmail-stream-type 'ssl)
   (setq smtpmail-smtp-service 465)
