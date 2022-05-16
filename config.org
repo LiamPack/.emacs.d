@@ -369,6 +369,13 @@ relatively convenient
   (save-place-mode 1)
   )
 #+end_src
+** visualizing whitespace
+#+begin_src emacs-lisp
+(lp-emacs-builtin-package 'whitespace-mode
+  (setq whitespace-style (quote (face spaces tabs newline space-mark tab-mark newline-mark)))
+
+  (global-whitespace-mode))
+#+end_src
 ** adding sensible advice around built-in functions
 - Add advice to =kill-region= and =kill-ring-save= to kill/save the current line if there is
   no active region
@@ -1849,6 +1856,8 @@ actions specified in the manual.
   (define-key lsp-ui-mode-map (kbd "C-c y d") 'lsp-ui-doc-show)
   (define-key lsp-ui-mode-map (kbd "C-c y C-d") 'lsp-ui-doc-hide)
   (define-key lsp-ui-mode-map (kbd "C-c y i") 'lsp-ui-imenu)
+  (define-key lsp-ui-mode-map (kbd "C-c y r") 'lsp-format-region)
+  (define-key lsp-ui-mode-map (kbd "C-c y b") 'lsp-format-buffer)
 
   (define-key lsp-ui-mode-map (kbd "C-c C-y d") 'lsp-ui-doc-show)
   (define-key lsp-ui-mode-map (kbd "C-c C-y C-d") 'lsp-ui-doc-hide))
@@ -1859,7 +1868,11 @@ actions specified in the manual.
   ;;(executable-find "mvn")
   (setq lsp-java-server-install-dir (expand-file-name "~/.emacs.d/share/eclipse.jdt.ls/"))
   (setq lsp-java-workspace-dir (expand-file-name "~/.emacs.d/share/eclipse.jdt.ls/workspace/"))
-  (add-hook 'java-mode-hook #'lsp))
+  (setq lsp-java-configuration-maven-user-settings (expand-file-name "~/.m2/settings.xml"))
+  (add-hook 'java-mode-hook #'lsp)
+  (define-key lsp-mode-map (kbd "C-c y t") #'lsp-java-type-hierarchy)
+
+  )
 ;; ;; -LSPJavaPac
 
 (lp-emacs-elpa-package 'lsp-julia
