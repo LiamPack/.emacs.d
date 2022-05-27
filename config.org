@@ -372,9 +372,7 @@ relatively convenient
 ** visualizing whitespace
 #+begin_src emacs-lisp
 (lp-emacs-builtin-package 'whitespace-mode
-  (setq whitespace-style (quote (face spaces tabs newline space-mark tab-mark newline-mark)))
-
-  (global-whitespace-mode))
+  (setq whitespace-style (quote (face spaces tabs newline space-mark tab-mark newline-mark))))
 #+end_src
 ** adding sensible advice around built-in functions
 - Add advice to =kill-region= and =kill-ring-save= to kill/save the current line if there is
@@ -419,14 +417,14 @@ relatively convenient
 General aesthetic configurations for emacs
 *** new ones
 #+begin_src org
-      - ~eziam-theme~ -- monochrome based on leuven
-      - ~poet~ -- writing-optimized theme
-      - ~faff~ -- nice lil paper theme
-      - ~autumn-theme~ -- autumn theme and all that, similar to faff
-      - ~green-screen~ -- oldschool hilarity. too ridiculous
-      - soft stone
-      - plan9
-      - solarized gruvbox light f
+                                                  - ~eziam-theme~ -- monochrome based on leuven
+                                                  - ~poet~ -- writing-optimized theme
+                                                  - ~faff~ -- nice lil paper theme
+                                                  - ~autumn-theme~ -- autumn theme and all that, similar to faff
+                                                  - ~green-screen~ -- oldschool hilarity. too ridiculous
+                                                  - soft stone
+                                                  - plan9
+                                                  - solarized gruvbox light f
 #+end_src
 
 *** old ones
@@ -642,6 +640,13 @@ match =.*?=, i.e all characters are whitespace.
 
 #+end_src
 
+** avy
+#+begin_src emacs-lisp
+(lp-emacs-elpa-package 'avy
+  (avy-setup-default) ;; binds C-' in the isearch map :O
+  (define-key global-map (kbd "C-'") 'avy-goto-char-timer)
+  (define-key global-map (kbd "M-'") 'avy-resume))
+#+end_src
 * minibuffer, completion, and symbol definitions
 ** general minibuffer completion configuration
 completion options, minibuffer options, minibuffer history options, prompt faces, ...
@@ -810,7 +815,7 @@ shine, but for now I'm using it mostly for =embark-export= for batched editing o
   (define-key global-map (kbd "C->") 'embark-become)
   (define-key global-map (kbd "M-a") 'embark-act)
   (define-key completion-list-mode-map (kbd "M-a")
-    #'(lambda () (interactive) () (mct-focus-mini-or-completions) (embark-act))))
+              #'(lambda () (interactive) () (mct-focus-mini-or-completions) (embark-act))))
 
 (lp-emacs-elpa-package 'embark-consult
   (define-key embark-collect-mode-map (kbd "o") 'consult-preview-at-point)
@@ -904,9 +909,9 @@ TODOs:
 (lp-emacs-elpa-package 'corfu
   ;; Optional customizations
   ;; :custom
-  ;; (corfu-cycle t)                ;; Enable cycling for `corfu-next/previous'
+  (setq corfu-cycle t)                ;; Enable cycling for `corfu-next/previous'
   ;; (corfu-auto t)                 ;; Enable auto completion
-  ;; (corfu-separator ?\s)          ;; Orderless field separator
+  (setq corfu-separator ?\s)          ;; Orderless field separator
   ;; (corfu-quit-at-boundary nil)   ;; Never quit at completion boundary
   ;; (corfu-quit-no-match nil)      ;; Never quit, even if there is no match
   ;; (corfu-preview-current nil)    ;; Disable current candidate preview
@@ -1498,8 +1503,7 @@ Its debatable whether xref should be in this section. May re-evaluate in future.
 
           ("c" "Tasks completed in past two weeks"
            ,'((agenda "" ((org-agenda-skip-function
-                           '(org-agenda-skip-entry-if 'nottodo 'done))
-                          (org-agenda-start-with-log-mode '(closed clock state))
+                           '(org-agenda-skip-entry-if 'todo 'deadline))
                           (org-agenda-archives-mode t)
                           (org-agenda-span 14)
                           (org-agenda-start-on-weekday -7)
@@ -1787,7 +1791,7 @@ actions specified in the manual.
 
 #+begin_src emacs-lisp
 (lp-emacs-builtin-package 'ispell
-  (setq ispell-dictionary "en_US")
+  (setq ispell-dictionary "english")
   (setq ispell-silently-savep t))
 
 (lp-emacs-builtin-package 'flyspell
@@ -1832,6 +1836,9 @@ actions specified in the manual.
   (setq lsp-keep-workspace-alive nil)
   (setq lsp-eldoc-hook '(lsp-hover))
 
+  (setq lsp-file-watch-threshold 1500)  ; pyright has more than 1000
+
+
   (define-key lsp-mode-map (kbd "C-c y a") #'lsp-execute-code-action)
 
   (setq read-process-output-max (* 1024 1024))
@@ -1842,7 +1849,7 @@ actions specified in the manual.
   ;; sideline visualization of idagonstics, actions, hover info
   (setq lsp-ui-sideline-show-diagnostics t)
   (setq lsp-ui-sideline-show-code-actions t)
-  (setq lsp-ui-sideline-show-hover t)
+  (setq lsp-ui-sideline-show-hover nil)
   (setq lsp-ui-sideline-delay 1)
 
   ;; documentation display
@@ -1853,14 +1860,13 @@ actions specified in the manual.
   (setq lsp-ui-doc-use-webkit nil)
   (setq lsp-ui-doc-delay 1)
 
+
+
   (define-key lsp-ui-mode-map (kbd "C-c y d") 'lsp-ui-doc-show)
   (define-key lsp-ui-mode-map (kbd "C-c y C-d") 'lsp-ui-doc-hide)
   (define-key lsp-ui-mode-map (kbd "C-c y i") 'lsp-ui-imenu)
   (define-key lsp-ui-mode-map (kbd "C-c y r") 'lsp-format-region)
-  (define-key lsp-ui-mode-map (kbd "C-c y b") 'lsp-format-buffer)
-
-  (define-key lsp-ui-mode-map (kbd "C-c C-y d") 'lsp-ui-doc-show)
-  (define-key lsp-ui-mode-map (kbd "C-c C-y C-d") 'lsp-ui-doc-hide))
+  (define-key lsp-ui-mode-map (kbd "C-c y b") 'lsp-format-buffer))
 
 
 ;; ;; LSPJavaPac
@@ -1871,24 +1877,24 @@ actions specified in the manual.
   (setq lsp-java-configuration-maven-user-settings (expand-file-name "~/.m2/settings.xml"))
   (add-hook 'java-mode-hook #'lsp)
   (define-key lsp-mode-map (kbd "C-c y t") #'lsp-java-type-hierarchy)
-
   )
 ;; ;; -LSPJavaPac
 
 (lp-emacs-elpa-package 'lsp-julia
   (setq lsp-julia-default-environment "~/.julia/environments/v1.7")
   (add-hook 'julia-mode-hook #'lsp))
-#+end_src
 
-#+RESULTS:
-| lsp | julia-snail-mode | eglot-ensure |
+
+(lp-emacs-elpa-package 'lsp-jedi
+  (add-hook 'python-mode-hook #'lsp))
+#+end_src
 
 ** eglot
 #+begin_src emacs-lisp
 (lp-emacs-elpa-package 'eglot
-  (defvar eglot-prog-mode-hooks '(python-mode-hook cc-mode-hook c-mode-hook c++-mode-hook cuda-mode-hook
-                                                   rjsx-mode-hook
-                                                   tuareg-mode-hook))
+  (defvar eglot-prog-mode-hooks '(cc-mode-hook c-mode-hook c++-mode-hook cuda-mode-hook
+                                               rjsx-mode-hook
+                                               tuareg-mode-hook))
   (dolist (mode eglot-prog-mode-hooks)
     (add-hook mode 'eglot-ensure))
 
@@ -1988,12 +1994,21 @@ python3-proselint=
 #+begin_src emacs-lisp
 (lp-emacs-elpa-package 'python
   (setq python-indent-offset 4)
-  (setq python-shell-interpreter "ipython"
+  (setq python-shell-interpreter "python"
         ;; python-shell-interpreter-args "console --simple-prompt"
         python-shell-prompt-detect-failure-warning nil)
   )
 
 (lp-emacs-elpa-package 'pyvenv)
+(lp-emacs-elpa-package 'conda
+  (conda-env-initialize-interactive-shells)
+  (conda-env-initialize-eshell)
+  (setq
+
+   conda-anaconda-home "/Users/packell1/miniconda3/"
+   conda-env-home-directory (expand-file-name "~/miniconda3/") ;; as in previous example; not required
+   conda-env-subdirectory "envs")
+  )
 #+end_src
 
 ** julia
@@ -2004,6 +2019,17 @@ python3-proselint=
 
 (lp-emacs-elpa-package 'julia-snail
   (add-hook 'julia-mode-hook 'julia-snail-mode))
+#+end_src
+
+** java
+#+begin_src emacs-lisp
+(lp-emacs-builtin-package 'cc-mode
+  (add-hook 'java-mode-hook
+            #'(lambda ()
+                (interactive)
+                (setq-local indent-tabs-mode t
+                            tab-width 4)
+                (whitespace-mode))))
 #+end_src
 
 ** c{,++} environment
