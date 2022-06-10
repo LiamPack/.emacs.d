@@ -1977,6 +1977,9 @@ python3-proselint=
   (add-hook 'markdown-mode-hook #'flymake-proselint-setup)
   (add-hook 'org-mode-hook #'flymake-proselint-setup)
   (add-hook 'text-mode-hook #'flymake-proselint-setup))
+
+(lp-emacs-elpa-package 'flymake-python-pyflakes
+  (add-hook 'python-mode-hook 'flymake-python-pyflakes-load))
 #+end_src
 ** ocaml
 #+begin_src emacs-lisp
@@ -2027,7 +2030,7 @@ python3-proselint=
   (add-hook 'java-mode-hook
             #'(lambda ()
                 (interactive)
-                (setq-local indent-tabs-mode t
+                (setq-local indent-tabs-mode nil
                             tab-width 4)
                 (whitespace-mode))))
 #+end_src
