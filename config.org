@@ -1689,37 +1689,55 @@ Its debatable whether xref should be in this section. May re-evaluate in future.
   (define-key org-mode-map (kbd "C-c ]") 'org-ref-insert-link))
 #+end_src
 ** markdown
-
 A time-tested classic mark-up language. Not much more to say; the customizations are minimal.
 
 #+begin_src emacs-lisp
 (lp-emacs-elpa-package 'markdown-mode)
 #+end_src
-** ~lp-journal~ for simple, low-cost journal management
-#+begin_src emacs-lisp
-(require 'lp-scratch)
-(setq lp--journal-dir (file-truename "~/org/roam/daily/"))
-(define-key global-map (kbd "C-c f j j") 'lp-journal-visit-today)
-(define-key global-map (kbd "C-c f j n") 'lp-journal-visit-forward-one-day)
-(define-key global-map (kbd "C-c f j p") 'lp-journal-visit-backward-one-day)
-#+end_src
-** ~lp-notes~ for simple, low-cost notes management
-#+begin_src emacs-lisp
-(require 'lp-scratch)
-(setq lp--notes-dir (file-truename "~/org/roam/"))
-(define-key global-map (kbd "C-c f d") 'lp-notes-dired)
-(define-key global-map (kbd "C-c f f") 'lp-notes-find-file)
-(define-key global-map (kbd "C-c f n") 'lp-notes-make-file)
-#+end_src
-
 ** ~denote~, prot's note-taking package
 #+begin_src emacs-lisp
 (lp-emacs-git-package
     'denote "https://git.sr.ht/~protesilaos/denote"
-    (setq denote-known-keywords '("emacs" "philosophy" "politics" "school" "food" "programming"
+    (setq denote-directory "~/Documents/notes")
+    (setq denote-allow-multi-word-keywords nil)
+    (setq denote-known-keywords '("emacs" "school" "food" "programming"
                                   "adult" ;; for adult-related stuff, e.g. finances, passwords, car, loans, etc.
-                                  "games"
-                                  )))
+                                  "games" "philosophy" "work"))
+    (setq denote-infer-keywords nil)
+    (setq denote-sort-keywords t)
+    (setq denote-file-type ".txt")
+
+    (require 'denote-dired)
+    (add-hook 'dired-mode-hook #'denote-dired-mode)
+
+    (require 'denote-link)
+
+    ;; Here is a custom, user-level command from one of the examples we
+    ;; showed in this manual.  We define it here and add it to a key binding
+    ;; below.
+    (defun my-denote-journal ()
+      "Create an entry tagged 'journal', while prompting for a title."
+      (interactive)
+      (denote
+       (denote--title-prompt)
+       "journal"))
+
+    ;; Denote does not define any key bindings.  This is for the user to
+    ;; decide.  For example:
+    (let ((map global-map))
+      (define-key map (kbd "C-c f j") #'my-denote-journal) ; our custom command
+      (define-key map (kbd "C-c f n") #'denote)
+      (define-key map (kbd "C-c f N") #'denote-type)
+      (define-key map (kbd "C-c f d") #'(lambda ()
+                                          (interactive)
+                                          (dired denote-directory)))
+
+      (define-key map (kbd "C-c f i") #'denote-link) ; "insert" mnemonic
+      (define-key map (kbd "C-c f I") #'denote-link-add-links)
+      (define-key map (kbd "C-c f l") #'denote-link-find-file) ; "list" links
+      (define-key map (kbd "C-c f b") #'denote-link-backlinks)
+
+      (define-key map (kbd "C-c f r") #'denote-dired-rename-file)))
 #+end_src
 ** pdf-tools
 #+begin_src emacs-lisp
@@ -2739,6 +2757,25 @@ the go-to.
 In the below, I'm testing things out. No commentary, no thoughts, no brain on how i feel
 about them is detailed. that's for the main packages. this is the hyper-safe toxic-waste
 testing zone
+
+** ~lp-journal~ for simple, low-cost journal management :noexport:
+#+begin_src
+(require 'lp-scratch)
+(setq lp--journal-dir (file-truename "~/org/roam/daily/"))
+(define-key global-map (kbd "C-c f j j") 'lp-journal-visit-today)
+(define-key global-map (kbd "C-c f j n") 'lp-journal-visit-forward-one-day)
+(define-key global-map (kbd "C-c f j p") 'lp-journal-visit-backward-one-day)
+#+end_src
+** ~lp-notes~ for simple, low-cost notes management :noexport:
+#+begin_src
+(require 'lp-scratch)
+(setq lp--notes-dir (file-truename "~/org/roam/"))
+(define-key global-map (kbd "C-c f d") 'lp-notes-dired)
+(define-key global-map (kbd "C-c f f") 'lp-notes-find-file)
+(define-key global-map (kbd "C-c f n") 'lp-notes-make-file)
+#+end_src
+
+
 * configurations and people i took inspiration from
 - Skeeto's configuration, https://github.com/skeeto/.emacs.d. This is the first
   configuration which I tried to modify for my own means back when I first started to take
