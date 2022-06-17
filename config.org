@@ -371,8 +371,9 @@ relatively convenient
 #+end_src
 ** visualizing whitespace
 #+begin_src emacs-lisp
-(lp-emacs-builtin-package 'whitespace-mode
-  (setq whitespace-style (quote (face spaces tabs newline space-mark tab-mark newline-mark))))
+(lp-emacs-builtin-package 'whitespace
+  (setq whitespace-style (quote (face spaces tabs newline space-mark tab-mark newline-mark)))
+  (add-hook 'java-mode-hook #'whitespace-mode))
 #+end_src
 ** adding sensible advice around built-in functions
 - Add advice to =kill-region= and =kill-ring-save= to kill/save the current line if there is
@@ -416,56 +417,53 @@ relatively convenient
 ** some themes i've liked
 General aesthetic configurations for emacs
 *** new ones
-#+begin_src org
-                                                  - ~eziam-theme~ -- monochrome based on leuven
-                                                  - ~poet~ -- writing-optimized theme
-                                                  - ~faff~ -- nice lil paper theme
-                                                  - ~autumn-theme~ -- autumn theme and all that, similar to faff
-                                                  - ~green-screen~ -- oldschool hilarity. too ridiculous
-                                                  - soft stone
-                                                  - plan9
-                                                  - solarized gruvbox light f
-#+end_src
-
+- ~eziam-theme~ -- monochrome based on leuven
+- ~poet~ -- writing-optimized theme
+- ~faff~ -- nice lil paper theme
+- ~autumn-theme~ -- autumn theme and all that, similar to faff
+- ~green-screen~ -- oldschool hilarity. too ridiculous
+- soft stone
+- plan9
+- solarized gruvbox light f
 *** old ones
-#+begin_verse
-  espresso ; cyberpunk ; moe-light ;
- * good themes
- ** base16
-     * zenburn
-     * unikitty light
-     * solarized light
-     * rebecca
-     * porple
-     * phd
-     * ocean
-     * nord
-     * monokai
-     * mocha
-     * mellow-purple
-     * material + material palenight
-     * harmonic-{light,dark}
-     * cupertino
-     * cupcake
-     * sulphurpool-light
-     * heath-light
-     * cave-light
-     * classic-{dark,light}
-  * avk-daylight
 
- * actual good themes
-   * leuven / parchment (https://github.com/ajgrf/parchment)
-   * porple
-   * doom-tomorrow-night
-     * Any of the doom ones really
-   * Habamax Theme - a little plain
-   * Also hydanatantantatna-theme
-   * gruvbox
-   * tsdh-light
-   * tron theme https://github.com/ianpan870102/Emacs-Tron-Legacy-Theme
-   * Naysayer-theme https://github.com/nickav/naysayer-theme.el
-   * That one black theme i'm using right now (6/15/19)
-#+end_verse
+- espresso ; cyberpunk ; moe-light ;
+
+good themes
+- base16
+  - zenburn
+  - unikitty light
+  - solarized light
+  - rebecca
+  - porple
+  - phd
+  - ocean
+  - nord
+  - monokai
+  - mocha
+  - mellow-purple
+  - material + material palenight
+  - harmonic-{light,dark}
+  - cupertino
+  - cupcake
+  - sulphurpool-light
+  - heath-light
+  - cave-light
+  - classic-{dark,light}
+  - avk-daylight
+
+- actual good themes
+  - leuven / parchment (https://github.com/ajgrf/parchment)
+  - porple
+  - doom-tomorrow-night
+    - Any of the doom ones really
+  - Habamax Theme - a little plain
+  - Also hydanatantantatna-theme
+  - gruvbox
+  - tsdh-light
+  - tron theme https://github.com/ianpan870102/Emacs-Tron-Legacy-Theme
+  - Naysayer-theme https://github.com/nickav/naysayer-theme.el
+  - That one black theme i'm using right now (6/15/19)
 
 ** color design
 #+begin_src emacs-lisp
@@ -660,7 +658,7 @@ completion options, minibuffer options, minibuffer history options, prompt faces
   ;; always allow tab cycle, except if you're running `completion-at-point', in which case
   ;; we want to always allow completion to help us. If we invoke `c-a-p', then set the
   ;; threshold to `nil' in the current buffer.
-  (setq completion-cycle-threshold 3)
+  (setq completion-cycle-threshold nil)
   ;;   (defun lp--no-cycle-for-completion-at-point (&rest args)
   ;;     "Set `completion-cycle-threshold' to NIL for the current buffer
   ;; if we invoke `completion-at-point'. `completion-cycle-threshold'
@@ -815,7 +813,7 @@ shine, but for now I'm using it mostly for =embark-export= for batched editing o
   (define-key global-map (kbd "C->") 'embark-become)
   (define-key global-map (kbd "M-a") 'embark-act)
   (define-key completion-list-mode-map (kbd "M-a")
-              #'(lambda () (interactive) () (mct-focus-mini-or-completions) (embark-act))))
+    #'(lambda () (interactive) () (mct-focus-mini-or-completions) (embark-act))))
 
 (lp-emacs-elpa-package 'embark-consult
   (define-key embark-collect-mode-map (kbd "o") 'consult-preview-at-point)
@@ -969,22 +967,12 @@ TODOs:
 
 *** corfu-popup -- corfu using ~popup~ / ~popon~, allowing terminal use
 #+begin_src emacs-lisp
-(when (not (directory-name-p "~/.emacs.d/elpa/emacs-popon"))
-  (shell-command "cd ~/.emacs.d/elpa && git clone https://codeberg.org/akib/emacs-popon.git")
-  (add-to-list 'load-path "~/.emacs.d/elpa/emacs-popon/" t))
-
-(lp-emacs-builtin-package 'popon)
-
-
-;; TODO this might break someday. might just want to implement this by hand instead of rely
-;; on small external package
-(when (not (directory-name-p "~/.emacs.d/elpa/emacs-corfu-popup"))
-  (shell-command "cd ~/.emacs.d/elpa && git clone https://codeberg.org/akib/emacs-corfu-popup"))
-(add-to-list 'load-path "~/.emacs.d/elpa/emacs-corfu-popup/" t)
-
-(lp-emacs-builtin-package 'corfu-popup
-  (unless (display-graphic-p)
-    (corfu-popup-mode +1)))
+(lp-emacs-git-package
+    'popon "https://codeberg.org/akib/emacs-popon.git")
+(lp-emacs-git-package
+    'corfu-popup "https://codeberg.org/akib/emacs-corfu-popup"
+    (unless (display-graphic-p)
+      (corfu-popup-mode +1)))
 #+end_src
 
 *** Cape -- Completion At Point Extensions
@@ -1682,17 +1670,11 @@ Its debatable whether xref should be in this section. May re-evaluate in future.
         bibtex-completion-library-path '("~/org/bib/pdfs/")
         bibtex-completion-notes-path "~/org/bib/notes/"))
 
-;; TODO this might break someday. might just want to implement this by hand instead of rely
-;; on small external package
-(when (not (directory-name-p "~/.emacs.d/elpa/consult-bibtex"))
-  (shell-command "cd ~/.emacs.d/elpa && git clone https://github.com/mohkale/consult-bibtex.git"))
-(add-to-list 'load-path "~/.emacs.d/elpa/consult-bibtex/" t)
-
-;; TODO Technically a built-in at this point i guess with the above sneaky git clone. not great
-(lp-emacs-builtin-package 'consult-bibtex
-  (with-eval-after-load 'embark
-    (add-to-list 'embark-keymap-alist '(bibtex-completion . consult-bibtex-embark-map)))
-  (setq consult-bibtex-default-action #'consult-bibtex-edit-notes))
+(lp-emacs-git-package
+    'consult-bibtex "https://github.com/mohkale/consult-bibtex.git"
+    (with-eval-after-load 'embark
+      (add-to-list 'embark-keymap-alist '(bibtex-completion . consult-bibtex-embark-map)))
+    (setq consult-bibtex-default-action #'consult-bibtex-edit-notes))
 #+end_src
 
 *** org-ref :disabled:
@@ -1730,6 +1712,15 @@ A time-tested classic mark-up language. Not much more to say; the customizations
 (define-key global-map (kbd "C-c f n") 'lp-notes-make-file)
 #+end_src
 
+** ~denote~, prot's note-taking package
+#+begin_src emacs-lisp
+(lp-emacs-git-package
+    'denote "https://git.sr.ht/~protesilaos/denote"
+    (setq denote-known-keywords '("emacs" "philosophy" "politics" "school" "food" "programming"
+                                  "adult" ;; for adult-related stuff, e.g. finances, passwords, car, loans, etc.
+                                  "games"
+                                  )))
+#+end_src
 ** pdf-tools
 #+begin_src emacs-lisp
 (lp-emacs-elpa-package 'pdf-tools
@@ -1825,7 +1816,7 @@ actions specified in the manual.
   (setq compilation-auto-jump-to-first-error t)
   )
 #+end_src
-** lsp lol for java  & Julia
+** lsp lol
 #+begin_src emacs-lisp
 (lp-emacs-elpa-package 'lsp-mode
   (setq lsp-keymap-prefix "C-c l")
@@ -1866,8 +1857,8 @@ actions specified in the manual.
   (define-key lsp-ui-mode-map (kbd "C-c y C-d") 'lsp-ui-doc-hide)
   (define-key lsp-ui-mode-map (kbd "C-c y i") 'lsp-ui-imenu)
   (define-key lsp-ui-mode-map (kbd "C-c y r") 'lsp-format-region)
-  (define-key lsp-ui-mode-map (kbd "C-c y b") 'lsp-format-buffer))
-
+  (define-key lsp-ui-mode-map (kbd "C-c y b") 'lsp-format-buffer)
+  (define-key lsp-ui-mode-map (kbd "C-c n") 'lsp-format-buffer))
 
 ;; ;; LSPJavaPac
 (lp-emacs-elpa-package 'lsp-java
@@ -1894,7 +1885,7 @@ actions specified in the manual.
 (lp-emacs-elpa-package 'eglot
   (defvar eglot-prog-mode-hooks '(cc-mode-hook c-mode-hook c++-mode-hook cuda-mode-hook
                                                rjsx-mode-hook
-                                               tuareg-mode-hook))
+                                               ))
   (dolist (mode eglot-prog-mode-hooks)
     (add-hook mode 'eglot-ensure))
 
@@ -2031,8 +2022,7 @@ python3-proselint=
             #'(lambda ()
                 (interactive)
                 (setq-local indent-tabs-mode nil
-                            tab-width 4)
-                (whitespace-mode))))
+                            tab-width 4))))
 #+end_src
 
 ** c{,++} environment

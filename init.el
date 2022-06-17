@@ -1,6 +1,5 @@
 (add-to-list 'load-path "~/.emacs.d/lisp/personal-packages/")
 (add-to-list 'load-path "~/.emacs.d/lisp/")
-(add-to-list 'custom-theme-load-path "~/.emacs.d/personal-packages/")
 
 (require 'package)
 
@@ -45,6 +44,27 @@
   `(progn
      (when (not (package-installed-p ,package))
        (package-install ,package))
+     (if (require ,package nil 'noerror)
+         (progn ,@body)
+       (print (format "[Warning]: Loading `%s' failed" ,package))
+       (display-warning 'lp-emacs (format "Loading `%s' failed" ,package) :warning)
+       (add-to-list 'lp-emacs-ensure-install-missed ,package)
+       (display-warning
+        'lp-emacs
+        "See `lp-emacs-ensure-installed-missed' for a set of missed packages that failed install"
+        :warning))))
+
+(defmacro lp-emacs-git-package (package repo-name &rest body)
+  (declare (indent 1))
+  `(progn
+     (let ((local-dir "~/.emacs.d/local"))
+       (when (not (directory-name-p local-dir))
+         (shell-command
+          (format "mkdir -p %s && cd %s && git clone %s"
+                  local-dir local-dir ,repo-name))
+         (add-to-list 'load-path
+                      (file-name-concat
+                       local-dir (f-filename (string-remove-suffix ".git" ,repo-name))))))
      (if (require ,package nil 'noerror)
          (progn ,@body)
        (print (format "[Warning]: Loading `%s' failed" ,package))
