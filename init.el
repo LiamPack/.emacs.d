@@ -75,6 +75,10 @@
         "See `lp-emacs-ensure-installed-missed' for a set of missed packages that failed install"
         :warning))))
 
+(lp-emacs-elpa-package 'exec-path-from-shell
+  (setq exec-path-from-shell-variables '("PATH" "JAVA_HOME"))
+  (exec-path-from-shell-initialize))
+
 ;; Mark safe variables early so that tangling won't break
 (put 'after-save-hook 'safe-local-variable
      (lambda (value) (equal value '(org-babel-tangle t))))

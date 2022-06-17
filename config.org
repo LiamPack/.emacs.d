@@ -1885,6 +1885,12 @@ actions specified in the manual.
   (setq lsp-java-server-install-dir (expand-file-name "~/.emacs.d/share/eclipse.jdt.ls/"))
   (setq lsp-java-workspace-dir (expand-file-name "~/.emacs.d/share/eclipse.jdt.ls/workspace/"))
   (setq lsp-java-configuration-maven-user-settings (expand-file-name "~/.m2/settings.xml"))
+  (setq lsp-java-configuration-runtimes '[(:name "JavaSE-1.8"
+                                                 :path "/home/kyoncho/jdk1.8.0_201.jdk/")
+                                          (:name "JavaSE-11"
+                                                 :path "/Library/Java/JavaVirtualMachines/temurin-11.jdk/Contents/Home/"
+                                                 :default t)])
+  ;; (setq lsp-java-java-path "")...
   (add-hook 'java-mode-hook #'lsp)
   (define-key lsp-mode-map (kbd "C-c y t") #'lsp-java-type-hierarchy)
   )
@@ -2041,7 +2047,7 @@ python3-proselint=
             #'(lambda ()
                 (interactive)
                 (setq-local indent-tabs-mode nil
-                            tab-width 4))))
+                            tab-width 2))))
 #+end_src
 
 ** c{,++} environment
@@ -2049,7 +2055,7 @@ python3-proselint=
 (lp-emacs-builtin-package 'cc-mode
   :config
   (setq gdb-many-windows 't)
-  (setq tab-width 4)
+  (setq tab-width 2)
   (setq c-basic-offset 4)
   (setq-default indent-tabs-mode nil)
 
@@ -2057,8 +2063,7 @@ python3-proselint=
   (define-key c++-mode-map (kbd "C-j") 'c-indent-new-comment-line)
   (add-hook 'c++-mode-hook
             #'(lambda ()
-                (setq compile-command "cmake .. -DCMAKE_EXRORT_COMPILE_COMMANDS=1 -DCMAKE_BUILD_TYPE=Debug; cmake --build . -j8")
-                ))
+                (setq compile-command "cmake .. -DCMAKE_EXRORT_COMPILE_COMMANDS=1 -DCMAKE_BUILD_TYPE=Debug; cmake --build . -j8")))
   )
 
 (lp-emacs-builtin-package 'gud
