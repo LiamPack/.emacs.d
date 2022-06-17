@@ -1698,14 +1698,14 @@ A time-tested classic mark-up language. Not much more to say; the customizations
 #+begin_src emacs-lisp
 (lp-emacs-git-package
     'denote "https://git.sr.ht/~protesilaos/denote"
-    (setq denote-directory "~/Documents/notes")
-    (setq denote-allow-multi-word-keywords nil)
+    (setq denote-directory "~/Documents/notes/")
+    (setq denote-allow-multi-word-keywords t)
     (setq denote-known-keywords '("emacs" "school" "food" "programming"
                                   "adult" ;; for adult-related stuff, e.g. finances, passwords, car, loans, etc.
                                   "games" "philosophy" "work"))
     (setq denote-infer-keywords nil)
     (setq denote-sort-keywords t)
-    (setq denote-file-type ".txt")
+    (setq denote-file-type 'text)
 
     (require 'denote-dired)
     (add-hook 'dired-mode-hook #'denote-dired-mode)
@@ -1730,7 +1730,7 @@ A time-tested classic mark-up language. Not much more to say; the customizations
       (define-key map (kbd "C-c f N") #'denote-type)
       (define-key map (kbd "C-c f d") #'(lambda ()
                                           (interactive)
-                                          (dired denote-directory)))
+                                          (dired (denote-directory))))
 
       (define-key map (kbd "C-c f i") #'denote-link) ; "insert" mnemonic
       (define-key map (kbd "C-c f I") #'denote-link-add-links)
