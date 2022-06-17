@@ -58,13 +58,13 @@
   (declare (indent 1))
   `(progn
      (let ((local-dir "~/.emacs.d/local"))
-       (when (not (directory-name-p local-dir))
+       (unless (file-directory-p (file-name-concat local-dir (file-name-base ,repo-name)))
          (shell-command
           (format "mkdir -p %s && cd %s && git clone %s"
                   local-dir local-dir ,repo-name))
          (add-to-list 'load-path
                       (file-name-concat
-                       local-dir (f-filename (string-remove-suffix ".git" ,repo-name))))))
+                       local-dir (file-name-base ,repo-name)))))
      (if (require ,package nil 'noerror)
          (progn ,@body)
        (print (format "[Warning]: Loading `%s' failed" ,package))

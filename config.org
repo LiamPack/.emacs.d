@@ -965,14 +965,14 @@ TODOs:
 
 #+end_src
 
-*** corfu-popup -- corfu using ~popup~ / ~popon~, allowing terminal use
+*** corfu-terminal -- corfu using ~popup~ / ~popon~, allowing terminal use
 #+begin_src emacs-lisp
 (lp-emacs-git-package
     'popon "https://codeberg.org/akib/emacs-popon.git")
 (lp-emacs-git-package
-    'corfu-popup "https://codeberg.org/akib/emacs-corfu-popup"
+    'corfu-terminal "https://codeberg.org/akib/emacs-corfu-terminal"
     (unless (display-graphic-p)
-      (corfu-popup-mode +1)))
+      (corfu-terminal-mode +1)))
 #+end_src
 
 *** Cape -- Completion At Point Extensions
@@ -1698,6 +1698,8 @@ A time-tested classic mark-up language. Not much more to say; the customizations
 #+begin_src emacs-lisp
 (lp-emacs-git-package
     'denote "https://git.sr.ht/~protesilaos/denote"
+    ;; highly recommneded to make this directory a git repo, or at least a
+    ;; `project.el`-recognized project
     (setq denote-directory "~/Documents/notes/")
     (setq denote-allow-multi-word-keywords t)
     (setq denote-known-keywords '("emacs" "school" "food" "programming"
@@ -1736,7 +1738,6 @@ A time-tested classic mark-up language. Not much more to say; the customizations
       (define-key map (kbd "C-c f I") #'denote-link-add-links)
       (define-key map (kbd "C-c f l") #'denote-link-find-file) ; "list" links
       (define-key map (kbd "C-c f b") #'denote-link-backlinks)
-
       (define-key map (kbd "C-c f r") #'denote-dired-rename-file)))
 #+end_src
 ** pdf-tools
