@@ -924,6 +924,24 @@ prefix the string with a "bang" =!=.
   ;; SPC should never complete: use it for `orderless' groups.
   )
 #+end_src
+** affe       -- a fzf-like for Emacs built on top of Consult (using Orderless)
+#+begin_src emacs-lisp
+(lp-emacs-elpa-package 'affe
+  (require 'orderless)
+  (consult-customize affe-grep :preview-key (kbd "C-o"))
+  ;; ;; -*- lexical-binding: t -*-
+  ;; (defun affe-orderless-regexp-compiler (input _type _ignorecase)
+  ;;   (setq input (orderless-pattern-compiler input))
+  ;;   (cons input (lambda (str) (orderless--highlight input str))))
+
+  ;; (setq affe-regexp-compiler #'affe-orderless-regexp-compiler)
+  (setq affe-highlight-function #'orderless-highlight-matches
+        affe-regexp-function #'orderless-pattern-compiler)
+  (define-key global-map (kbd "M-s r") #'affe-grep)
+  (define-key global-map (kbd "M-s f") #'affe-find)
+  )
+#+end_src
+
 ** vertico    -- VERTical Interactive COmpletion
 I'm kind of sick of the acronyms that only take pieces of words, but I like the package so
 it gets a pass.
