@@ -53,3 +53,8 @@ desktop
 package-quickstart*
 desktop*
 share/*
+/.emacs.desktop.lock
+/racket-mode/
+/network-security.data
+/local/
+/.dap-breakpoints
