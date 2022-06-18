@@ -1938,6 +1938,18 @@ actions specified in the manual.
   )
 #+end_src
 
+** outline-mode
+- ~text-mode~ derived, so invoking ~outline-mode~ also invokes ~text-mode-hook~
+- ~C-c @~ prefix in ~outline-minor-mode~
+- ~consult-outline~ matches regexp defined in the ~outline-regexp~ variable
+
+#+begin_src emacs-lisp
+(lp-emacs-builtin-package 'outline
+  ;; See ./templates in text-mode: h1,h2 should both match this regexp
+  ;; to generate an outline in simple text notes
+  (setq outline-regexp "= [A-z ]+ =\n=+$\\|- [A-z ]+ -\n-+$\\|[*]+"))
+#+end_src
+
 * programming languages and environments
 ** programming mode
 #+begin_src emacs-lisp
