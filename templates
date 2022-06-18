@@ -69,8 +69,13 @@ text-mode rst-mode
           "| " (s str)                       " |" n
           "+-" (make-string (length str) ?-) "-+" n)
 (calc (p "taylor(sin(x),x=0,3)" formula) n "----" n (format "%s" (calc-eval formula)))
-(h1 (make-string (length title) ?=) n (p "Title: " title) n (make-string (length title) ?=) n n)
-(h2 (make-string (length title) ?-) n (p "Title: " title) n (make-string (length title) ?-) n n)
+(h1 "==" (make-string (length title) ?=)"==" n
+    "= " (p "Title: " title) " ="n
+    "==" (make-string (length title) ?=) "==" n n)
+(h2 "--" (make-string (length title) ?-)"--" n
+    "- " (p "Title: " title) " -"n
+    "--" (make-string (length title) ?-) "--" n n)
+
 
 java-mode
 
