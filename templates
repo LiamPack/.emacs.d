@@ -63,19 +63,14 @@ eshell-mode
 (unl "unless { " p " } { " q " }")
 (unle "unless { " p " } { " p " } { " q " }")
 
-text-mode
+text-mode rst-mode
 
-(cut "--8<---------------cut here---------------start------------->8---" n r n
-     "--8<---------------cut here---------------end--------------->8---" n)
 (asciibox "+-" (make-string (length str) ?-) "-+" n
           "| " (s str)                       " |" n
           "+-" (make-string (length str) ?-) "-+" n)
-(rot13 (p "plain text" text) n "----" n (rot13 text))
 (calc (p "taylor(sin(x),x=0,3)" formula) n "----" n (format "%s" (calc-eval formula)))
-
-rst-mode
-
-(title (make-string (length title) ?=) n (p "Title: " title) n (make-string (length title) ?=) n)
+(h1 (make-string (length title) ?=) n (p "Title: " title) n (make-string (length title) ?=) n n)
+(h2 (make-string (length title) ?-) n (p "Title: " title) n (make-string (length title) ?-) n n)
 
 java-mode
 

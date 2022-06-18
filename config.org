@@ -621,7 +621,7 @@ updated 2015 as of writing [2022-03-06 Sun 15:16]).
         '((1 . (overline background variable-pitch 1.3))
           (2 . (rainbow overline 1.1))
           (t . (semibold))))
-  (modus-themes-load-operandi)
+  (modus-themes-load-vivendi)
   )
 #+end_src
 
@@ -1803,7 +1803,7 @@ A time-tested classic mark-up language. Not much more to say; the customizations
     (setq denote-allow-multi-word-keywords t)
     (setq denote-known-keywords '("emacs" "school" "food" "programming"
                                   "adult" ;; for adult-related stuff, e.g. finances, passwords, car, loans, etc.
-                                  "games" "philosophy" "work"))
+                                  "games" "philosophy" "work" "exercise" "bouldering" "journal"))
     (setq denote-infer-keywords nil)
     (setq denote-infer-keywords t)
     (setq denote-sort-keywords t)
@@ -1840,6 +1840,29 @@ A time-tested classic mark-up language. Not much more to say; the customizations
       (define-key map (kbd "C-c f b") #'denote-link-backlinks)
       (define-key map (kbd "C-c f r") #'denote-dired-rename-file)))
 #+end_src
+** ~tmr~, timing and time-keeping in Emacs
+
+#+begin_src emacs-lisp
+(lp-emacs-elpa-package 'tmr
+  ;; Works on most unix-based systems I think, unsure on Mac
+  (setq tmr-sound-file "/usr/share/sounds/freedesktop/stereo/alarm-clock-elapsed.oga")
+  (setq tmr-notification-urgency 'normal)
+  (setq tmr-descriptions-list
+        (list "Class Readings"
+              "Class Homework"
+              "Boil Pasta"
+              "Work"
+              "Break"))
+
+  (let ((map global-map))
+    (define-key map (kbd "C-c t t") #'tmr)
+    (define-key map (kbd "C-c t d") #'tmr-with-description)
+    (define-key map (kbd "C-c t T") #'tmr-clone)
+    (define-key map (kbd "C-c t c") #'tmr-cancel)
+    (define-key map (kbd "C-c t r") #'tmr-remove-finished)
+    (define-key map (kbd "C-c t l") #'tmr-tabulated-view)))
+#+end_src
+
 ** pdf-tools
 #+begin_src emacs-lisp
 (lp-emacs-elpa-package 'pdf-tools
