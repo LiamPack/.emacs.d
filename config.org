@@ -46,7 +46,7 @@ Not all of the emacs defaults are quite sane. So here's to some sanity.
   ;; i fat-finger way too much to not have the confirmation
   (setq confirm-kill-emacs #'yes-or-no-p)
   (global-hl-line-mode t)               ; highlight current line
-  (setq-default fill-column 92)         ; column length
+  (setq-default fill-column 72)         ; column length
   (column-number-mode t)                ; show column number in the mode line
 
   ;; name on top of frame
@@ -1818,11 +1818,23 @@ A time-tested classic mark-up language. Not much more to say; the customizations
     ;; showed in this manual.  We define it here and add it to a key binding
     ;; below.
     (defun my-denote-journal ()
-      "Create an entry tagged 'journal', while prompting for a title."
+      "Create an entry tagged 'journal', while prompting for a
+title. With prefix arg 'C-u', prompt the user for additional
+keywords from `journal'"
       (interactive)
-      (denote
-       (denote--title-prompt)
-       "journal"))
+      (let* ((title (denote--title-prompt))
+             (tags-prompt
+              (if current-prefix-arg
+                  (denote--keywords-prompt)
+                nil))
+             (tags
+              (cond
+               ((null tags-prompt) "journal")
+               ((listp tags-prompt) (append '("journal") tags-prompt))
+               (t (list "journal" tags-prompt)))))
+        (denote
+         title
+         tags)))
 
     ;; Denote does not define any key bindings.  This is for the user to
     ;; decide.  For example:
@@ -1862,6 +1874,37 @@ A time-tested classic mark-up language. Not much more to say; the customizations
     (define-key map (kbd "C-c t r") #'tmr-remove-finished)
     (define-key map (kbd "C-c t l") #'tmr-tabulated-view)))
 #+end_src
+
+** ~logos~, a simple focus mode for emacs
+#+begin_src emacs-lisp
+(lp-emacs-elpa-package 'olivetti
+  (setq olivetti-body-width 0.7
+        olivetti-minimum-body-width 80
+        olivetti-recall-visual-line-mode-entry-state t))
+
+(lp-emacs-elpa-package 'logos
+  (setq logos-outlines-are-pages t)
+  (setq logos-outline-regexp-alist
+        `((text-mode .  "") ;; just use the page-break to make things simple
+          (org-mode . "^\\*+ +")
+          (t . ,(or outline-regexp logos--page-delimiter))))
+
+  (setq-default logos-hide-mode-line t
+                logos-hide-buffer-boundaries nil
+                logos-hide-fringe t
+                logos-variable-pitch nil
+                logos-scroll-lock t
+                logos-olivetti t)
+
+  (let ((map global-map))
+    (define-key map [remap narrow-to-region] #'logos-narrow-dwim)
+    (define-key map [remap forward-page] #'logos-forward-page-dwim) ; C-x ]
+    (define-key map [remap backward-page] #'logos-backward-page-dwim) ; C-x [
+    (define-key map (kbd "M-^") #'logos-focus-mode)
+    ))
+#+end_src
+
+**
 
 ** pdf-tools
 #+begin_src emacs-lisp
@@ -1947,7 +1990,7 @@ actions specified in the manual.
 (lp-emacs-builtin-package 'outline
   ;; See ./templates in text-mode: h1,h2 should both match this regexp
   ;; to generate an outline in simple text notes
-  (setq outline-regexp "= [A-z ]+ =\n=+$\\|- [A-z ]+ -\n-+$\\|[*]+"))
+  (setq outline-regexp "^= .+ =\n=+$\\|^- .+ -\n-+$\\|^[*]+"))
 #+end_src
 
 * programming languages and environments
@@ -2625,7 +2668,7 @@ the go-to.
   )
 #+end_src
 * external environment interface
-** notmuch -- mail in emacs
+** notmuch                                            -- mail in emacs
 #+begin_src emacs-lisp
 (lp-emacs-elpa-package 'notmuch
   (setq notmuch-show-logo nil)
@@ -2783,7 +2826,7 @@ the go-to.
   (setq send-mail-function 'smtpmail-send-it))
 #+END_SRC
 
-** eww -- web browsing
+** eww                                                -- web browsing
 #+begin_src emacs-lisp
 (lp-emacs-builtin-package 'eww
   (define-key global-map (kbd "<f12>") 'eww)
@@ -2820,7 +2863,7 @@ the go-to.
   (define-key eww-bookmark-mode-map (kbd "d") #'eww-bookmark-kill) ; same
   )
 #+end_src
-** elfeed -- RSS feed reader
+** elfeed                                             -- RSS feed reader
 
 #+begin_src emacs-lisp
 (lp-emacs-elpa-package 'elfeed
@@ -2892,6 +2935,22 @@ the go-to.
                        ("https://sive.rs/podcast.rss" infrequent)
                        ("https://lacker.io/feed.xml" ai tech)
                        ("https://graymirror.substack.com/feed" leftist))))
+#+end_src
+** nov                                                -- epub reader
+
+#+begin_src emacs-lisp
+(lp-emacs-elpa-package 'nov
+  (add-to-list 'auto-mode-alist '("\\.epub\\'" . nov-mode))
+
+  (setq nov-text-width nil)
+  (add-hook 'nov-mode-hook 'visual-line-mode)
+
+  (defun my-nov-font-setup ()
+    (face-remap-add-relative 'variable-pitch :family "Liberation Serif"
+                             :height 1.0))
+
+  (add-hook 'nov-mode-hook 'my-nov-font-setup)
+  )
 #+end_src
 
 * hyper experimental, toxic zone
