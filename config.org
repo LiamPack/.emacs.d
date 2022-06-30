@@ -2837,7 +2837,7 @@ the go-to.
   (setq shr-discard-aria-hidden t)
   (setq shr-cookie-policy nil)
 
-  (setq eww-search-prefix "https://www.duckduckgo.com/search?q=")
+  (setq eww-search-prefix "https://www.duckduckgo.com/?q=")
 
   (setq browse-url-browser-function 'eww-browse-url)
   (setq browse-url-secondary-browser-function 'browse-url-default-browser)
@@ -2885,7 +2885,7 @@ the go-to.
   (let ((map elfeed-search-mode-map))
     (define-key map (kbd "w") #'elfeed-search-yank)
     (define-key map (kbd "g") #'elfeed-update)
-    (define-key map (kbd "G") #'elfeed-search-update--force)) ; "hop" mnemonic
+    (define-key map (kbd "G") #'elfeed-search-update --force)) ; "hop" mnemonic
   (let ((map elfeed-show-mode-map))
     (define-key map (kbd "w") #'elfeed-show-yank))
   ;; Make sure to also check the section on shr and eww for how I handle
@@ -2949,6 +2949,55 @@ the go-to.
                              :height 1.0))
 
   (add-hook 'nov-mode-hook 'my-nov-font-setup))
+#+end_src
+
+** bongo                                              -- music player
+#+begin_src emacs-lisp
+(lp-emacs-elpa-package 'bongo
+  (setq bongo-default-directory "/home/liamp/Desktop/musics/")
+  (setq bongo-display-inline-playback-progress t)
+  (setq bongo-prefer-library-buffers nil)
+  (setq bongo-insert-whole-directory-trees t)
+  (setq bongo-logo nil)
+  (setq bongo-display-track-icons nil)
+  (setq bongo-display-track-lengths nil)
+  (setq bongo-display-header-icons nil)
+  (setq bongo-display-playback-mode-indicator t)
+  (setq bongo-display-inline-playback-progress nil) ; t slows down the playlist buffer
+  (setq bongo-join-inserted-tracks nil)
+  (setq bongo-field-separator (propertize " · " 'face 'shadow))
+  (setq bongo-mark-played-tracks t)
+  ;; (setq bongo-vlc-program-name "cvlc")
+  (bongo-mode-line-indicator-mode -1)
+  (bongo-header-line-mode -1)
+  (let ((map global-map))
+    (define-key map (kbd "C-c b") #'bongo)
+    (define-key map (kbd "<C-XF86AudioPlay>") #'bongo-pause/resume)
+    (define-key map (kbd "<C-XF86AudioNext>") #'bongo-next)
+    (define-key map (kbd "<C-XF86AudioPrev>") #'bongo-previous)
+    (define-key map (kbd "<C-M-XF86AudioPlay>") #'bongo-play-random)
+    (define-key map (kbd "<M-XF86AudioPlay>") #'bongo-show)
+    (define-key map (kbd "<S-XF86AudioNext>") #'bongo-seek-forward-10)
+    (define-key map (kbd "<S-XF86AudioPrev>") #'bongo-seek-backward-10)
+    ;; Same as above for the pgtk build of Emacs 29.  Only tested it
+    ;; with SwayWM.  GNOME 42 may have its own bindings for the
+    ;; multimedia keys that require changes at the level of the desktop
+    ;; environment.
+    (define-key map (kbd "C-<AudioPlay>") #'bongo-pause/resume)
+    (define-key map (kbd "C-<AudioNext>") #'bongo-next)
+    (define-key map (kbd "C-<AudioPrev>") #'bongo-previous)
+    (define-key map (kbd "C-M-<AudioPlay>") #'bongo-play-random)
+    (define-key map (kbd "M-<AudioPlay>") #'bongo-show)
+    (define-key map (kbd "S-<AudioNext>") #'bongo-seek-forward-10)
+    (define-key map (kbd "S-<AudioPrev>") #'bongo-seek-backward-10))
+  (let ((map bongo-playlist-mode-map))
+    (define-key map (kbd "n") #'bongo-next-object)
+    (define-key map (kbd "p") #'bongo-previous-object)
+    (define-key map (kbd "R") #'bongo-rename-line)
+    (define-key map (kbd "j") #'bongo-dired-line)       ; Jump to dir of file at point
+    (define-key map (kbd "J") #'dired-jump)             ; Jump to library buffer
+    (define-key map (kbd "I") #'bongo-insert-special)))
+
 #+end_src
 
 * hyper experimental, toxic zone
