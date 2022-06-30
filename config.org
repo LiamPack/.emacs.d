@@ -521,7 +521,7 @@ updated 2015 as of writing [2022-03-06 Sun 15:16]).
         modus-themes-deuteranopia nil
         modus-themes-tabs-accented t
         modus-themes-variable-pitch-ui nil
-        modus-themes-inhibit-reload t ; only applies to `customize-set-variable' and related
+        modus-themes-inhibit-reload nil ; only applies to `customize-set-variable' and related
 
         modus-themes-fringes nil ; {nil,'subtle,'intense}
 
@@ -529,7 +529,7 @@ updated 2015 as of writing [2022-03-06 Sun 15:16]).
         ;; default), or a list of properties that may include any of those
         ;; symbols: `straight-underline', `text-also', `background',
         ;; `intense' OR `faint'.
-        modus-themes-lang-checkers '(straight-underline)
+        modus-themes-lang-checkers '(straight-underline background)
 
         ;; Options for `modus-themes-mode-line' are either nil, or a list
         ;; that can combine any of `3d' OR `moody', `borderless',
@@ -537,7 +537,7 @@ updated 2015 as of writing [2022-03-06 Sun 15:16]).
         ;; of padding and NATNUM), and a floating point for the height of
         ;; the text relative to the base font size (or a cons cell of
         ;; height and FLOAT)
-        modus-themes-mode-line '(accented borderless (padding . 4) (height . 0.9))
+        modus-themes-mode-line '(accented 3d)
 
         ;; Same as above:
         ;; modus-themes-mode-line '(accented borderless 4 0.9)
@@ -545,17 +545,17 @@ updated 2015 as of writing [2022-03-06 Sun 15:16]).
         ;; Options for `modus-themes-markup' are either nil, or a list
         ;; that can combine any of `bold', `italic', `background',
         ;; `intense'.
-        modus-themes-markup '(background italic)
+        modus-themes-markup '(bold italic background)
 
         ;; Options for `modus-themes-syntax' are either nil (the default),
         ;; or a list of properties that may include any of those symbols:
         ;; `faint', `yellow-comments', `green-strings', `alt-syntax'
-        modus-themes-syntax '(green-strings yellow-comments)
+        modus-themes-syntax '(green-strings yellow-comments alt-syntax)
 
         ;; Options for `modus-themes-hl-line' are either nil (the default),
         ;; or a list of properties that may include any of those symbols:
         ;; `accented', `underline', `intense'
-        modus-themes-hl-line '(underline accented)
+        modus-themes-hl-line '(underline)
 
         ;; Options for `modus-themes-paren-match' are either nil (the
         ;; default), or a list of properties that may include any of those
@@ -611,18 +611,17 @@ updated 2015 as of writing [2022-03-06 Sun 15:16]).
         modus-themes-org-blocks 'gray-background ; {nil,'gray-background,'tinted-background}
 
         modus-themes-org-agenda ; this is an alist: read the manual or its doc string
-        '((header-block . (variable-pitch 1.3))
+        '((header-block . (variable-pitch 1.2))
           (header-date . (grayscale workaholic bold-today 1.1))
           (event . (accented varied))
           (scheduled . uniform)
           (habit . traffic-light))
 
         modus-themes-headings ; this is an alist: read the manual or its doc string
-        '((1 . (overline background variable-pitch 1.3))
+        '((1 . (overline background variable-pitch 1.2))
           (2 . (rainbow overline 1.1))
           (t . (semibold))))
-  (modus-themes-load-vivendi)
-  )
+  (modus-themes-load-vivendi))
 #+end_src
 
 ** anti-bright themes, a soft low-contrast light theme
@@ -1795,11 +1794,10 @@ A time-tested classic mark-up language. Not much more to say; the customizations
 #+end_src
 ** ~denote~, prot's note-taking package
 #+begin_src emacs-lisp
-(lp-emacs-git-package
-    'denote "https://git.sr.ht/~protesilaos/denote"
+(lp-emacs-elpa-package 'denote
     ;; highly recommneded to make this directory a git repo, or at least a
     ;; `project.el`-recognized project
-    (setq denote-directory "~/Documents/notes/")
+    (setq denote-directory "~/Dropbox/denotes/")
     (setq denote-allow-multi-word-keywords t)
     (setq denote-known-keywords '("emacs" "school" "food" "programming"
                                   "adult" ;; for adult-related stuff, e.g. finances, passwords, car, loans, etc.
@@ -1852,6 +1850,7 @@ keywords from `journal'"
       (define-key map (kbd "C-c f b") #'denote-link-backlinks)
       (define-key map (kbd "C-c f r") #'denote-dired-rename-file)))
 #+end_src
+
 ** ~tmr~, timing and time-keeping in Emacs
 
 #+begin_src emacs-lisp
@@ -1920,7 +1919,7 @@ keywords from `journal'"
   (setq pdf-view-display-size 'fit-width)
   (setq pdf-view-continuous t)
   (setq pdf-view-use-dedicated-register nil)
-  (setq pdf-view-max-image-width 1080)
+  (setq pdf-view-max-image-width 2160)
   (setq pdf-outline-imenu-use-flat-menus t)
 
   (pdf-loader-install)
@@ -1945,8 +1944,7 @@ keywords from `journal'"
         (prot/pdf-tools-backdrop)))
 
     (add-hook 'pdf-tools-enabled-hook #'prot/pdf-tools-midnight-mode-toggle)
-    (add-hook 'modus-themes-after-load-theme-hook #'prot/pdf-tools-midnight-mode-toggle)
-    ))
+    (add-hook 'modus-themes-after-load-theme-hook #'prot/pdf-tools-midnight-mode-toggle)))
 #+end_src
 
 ** ispell+flyspell
@@ -2830,6 +2828,7 @@ the go-to.
 #+begin_src emacs-lisp
 (lp-emacs-builtin-package 'eww
   (define-key global-map (kbd "<f12>") 'eww)
+  (define-key global-map (kbd "M-(") 'eww)
   (setq shr-use-colors nil)             ; t is bad for accessibility
   (setq shr-use-fonts nil)              ; t is not for me
   (setq shr-max-image-proportion 0.6)
@@ -2838,7 +2837,7 @@ the go-to.
   (setq shr-discard-aria-hidden t)
   (setq shr-cookie-policy nil)
 
-  (setq eww-search-prefix "https://www.google.com/search?q=")
+  (setq eww-search-prefix "https://www.duckduckgo.com/search?q=")
 
   (setq browse-url-browser-function 'eww-browse-url)
   (setq browse-url-secondary-browser-function 'browse-url-default-browser)
@@ -2949,8 +2948,7 @@ the go-to.
     (face-remap-add-relative 'variable-pitch :family "Liberation Serif"
                              :height 1.0))
 
-  (add-hook 'nov-mode-hook 'my-nov-font-setup)
-  )
+  (add-hook 'nov-mode-hook 'my-nov-font-setup))
 #+end_src
 
 * hyper experimental, toxic zone
@@ -2958,8 +2956,8 @@ In the below, I'm testing things out. No commentary, no thoughts, no brain on ho
 about them is detailed. that's for the main packages. this is the hyper-safe toxic-waste
 testing zone
 
-** ~lp-journal~ for simple, low-cost journal management :noexport:
-#+begin_src
+** ~lp-journal~ for simple, low-cost journaling                     :noexport:
+#+begin_src emacs-lisp :tangle no
 (require 'lp-scratch)
 (setq lp--journal-dir (file-truename "~/org/roam/daily/"))
 (define-key global-map (kbd "C-c f j j") 'lp-journal-visit-today)
@@ -2967,7 +2965,7 @@ testing zone
 (define-key global-map (kbd "C-c f j p") 'lp-journal-visit-backward-one-day)
 #+end_src
 ** ~lp-notes~ for simple, low-cost notes management :noexport:
-#+begin_src
+#+begin_src emacs-lisp :tangle n
 (require 'lp-scratch)
 (setq lp--notes-dir (file-truename "~/org/roam/"))
 (define-key global-map (kbd "C-c f d") 'lp-notes-dired)
