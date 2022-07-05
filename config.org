@@ -1,30 +1,37 @@
 #+TITLE: My Emacs Config
 
-Documenting this configuration is a way to consolidate the knowledge of my own
-environment. This could serve as an entry-point for someone (bless their heart) to try to
-see what this configuration has to offer, but this is primarily (and perhaps
-counter-intuitively) for selfish reasons.
+Documenting this configuration is a way to consolidate the knowledge of
+my own environment. This could serve as an entry-point for someone
+(bless their heart) to try to see what this configuration has to offer,
+but this is primarily (and perhaps counter-intuitively) for selfish
+reasons.
 
-There's an emphasis on simple utilities and packages. This logically leads to relying on
-many of the wonderful, but perhaps not-as-well-understood, built-in packages (~winner~, ~tab
-bar~, ~bibtex~, ~dabbrev+abbrev~, ~xref~, ...), and some external-but-necessary packages
-({~mct~, ~embark~, ~consult~}, ...). Simple packages allow composability:
-"dedication to its craft" means that packages won't be stepping on each-others toes, which
-reduces the cognitive overhead of evaluating, say, which search+jump function to use.
+There's an emphasis on simple utilities and packages. This logically
+leads to relying on many of the wonderful, but perhaps
+not-as-well-understood, built-in packages (~winner~, ~tab bar~,
+~bibtex~, ~dabbrev+abbrev~, ~xref~, ...), and some
+external-but-necessary packages ({~vertico~, ~embark~, ~consult~},
+...). Simple packages allow composability: "dedication to its craft"
+means that packages won't be stepping on each-others toes, which reduces
+the cognitive overhead of evaluating, say, which search+jump function to
+use.
 
-More complex packages are no doubt useful and have their place (Helm, Ivy). But in the past
-I relied too much on these big strong tools without the underlying systems and methodology
-in place to effectively use them, rendering my productivity much lower than it could have
-been. The first brain needs to work well before the second brain can be effective. Also I
-was incessantly yak-shaving since I had no laws about which packages to install, so keeping
-a simple-and-preferred-built-in approach forces me to think twice about whether I really
-need the new shiny docker buffer editing package, or a SCSS-specific color-mapping mode. An
-end-goal may be to someday rely on no external packages, but that doesn't seem likely unless
-~orderless~ somehow makes it into ~emacs.git~.
+More complex packages are no doubt useful and have their place (Helm,
+Ivy). But in the past I relied too much on these big strong tools
+without the underlying systems and methodology in place to effectively
+use them, rendering my productivity much lower than it could have
+been. The first brain needs to work well before the second brain can be
+effective. Also I was incessantly yak-shaving since I had no laws about
+which packages to install, so keeping a simple-and-preferred-built-in
+approach forces me to think twice about whether I really need the new
+shiny docker buffer editing package, or a SCSS-specific color-mapping
+mode. An end-goal may be to someday rely on no external packages, but
+that doesn't seem likely unless ~orderless~ somehow makes it into
+~emacs.git~.
 
-Inspiration is, as always, taken from those more experienced and more wise than
-myself. Credits to the (many) configurations I took inspiration from over the years, which
-are linked in a final section.
+Inspiration is, as always, taken from those more experienced and more
+wise than myself. Credits to the (many) configurations I took
+inspiration from over the years, which are linked in a final section.
 
 * sane defaults and general emacs capabilities
 ** initial setup, keybinds, etc.
@@ -115,7 +122,7 @@ Not all of the emacs defaults are quite sane. So here's to some sanity.
   (define-key global-map (kbd "C-x k") #'(lambda () (interactive) (kill-buffer nil)))
   (define-key global-map (kbd "C-x K") #'(lambda () (interactive) (kill-buffer nil) (delete-window)))
   (define-key emacs-lisp-mode-map (kbd "C-c C-k") #'eval-buffer)
-  (define-key global-map (kbd "C-c n") #'lp--clean-up-buffer-or-region)
+  (define-key global-map (kbd "C-c n") #'whitespace-cleanup)
   (define-key global-map (kbd "<f5>")  #'revert-buffer)
 
   (define-key global-map (kbd "M-z") #'zap-up-to-char) ;; i generally go up to a char non-inclusive
@@ -1091,7 +1098,7 @@ TODOs:
   )
 #+end_src
 
-** [NOEXPORT] mct  -- minimalist minibuffer completion visualization :noexport:
+** [unused, dead] mct  -- minimalist minibuffer completion visualization :noexport:
 [2021-12-06] I gave it a serious try but MCT isn't gonna cut it. I'd like my
 completions to be done quicker.
 
@@ -1220,6 +1227,26 @@ Its debatable whether xref should be in this section. May re-evaluate in future.
 #+end_src
 
 * reading, writing, and task keeping
+** text-mode
+#+begin_src emacs-lisp
+(lp-emacs-builtin-package 'text-mode
+  (add-hook 'text-mode-hook
+            #'(lambda ()
+                (interactive)
+                (setq-local paragraph-start "\\|\\*\\| *-\\| *[1-9]\\.\\|[ 	]*$"))))
+#+end_src
+** outline-mode
+- ~text-mode~ derived, so invoking ~outline-mode~ also invokes ~text-mode-hook~
+- ~C-c @~ prefix in ~outline-minor-mode~
+- ~consult-outline~ matches regexp defined in the ~outline-regexp~ variable
+
+#+begin_src emacs-lisp
+(lp-emacs-builtin-package 'outline
+  ;; See ./templates in text-mode: h1,h2 should both match this regexp
+  ;; to generate an outline in simple text notes
+  (setq outline-regexp "^= .+ =\n=+$\\|^- .+ -\n-+$\\|^[*]+"))
+#+end_src
+
 ** latex
 #+begin_src emacs-lisp
 ;; auctex requires special configuration..
@@ -1977,18 +2004,6 @@ actions specified in the manual.
   (define-key flyspell-mode-map (kbd "C-;") nil) ;; gets in the way of things.
   (define-key flyspell-mode-map (kbd "C-M-i") nil) ;; gets in the way of things.
   )
-#+end_src
-
-** outline-mode
-- ~text-mode~ derived, so invoking ~outline-mode~ also invokes ~text-mode-hook~
-- ~C-c @~ prefix in ~outline-minor-mode~
-- ~consult-outline~ matches regexp defined in the ~outline-regexp~ variable
-
-#+begin_src emacs-lisp
-(lp-emacs-builtin-package 'outline
-  ;; See ./templates in text-mode: h1,h2 should both match this regexp
-  ;; to generate an outline in simple text notes
-  (setq outline-regexp "^= .+ =\n=+$\\|^- .+ -\n-+$\\|^[*]+"))
 #+end_src
 
 * programming languages and environments
@@ -2885,7 +2900,7 @@ the go-to.
   (let ((map elfeed-search-mode-map))
     (define-key map (kbd "w") #'elfeed-search-yank)
     (define-key map (kbd "g") #'elfeed-update)
-    (define-key map (kbd "G") #'elfeed-search-update --force)) ; "hop" mnemonic
+    (define-key map (kbd "G") #'elfeed-search-update--force)) ; "hop" mnemonic
   (let ((map elfeed-show-mode-map))
     (define-key map (kbd "w") #'elfeed-show-yank))
   ;; Make sure to also check the section on shr and eww for how I handle
@@ -3000,7 +3015,7 @@ the go-to.
 
 #+end_src
 
-* hyper experimental, toxic zone
+* hyper experimental, toxic zone ⚠
 In the below, I'm testing things out. No commentary, no thoughts, no brain on how i feel
 about them is detailed. that's for the main packages. this is the hyper-safe toxic-waste
 testing zone
@@ -3024,17 +3039,20 @@ testing zone
 
 
 * configurations and people i took inspiration from
-- Skeeto's configuration, https://github.com/skeeto/.emacs.d. This is the first
-  configuration which I tried to modify for my own means back when I first started to take
-  courses in CS at college. It's where it all began, and I intend to look back to see where
-  he's traveled with it sometime soon.
-- Prot, of course. [[potesilaos.com/emacs/dotemacs]]. So much of the little things he picks up
-  on in the manuals and specifications is incredibly useful in day-to-day use. That's not
-  even mentioning his incredibly informative youtube videos and insightful posts on his
-  website, both emacs-related or otherwise. His communication of the "software-freedom
-  philosophy" is best-in-class and inspired me to sit down, minimize, and really understand
-  my tools. In this way, I am free from the standards and specifications of those who wish
-  to indoctrinate me into a state of reliance on their sub-par and opaque products.
+- Skeeto's configuration, https://github.com/skeeto/.emacs.d. This is
+  the first configuration which I tried to modify for my own means back
+  when I first started to take courses in CS at college. It's where it
+  all began, and I intend to look back to see where he's traveled with
+  it sometime soon.
+- Prot, of course. [[potesilaos.com/emacs/dotemacs]]. So much of the little
+  things he picks up on in the manuals and specifications is incredibly
+  useful in day-to-day use. That's not even mentioning his incredibly
+  informative youtube videos and insightful posts on his website, both
+  emacs-related or otherwise. His communication of the "software-freedom
+  philosophy" is best-in-class and inspired me to sit down, minimize,
+  and really understand my tools. In this way, I am free from the
+  standards and specifications of those who wish to indoctrinate me into
+  a state of reliance on their sub-par and opaque products.
 - Howardisms is an OG.
 - Sacha Chua
 - TODO: I'm sure there's a lot more ...
