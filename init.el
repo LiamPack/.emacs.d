@@ -95,3 +95,5 @@
     (require 'ob-tangle)
     (org-babel-tangle-file .org .el "emacs-lisp"))
   (load-file .el))
+
+(load-file "post-init.el")
