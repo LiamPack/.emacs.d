@@ -1822,60 +1822,60 @@ A time-tested classic mark-up language. Not much more to say; the customizations
 ** ~denote~, prot's note-taking package
 #+begin_src emacs-lisp
 (lp-emacs-elpa-package 'denote
-    ;; highly recommneded to make this directory a git repo, or at least a
-    ;; `project.el`-recognized project
-    (setq denote-directory "~/Dropbox/denotes/")
-    (setq denote-allow-multi-word-keywords t)
-    (setq denote-known-keywords '("emacs" "school" "food" "programming"
-                                  "adult" ;; for adult-related stuff, e.g. finances, passwords, car, loans, etc.
-                                  "games" "philosophy" "work" "exercise" "bouldering" "journal"))
-    (setq denote-infer-keywords nil)
-    (setq denote-infer-keywords t)
-    (setq denote-sort-keywords t)
-    (setq denote-file-type 'text)
+  ;; highly recommneded to make this directory a git repo, or at least a
+  ;; `project.el`-recognized project
+  (setq denote-directory "~/Dropbox/denotes/")
+  (setq denote-allow-multi-word-keywords t)
+  (setq denote-known-keywords '("emacs" "school" "food" "programming"
+                                "adult" ;; for adult-related stuff, e.g. finances, passwords, car, loans, etc.
+                                "games" "philosophy" "work" "exercise" "bouldering" "journal"))
+  (setq denote-infer-keywords nil)
+  (setq denote-infer-keywords t)
+  (setq denote-sort-keywords t)
+  (setq denote-file-type 'text)
 
-    (require 'denote-dired)
-    (add-hook 'dired-mode-hook #'denote-dired-mode)
+  (require 'denote-dired)
+  (add-hook 'dired-mode-hook #'denote-dired-mode)
 
-    (require 'denote-link)
+  (require 'denote-link)
 
-    ;; Here is a custom, user-level command from one of the examples we
-    ;; showed in this manual.  We define it here and add it to a key binding
-    ;; below.
-    (defun my-denote-journal ()
-      "Create an entry tagged 'journal', while prompting for a
+  ;; Here is a custom, user-level command from one of the examples we
+  ;; showed in this manual.  We define it here and add it to a key binding
+  ;; below.
+  (defun my-denote-journal ()
+    "Create an entry tagged 'journal', while prompting for a
 title. With prefix arg 'C-u', prompt the user for additional
 keywords from `journal'"
-      (interactive)
-      (let* ((title (denote--title-prompt))
-             (tags-prompt
-              (if current-prefix-arg
-                  (denote--keywords-prompt)
-                nil))
-             (tags
-              (cond
-               ((null tags-prompt) "journal")
-               ((listp tags-prompt) (append '("journal") tags-prompt))
-               (t (list "journal" tags-prompt)))))
-        (denote
-         title
-         tags)))
+    (interactive)
+    (let* ((title (denote--title-prompt))
+           (tags-prompt
+            (if current-prefix-arg
+                (denote--keywords-prompt)
+              nil))
+           (tags
+            (cond
+             ((null tags-prompt) "journal")
+             ((listp tags-prompt) (append '("journal") tags-prompt))
+             (t (list "journal" tags-prompt)))))
+      (denote
+       title
+       tags)))
 
-    ;; Denote does not define any key bindings.  This is for the user to
-    ;; decide.  For example:
-    (let ((map global-map))
-      (define-key map (kbd "C-c f j") #'my-denote-journal) ; our custom command
-      (define-key map (kbd "C-c f n") #'denote)
-      (define-key map (kbd "C-c f N") #'denote-type)
-      (define-key map (kbd "C-c f d") #'(lambda ()
-                                          (interactive)
-                                          (dired (denote-directory))))
+  ;; Denote does not define any key bindings.  This is for the user to
+  ;; decide.  For example:
+  (let ((map global-map))
+    (define-key map (kbd "C-c f j") #'denote-create-note-in-subdirectory) ; our custom command
+    (define-key map (kbd "C-c f n") #'denote)
+    (define-key map (kbd "C-c f N") #'denote-type)
+    (define-key map (kbd "C-c f d") #'(lambda ()
+                                        (interactive)
+                                        (dired (denote-directory))))
 
-      (define-key map (kbd "C-c f i") #'denote-link) ; "insert" mnemonic
-      (define-key map (kbd "C-c f I") #'denote-link-add-links)
-      (define-key map (kbd "C-c f l") #'denote-link-find-file) ; "list" links
-      (define-key map (kbd "C-c f b") #'denote-link-backlinks)
-      (define-key map (kbd "C-c f r") #'denote-dired-rename-file)))
+    (define-key map (kbd "C-c f i") #'denote-link) ; "insert" mnemonic
+    (define-key map (kbd "C-c f I") #'denote-link-add-links)
+    (define-key map (kbd "C-c f l") #'denote-link-find-file) ; "list" links
+    (define-key map (kbd "C-c f b") #'denote-link-backlinks)
+    (define-key map (kbd "C-c f r") #'denote-dired-rename-file)))
 #+end_src
 
 ** ~tmr~, timing and time-keeping in Emacs
