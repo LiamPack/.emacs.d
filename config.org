@@ -379,8 +379,7 @@ relatively convenient
 ** visualizing whitespace
 #+begin_src emacs-lisp
 (lp-emacs-builtin-package 'whitespace
-  (setq whitespace-style (quote (face spaces tabs newline space-mark tab-mark newline-mark)))
-  (add-hook 'java-mode-hook #'whitespace-mode))
+  (setq whitespace-style (quote (face spaces tabs newline space-mark tab-mark newline-mark))))
 #+end_src
 ** adding sensible advice around built-in functions
 - Add advice to =kill-region= and =kill-ring-save= to kill/save the current line if there is
@@ -490,24 +489,26 @@ Some modifications to the built-in theme I'm playing with. Playing around with s
 building my own kind of theme. Right now its a direct rip of the [[https://github.com/rocher/ubuntu-theme][ubuntu-theme]] package (last
 updated 2015 as of writing [2022-03-06 Sun 15:16]).
 
-- [ ] variable-pitch with ~Quicksand~ as the non-monospaced font
+- variable-pitch with ~Quicksand~ as the non-monospaced font
+- liking ~cozette~ now
 
 #+begin_src emacs-lisp
 (add-to-list 'load-path "~/.emacs.d/lisp/")
 
 ;; (require 'lp-theme)
 (load-theme 'modus-vivendi)
-(set-frame-font "DejaVu Sans Mono 14")
+(set-face-attribute 'default nil :font "Cozette Vector" :height 180)
 
-;; (modify-all-frames-parameters
-;;  '((right-divider-width . 40)
-;;    (internal-border-width . 40)))
-;; (dolist (face '(window-divider
-;;                 window-divider-first-pixel
-;;                 window-divider-last-pixel))
-;;   (face-spec-reset-face face)
-;;   (set-face-foreground face (face-attribute 'default :background)))
-;; (set-face-background 'fringe (face-attribute 'default :background))
+;; add some fringes
+(modify-all-frames-parameters
+ '((right-divider-width . 10)
+   (internal-border-width . 10)))
+(dolist (face '(window-divider
+                window-divider-first-pixel
+                window-divider-last-pixel))
+  (face-spec-reset-face face)
+  (set-face-foreground face (face-attribute 'default :background)))
+(set-face-background 'fringe (face-attribute 'default :background))
 
 ;; (set-frame-font "Quicksand Medium 14")
 
@@ -614,8 +615,8 @@ updated 2015 as of writing [2022-03-06 Sun 15:16]).
 
         ;; Options for `modus-themes-diffs': nil, 'desaturated, 'bg-only
         modus-themes-diffs 'desaturated
-
-        modus-themes-org-blocks 'gray-background ; {nil,'gray-background,'tinted-background}
+        
+        modus-themes-org-blocks 'tinted-background ; {nil,'gray-background,'tinted-background}
 
         modus-themes-org-agenda ; this is an alist: read the manual or its doc string
         '((header-block . (variable-pitch 1.2))
@@ -625,8 +626,8 @@ updated 2015 as of writing [2022-03-06 Sun 15:16]).
           (habit . traffic-light))
 
         modus-themes-headings ; this is an alist: read the manual or its doc string
-        '((1 . (overline background variable-pitch 1.2))
-          (2 . (rainbow overline 1.1))
+        '((1 . (overline background 1.0))
+          (2 . (rainbow overline 1.0))
           (t . (semibold))))
   (modus-themes-load-vivendi))
 #+end_src
@@ -834,7 +835,7 @@ doesn't play well with lsp, but i haven't heard anything about =eglot=.
   (setq xref-show-definitions-function #'consult-xref)
   (define-key completion-list-mode-map (kbd "C-o") #'consult-preview-at-point)
 
-  ;; (setq completion-in-region-function #'consult-completion-in-region)
+  (setq completion-in-region-function #'consult-completion-in-region)
   )
 
 (lp-emacs-elpa-package 'consult-dir
@@ -930,8 +931,11 @@ prefix the string with a "bang" =!=.
   ;; SPC should never complete: use it for `orderless' groups.
   )
 #+end_src
-** affe       -- a fzf-like for Emacs built on top of Consult (using Orderless)
-#+begin_src emacs-lisp
+** [disabled] affe       -- a fzf-like for Emacs built on top of Consult (using Orderless)
+[2022-07-14 Thu 21:22] currently disabled until i figure out why its so
+error prone on prompt
+
+#+begin_src emacs-lisp :tangle no
 (lp-emacs-elpa-package 'affe
   (require 'orderless)
   (consult-customize affe-grep :preview-key (kbd "C-o"))
@@ -970,7 +974,9 @@ TODOs:
   ;; your current input.
   (add-hook 'rfn-eshadow-update-overlay-hook #'vertico-directory-tidy))
 #+end_src
-** corfu      -- Completion Overlay Region FUnction
+** [disabled] corfu      -- Completion Overlay Region FUnction
+[2022-07-14 Thu 21:19] currently disabled in favor of consult-completion-in-region
+
 Again, hate the multi-letter-per-word acronym but its a good package.
 
 TODOs:
@@ -978,7 +984,7 @@ TODOs:
 - [ ] Lots of really good documentation on making ~corfu~ play nice with LSP and Eglot,
   something I've had a problem with in the past.
 
-#+begin_src emacs-lisp
+#+begin_src emacs-lisp :tangle no
 (lp-emacs-elpa-package 'corfu
   ;; Optional customizations
   ;; :custom
@@ -1681,8 +1687,8 @@ Its debatable whether xref should be in this section. May re-evaluate in future.
   (define-key global-map (kbd "C-c l") 'org-store-link))
 #+END_SRC
 
-*** org-modern
-#+begin_src emacs-lisp
+*** org-modern :disabled:
+#+begin_src emacs-lisp :tangle no
 (lp-emacs-elpa-package 'org-modern
   (add-hook 'org-mode-hook #'org-modern-mode)
   (add-hook 'org-agenda-finalize-hook #'org-modern-agenda))
@@ -2041,10 +2047,14 @@ actions specified in the manual.
 
 
   (define-key lsp-mode-map (kbd "C-c y a") #'lsp-execute-code-action)
+  (define-key lsp-mode-map (kbd "C-c y M-d") #'lsp-describe-thing-at-point)
+  (define-key lsp-ui-mode-map (kbd "C-c y r") 'lsp-format-region)
+  (define-key lsp-ui-mode-map (kbd "C-c y b") 'lsp-format-buffer)
+  (define-key lsp-ui-mode-map (kbd "C-c n") 'lsp-format-buffer)
 
   (setq read-process-output-max (* 1024 1024))
   (setq base-lsp-mode-hooks
-        '(typescript-mode-hook tuargeg-mode-hook))
+        '(typescript-mode-hook tuareg-mode-hook))
   (dolist (hook base-lsp-mode-hooks)
     (add-hook hook #'lsp)))
 
@@ -2065,10 +2075,7 @@ actions specified in the manual.
 
   (define-key lsp-ui-mode-map (kbd "C-c y d") 'lsp-ui-doc-show)
   (define-key lsp-ui-mode-map (kbd "C-c y C-d") 'lsp-ui-doc-hide)
-  (define-key lsp-ui-mode-map (kbd "C-c y i") 'lsp-ui-imenu)
-  (define-key lsp-ui-mode-map (kbd "C-c y r") 'lsp-format-region)
-  (define-key lsp-ui-mode-map (kbd "C-c y b") 'lsp-format-buffer)
-  (define-key lsp-ui-mode-map (kbd "C-c n") 'lsp-format-buffer))
+  (define-key lsp-ui-mode-map (kbd "C-c y i") 'lsp-ui-imenu))
 
 ;; ;; LSPJavaPac
 (lp-emacs-elpa-package 'lsp-java
@@ -2076,9 +2083,7 @@ actions specified in the manual.
   (setq lsp-java-server-install-dir (expand-file-name "~/.emacs.d/share/eclipse.jdt.ls/"))
   (setq lsp-java-workspace-dir (expand-file-name "~/.emacs.d/share/eclipse.jdt.ls/workspace/"))
   (setq lsp-java-configuration-maven-user-settings (expand-file-name "~/.m2/settings.xml"))
-  (setq lsp-java-configuration-runtimes '[(:name "JavaSE-1.8"
-                                                 :path "/home/kyoncho/jdk1.8.0_201.jdk/")
-                                          (:name "JavaSE-11"
+  (setq lsp-java-configuration-runtimes '[(:name "JavaSE-11"
                                                  :path "/Library/Java/JavaVirtualMachines/temurin-11.jdk/Contents/Home/"
                                                  :default t)])
   ;; (setq lsp-java-java-path "")...
@@ -2090,10 +2095,6 @@ actions specified in the manual.
 (lp-emacs-elpa-package 'lsp-julia
   (setq lsp-julia-default-environment "~/.julia/environments/v1.7")
   (add-hook 'julia-mode-hook #'lsp))
-
-
-(lp-emacs-elpa-package 'lsp-jedi
-  (add-hook 'python-mode-hook #'lsp))
 #+end_src
 
 ** eglot
@@ -2162,7 +2163,7 @@ python3-proselint=
 
   (let ((map flymake-mode-map))
     (define-key map (kbd "C-c y s") #'flymake-start)
-    (define-key map (kbd "C-c y d") #'flymake-show-buffer-diagnostics) ; Emacs28
+    (define-key map (kbd "C-c y !") #'flymake-show-buffer-diagnostics) ; Emacs28
     (define-key map (kbd "C-c y n") #'flymake-goto-next-error)
     (define-key map (kbd "C-c y p") #'flymake-goto-prev-error)))
 #+END_SRC
@@ -2190,10 +2191,11 @@ python3-proselint=
 #+end_src
 ** ocaml
 #+begin_src emacs-lisp
-(lp-emacs-elpa-package 'tuareg)
+(lp-emacs-elpa-package 'tuareg
+  (setq tuareg-opam-insinuate t))
 
 (lp-emacs-elpa-package 'utop
-  (setq utop-command "opam config exec -- utop -emacs")
+  (setq utop-command "opam config exec -- dune utop . -- -emacs")
   ;; (setq utop-command "opam config exec -- dune utop . -- -emacs")
 
   (autoload 'utop-minor-mode "utop" "Minor mode for utop" t)
@@ -2211,10 +2213,9 @@ python3-proselint=
 
 (lp-emacs-elpa-package 'pyvenv)
 (lp-emacs-elpa-package 'conda
-  (conda-env-initialize-interactive-shells)
-  (conda-env-initialize-eshell)
+  ;; (conda-env-initialize-interactive-shells)
+  ;; (conda-env-initialize-eshell)
   (setq
-
    conda-anaconda-home "/Users/packell1/miniconda3/"
    conda-env-home-directory (expand-file-name "~/miniconda3/") ;; as in previous example; not required
    conda-env-subdirectory "envs")
@@ -2318,7 +2319,9 @@ python3-proselint=
 ** symbolic math (maxima, calc)
 
 #+begin_src emacs-lisp
-(lp-emacs-builtin-package 'calc)
+(lp-emacs-builtin-package 'calc
+  ;; TODO types for bytes and stuff
+  )
 (lp-emacs-elpa-package 'maxima
   (add-hook 'maxima-mode-hook #'maxima-hook-function)
   (add-hook 'maxima-inferior-mode-hook #'maxima-hook-function)
