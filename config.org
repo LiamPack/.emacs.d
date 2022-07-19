@@ -2048,9 +2048,9 @@ actions specified in the manual.
 
   (define-key lsp-mode-map (kbd "C-c y a") #'lsp-execute-code-action)
   (define-key lsp-mode-map (kbd "C-c y M-d") #'lsp-describe-thing-at-point)
-  (define-key lsp-ui-mode-map (kbd "C-c y r") 'lsp-format-region)
-  (define-key lsp-ui-mode-map (kbd "C-c y b") 'lsp-format-buffer)
-  (define-key lsp-ui-mode-map (kbd "C-c n") 'lsp-format-buffer)
+  (define-key lsp-mode-map (kbd "C-c y r") 'lsp-format-region)
+  (define-key lsp-mode-map (kbd "C-c y b") 'lsp-format-buffer)
+  (define-key lsp-mode-map (kbd "C-c n") 'lsp-format-buffer)
 
   (setq read-process-output-max (* 1024 1024))
   (setq base-lsp-mode-hooks
