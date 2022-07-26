@@ -96,4 +96,4 @@
     (org-babel-tangle-file .org .el "emacs-lisp"))
   (load-file .el))
 
-(load-file "post-init.el")
+(load-file (expand-file-name "post-init.el" user-emacs-directory))
