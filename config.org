@@ -1842,30 +1842,9 @@ A time-tested classic mark-up language. Not much more to say; the customizations
 
   (require 'denote-dired)
   (add-hook 'dired-mode-hook #'denote-dired-mode)
+  (add-hook 'find-file-hook #'denote-link-buttonize-buffer)
 
   (require 'denote-link)
-
-  ;; Here is a custom, user-level command from one of the examples we
-  ;; showed in this manual.  We define it here and add it to a key binding
-  ;; below.
-  (defun my-denote-journal ()
-    "Create an entry tagged 'journal', while prompting for a
-title. With prefix arg 'C-u', prompt the user for additional
-keywords from `journal'"
-    (interactive)
-    (let* ((title (denote--title-prompt))
-           (tags-prompt
-            (if current-prefix-arg
-                (denote--keywords-prompt)
-              nil))
-           (tags
-            (cond
-             ((null tags-prompt) "journal")
-             ((listp tags-prompt) (append '("journal") tags-prompt))
-             (t (list "journal" tags-prompt)))))
-      (denote
-       title
-       tags)))
 
   ;; Denote does not define any key bindings.  This is for the user to
   ;; decide.  For example:
@@ -1881,7 +1860,9 @@ keywords from `journal'"
     (define-key map (kbd "C-c f I") #'denote-link-add-links)
     (define-key map (kbd "C-c f l") #'denote-link-find-file) ; "list" links
     (define-key map (kbd "C-c f b") #'denote-link-backlinks)
-    (define-key map (kbd "C-c f r") #'denote-dired-rename-file)))
+    (define-key map (kbd "C-c f r") #'denote-dired-rename-file-and-rewrite-front-matter)
+    (define-key map (kbd "C-c f r") #'denote-dired-rename-marked-files)
+    ))
 #+end_src
 
 ** ~tmr~, timing and time-keeping in Emacs
@@ -2322,7 +2303,18 @@ python3-proselint=
 #+begin_src emacs-lisp
 (lp-emacs-builtin-package 'calc
   ;; TODO types for bytes and stuff
+  (setq math-additional-units '(
+          (GiB "1024 * MiB" "Giga Byte")
+          (MiB "1024 * KiB" "Mega Byte")
+          (KiB "1024 * B" "Kilo Byte")
+          (B nil "Byte")
+          (Gib "1024 * Mib" "Giga Bit")
+          (Mib "1024 * Kib" "Mega Bit")
+          (Kib "1024 * b" "Kilo Bit")
+          (b nil "B/8" "bit")))
+  (setq math-units-table nil) ; clear the units table cache
   )
+
 (lp-emacs-elpa-package 'maxima
   (add-hook 'maxima-mode-hook #'maxima-hook-function)
   (add-hook 'maxima-inferior-mode-hook #'maxima-hook-function)
