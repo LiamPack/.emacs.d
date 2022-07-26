@@ -2217,6 +2217,7 @@ python3-proselint=
   ;; (conda-env-initialize-eshell)
   (setq
    conda-anaconda-home "/Users/packell1/miniconda3/"
+   conda-anaconda-home (expand-file-name "~/miniconda3/")
    conda-env-home-directory (expand-file-name "~/miniconda3/") ;; as in previous example; not required
    conda-env-subdirectory "envs")
   )
@@ -3040,6 +3041,21 @@ testing zone
 (define-key global-map (kbd "C-c f n") 'lp-notes-make-file)
 #+end_src
 
+
+** moldable-emacs, code-compass, etc
+#+begin_src emacs-lisp
+(lp-emacs-elpa-package 'simple-httpd)
+(lp-emacs-elpa-package 'f)
+(lp-emacs-elpa-package 's)
+(lp-emacs-elpa-package 'dash)
+
+(lp-emacs-git-package
+    'code-compass "https://github.com/ag91/code-compass.git")
+
+(lp-emacs-git-package
+    'moldable-emacs "https://github.com/ag91/moldable-emacs.git"
+    (me-setup-molds))
+#+end_src
 
 * configurations and people i took inspiration from
 - Skeeto's configuration, https://github.com/skeeto/.emacs.d. This is
