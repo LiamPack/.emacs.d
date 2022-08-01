@@ -483,39 +483,6 @@ good themes
   (setq rainbow-ansi-colors nil)
   (setq rainbow-x-colors nil))
 #+end_src
-** personal theme
-Some modifications to the built-in theme I'm playing with. Playing around with some
-[[https://protesilaos.com/codelog/2020-08-28-notes-emacs-theme-devs/][advice from Prot]] in
-building my own kind of theme. Right now its a direct rip of the [[https://github.com/rocher/ubuntu-theme][ubuntu-theme]] package (last
-updated 2015 as of writing [2022-03-06 Sun 15:16]).
-
-- variable-pitch with ~Quicksand~ as the non-monospaced font
-- liking ~cozette~ now
-
-#+begin_src emacs-lisp
-(add-to-list 'load-path "~/.emacs.d/lisp/")
-
-;; (require 'lp-theme)
-(load-theme 'modus-vivendi)
-(set-face-attribute 'default nil :font "Cozette Vector" :height 180)
-
-;; add some fringes
-(modify-all-frames-parameters
- '((right-divider-width . 10)
-   (internal-border-width . 10)))
-(dolist (face '(window-divider
-                window-divider-first-pixel
-                window-divider-last-pixel))
-  (face-spec-reset-face face)
-  (set-face-foreground face (face-attribute 'default :background)))
-(set-face-background 'fringe (face-attribute 'default :background))
-
-;; (set-frame-font "Quicksand Medium 14")
-
-;; (face-attribute 'default :font)
-;; #<font-object "-PfEd-Quicksand Medium-normal-normal-normal-*-16-*-*-*-*-0-iso10646-1"> funny font that auto-loaded somehow which i'm kinda vibing with
-#+end_src
-
 ** modus themes
 =modus-themes= is simply the GOAT at this point. Not much more to say than that.
 
@@ -638,6 +605,39 @@ updated 2015 as of writing [2022-03-06 Sun 15:16]).
 (lp-emacs-elpa-package 'twilight-anti-bright-theme)
 (lp-emacs-elpa-package 'twilight-bright-theme)
 #+end_src
+** personal theme
+Some modifications to the built-in theme I'm playing with. Playing around with some
+[[https://protesilaos.com/codelog/2020-08-28-notes-emacs-theme-devs/][advice from Prot]] in
+building my own kind of theme. Right now its a direct rip of the [[https://github.com/rocher/ubuntu-theme][ubuntu-theme]] package (last
+updated 2015 as of writing [2022-03-06 Sun 15:16]).
+
+- variable-pitch with ~Quicksand~ as the non-monospaced font
+- liking ~cozette~ now
+
+#+begin_src emacs-lisp
+(add-to-list 'load-path "~/.emacs.d/lisp/")
+
+;; (require 'lp-theme)
+(load-theme 'modus-vivendi)
+;; (set-face-attribute 'default nil :font "Cozette Vector" :height 180)
+
+;; add some fringes
+(modify-all-frames-parameters
+ '((right-divider-width . 10)
+   (internal-border-width . 10)))
+(dolist (face '(window-divider
+                window-divider-first-pixel
+                window-divider-last-pixel))
+  (face-spec-reset-face face)
+  (set-face-foreground face (face-attribute 'default :background)))
+(set-face-background 'fringe (face-attribute 'default :background))
+
+;; (set-frame-font "Quicksand Medium 14")
+
+;; (face-attribute 'default :font)
+;; #<font-object "-PfEd-Quicksand Medium-normal-normal-normal-*-16-*-*-*-*-0-iso10646-1"> funny font that auto-loaded somehow which i'm kinda vibing with
+#+end_src
+
 * movement and editing
 ** isearch and replace
 =isearch= isn't gonna go out of style anytime soon that's for sure. And especially not if
