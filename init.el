@@ -5,7 +5,7 @@
 
 ;; automatic package installation
 (setq package-enable-at-startup t)
-(setq package-quickstart t)
+;; (setq package-quickstart t)
 
 (add-to-list 'package-archives '("elpa-devel" . "https://elpa.gnu.org/devel/") t)
 (add-to-list 'package-archives '("melpa" . "https://melpa.org/packages/") t)

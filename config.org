@@ -38,11 +38,12 @@ inspiration from over the years, which are linked in a final section.
 Not all of the emacs defaults are quite sane. So here's to some sanity.
 
 #+begin_src emacs-lisp
-;; hacky way to remove the =custom-variables= generation in =init.el=
-(setq custom-file (make-temp-file "emacs-custom-"))
 
 ;; some from https://pastebin.com/MDagsZD7
 (lp-emacs-builtin-package 'emacs
+  ;; hacky way to remove the =custom-variables= generation in =init.el=
+  (setq custom-file (make-temp-file "emacs-custom-"))
+
   ;; why do these binds exist
   (global-unset-key (kbd "C-z"))
   (global-unset-key (kbd "C-x C-z"))
@@ -131,7 +132,6 @@ Not all of the emacs defaults are quite sane. So here's to some sanity.
   (define-key global-map (kbd "C-<tab>") 'next-window-any-frame)
   (define-key global-map (kbd "<backtab>") 'previous-window-any-frame)
   (define-key global-map (kbd "C-x C-M-e") 'pp-macroexpand-last-sexp)
-  ;; (define-key global-map (kbd "C-x C-e") 'eval-defun) ;; already bound to C-M-x
   (define-key global-map (kbd "C-h j") 'describe-keymap)
   (define-key global-map (kbd "C-c C-j") 'join-line)
   (define-key global-map (kbd "C-S-p") #'(lambda () (interactive) (previous-line 7)))
@@ -153,7 +153,7 @@ Not all of the emacs defaults are quite sane. So here's to some sanity.
   ;; as always, from prot:
   (setq ibuffer-expert t)
   (setq ibuffer-display-summary nil)
-  (setq ibuffer-show-empty-filter-groups nil)
+  (setq ibuffer-show-empty-filter-groups t)
   (setq ibuffer-movement-cycle nil)
   (setq ibuffer-default-sorting-mode 'filename/process)
   (setq ibuffer-use-header-line t)
@@ -598,6 +598,41 @@ good themes
           (t . (semibold))))
   (modus-themes-load-vivendi))
 #+end_src
+
+** personal theme
+Some modifications to the built-in theme I'm playing with. Playing around with some
+[[https://protesilaos.com/codelog/2020-08-28-notes-emacs-theme-devs/][advice from Prot]] in
+building my own kind of theme. Right now its a direct rip of the [[https://github.com/rocher/ubuntu-theme][ubuntu-theme]] package (last
+updated 2015 as of writing [2022-03-06 Sun 15:16]).
+
+- variable-pitch with ~Quicksand~ as the non-monospaced font
+- liking ~cozette~ now
+
+#+begin_src emacs-lisp
+(add-to-list 'load-path "~/.emacs.d/lisp/")
+
+;; (require 'lp-theme)
+(load-theme 'modus-vivendi)
+(set-face-attribute 'default nil :font "dejavu sans mono" :height 120)
+
+;; add some fringes
+(modify-all-frames-parameters
+ '((right-divider-width . 10)
+   (internal-border-width . 10)))
+(dolist (face '(window-divider
+                window-divider-first-pixel
+                window-divider-last-pixel))
+  (face-spec-reset-face face)
+  (set-face-foreground face (face-attribute 'default :background)))
+(set-face-background 'fringe (face-attribute 'default :background))
+
+;; (set-frame-font "Quicksand Medium 14")
+
+;; (face-attribute 'default :font)
+;; #<font-object "-PfEd-Quicksand Medium-normal-normal-normal-*-16-*-*-*-*-0-iso10646-1"> funny font that auto-loaded somehow which i'm kinda vibing with
+#+end_src
+
+#+RESULTS:
 
 ** anti-bright themes, a soft low-contrast light theme
 #+begin_src emacs-lisp :tangle no
@@ -1840,11 +1875,8 @@ A time-tested classic mark-up language. Not much more to say; the customizations
   (setq denote-sort-keywords t)
   (setq denote-file-type 'text)
 
-  (require 'denote-dired)
   (add-hook 'dired-mode-hook #'denote-dired-mode)
   (add-hook 'find-file-hook #'denote-link-buttonize-buffer)
-
-  (require 'denote-link)
 
   ;; Denote does not define any key bindings.  This is for the user to
   ;; decide.  For example:
@@ -1860,10 +1892,13 @@ A time-tested classic mark-up language. Not much more to say; the customizations
     (define-key map (kbd "C-c f I") #'denote-link-add-links)
     (define-key map (kbd "C-c f l") #'denote-link-find-file) ; "list" links
     (define-key map (kbd "C-c f b") #'denote-link-backlinks)
-    (define-key map (kbd "C-c f r") #'denote-dired-rename-file-and-rewrite-front-matter)
-    (define-key map (kbd "C-c f r") #'denote-dired-rename-marked-files)
+    (define-key map (kbd "C-c f r") #'denote-rename-file)
+    (define-key map (kbd "C-c f R") #'denote-rename-file-using-front-matter)
     ))
 #+end_src
+
+#+RESULTS:
+: denote-rename-file-using-front-matter
 
 ** ~tmr~, timing and time-keeping in Emacs
 
@@ -2290,14 +2325,27 @@ python3-proselint=
 ;; since chez has no docs implemented for geiser, i'd rather just generate tags and use
 ;; xref-etags-mode to do most of the heavy lifting...
 (lp-emacs-elpa-package 'geiser
-  (add-hook 'geiser-mode-hook #'paredit-mode))
+  (add-hook 'geiser-mode-hook #'paredit-mode)
+  (setq auto-mode-alist (cons '("\\.scm" . scheme-mode) auto-mode-alist))
+  (setq auto-mode-alist (cons '("\\.sls" . scheme-mode) auto-mode-alist))
+  )
 
+(lp-emacs-elpa-package 'geiser-guile)
 (lp-emacs-elpa-package 'geiser-chez)
+(lp-emacs-elpa-package 'geiser-kawa
+  (setq geiser-kawa-use-included-kawa t)
+  )
+
+
 (lp-emacs-elpa-package 'racket-mode
   (add-hook 'racket-mode-hook #'racket-xp-mode)
   (lp-emacs-elpa-package 'flymake-racket
     (flymake-racket-setup)))
 #+end_src
+
+#+RESULTS:
+| flymake-racket-add-hook | paredit-mode | geiser-mode--maybe-activate |
+
 ** symbolic math (maxima, calc)
 
 #+begin_src emacs-lisp
@@ -2319,6 +2367,9 @@ python3-proselint=
   (add-hook 'maxima-mode-hook #'maxima-hook-function)
   (add-hook 'maxima-inferior-mode-hook #'maxima-hook-function)
   (setq maxima-display-maxima-buffer t)
+  (setq auto-mode-alist (cons '("\\.mac" . maxima-mode) auto-mode-alist))
+  (setq auto-mode-alist (cons '("\\.mc" . maxima-mode) auto-mode-alist))
+
   )
 #+end_src
 
@@ -2601,8 +2652,12 @@ Access recent files, where recents exclude the annoying =.git=, =.elpa=, etc. fi
 #+begin_src emacs-lisp
 (lp-emacs-elpa-package 'exec-path-from-shell
   (setq exec-path-from-shell-variables '("PATH" "JAVA_HOME"))
+  (setenv "JAVA_HOME" "/usr/lib/jvm/java-1.11.0-openjdk-amd64/")
   (exec-path-from-shell-initialize))
 #+end_src
+
+#+RESULTS:
+: ((KAWA_HOME) (JAVA_HOME . /usr/lib/jvm/java-1.11.0-openjdk-amd64/) (PATH . /home/liamp/.cargo/bin:/home/liamp/.opam/4.13.0/bin:/home/liamp/julia-1.6.5/bin:/home/liamp/.local/bin:/home/liamp/bin:/home/liamp/.local/bin:/usr/local/bin:/usr/bin:/bin:/usr/local/games:/usr/games:/snap/bin:/snap/bin/))
 
 ** Transparent Remote (file) Access, Multiple Protocol (TRAMP)
 
@@ -2908,40 +2963,31 @@ the go-to.
   (setq browse-url-browser-function 'eww-browse-url)
   (setq browse-url-secondary-browser-function 'browse-url-default-browser)
   (setq elfeed-feeds '(("https://freddiedeboer.substack.com/feed.rss" leftist) ;; marxist i think
-                       ("https://www.juliabloggers.com/feed/" julia ) ;; julia blogs
+                       ("https://www.juliabloggers.com/feed/" julia) ;; julia blogs
                        ("https://protesilaos.com/master.xml" leftist philosphy emacs)
-                       ("https://hnrss.org/newest?points=100" hacker-news tech)
+                       ("https://hnrss.org/newest?points=100" hacker tech)
                        "https://dynomight.net/feed.xml"
                        ("https://computer.rip/rss.xml" tech) ;; "computers are bad
                        ("http://rachelbythebay.com/w/2021/11/06/sql/" tech)
                        ("https://matt.might.net/articles/feed.rss" tech academia pl)
                        ("https://www.nayuki.io/rss20.xml" hacker)
-                       ("https://ava.substack.com/feed" writing help-self)
-                       ("https://askmolly.substack.com/feed" writing help-self)
-                       ("https://askpolly.substack.com/feed" writing help-self)
-                       ("https://cherylstrayed.substack.com/feed" writing help-self)
+                       ("https://ava.substack.com/feed" writing)
+                       ("https://askmolly.substack.com/feed" writing)
+                       ("https://askpolly.substack.com/feed" writing)
+                       ("https://cherylstrayed.substack.com/feed" writing)
                        ("https://griefbacon.substack.com/feed" writing)
-                       ("https://leandramcohen.substack.com/feed" fashion)
                        ("https://defaultfriend.substack.com/feed" writing)
                        ("https://jdahl.substack.com/feed" writing)
-                       ("http://feeds.feedburner.com/FineArtAndYou" art)
                        ("http://inconvergent.net/atom.xml" infrequent)
                        ("http://nullprogram.com/feed/" infrequent)
                        ("http://feeds.feedburner.com/datacolada/" infrequent)
-                       ("https://terrytao.wordpress.com/feed/" math)
-                       ("http://xkcd.com/rss.xml" comic)
-                       ("http://feeds.feedburner.com/RoguelikeRadio" infrequent)
-                       ("http://cppcast.libsyn.com/rss" cpp)
                        ("http://planet.emacsen.org/atom.xml" lisp) ;; emacs
                        ("https://planet.lisp.org/rss20.xml" lisp) ;; lisp
                        ("https://tymoon.eu/api/reader/atom" lisp) ;; lisp, gamedev
                        ("https://40ants.com/lisp-project-of-the-day/rss.xml" lisp) ;; lisp project of the day
                        ("https://ambrevar.xyz/atom.xml" lisp) ;; lisper, maker of nyxt browser
                        ("https://alhassy.github.io/rss.xml" lisp) ;; lisper, had that great post about emacs lisp's type system
-                       ("https://www.reddit.com/r/dailyprogrammer/.rss" daily)
                        ("http://understandinguncertainty.org/blog" infrequent)
-                       ("http://timharford.com/feed/" econ)
-                       ("https://www.bennee.com/~alex/blog/feeds/all.atom.xml" infrequent)
                        ("https://sive.rs/podcast.rss" infrequent)
                        ("https://lacker.io/feed.xml" ai tech)
                        ("https://graymirror.substack.com/feed" leftist))))
