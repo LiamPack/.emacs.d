@@ -2108,9 +2108,9 @@ actions specified in the manual.
   )
 ;; ;; -LSPJavaPac
 
-(lp-emacs-elpa-package 'lsp-julia
-  (setq lsp-julia-default-environment "~/.julia/environments/v1.7")
-  (add-hook 'julia-mode-hook #'lsp))
+;; (lp-emacs-elpa-package 'lsp-julia
+;;   (setq lsp-julia-default-environment "~/.julia/environments/v1.7")
+;;   (add-hook 'julia-mode-hook #'lsp))
 #+end_src
 
 ** eglot
@@ -2246,7 +2246,12 @@ python3-proselint=
 (lp-emacs-elpa-package 'vterm)
 
 (lp-emacs-elpa-package 'julia-snail
-  (add-hook 'julia-mode-hook 'julia-snail-mode))
+  (add-hook 'julia-mode-hook 'julia-snail-mode)
+  (setq julia-snail-multimedia-enable t)
+  (setq julia-snail-multimedia-buffer-autoswitch t)
+  (setq julia-snail-multimedia-buffer-style :multi)
+  (setq julia-snail-extensions '(repl-history formatter))
+  )
 #+end_src
 
 ** java
