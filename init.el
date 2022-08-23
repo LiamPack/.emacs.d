@@ -85,6 +85,7 @@
 
 (put 'display-line-numbers-width 'safe-local-variable 'integerp)
 
+(require 'org)
 ;; Tangle and compile if necessary only, then load the configuration
 (let* ((.org (expand-file-name "config.org" user-emacs-directory))
        (.el (concat (file-name-sans-extension .org) ".el"))

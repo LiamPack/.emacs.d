@@ -405,6 +405,18 @@ relatively convenient
   "Disable all active themes before loading a new theme."
   (mapc #'disable-theme custom-enabled-themes))
 
+(define-advice load-theme (:after (&rest args))
+  ;; add some fringes
+  (modify-all-frames-parameters
+   '((right-divider-width . 10)
+     (internal-border-width . 10)))
+  (dolist (face '(window-divider
+                  window-divider-first-pixel
+                  window-divider-last-pixel))
+    (face-spec-reset-face face)
+    (set-face-foreground face (face-attribute 'default :background)))
+  (set-face-background 'fringe (face-attribute 'default :background)))
+
 (defun block-undo (fn &rest args)
   "Wrap function `FN' with `ARGS' and allow block-undo of the the `FN'
   operation rather than atomized undo for each interactive emacs
@@ -595,82 +607,23 @@ good themes
         modus-themes-headings ; this is an alist: read the manual or its doc string
         '((1 . (overline background 1.0))
           (2 . (rainbow overline 1.0))
-          (t . (semibold))))
-  (modus-themes-load-vivendi))
+          (t . (semibold)))))
 #+end_src
 
-** personal theme
-Some modifications to the built-in theme I'm playing with. Playing around with some
-[[https://protesilaos.com/codelog/2020-08-28-notes-emacs-theme-devs/][advice from Prot]] in
-building my own kind of theme. Right now its a direct rip of the [[https://github.com/rocher/ubuntu-theme][ubuntu-theme]] package (last
-updated 2015 as of writing [2022-03-06 Sun 15:16]).
-
-- variable-pitch with ~Quicksand~ as the non-monospaced font
-- liking ~cozette~ now
+** ef-themes
+#+begin_src emacs-lisp
+(lp-emacs-elpa-package 'ef-themes)
+#+end_src
+** Face Customization
 
 #+begin_src emacs-lisp
-(add-to-list 'load-path "~/.emacs.d/lisp/")
+(load-theme 'ef-dark :no-confirm)
+;; (set-face-attribute 'default nil :font "dejavu sans mono" :height 120)
 
-;; (require 'lp-theme)
-(load-theme 'modus-vivendi)
-(set-face-attribute 'default nil :font "dejavu sans mono" :height 120)
+(set-face-attribute 'default nil :font "Iosevka Comfy fixed" :height 140)
 
-;; add some fringes
-(modify-all-frames-parameters
- '((right-divider-width . 10)
-   (internal-border-width . 10)))
-(dolist (face '(window-divider
-                window-divider-first-pixel
-                window-divider-last-pixel))
-  (face-spec-reset-face face)
-  (set-face-foreground face (face-attribute 'default :background)))
-(set-face-background 'fringe (face-attribute 'default :background))
 
-;; (set-frame-font "Quicksand Medium 14")
 
-;; (face-attribute 'default :font)
-;; #<font-object "-PfEd-Quicksand Medium-normal-normal-normal-*-16-*-*-*-*-0-iso10646-1"> funny font that auto-loaded somehow which i'm kinda vibing with
-#+end_src
-
-#+RESULTS:
-
-** anti-bright themes, a soft low-contrast light theme
-#+begin_src emacs-lisp :tangle no
-;; only enable when not terminal mode?
-(lp-emacs-elpa-package 'twilight-anti-bright-theme)
-(lp-emacs-elpa-package 'twilight-bright-theme)
-#+end_src
-** personal theme
-Some modifications to the built-in theme I'm playing with. Playing around with some
-[[https://protesilaos.com/codelog/2020-08-28-notes-emacs-theme-devs/][advice from Prot]] in
-building my own kind of theme. Right now its a direct rip of the [[https://github.com/rocher/ubuntu-theme][ubuntu-theme]] package (last
-updated 2015 as of writing [2022-03-06 Sun 15:16]).
-
-- variable-pitch with ~Quicksand~ as the non-monospaced font
-- liking ~cozette~ now
-
-#+begin_src emacs-lisp
-(add-to-list 'load-path "~/.emacs.d/lisp/")
-
-;; (require 'lp-theme)
-(load-theme 'modus-vivendi)
-;; (set-face-attribute 'default nil :font "Cozette Vector" :height 180)
-
-;; add some fringes
-(modify-all-frames-parameters
- '((right-divider-width . 10)
-   (internal-border-width . 10)))
-(dolist (face '(window-divider
-                window-divider-first-pixel
-                window-divider-last-pixel))
-  (face-spec-reset-face face)
-  (set-face-foreground face (face-attribute 'default :background)))
-(set-face-background 'fringe (face-attribute 'default :background))
-
-;; (set-frame-font "Quicksand Medium 14")
-
-;; (face-attribute 'default :font)
-;; #<font-object "-PfEd-Quicksand Medium-normal-normal-normal-*-16-*-*-*-*-0-iso10646-1"> funny font that auto-loaded somehow which i'm kinda vibing with
 #+end_src
 
 * movement and editing
@@ -894,12 +847,19 @@ shine, but for now I'm using it mostly for =embark-export= for batched editing o
   (define-key global-map (kbd "C->") 'embark-become)
   (define-key global-map (kbd "M-a") 'embark-act)
   (define-key completion-list-mode-map (kbd "M-a")
-    #'(lambda () (interactive) () (mct-focus-mini-or-completions) (embark-act))))
+    #'(lambda () (interactive) () (mct-focus-mini-or-completions) (embark-act)))
+  (define-key embark-collect-mode-map (kbd "o") 'consult-preview-at-point)
+  ;; Hide the mode line of the Embark live/completions buffers
+  (add-to-list 'display-buffer-alist
+               '("\\`\\*Embark Collect \\(Live\\|Completions\\)\\*"
+                 nil
+                 (window-parameters (mode-line-format . none))))
+  
+  ;; Optionally replace the key help with a completing-read interface
+  (setq prefix-help-command #'embark-prefix-help-command))
 
 (lp-emacs-elpa-package 'embark-consult
-  (define-key embark-collect-mode-map (kbd "o") 'consult-preview-at-point)
-  ;; :hook (embark-collect-mode . embark-consult-preview-minor-mode)
-  )
+  (define-key embark-collect-mode-map (kbd "o") 'consult-preview-at-point))
 #+end_src
 
 ** marginalia -- enhanced minibuffer detail display
@@ -1082,7 +1042,7 @@ TODOs:
 #+end_src
 
 *** corfu-terminal -- corfu using ~popup~ / ~popon~, allowing terminal use
-#+begin_src emacs-lisp
+#+begin_src emacs-lisp :tangle no
 (lp-emacs-git-package
     'popon "https://codeberg.org/akib/emacs-popon.git")
 (lp-emacs-git-package
@@ -1091,7 +1051,7 @@ TODOs:
       (corfu-terminal-mode +1)))
 #+end_src
 
-*** Cape -- Completion At Point Extensions
+** Cape -- Completion At Point Extensions
 #+begin_src emacs-lisp
 (lp-emacs-elpa-package 'cape
   (add-to-list 'completion-at-point-functions #'cape-file)
@@ -1212,17 +1172,6 @@ initialism"
   )
 #+end_src
 
-** which-key
-
-I use =which-key= to discover new useful commands hiding in a keymap prefix. That's pretty
-much it, but its proven itself tremendously helpful for exploring features of the built-in
-or of a new package.
-
-#+begin_src emacs-lisp
-(lp-emacs-elpa-package 'which-key
-  ;;:diminish which-key-mode
-  (which-key-mode 1))
-#+end_src
 ** built-in completion utilities (abbrev, dabbrev)
 
 #+begin_src emacs-lisp
