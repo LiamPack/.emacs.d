@@ -418,7 +418,7 @@ relatively convenient
   (set-face-background 'fringe (face-attribute 'default :background)))
 
 (defun block-undo (fn &rest args)
-  "Wrap function `FN' with `ARGS' and allow block-undo of the the `FN'
+  "Wrap function `FN' with `ARGS' and allow block-undo of the `FN'
   operation rather than atomized undo for each interactive emacs
   function."
   (let ((marker (prepare-change-group)))
@@ -618,12 +618,7 @@ good themes
 
 #+begin_src emacs-lisp
 (load-theme 'ef-dark :no-confirm)
-;; (set-face-attribute 'default nil :font "dejavu sans mono" :height 120)
-
 (set-face-attribute 'default nil :font "Iosevka Comfy fixed" :height 140)
-
-
-
 #+end_src
 
 * movement and editing
@@ -657,8 +652,7 @@ match =.*?=, i.e all characters are whitespace.
 
   (define-key minibuffer-local-isearch-map (kbd "M-/") #'isearch-complete-edit)
   (let ((map isearch-mode-map))
-    ;; (define-key map (kbd "C-g") #'isearch-cancel) ; instead of `isearch-abort'
-    (define-key map (kbd "C-g") #'isearch-abort)
+    (define-key map (kbd "C-g") #'isearch-cancel) ; instead of `isearch-abort'
     (define-key map (kbd "M-/") #'isearch-complete)))
 
 (require 'replace)
@@ -720,10 +714,9 @@ completion options, minibuffer options, minibuffer history options, prompt faces
   (minibuffer-electric-default-mode 1) ;; update default completion if change
 
   ;; Add prompt indicator to `completing-read-multiple'.
-  ;; Alternatively try `consult-completing-read-multiple'.
-  ;; (defun crm-indicator (args)
-  ;;   (cons (concat "[CRM] " (car args)) (cdr args)))
-  ;; (advice-add #'completing-read-multiple :filter-args #'crm-indicator)
+  (defun crm-indicator (args)
+    (cons (concat "[CRM] " (car args)) (cdr args)))
+  (advice-add #'completing-read-multiple :filter-args #'crm-indicator)
 
   ;; Do not allow the cursor in the minibuffer prompt
   (setq minibuffer-prompt-properties
@@ -757,46 +750,46 @@ doesn't play well with lsp, but i haven't heard anything about =eglot=.
 (lp-emacs-elpa-package 'consult
   (setq consult-goto-map
         (let ((map (make-sparse-keymap)))
-          (define-key map (kbd "e") 'consult-compile-error)
-          (define-key map (kbd "l") 'consult-flymake)
-          (define-key map (kbd "f") 'consult-flymake)               ;; Alternative: consult-flycheck
-          (define-key map (kbd "o") 'consult-outline)               ;; Alternative: consult-org-heading
-          (define-key map (kbd "m") 'consult-mark)
-          (define-key map (kbd "k") 'consult-global-mark)
-          (define-key map (kbd "i") 'consult-imenu)
-          (define-key map (kbd "I") 'consult-imenu-multi)
+          (define-key map (kbd "e") #'consult-compile-error)
+          (define-key map (kbd "l") #'consult-flymake)
+          (define-key map (kbd "f") #'consult-flymake)               ;; Alternative: consult-flycheck
+          (define-key map (kbd "o") #'consult-outline)               ;; Alternative: consult-org-heading
+          (define-key map (kbd "m") #'consult-mark)
+          (define-key map (kbd "k") #'consult-global-mark)
+          (define-key map (kbd "i") #'consult-imenu)
+          (define-key map (kbd "I") #'consult-imenu-multi)
           (define-key map (kbd "b") #'consult-bibtex)               ;; Needs to be done here else we need to re-create and bind the keymap. w/e.
           map))
 
   (let ((map global-map))
     ;; Custom M-# bindings for fast register access
-    (define-key map (kbd "C-x r l") 'consult-register-load)
-    (define-key map (kbd "C-x r s") 'consult-register-store)          ;; orig. abbrev-prefix-mark (unrelated)
-    (define-key map (kbd "C-x r r") 'consult-register)
-    (define-key map (kbd "C-x r b") 'consult-bookmark))
+    (define-key map (kbd "C-x r l") #'consult-register-load)
+    (define-key map (kbd "C-x r s") #'consult-register-store)          ;; orig. abbrev-prefix-mark (unrelated)
+    (define-key map (kbd "C-x r r") #'consult-register)
+    (define-key map (kbd "C-x r b") #'consult-bookmark))
 
   (setq consult-mode-mode-map
         (let ((map (make-sparse-keymap)))
-          (define-key map (kbd "h") 'consult-history)
-          (define-key map (kbd "m") 'consult-mode-command)
-          (define-key map (kbd "k") 'consult-kmacro)
+          (define-key map (kbd "h") #'consult-history)
+          (define-key map (kbd "m") #'consult-mode-command)
+          (define-key map (kbd "k") #'consult-kmacro)
           map))
 
   (setq consult-search-map
         (let ((map (make-sparse-keymap)))
-          (define-key map (kbd "f") 'consult-find)
-          (define-key map (kbd "F") 'consult-locate)
-          (define-key map (kbd "g") 'consult-grep)
-          (define-key map (kbd "G") 'consult-git-grep)
-          (define-key map (kbd "r") 'consult-ripgrep)
-          (define-key map (kbd "l") 'consult-line)
-          (define-key map (kbd "L") 'consult-line-multi)
-          (define-key map (kbd "m") 'consult-multi-occur)
-          (define-key map (kbd "k") 'consult-keep-lines)
-          (define-key map (kbd "u") 'consult-focus-lines)
-          (define-key map (kbd "j") 'consult-recent-file)
-          (define-key map (kbd "s") 'consult-isearch)
-          (define-key map (kbd "o") 'occur)
+          (define-key map (kbd "f") #'consult-find)
+          (define-key map (kbd "F") #'consult-locate)
+          (define-key map (kbd "g") #'consult-grep)
+          (define-key map (kbd "G") #'consult-git-grep)
+          (define-key map (kbd "r") #'consult-ripgrep)
+          (define-key map (kbd "l") #'consult-line)
+          (define-key map (kbd "L") #'consult-line-multi)
+          (define-key map (kbd "m") #'consult-multi-occur)
+          (define-key map (kbd "k") #'consult-keep-lines)
+          (define-key map (kbd "u") #'consult-focus-lines)
+          (define-key map (kbd "j") #'consult-recent-file)
+          (define-key map (kbd "s") #'consult-isearch-history)
+          (define-key map (kbd "o") #'occur)
           (define-key map (kbd "C-o") 'occur)
           map))
   (define-key global-map (kbd "M-s") consult-search-map)
@@ -810,13 +803,12 @@ doesn't play well with lsp, but i haven't heard anything about =eglot=.
   (define-key global-map (kbd "C-:") 'consult-complex-command)
   (define-key global-map [remap apropos-command] 'consult-apropos)
 
-  (setq consult-preview-key (kbd "C-o") ) ;; disable live preview
+  (setq consult-preview-key (kbd "C-o")) ;; disable live preview
   ;; (setq consult-project-root-function #'project-roots)
   (setq consult-async-min-input 3)
   (setq consult-async-input-debounce 0.5)
   (setq consult-async-input-throttle 0.8)
   (setq consult-narrow-key "<")
-  :config
   (setf (alist-get 'slime-repl-mode consult-mode-histories)
         'slime-repl-input-history)
   (setq xref-show-xrefs-function #'consult-xref)
@@ -870,10 +862,7 @@ Enhanced minibuffer information when using =switch-to-buffer=, =find-file=,
 #+begin_src emacs-lisp
 (lp-emacs-elpa-package 'marginalia
   (setq marginalia-max-relative-age 0)  ; time is absolute here!
-  (marginalia-mode 1)
-  (with-eval-after-load 'mct
-    (progn
-      (setq mct-apply-completion-stripes t))))
+  (marginalia-mode 1))
 #+end_src
 ** orderless  -- orderless filtering and mapping of symbols
 
@@ -1197,7 +1186,7 @@ initialism"
 #+end_src
 ** xref
 
-Its debatable whether xref should be in this section. May re-evaluate in future.
+Its debatable whether xref should be in this category. May re-evaluate in future.
 
 #+begin_src emacs-lisp
 (lp-emacs-builtin-package 'xref
@@ -1208,7 +1197,7 @@ Its debatable whether xref should be in this section. May re-evaluate in future.
   (setq xref-search-program 'ripgrep)
   )
 #+END_SRC
-** dumb jump
+** [disabled] dumb jump
 #+begin_src emacs-lisp :tangle no
 (lp-emacs-elpa-package 'dumb-jump
   (add-hook 'xref-backend-functions #'dumb-jump-xref-activate)
@@ -1218,6 +1207,10 @@ Its debatable whether xref should be in this section. May re-evaluate in future.
 
 * reading, writing, and task keeping
 ** text-mode
+
+It's nice to define paragraphs for text-mode that roughly mimic bullet
+points and those kinds of syntactic forms.
+
 #+begin_src emacs-lisp
 (lp-emacs-builtin-package 'text-mode
   (add-hook 'text-mode-hook
@@ -1238,6 +1231,8 @@ Its debatable whether xref should be in this section. May re-evaluate in future.
 #+end_src
 
 ** latex
+Need to cleanup the conditional on using auctex or not.
+
 #+begin_src emacs-lisp
 ;; auctex requires special configuration..
 ;;
@@ -1279,11 +1274,12 @@ Its debatable whether xref should be in this section. May re-evaluate in future.
   (add-hook 'latex-mode-hook #'cdlatex-mode))
 #+end_src
 ** org
-#+begin_src emacs-lisp
+
+TODO: seriously bloated with configuration. I don't even use org that
+much anymore, and I have no clue how i configured the below anymore.
+
+#+begin_src emacs-lisp :tangle no
 (lp-emacs-builtin-package 'org
-  ;; TODO: fix this with the right straight source
-  ;; (unbind-key (kbd "C-'") org-mode-map)
-  ;; (unbind-key (kbd "C-c C-j") org-mode-map)
   (defun org-file-path (filename)
     "Return absolute address of an org file give its relative name."
     (concat (file-name-as-directory org-directory) filename))
@@ -1340,7 +1336,6 @@ Its debatable whether xref should be in this section. May re-evaluate in future.
   (setq org-use-sub-superscripts '{})   ; not a big fan of the ambiguity
   (setq org-insert-heading-respect-content t)
 
-
   ;; tags
   (setq org-tags-match-list-sublevels t)
 
@@ -1353,7 +1348,6 @@ Its debatable whether xref should be in this section. May re-evaluate in future.
   ;;                            (nil . (:maxlevel . 2))))
 
   (setq org-refile-targets nil)
-
 
   (setq org-refile-use-outline-path 'file)
   (setq org-outline-path-complete-in-steps t)
@@ -1846,9 +1840,6 @@ A time-tested classic mark-up language. Not much more to say; the customizations
     ))
 #+end_src
 
-#+RESULTS:
-: denote-rename-file-using-front-matter
-
 ** ~tmr~, timing and time-keeping in Emacs
 
 #+begin_src emacs-lisp
@@ -1859,7 +1850,6 @@ A time-tested classic mark-up language. Not much more to say; the customizations
   (setq tmr-descriptions-list
         (list "Class Readings"
               "Class Homework"
-              "Boil Pasta"
               "Work"
               "Break"))
 
@@ -2062,8 +2052,8 @@ actions specified in the manual.
 ;;   (add-hook 'julia-mode-hook #'lsp))
 #+end_src
 
-** eglot
-#+begin_src emacs-lisp
+** [disabled] eglot
+#+begin_src emacs-lisp :tangle no
 (lp-emacs-elpa-package 'eglot
   (defvar eglot-prog-mode-hooks '(cc-mode-hook c-mode-hook c++-mode-hook cuda-mode-hook
                                                rjsx-mode-hook
@@ -2154,19 +2144,6 @@ python3-proselint=
 (lp-emacs-elpa-package 'flymake-python-pyflakes
   (add-hook 'python-mode-hook 'flymake-python-pyflakes-load))
 #+end_src
-** ocaml
-#+begin_src emacs-lisp
-(lp-emacs-elpa-package 'tuareg
-  (setq tuareg-opam-insinuate t))
-
-(lp-emacs-elpa-package 'utop
-  (setq utop-command "opam config exec -- dune utop . -- -emacs")
-  ;; (setq utop-command "opam config exec -- dune utop . -- -emacs")
-
-  (autoload 'utop-minor-mode "utop" "Minor mode for utop" t)
-  (add-hook 'tuareg-mode-hook 'utop-minor-mode))
-(lp-emacs-elpa-package 'dune)
-#+end_src
 ** python
 #+begin_src emacs-lisp
 (lp-emacs-elpa-package 'python
@@ -2186,6 +2163,8 @@ python3-proselint=
    conda-env-home-directory (expand-file-name "~/miniconda3/") ;; as in previous example; not required
    conda-env-subdirectory "envs")
   )
+
+(lp-emacs-elpa-package 'ein)
 #+end_src
 
 ** julia
@@ -2281,14 +2260,12 @@ python3-proselint=
 (lp-emacs-elpa-package 'geiser
   (add-hook 'geiser-mode-hook #'paredit-mode)
   (setq auto-mode-alist (cons '("\\.scm" . scheme-mode) auto-mode-alist))
-  (setq auto-mode-alist (cons '("\\.sls" . scheme-mode) auto-mode-alist))
-  )
+  (setq auto-mode-alist (cons '("\\.sls" . scheme-mode) auto-mode-alist)))
 
 (lp-emacs-elpa-package 'geiser-guile)
 (lp-emacs-elpa-package 'geiser-chez)
 (lp-emacs-elpa-package 'geiser-kawa
-  (setq geiser-kawa-use-included-kawa t)
-  )
+  (setq geiser-kawa-use-included-kawa t))
 
 
 (lp-emacs-elpa-package 'racket-mode
@@ -2327,6 +2304,19 @@ python3-proselint=
   )
 #+end_src
 
+** ocaml
+#+begin_src emacs-lisp
+(lp-emacs-elpa-package 'tuareg
+  (setq tuareg-opam-insinuate t))
+
+(lp-emacs-elpa-package 'utop
+  (setq utop-command "opam config exec -- dune utop . -- -emacs")
+  ;; (setq utop-command "opam config exec -- dune utop . -- -emacs")
+
+  (autoload 'utop-minor-mode "utop" "Minor mode for utop" t)
+  (add-hook 'tuareg-mode-hook 'utop-minor-mode))
+(lp-emacs-elpa-package 'dune)
+#+end_src
 ** docker
 
 Docker is just too prevalent not to be ready for it. =docker-tramp= is an incredibly useful
@@ -2461,10 +2451,7 @@ has lots of overlap with =projectile=. Might as well remove a dependency.
     (define-key map (kbd "o") #'vc-log-outgoing)
     (define-key map (kbd "f") #'vc-log-incoming)
     (define-key map (kbd "F") #'vc-update)
-    (define-key map (kbd "P") #'vc-push))
-
-
-  )
+    (define-key map (kbd "P") #'vc-push)))
 #+end_src
 ** shell
 #+begin_src emacs-lisp
@@ -2556,9 +2543,9 @@ that I haven't dug my teeth into yet. I like the setup below.
 
   (let ((map dired-mode-map))
     (define-key map (kbd "C-+") #'dired-create-empty-file)
-    (define-key map (kbd "M-s f") #'nil)
-    (define-key map (kbd "C-x v v") #'dired-vc-next-action))
-  )
+    (define-key map (kbd "M-s f") #'consult-find)
+    (define-key map (kbd "C-x v v") #'dired-vc-next-action)))
+
 (lp-emacs-builtin-package 'dired-x
   (setq dired-clean-up-buffers-too t)
   (setq dired-clean-confirm-killing-deleted-buffers t)
@@ -2609,9 +2596,6 @@ Access recent files, where recents exclude the annoying =.git=, =.elpa=, etc. fi
   (setenv "JAVA_HOME" "/usr/lib/jvm/java-1.11.0-openjdk-amd64/")
   (exec-path-from-shell-initialize))
 #+end_src
-
-#+RESULTS:
-: ((KAWA_HOME) (JAVA_HOME . /usr/lib/jvm/java-1.11.0-openjdk-amd64/) (PATH . /home/liamp/.cargo/bin:/home/liamp/.opam/4.13.0/bin:/home/liamp/julia-1.6.5/bin:/home/liamp/.local/bin:/home/liamp/bin:/home/liamp/.local/bin:/usr/local/bin:/usr/bin:/bin:/usr/local/games:/usr/games:/snap/bin:/snap/bin/))
 
 ** Transparent Remote (file) Access, Multiple Protocol (TRAMP)
 
@@ -2822,7 +2806,7 @@ the go-to.
     )
 
   (let ((map global-map))
-    (define-key map (kbd "C-c m") #'notmuch)
+    ;; (define-key map (kbd "C-c m") #'notmuch)
     (define-key map (kbd "C-x m") #'notmuch-mua-new-mail)) ; override `compose-mail'
   (define-key notmuch-search-mode-map (kbd "/") #'notmuch-search-filter) ; alias for l
   (define-key notmuch-hello-mode-map (kbd "C-<tab>") nil)
@@ -2845,6 +2829,8 @@ the go-to.
 #+END_SRC
 
 ** eww                                                -- web browsing
+R, b, l, r are good keybinds.
+
 #+begin_src emacs-lisp
 (lp-emacs-builtin-package 'eww
   (define-key global-map (kbd "<f12>") 'eww)
@@ -3016,25 +3002,7 @@ In the below, I'm testing things out. No commentary, no thoughts, no brain on ho
 about them is detailed. that's for the main packages. this is the hyper-safe toxic-waste
 testing zone
 
-** ~lp-journal~ for simple, low-cost journaling                     :noexport:
-#+begin_src emacs-lisp :tangle no
-(require 'lp-scratch)
-(setq lp--journal-dir (file-truename "~/org/roam/daily/"))
-(define-key global-map (kbd "C-c f j j") 'lp-journal-visit-today)
-(define-key global-map (kbd "C-c f j n") 'lp-journal-visit-forward-one-day)
-(define-key global-map (kbd "C-c f j p") 'lp-journal-visit-backward-one-day)
-#+end_src
-** ~lp-notes~ for simple, low-cost notes management :noexport:
-#+begin_src emacs-lisp :tangle n
-(require 'lp-scratch)
-(setq lp--notes-dir (file-truename "~/org/roam/"))
-(define-key global-map (kbd "C-c f d") 'lp-notes-dired)
-(define-key global-map (kbd "C-c f f") 'lp-notes-find-file)
-(define-key global-map (kbd "C-c f n") 'lp-notes-make-file)
-#+end_src
-
-
-** moldable-emacs, code-compass, etc
+** moldable-emacs, code-compass, tree-sitter
 #+begin_src emacs-lisp
 (lp-emacs-elpa-package 'simple-httpd)
 (lp-emacs-elpa-package 'f)
@@ -3044,13 +3012,44 @@ testing zone
 
 (lp-emacs-elpa-package 'tree-sitter)
 (lp-emacs-elpa-package 'tree-sitter-langs)
+(lp-emacs-elpa-package 'org-ql) ;; for updating note molds via org export
 
 (lp-emacs-git-package
-    'code-compass "https://github.com/ag91/code-compass.git")
+    'code-compass "https://github.com/ag91/code-compass.git"
+    (setq c/display-icon nil)
+    )
 
 (lp-emacs-git-package
     'moldable-emacs "https://github.com/ag91/moldable-emacs.git"
-    (me-setup-molds))
+    (me-setup-molds)
+    (let ((map global-map))
+      (define-key map (kbd "C-c m m") #'me-mold)
+      (define-key map (kbd "C-c m f") #'me-go-forward)
+      (define-key map (kbd "C-c m b") #'me-go-back)
+      (define-key map (kbd "C-c m o") #'me-open-at-point)
+      (define-key map (kbd "C-c m d") #'me-docs)
+      (define-key map (kbd "C-c m g") #'me-goto-mold-source)
+      (define-key map (kbd "C-c m e a") #'me-mold-add-last-example)
+      )
+
+    )
+#+end_src
+
+** [disabled] ~lp-journal~ for simple, low-overhead journaling     :noexport:
+#+begin_src emacs-lisp :tangle no
+(require 'lp-scratch)
+(setq lp--journal-dir (file-truename "~/org/roam/daily/"))
+(define-key global-map (kbd "C-c f j j") 'lp-journal-visit-today)
+(define-key global-map (kbd "C-c f j n") 'lp-journal-visit-forward-one-day)
+(define-key global-map (kbd "C-c f j p") 'lp-journal-visit-backward-one-day)
+#+end_src
+** [disabled] ~lp-notes~ for simple, low-cost notes management     :noexport:
+#+begin_src emacs-lisp :tangle no
+(require 'lp-scratch)
+(setq lp--notes-dir (file-truename "~/org/roam/"))
+(define-key global-map (kbd "C-c f d") 'lp-notes-dired)
+(define-key global-map (kbd "C-c f f") 'lp-notes-find-file)
+(define-key global-map (kbd "C-c f n") 'lp-notes-make-file)
 #+end_src
 
 * configurations and people i took inspiration from
@@ -3068,6 +3067,6 @@ testing zone
   and really understand my tools. In this way, I am free from the
   standards and specifications of those who wish to indoctrinate me into
   a state of reliance on their sub-par and opaque products.
-- Howardisms is an OG.
+- Howardisms and that one video he made
 - Sacha Chua
 - TODO: I'm sure there's a lot more ...
