@@ -635,12 +635,10 @@ good themes
 #+end_src
 ** Face Customization
 
-#+begin_src emacs-lisp
+#+begin_src emacs-lisp :results none
 (load-theme 'ef-dark :no-confirm)
-(set-face-attribute 'default nil :font "Iosevka Comfy" :height 140)
+(set-face-attribute 'default nil :font "Iosevka Comfy" :height 180)
 #+end_src
-
-#+RESULTS:
 
 * movement and editing
 ** isearch and replace
@@ -696,47 +694,47 @@ match =.*?=, i.e all characters are whitespace.
 ** rectangles
 
 #+begin_src emacs-lisp
-  (lp-emacs-builtin-package 'rect
-    (let ((map rectangle-mark-mode-map))
-      (define-key map (kbd "t") #'string-rectangle)
-      (define-key map (kbd "o") #'open-rectangle)
-      (define-key map (kbd "c") #'clear-rectangle)
-      (define-key map (kbd "n") #'rectangle-number-lines)
-      (define-key map (kbd "x") #'rectangle-exchange-point-and-mark)
-      (define-key map (kbd "*") #'calc-grab-rectangle)
-      (define-key map (kbd ":") #'calc-grab-sum-down)
-      (define-key map (kbd "_") #'calc-grab-sum-across)))
+(lp-emacs-builtin-package 'rect
+  (let ((map rectangle-mark-mode-map))
+    (define-key map (kbd "t") #'string-rectangle)
+    (define-key map (kbd "o") #'open-rectangle)
+    (define-key map (kbd "c") #'clear-rectangle)
+    (define-key map (kbd "n") #'rectangle-number-lines)
+    (define-key map (kbd "x") #'rectangle-exchange-point-and-mark)
+    (define-key map (kbd "*") #'calc-grab-rectangle)
+    (define-key map (kbd ":") #'calc-grab-sum-down)
+    (define-key map (kbd "_") #'calc-grab-sum-across)))
 #+end_src
 
 ** text extras
 #+begin_src emacs-lisp
-  ;; (use-package text-extras
-  ;;   :bind
-  ;;   ("M-Q" . unfill-paragraph)
-  ;;   ("C-\"" . copy-word-from-above)
-  ;;   ("M-L" . mark-line)
-  ;;   ("M-C" . mark-char)
-  ;;   ("M-@" . mark-my-word)
-  ;;   ("M-g r" . goto-random-line)
-  ;;   ("M-g M-r" . goto-random-line)
-  ;;   ("C-M--" . kill-inside-sexp)
-  ;;   ("C-M-=" . mark-inside-sexp)
-  ;;   ("M-U" . unwrap-sexp)
-  ;;   ("M-S" . unwrap-mark-sexp)
-  ;;   ("C-|" . pipe-region)
-  ;;   ("C-S-s" . forward-to-whitespace)
-  ;;   ("C-S-r" . backward-to-whitespace)
-  ;;   ("M-W" . mark-non-whitespace)
-  ;;   ("M-'" . dabbrev-next)
-  ;;   ("C-M-'" . dabbrev-complete-next)
-  ;;   ("C-c e" . text-to-clipboard)
-  ;;   ("M-s i" . focus-lines)
-  ;;   ([remap upcase-word] . upcase-dwiw)
-  ;;   ([remap downcase-word] . downcase-dwiw)
-  ;;   ([remap capitalize-word] . capitalize-dwiw)
-  ;;   :commands
-  ;;   force-truncate-lines
-  ;;   turn-off-visual-line-mode)
+;; (use-package text-extras
+;;   :bind
+;;   ("M-Q" . unfill-paragraph)
+;;   ("C-\"" . copy-word-from-above)
+;;   ("M-L" . mark-line)
+;;   ("M-C" . mark-char)
+;;   ("M-@" . mark-my-word)
+;;   ("M-g r" . goto-random-line)
+;;   ("M-g M-r" . goto-random-line)
+;;   ("C-M--" . kill-inside-sexp)
+;;   ("C-M-=" . mark-inside-sexp)
+;;   ("M-U" . unwrap-sexp)
+;;   ("M-S" . unwrap-mark-sexp)
+;;   ("C-|" . pipe-region)
+;;   ("C-S-s" . forward-to-whitespace)
+;;   ("C-S-r" . backward-to-whitespace)
+;;   ("M-W" . mark-non-whitespace)
+;;   ("M-'" . dabbrev-next)
+;;   ("C-M-'" . dabbrev-complete-next)
+;;   ("C-c e" . text-to-clipboard)
+;;   ("M-s i" . focus-lines)
+;;   ([remap upcase-word] . upcase-dwiw)
+;;   ([remap downcase-word] . downcase-dwiw)
+;;   ([remap capitalize-word] . capitalize-dwiw)
+;;   :commands
+;;   force-truncate-lines
+;;   turn-off-visual-line-mode)
 
 #+end_src
 
@@ -1329,6 +1327,67 @@ Need to cleanup the conditional on using auctex or not.
 #+end_src
 ** org
 
+#+begin_src emacs-lisp
+
+(lp-emacs-builtin-package 'org
+  (setq org-startup-folded t)
+  (setq org-pretty-entities t)
+  (setq org-pretty-entities-include-sub-superscripts nil) ; not a fan of hidden characters
+  (setq org-indirect-buffer-display #'current-window)
+  (setq org-format-latex-options (plist-put org-format-latex-options :scale 2.0))
+
+  ;;; babel
+  ;; NOTE: If this isn't working, make sure to delete /
+  ;; byte-recompile the /elpa/org/.. directory.
+  ;; enable language compiles
+  (org-babel-do-load-languages
+   'org-babel-load-languages
+   '((emacs-lisp . t)
+     (gnuplot . t)))
+
+  (setq org-src-window-setup 'plain) ;; let display-buffer handle it
+  (setq org-confirm-babel-evaluate nil)
+  (setq org-edit-src-persistent-message nil)
+  (setq org-src-fontify-natively t)
+  (setq org-src-preserve-indentation t)
+  (setq org-src-tab-acts-natively t)
+  (setq org-edit-src-content-indentation 0)
+
+  (setq org-special-ctrl-a/e nil)
+  (setq org-special-ctrl-k nil)
+  (setq org-hide-emphasis-markers nil)
+
+  (setq org-structure-template-alist
+        '(("s" . "src")
+          ("E" . "src emacs-lisp")
+          ("e" . "example")
+          ("q" . "quote")
+          ("v" . "verse")
+          ("V" . "verbatim")
+          ("c" . "center")
+          ("C" . "comment")))
+
+  (setq org-return-follows-link nil)
+
+  (setq org-use-sub-superscripts nil)   ; not a big fan of the ambiguity
+  (setq org-insert-heading-respect-content t)
+
+  ;; Auto wrap paragraphs in some modes (auto-fill-mode)
+  (add-hook 'text-mode-hook #'turn-on-auto-fill)
+  (add-hook 'org-mode-hook #'turn-on-auto-fill)
+  (define-key org-mode-map (kbd "C-c q") 'auto-fill-mode)
+
+  ;;; cdlatex is very useful for math-related editing
+  (add-hook 'org-mode-hook #'turn-on-org-cdlatex)
+
+  ;;; making links to other contexts
+  (define-key global-map (kbd "C-c l") 'org-store-link)
+  )
+
+#+end_src
+
+*** old
+
 TODO: seriously bloated with configuration. I don't even use org that
 much anymore, and I have no clue how i configured the below anymore.
 
@@ -1859,39 +1918,39 @@ A time-tested classic mark-up language. Not much more to say; the customizations
 #+end_src
 ** ~denote~, prot's note-taking package
 #+begin_src emacs-lisp
-  (lp-emacs-elpa-package 'denote
-    ;; highly recommneded to make this directory a git repo, or at least a
-    ;; `project.el`-recognized project
-    (setq denote-directory "~/Dropbox/denotes/")
-    (setq denote-allow-multi-word-keywords t)
-    (setq denote-known-keywords '("emacs" "school" "food" "programming"
-                                  "adult" ;; for adult-related stuff, e.g. finances, passwords, car, loans, etc.
-                                  "games" "philosophy" "work" "exercise" "bouldering" "journal"))
+(lp-emacs-elpa-package 'denote
+  ;; highly recommneded to make this directory a git repo, or at least a
+  ;; `project.el`-recognized project
+  (setq denote-directory "~/Dropbox/denotes/")
+  (setq denote-allow-multi-word-keywords t)
+  (setq denote-known-keywords '("emacs" "school" "food" "programming"
+                                "adult" ;; for adult-related stuff, e.g. finances, passwords, car, loans, etc.
+                                "games" "philosophy" "work" "exercise" "bouldering" "journal"))
 
-    (setq denote-infer-keywords t)
-    (setq denote-sort-keywords t)
-    (setq denote-file-type 'text)
+  (setq denote-infer-keywords t)
+  (setq denote-sort-keywords t)
+  (setq denote-file-type 'text)
 
-    (add-hook 'dired-mode-hook #'denote-dired-mode)
-    (add-hook 'find-file-hook #'denote-link-buttonize-buffer)
+  (add-hook 'dired-mode-hook #'denote-dired-mode)
+  (add-hook 'find-file-hook #'denote-link-buttonize-buffer)
 
-    ;; Denote does not define any key bindings.  This is for the user to
-    ;; decide.  For example:
-    (let ((map global-map))
-      (define-key map (kbd "C-c f j") #'denote-create-note-in-subdirectory) ; our custom command
-      (define-key map (kbd "C-c f n") #'denote)
-      (define-key map (kbd "C-c f N") #'denote-type)
-      (define-key map (kbd "C-c f d") #'(lambda ()
-                                          (interactive)
-                                          (dired (denote-directory))))
+  ;; Denote does not define any key bindings.  This is for the user to
+  ;; decide.  For example:
+  (let ((map global-map))
+    (define-key map (kbd "C-c f j") #'denote-create-note-in-subdirectory) ; our custom command
+    (define-key map (kbd "C-c f n") #'denote)
+    (define-key map (kbd "C-c f N") #'denote-type)
+    (define-key map (kbd "C-c f d") #'(lambda ()
+                                        (interactive)
+                                        (dired (denote-directory))))
 
-      (define-key map (kbd "C-c f i") #'denote-link) ; "insert" mnemonic
-      (define-key map (kbd "C-c f I") #'denote-link-add-links)
-      (define-key map (kbd "C-c f l") #'denote-link-find-file) ; "list" links
-      (define-key map (kbd "C-c f b") #'denote-link-backlinks)
-      (define-key map (kbd "C-c f r") #'denote-rename-file)
-      (define-key map (kbd "C-c f R") #'denote-rename-file-using-front-matter)
-      ))
+    (define-key map (kbd "C-c f i") #'denote-link) ; "insert" mnemonic
+    (define-key map (kbd "C-c f I") #'denote-link-add-links)
+    (define-key map (kbd "C-c f l") #'denote-link-find-file) ; "list" links
+    (define-key map (kbd "C-c f b") #'denote-link-backlinks)
+    (define-key map (kbd "C-c f r") #'denote-rename-file)
+    (define-key map (kbd "C-c f R") #'denote-rename-file-using-front-matter)
+    ))
 #+end_src
 
 ** ~tmr~, timing and time-keeping in Emacs
@@ -2288,46 +2347,46 @@ python3-proselint=
 #+end_src
 ** (common) lisp, scheme, and racket
 #+begin_src emacs-lisp
-  (lp-emacs-elpa-package 'paredit
-    (add-hook 'emacs-lisp-mode-hook #'paredit-mode)
-    (add-hook 'lisp-mode-hook #'paredit-mode)
-    (add-hook 'scheme-mode-hook #'paredit-mode)
-    (add-hook 'sly-mode-hook #'paredit-mode)
-    (add-hook 'racket-mode-hook #'paredit-mode))
+(lp-emacs-elpa-package 'paredit
+  (add-hook 'emacs-lisp-mode-hook #'paredit-mode)
+  (add-hook 'lisp-mode-hook #'paredit-mode)
+  (add-hook 'scheme-mode-hook #'paredit-mode)
+  (add-hook 'sly-mode-hook #'paredit-mode)
+  (add-hook 'racket-mode-hook #'paredit-mode))
 
-  (lp-emacs-elpa-package 'sly
-    (setq inferior-lisp-program "/usr/bin/sbcl"))
+(lp-emacs-elpa-package 'sly
+  (setq inferior-lisp-program "/usr/bin/sbcl"))
 
-  (lp-emacs-elpa-package 'sly-asdf)
+(lp-emacs-elpa-package 'sly-asdf)
 
-  (lp-emacs-elpa-package 'sly-quicklisp)
+(lp-emacs-elpa-package 'sly-quicklisp)
 
-  ;; eldoc provides minibuffer hints for elisp things. it's super nice
-  (lp-emacs-elpa-package 'eldoc
-    (global-eldoc-mode 1))
+;; eldoc provides minibuffer hints for elisp things. it's super nice
+(lp-emacs-elpa-package 'eldoc
+  (global-eldoc-mode 1))
 
-  (lp-emacs-elpa-package 'rainbow-delimiters
-    (add-hook 'prog-mode-hook 'rainbow-delimiters-mode))
+(lp-emacs-elpa-package 'rainbow-delimiters
+  (add-hook 'prog-mode-hook 'rainbow-delimiters-mode))
 
-  ;; since chez has no docs implemented for geiser, i'd rather just generate tags and use
-  ;; xref-etags-mode to do most of the heavy lifting...
-  (lp-emacs-elpa-package 'geiser
-    (add-hook 'geiser-mode-hook #'paredit-mode)
-    (setq auto-mode-alist (cons '("\\.scm" . scheme-mode) auto-mode-alist))
-    (setq auto-mode-alist (cons '("\\.sls" . scheme-mode) auto-mode-alist))
-    (setq geiser-scheme-implementation 'chez))
-
-
-  ;; (lp-emacs-elpa-package 'geiser-guile)
-  (lp-emacs-elpa-package 'geiser-chez)
-  ;; (lp-emacs-elpa-package 'geiser-kawa
-  ;;   (setq geiser-kawa-use-included-kawa t))
+;; since chez has no docs implemented for geiser, i'd rather just generate tags and use
+;; xref-etags-mode to do most of the heavy lifting...
+(lp-emacs-elpa-package 'geiser
+  (add-hook 'geiser-mode-hook #'paredit-mode)
+  (setq auto-mode-alist (cons '("\\.scm" . scheme-mode) auto-mode-alist))
+  (setq auto-mode-alist (cons '("\\.sls" . scheme-mode) auto-mode-alist))
+  (setq geiser-scheme-implementation 'chez))
 
 
-  (lp-emacs-elpa-package 'racket-mode
-    (add-hook 'racket-mode-hook #'racket-xp-mode)
-    (lp-emacs-elpa-package 'flymake-racket
-      (flymake-racket-setup)))
+;; (lp-emacs-elpa-package 'geiser-guile)
+(lp-emacs-elpa-package 'geiser-chez)
+;; (lp-emacs-elpa-package 'geiser-kawa
+;;   (setq geiser-kawa-use-included-kawa t))
+
+
+(lp-emacs-elpa-package 'racket-mode
+  (add-hook 'racket-mode-hook #'racket-xp-mode)
+  (lp-emacs-elpa-package 'flymake-racket
+    (flymake-racket-setup)))
 #+end_src
 
 #+RESULTS:
@@ -2339,14 +2398,14 @@ python3-proselint=
 (lp-emacs-builtin-package 'calc
   ;; TODO types for bytes and stuff
   (setq math-additional-units '(
-          (GiB "1024 * MiB" "Giga Byte")
-          (MiB "1024 * KiB" "Mega Byte")
-          (KiB "1024 * B" "Kilo Byte")
-          (B nil "Byte")
-          (Gib "1024 * Mib" "Giga Bit")
-          (Mib "1024 * Kib" "Mega Bit")
-          (Kib "1024 * b" "Kilo Bit")
-          (b nil "B/8" "bit")))
+                                (GiB "1024 * MiB" "Giga Byte")
+                                (MiB "1024 * KiB" "Mega Byte")
+                                (KiB "1024 * B" "Kilo Byte")
+                                (B nil "Byte")
+                                (Gib "1024 * Mib" "Giga Bit")
+                                (Mib "1024 * Kib" "Mega Bit")
+                                (Kib "1024 * b" "Kilo Bit")
+                                (b nil "B/8" "bit")))
   (setq math-units-table nil) ; clear the units table cache
   )
 
@@ -2392,14 +2451,14 @@ not gonna worry about it for now).
 Instead of using =projectile=, there's now a wonderful built-in library, =project=, which
 has lots of overlap with =projectile=. Might as well remove a dependency.
 #+begin_src emacs-lisp
-  (lp-emacs-builtin-package 'project
-    (define-key global-map (kbd "C-x p a") 'ff-find-other-file))
+(lp-emacs-builtin-package 'project
+  (define-key global-map (kbd "C-x p a") 'ff-find-other-file))
 
-  (lp-emacs-git-package 'project-x
-    "https://github.com/karthink/project-x.git"
-    (setq project-x-window-list-file (locate-user-emacs-file "project-x-window-list"))
-    (setq project-x-local-identifier ".project")
-    (project-x-mode 1))
+(lp-emacs-git-package 'project-x
+  "https://github.com/karthink/project-x.git"
+  (setq project-x-window-list-file (locate-user-emacs-file "project-x-window-list"))
+  (setq project-x-local-identifier ".project")
+  (project-x-mode 1))
 #+end_src
 
 ** magit
