@@ -123,7 +123,7 @@ Not all of the emacs defaults are quite sane. So here's to some sanity.
   (define-key global-map (kbd "C-x k") #'(lambda () (interactive) (kill-buffer nil)))
   (define-key global-map (kbd "C-x K") #'(lambda () (interactive) (kill-buffer nil) (delete-window)))
   (define-key emacs-lisp-mode-map (kbd "C-c C-k") #'eval-buffer)
-  (define-key global-map (kbd "C-c n") #'whitespace-cleanup)
+  (define-key global-map (kbd "C-c n") #'(lambda () (interactive) (whitespace-cleanup)))
   (define-key global-map (kbd "<f5>")  #'revert-buffer)
 
   (define-key global-map (kbd "M-z") #'zap-up-to-char) ;; i generally go up to a char non-inclusive
@@ -305,7 +305,26 @@ Not all of the emacs defaults are quite sane. So here's to some sanity.
 (lp-emacs-builtin-package 'winner
   (winner-mode t)     ; move between windows configuration
   )
+
 #+end_src
+
+*** windmove
+#+begin_src emacs-lisp
+(lp-emacs-builtin-package 'windmove
+  (setq windmove-create-window nil)     ; Emacs 27.1
+  (let ((map global-map))
+    ;; Those override some commands that are already available with
+    ;; C-M-u, C-M-f, C-M-b.
+    (define-key map (kbd "C-M-<up>") #'windmove-up)
+    (define-key map (kbd "C-M-<right>") #'windmove-right)
+    (define-key map (kbd "C-M-<down>") #'windmove-down)
+    (define-key map (kbd "C-M-<left>") #'windmove-left)
+    (define-key map (kbd "C-M-S-<up>") #'windmove-swap-states-up)
+    (define-key map (kbd "C-M-S-<right>") #'windmove-swap-states-right) ; conflicts with `org-increase-number-at-point'
+    (define-key map (kbd "C-M-S-<down>") #'windmove-swap-states-down)
+    (define-key map (kbd "C-M-S-<left>") #'windmove-swap-states-left)))
+#+end_src
+
 ** displaying the time
 #+begin_src emacs-lisp
 (lp-emacs-builtin-package 'time
@@ -618,8 +637,10 @@ good themes
 
 #+begin_src emacs-lisp
 (load-theme 'ef-dark :no-confirm)
-(set-face-attribute 'default nil :font "Iosevka Comfy fixed" :height 140)
+(set-face-attribute 'default nil :font "Iosevka Comfy" :height 140)
 #+end_src
+
+#+RESULTS:
 
 * movement and editing
 ** isearch and replace
@@ -649,7 +670,6 @@ match =.*?=, i.e all characters are whitespace.
   (setq lazy-highlight-no-delay-length 3)
   (setq isearch-wrap-pause t)
 
-
   (define-key minibuffer-local-isearch-map (kbd "M-/") #'isearch-complete-edit)
   (let ((map isearch-mode-map))
     (define-key map (kbd "C-g") #'isearch-cancel) ; instead of `isearch-abort'
@@ -673,6 +693,53 @@ match =.*?=, i.e all characters are whitespace.
   (define-key global-map (kbd "C-'") 'avy-goto-char-timer)
   (define-key global-map (kbd "M-'") 'avy-resume))
 #+end_src
+** rectangles
+
+#+begin_src emacs-lisp
+  (lp-emacs-builtin-package 'rect
+    (let ((map rectangle-mark-mode-map))
+      (define-key map (kbd "t") #'string-rectangle)
+      (define-key map (kbd "o") #'open-rectangle)
+      (define-key map (kbd "c") #'clear-rectangle)
+      (define-key map (kbd "n") #'rectangle-number-lines)
+      (define-key map (kbd "x") #'rectangle-exchange-point-and-mark)
+      (define-key map (kbd "*") #'calc-grab-rectangle)
+      (define-key map (kbd ":") #'calc-grab-sum-down)
+      (define-key map (kbd "_") #'calc-grab-sum-across)))
+#+end_src
+
+** text extras
+#+begin_src emacs-lisp
+  ;; (use-package text-extras
+  ;;   :bind
+  ;;   ("M-Q" . unfill-paragraph)
+  ;;   ("C-\"" . copy-word-from-above)
+  ;;   ("M-L" . mark-line)
+  ;;   ("M-C" . mark-char)
+  ;;   ("M-@" . mark-my-word)
+  ;;   ("M-g r" . goto-random-line)
+  ;;   ("M-g M-r" . goto-random-line)
+  ;;   ("C-M--" . kill-inside-sexp)
+  ;;   ("C-M-=" . mark-inside-sexp)
+  ;;   ("M-U" . unwrap-sexp)
+  ;;   ("M-S" . unwrap-mark-sexp)
+  ;;   ("C-|" . pipe-region)
+  ;;   ("C-S-s" . forward-to-whitespace)
+  ;;   ("C-S-r" . backward-to-whitespace)
+  ;;   ("M-W" . mark-non-whitespace)
+  ;;   ("M-'" . dabbrev-next)
+  ;;   ("C-M-'" . dabbrev-complete-next)
+  ;;   ("C-c e" . text-to-clipboard)
+  ;;   ("M-s i" . focus-lines)
+  ;;   ([remap upcase-word] . upcase-dwiw)
+  ;;   ([remap downcase-word] . downcase-dwiw)
+  ;;   ([remap capitalize-word] . capitalize-dwiw)
+  ;;   :commands
+  ;;   force-truncate-lines
+  ;;   turn-off-visual-line-mode)
+
+#+end_src
+
 * minibuffer, completion, and symbol definitions
 ** general minibuffer completion configuration
 completion options, minibuffer options, minibuffer history options, prompt faces, ...
@@ -683,17 +750,7 @@ completion options, minibuffer options, minibuffer history options, prompt faces
   (setq completions-detailed t)
   (setq completion-ignore-case t)
 
-  ;; always allow tab cycle, except if you're running `completion-at-point', in which case
-  ;; we want to always allow completion to help us. If we invoke `c-a-p', then set the
-  ;; threshold to `nil' in the current buffer.
   (setq completion-cycle-threshold nil)
-  ;;   (defun lp--no-cycle-for-completion-at-point (&rest args)
-  ;;     "Set `completion-cycle-threshold' to NIL for the current buffer
-  ;; if we invoke `completion-at-point'. `completion-cycle-threshold'
-  ;; will retain its original value in any invoked minibuffer commands
-  ;; since the value is set locally."
-  ;;     (setq-local completion-cycle-threshold nil))
-  ;;   (advice-add 'completion-at-point :before #'lp--no-cycle-for-completion-at-point)
 
   ;; emacs28 completion stuff
   (setq completions-group t)
@@ -815,15 +872,12 @@ doesn't play well with lsp, but i haven't heard anything about =eglot=.
   (setq xref-show-definitions-function #'consult-xref)
   (define-key completion-list-mode-map (kbd "C-o") #'consult-preview-at-point)
 
-  (setq completion-in-region-function #'consult-completion-in-region)
-  )
+  (setq completion-in-region-function #'consult-completion-in-region))
 
 (lp-emacs-elpa-package 'consult-dir
   (define-key global-map (kbd "C-x C-d") 'consult-dir)
   (define-key minibuffer-local-completion-map (kbd "C-x C-d") 'consult-dir)
   (define-key minibuffer-local-completion-map (kbd "C-x C-j") 'consult-dir-jump-file))
-
-
 #+end_src
 ** embark     -- Mini-buffer actions rooted in Keymaps (contextual actions)
 
@@ -1805,39 +1859,39 @@ A time-tested classic mark-up language. Not much more to say; the customizations
 #+end_src
 ** ~denote~, prot's note-taking package
 #+begin_src emacs-lisp
-(lp-emacs-elpa-package 'denote
-  ;; highly recommneded to make this directory a git repo, or at least a
-  ;; `project.el`-recognized project
-  (setq denote-directory "~/Dropbox/denotes/")
-  (setq denote-allow-multi-word-keywords t)
-  (setq denote-known-keywords '("emacs" "school" "food" "programming"
-                                "adult" ;; for adult-related stuff, e.g. finances, passwords, car, loans, etc.
-                                "games" "philosophy" "work" "exercise" "bouldering" "journal"))
-  (setq denote-infer-keywords nil)
-  (setq denote-infer-keywords t)
-  (setq denote-sort-keywords t)
-  (setq denote-file-type 'text)
+  (lp-emacs-elpa-package 'denote
+    ;; highly recommneded to make this directory a git repo, or at least a
+    ;; `project.el`-recognized project
+    (setq denote-directory "~/Dropbox/denotes/")
+    (setq denote-allow-multi-word-keywords t)
+    (setq denote-known-keywords '("emacs" "school" "food" "programming"
+                                  "adult" ;; for adult-related stuff, e.g. finances, passwords, car, loans, etc.
+                                  "games" "philosophy" "work" "exercise" "bouldering" "journal"))
 
-  (add-hook 'dired-mode-hook #'denote-dired-mode)
-  (add-hook 'find-file-hook #'denote-link-buttonize-buffer)
+    (setq denote-infer-keywords t)
+    (setq denote-sort-keywords t)
+    (setq denote-file-type 'text)
 
-  ;; Denote does not define any key bindings.  This is for the user to
-  ;; decide.  For example:
-  (let ((map global-map))
-    (define-key map (kbd "C-c f j") #'denote-create-note-in-subdirectory) ; our custom command
-    (define-key map (kbd "C-c f n") #'denote)
-    (define-key map (kbd "C-c f N") #'denote-type)
-    (define-key map (kbd "C-c f d") #'(lambda ()
-                                        (interactive)
-                                        (dired (denote-directory))))
+    (add-hook 'dired-mode-hook #'denote-dired-mode)
+    (add-hook 'find-file-hook #'denote-link-buttonize-buffer)
 
-    (define-key map (kbd "C-c f i") #'denote-link) ; "insert" mnemonic
-    (define-key map (kbd "C-c f I") #'denote-link-add-links)
-    (define-key map (kbd "C-c f l") #'denote-link-find-file) ; "list" links
-    (define-key map (kbd "C-c f b") #'denote-link-backlinks)
-    (define-key map (kbd "C-c f r") #'denote-rename-file)
-    (define-key map (kbd "C-c f R") #'denote-rename-file-using-front-matter)
-    ))
+    ;; Denote does not define any key bindings.  This is for the user to
+    ;; decide.  For example:
+    (let ((map global-map))
+      (define-key map (kbd "C-c f j") #'denote-create-note-in-subdirectory) ; our custom command
+      (define-key map (kbd "C-c f n") #'denote)
+      (define-key map (kbd "C-c f N") #'denote-type)
+      (define-key map (kbd "C-c f d") #'(lambda ()
+                                          (interactive)
+                                          (dired (denote-directory))))
+
+      (define-key map (kbd "C-c f i") #'denote-link) ; "insert" mnemonic
+      (define-key map (kbd "C-c f I") #'denote-link-add-links)
+      (define-key map (kbd "C-c f l") #'denote-link-find-file) ; "list" links
+      (define-key map (kbd "C-c f b") #'denote-link-backlinks)
+      (define-key map (kbd "C-c f r") #'denote-rename-file)
+      (define-key map (kbd "C-c f R") #'denote-rename-file-using-front-matter)
+      ))
 #+end_src
 
 ** ~tmr~, timing and time-keeping in Emacs
@@ -2234,44 +2288,46 @@ python3-proselint=
 #+end_src
 ** (common) lisp, scheme, and racket
 #+begin_src emacs-lisp
-(lp-emacs-elpa-package 'paredit
-  (add-hook 'emacs-lisp-mode-hook #'paredit-mode)
-  (add-hook 'lisp-mode-hook #'paredit-mode)
-  (add-hook 'scheme-mode-hook #'paredit-mode)
-  (add-hook 'sly-mode-hook #'paredit-mode)
-  (add-hook 'racket-mode-hook #'paredit-mode))
+  (lp-emacs-elpa-package 'paredit
+    (add-hook 'emacs-lisp-mode-hook #'paredit-mode)
+    (add-hook 'lisp-mode-hook #'paredit-mode)
+    (add-hook 'scheme-mode-hook #'paredit-mode)
+    (add-hook 'sly-mode-hook #'paredit-mode)
+    (add-hook 'racket-mode-hook #'paredit-mode))
 
-(lp-emacs-elpa-package 'sly
-  (setq inferior-lisp-program "/usr/bin/sbcl"))
+  (lp-emacs-elpa-package 'sly
+    (setq inferior-lisp-program "/usr/bin/sbcl"))
 
-(lp-emacs-elpa-package 'sly-asdf)
+  (lp-emacs-elpa-package 'sly-asdf)
 
-(lp-emacs-elpa-package 'sly-quicklisp)
+  (lp-emacs-elpa-package 'sly-quicklisp)
 
-;; eldoc provides minibuffer hints for elisp things. it's super nice
-(lp-emacs-elpa-package 'eldoc
-  (global-eldoc-mode 1))
+  ;; eldoc provides minibuffer hints for elisp things. it's super nice
+  (lp-emacs-elpa-package 'eldoc
+    (global-eldoc-mode 1))
 
-(lp-emacs-elpa-package 'rainbow-delimiters
-  (add-hook 'prog-mode-hook 'rainbow-delimiters-mode))
+  (lp-emacs-elpa-package 'rainbow-delimiters
+    (add-hook 'prog-mode-hook 'rainbow-delimiters-mode))
 
-;; since chez has no docs implemented for geiser, i'd rather just generate tags and use
-;; xref-etags-mode to do most of the heavy lifting...
-(lp-emacs-elpa-package 'geiser
-  (add-hook 'geiser-mode-hook #'paredit-mode)
-  (setq auto-mode-alist (cons '("\\.scm" . scheme-mode) auto-mode-alist))
-  (setq auto-mode-alist (cons '("\\.sls" . scheme-mode) auto-mode-alist)))
-
-(lp-emacs-elpa-package 'geiser-guile)
-(lp-emacs-elpa-package 'geiser-chez)
-(lp-emacs-elpa-package 'geiser-kawa
-  (setq geiser-kawa-use-included-kawa t))
+  ;; since chez has no docs implemented for geiser, i'd rather just generate tags and use
+  ;; xref-etags-mode to do most of the heavy lifting...
+  (lp-emacs-elpa-package 'geiser
+    (add-hook 'geiser-mode-hook #'paredit-mode)
+    (setq auto-mode-alist (cons '("\\.scm" . scheme-mode) auto-mode-alist))
+    (setq auto-mode-alist (cons '("\\.sls" . scheme-mode) auto-mode-alist))
+    (setq geiser-scheme-implementation 'chez))
 
 
-(lp-emacs-elpa-package 'racket-mode
-  (add-hook 'racket-mode-hook #'racket-xp-mode)
-  (lp-emacs-elpa-package 'flymake-racket
-    (flymake-racket-setup)))
+  ;; (lp-emacs-elpa-package 'geiser-guile)
+  (lp-emacs-elpa-package 'geiser-chez)
+  ;; (lp-emacs-elpa-package 'geiser-kawa
+  ;;   (setq geiser-kawa-use-included-kawa t))
+
+
+  (lp-emacs-elpa-package 'racket-mode
+    (add-hook 'racket-mode-hook #'racket-xp-mode)
+    (lp-emacs-elpa-package 'flymake-racket
+      (flymake-racket-setup)))
 #+end_src
 
 #+RESULTS:
@@ -2336,9 +2392,16 @@ not gonna worry about it for now).
 Instead of using =projectile=, there's now a wonderful built-in library, =project=, which
 has lots of overlap with =projectile=. Might as well remove a dependency.
 #+begin_src emacs-lisp
-(lp-emacs-builtin-package 'project
-  (define-key global-map (kbd "C-x p a") 'ff-find-other-file))
+  (lp-emacs-builtin-package 'project
+    (define-key global-map (kbd "C-x p a") 'ff-find-other-file))
+
+  (lp-emacs-git-package 'project-x
+    "https://github.com/karthink/project-x.git"
+    (setq project-x-window-list-file (locate-user-emacs-file "project-x-window-list"))
+    (setq project-x-local-identifier ".project")
+    (project-x-mode 1))
 #+end_src
+
 ** magit
 #+begin_src emacs-lisp
   ;;; Magit
