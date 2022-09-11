@@ -636,7 +636,7 @@ good themes
 ** Face Customization
 
 #+begin_src emacs-lisp :results none
-(load-theme 'ef-dark :no-confirm)
+(load-theme 'ef-duo-dark :no-confirm)
 (set-face-attribute 'default nil :font "Iosevka Comfy" :height 180)
 #+end_src
 
@@ -1411,10 +1411,14 @@ Need to cleanup the conditional on using auctex or not.
 
   ;;; making links to other contexts
   (define-key global-map (kbd "C-c l") 'org-store-link)
+
+  ;;; Use org-agenda for viewing diary entries
+  (setq org-agenda-insert-diary-strategy 'date-tree)
+  (setq org-agenda-insert-diary-extract-time t)
+  (setq org-agenda-include-diary t)
   )
 
 #+end_src
-
 *** old
 
 TODO: seriously bloated with configuration. I don't even use org that
@@ -3204,6 +3208,7 @@ testing zone
 #+end_src
 
 * configurations and people i took inspiration from
+- Emacs itself 
 - Skeeto's configuration, https://github.com/skeeto/.emacs.d. This is
   the first configuration which I tried to modify for my own means back
   when I first started to take courses in CS at college. It's where it
