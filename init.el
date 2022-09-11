@@ -28,12 +28,15 @@
 (defmacro lp-emacs-builtin-package (package &rest body)
   (declare (indent 1))
   `(progn
-     (unless (require ,package nil 'noerror)
-       (progn
-         (add-to-list 'lp-emacs-ensure-builtin-missed ,package)
-         (print (format "[Warning]: Loading `%s' failed" ,package))
-         (display-warning 'lp-emacs (format "Loading `%s' failed" ,package) :warning)))
-     ,@body))
+     (if (require ,package nil 'noerror)
+         (progn ,@body)
+       (print (format "[Warning]: Loading `%s' failed" ,package))
+       (display-warning 'lp-emacs (format "Loading `%s' failed" ,package) :warning)
+       (display-warning
+        'lp-emacs
+        "See `lp-emacs-ensure-builtin-missed' for a set of missed packages that failed install"
+        :warning)
+       (add-to-list 'lp-emacs-ensure-builtin-missed ,package))))
 
 
 (defvar lp-emacs-ensure-install-missed '()
@@ -48,11 +51,11 @@
          (progn ,@body)
        (print (format "[Warning]: Loading `%s' failed" ,package))
        (display-warning 'lp-emacs (format "Loading `%s' failed" ,package) :warning)
-       (add-to-list 'lp-emacs-ensure-install-missed ,package)
        (display-warning
         'lp-emacs
         "See `lp-emacs-ensure-installed-missed' for a set of missed packages that failed install"
-        :warning))))
+        :warning)
+       (add-to-list 'lp-emacs-ensure-install-missed ,package))))
 
 (defmacro lp-emacs-git-package (package repo-name &rest body)
   (declare (indent 1))
@@ -69,14 +72,15 @@
          (progn ,@body)
        (print (format "[Warning]: Loading `%s' failed" ,package))
        (display-warning 'lp-emacs (format "Loading `%s' failed" ,package) :warning)
-       (add-to-list 'lp-emacs-ensure-install-missed ,package)
        (display-warning
         'lp-emacs
         "See `lp-emacs-ensure-installed-missed' for a set of missed packages that failed install"
-        :warning))))
+        :warning)
+       (add-to-list 'lp-emacs-ensure-install-missed ,package))))
 
 (lp-emacs-elpa-package 'exec-path-from-shell
   (setq exec-path-from-shell-variables '("PATH" "JAVA_HOME"))
+  (setenv "JAVA_HOME" "/usr/lib/jvm/java-1.11.0-openjdk-amd64/")
   (exec-path-from-shell-initialize))
 
 ;; Mark safe variables early so that tangling won't break
