@@ -1008,27 +1008,6 @@ prefix the string with a "bang" =!=.
   )
 #+end_src
 
-** [disabled] affe       -- a fzf-like for Emacs built on top of Consult (using Orderless)
-[2022-07-14 Thu 21:22] currently disabled until i figure out why its so
-error prone on prompt
-
-#+begin_src emacs-lisp :tangle no
-(lp-emacs-elpa-package 'affe
-  (require 'orderless)
-  (consult-customize affe-grep :preview-key (kbd "C-o"))
-  ;; ;; -*- lexical-binding: t -*-
-  ;; (defun affe-orderless-regexp-compiler (input _type _ignorecase)
-  ;;   (setq input (orderless-pattern-compiler input))
-  ;;   (cons input (lambda (str) (orderless--highlight input str))))
-
-  ;; (setq affe-regexp-compiler #'affe-orderless-regexp-compiler)
-  (setq affe-highlight-function #'orderless-highlight-matches
-        affe-regexp-function #'orderless-pattern-compiler)
-  (define-key global-map (kbd "M-s r") #'affe-grep)
-  (define-key global-map (kbd "M-s f") #'affe-find)
-  )
-#+end_src
-
 ** [disabled] vertico    -- VERTical Interactive COmpletion
 I'm kind of sick of the acronyms that only take pieces of words, but I like the package so
 it gets a pass.
@@ -1050,88 +1029,6 @@ TODOs:
   ;; root '/' directory, Vertico will clear the old path to keep only
   ;; your current input.
   (add-hook 'rfn-eshadow-update-overlay-hook #'vertico-directory-tidy))
-#+end_src
-
-** [disabled] corfu      -- Completion Overlay Region FUnction
-[2022-07-14 Thu 21:19] currently disabled in favor of consult-completion-in-region
-
-Again, hate the multi-letter-per-word acronym but its a good package.
-
-TODOs:
-- [ ] Lots of really good documentation and information in the README and documentation of ~corfu~.
-- [ ] Lots of really good documentation on making ~corfu~ play nice with LSP and Eglot,
-  something I've had a problem with in the past.
-
-#+begin_src emacs-lisp :tangle no
-(lp-emacs-elpa-package 'corfu
-  ;; Optional customizations
-  ;; :custom
-  (setq corfu-cycle t)                ;; Enable cycling for `corfu-next/previous'
-  ;; (corfu-auto t)                 ;; Enable auto completion
-  (setq corfu-separator ?\s)          ;; Orderless field separator
-  ;; (corfu-quit-at-boundary nil)   ;; Never quit at completion boundary
-  ;; (corfu-quit-no-match nil)      ;; Never quit, even if there is no match
-  ;; (corfu-preview-current nil)    ;; Disable current candidate preview
-  ;; (corfu-preselect-first nil)    ;; Disable candidate preselection
-  ;; (corfu-on-exact-match nil)     ;; Configure handling of exact matches
-  ;; (corfu-echo-documentation nil) ;; Disable documentation in the echo area
-  ;; (corfu-scroll-margin 5)        ;; Use scroll margin
-
-  ;; Recommended: Enable Corfu globally.
-  ;; This is recommended since Dabbrev can be used globally (M-/).
-  ;; See also `corfu-excluded-modes'.
-  (global-corfu-mode)
-
-    ;;;;; Experimental corfu activation when vertico/mct aren't active
-  (defun corfu-enable-always-in-minibuffer ()
-    "Enable Corfu in the minibuffer if Vertico/Mct are not active."
-    (unless (or (bound-and-true-p mct--active)
-                (bound-and-true-p vertico--input))
-      ;; (setq-local corfu-auto nil) Enable/disable auto completion
-      (corfu-mode 1)))
-  (add-hook 'minibuffer-setup-hook #'corfu-enable-always-in-minibuffer 1)
-
-    ;;;;; corfu in eshell
-  (add-hook 'eshell-mode-hook
-            (lambda ()
-              (setq-local corfu-auto nil)
-              (corfu-mode)))
-  (defun corfu-send-shell (&rest _)
-    "Send completion candidate when inside comint/eshell."
-    (cond
-     ((and (derived-mode-p 'eshell-mode) (fboundp 'eshell-send-input))
-      (eshell-send-input))
-     ((and (derived-mode-p 'comint-mode)  (fboundp 'comint-send-input))
-      (comint-send-input))))
-
-  (advice-add #'corfu-insert :after #'corfu-send-shell)
-
-  ;; Silence the pcomplete capf, no errors or messages!
-  (advice-add 'pcomplete-completions-at-point :around #'cape-wrap-silent)
-
-  ;; Ensure that pcomplete does not write to the buffer
-  ;; and behaves as a pure `completion-at-point-function'.
-  (advice-add 'pcomplete-completions-at-point :around #'cape-wrap-purify)
-
-    ;;;;; Allow moving of the current Corfu completion to the minibuffer (!!!)
-  (defun corfu-move-to-minibuffer ()
-    (interactive)
-    (let ((completion-extra-properties corfu--extra)
-          completion-cycle-threshold completion-cycling)
-      (apply #'consult-completion-in-region completion-in-region--data)))
-  (define-key corfu-map "\M-m" #'corfu-move-to-minibuffer)
-  )
-
-#+end_src
-
-*** corfu-terminal -- corfu using ~popup~ / ~popon~, allowing terminal use
-#+begin_src emacs-lisp :tangle no
-(lp-emacs-git-package
-    'popon "https://codeberg.org/akib/emacs-popon.git")
-(lp-emacs-git-package
-    'corfu-terminal "https://codeberg.org/akib/emacs-corfu-terminal"
-    (unless (display-graphic-p)
-      (corfu-terminal-mode +1)))
 #+end_src
 
 ** Cape -- Completion At Point Extensions
@@ -1182,79 +1079,6 @@ TODOs:
   )
 #+end_src
 
-** [disabled, dead] mct  -- minimalist minibuffer completion visualization :noexport:
-[2021-12-06] I gave it a serious try but MCT isn't gonna cut it. I'd like my
-completions to be done quicker.
-
-[2021-12-28 Tue] hoho just kidding im back at it :)
-
-[2022-05-15 Sun 17:21] Update: ~MCT~ development has now been discontinued, so to
-speak. Prot will no longer support this package as Emacs 29 will have built-in functionality
-providing much of what this package set out to accomplish. Leaving this here for historical
-purposes. I'll be moving back to ~vertico~ and ~corfu~ for completion utility and removing
-this section soon.
-
-=vertico= has this weird problem when using =<RET>= to complete: it still takes time to
-narrow down the larger list at completion time. With MCT, that penalty is up-front rather
-than at-completion-time, which I much prefer. Amortized, MCT actually ends up faster with
-larger =completing-read= calls.
-
-=mct= now has a =completion-in-region= substitute to rival =corfu= with only built-in
-capabilities of the =*Completions*= buffer. Very exciting, this is my go-to now. Especially
-since =completion-at-point= with =mct= allows orderless style dispatching (e.g. =fffa==
-completes to =face-font-family-alternatives= with my === style dispatch to "strict leading
-initialism"
-
-#+begin_src emacs-lisp :tangle no
-(lp-emacs-elpa-package 'mct
-  (setq mct-remove-shadowed-file-names t) ; works when `file-name-shadow-mode' is enabled
-  (setq mct-hide-completion-mode-line t)
-  (setq mct-show-completion-line-numbers nil)
-  (setq mct-minimum-input 4)
-  (setq mct-live-update-delay 0.6)
-  (setq mct-completions-format 'one-column)
-  (setq mct-live-completion 'visible)
-
-  ;; NOTE: `mct-completion-blocklist' can be used for commands with lots
-  ;; of candidates, depending also on how low `mct-minimum-input' is.
-  ;; With the settings shown here this is not required, otherwise I would
-  ;; use something like this:
-  ;;
-  (setq mct-completion-blocklist
-        '( describe-symbol describe-function describe-variable
-           execute-extended-command insert-char))
-
-  ;; This is for commands that should always pop up the completions'
-  ;; buffer.  It circumvents the default method of waiting for some user
-  ;; input (see `mct-minimum-input') before displaying and updating the
-  ;; completions' buffer.
-  (setq mct-completion-passlist
-        '(imenu
-          Info-goto-node
-          Info-index
-          Info-menu
-          vc-retrieve-tag
-          Man-follow-manual-reference
-          Man-goto-section))
-
-  ;; You can place the Completions' buffer wherever you want, by following
-  ;; the syntax of `display-buffer'.  For example, try this:
-
-  ;; (setq mct-display-buffer-action
-  ;;       (quote ((display-buffer-reuse-window
-  ;;                display-buffer-in-side-window)
-  ;;               (side . left)
-  ;;               (slot . 99)
-  ;;               (window-width . 0.3))))
-
-  (mct-minibuffer-mode +1)
-  (mct-region-mode +1)
-  ;; (define-key vertico-map (kbd "M-RET") #'minibuffer-force-complete-and-exit)
-  ;; (define-key vertico-map (kbd "M-TAB") #'minibuffer-complete)
-
-  )
-#+end_src
-
 ** built-in completion utilities (abbrev, dabbrev)
 
 #+begin_src emacs-lisp
@@ -1292,14 +1116,6 @@ Its debatable whether xref should be in this category. May re-evaluate in future
   (setq xref-search-program 'ripgrep)
   )
 #+END_SRC
-
-** [disabled] dumb jump
-#+begin_src emacs-lisp :tangle no
-(lp-emacs-elpa-package 'dumb-jump
-  (add-hook 'xref-backend-functions #'dumb-jump-xref-activate)
-  (setq xref-show-definitions-function #'xref-show-definitions-completing-read)
-  (setq dumb-jump-prefer-searcher 'grep))
-#+end_src
 
 ** recentf
 
