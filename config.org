@@ -1,4 +1,4 @@
-#+TITLE: My Emacs Config
+#+TITLE: Another Emacs Configuration
 
 Documenting this configuration is a way to consolidate the knowledge of
 my own environment. This could serve as an entry-point for someone
@@ -6,32 +6,36 @@ my own environment. This could serve as an entry-point for someone
 but this is primarily (and perhaps counter-intuitively) for selfish
 reasons.
 
-There's an emphasis on simple utilities and packages. This logically
-leads to relying on many of the wonderful, but perhaps
-not-as-well-understood, built-in packages (~winner~, ~tab bar~,
-~bibtex~, ~dabbrev+abbrev~, ~xref~, ...), and some
-external-but-necessary packages ({~vertico~, ~embark~, ~consult~},
-...). Simple packages allow composability: "dedication to its craft"
-means that packages won't be stepping on each-others toes, which reduces
-the cognitive overhead of evaluating, say, which search+jump function to
-use.
+There's an emphasis on simple utilities and packages. I rely on many of
+the wonderful, but perhaps not-as-well-explored, built-in packages
+(~icomplete~, ~desktop~, ~dabbrev~ and ~abbrev~, ~xref~, ~isearch~,
+etc.), and some external-but-necessary packages (~embark~, ~consult~,
+~eglot~, programming-language specific, etc.). Simple packages
+frequently permit composition: they generally promise that they won't
+step on their neighbors' toes, which reduces the cognitive overhead of
+evaluating, say, which search+jump function to use and whether it will
+react well to the current environment.
 
-More complex packages are no doubt useful and have their place (Helm,
-Ivy). But in the past I relied too much on these big strong tools
-without the underlying systems and methodology in place to effectively
-use them, rendering my productivity much lower than it could have
-been. The first brain needs to work well before the second brain can be
-effective. Also I was incessantly yak-shaving since I had no laws about
-which packages to install, so keeping a simple-and-preferred-built-in
-approach forces me to think twice about whether I really need the new
-shiny docker buffer editing package, or a SCSS-specific color-mapping
-mode. An end-goal may be to someday rely on no external packages, but
-that doesn't seem likely unless ~orderless~ somehow makes it into
-~emacs.git~.
+More complex packages are no doubt useful and have their place
+(e.g. Helm, Ivy). In the past, these packages were a godsend due to how
+easy it was for me to set up Emacs and be immediately effective. As time
+went on, however, I found that I didn't understand my tools well enough;
+I always looked for a solution that was "install this new package"
+rather than "fix the underlying problem yourself with the tools you
+have."
 
-Inspiration is, as always, taken from those more experienced and more
-wise than myself. Credits to the (many) configurations I took
-inspiration from over the years, which are linked in a final section.
+Without discipline restricting me from installing new packages, I was
+incessantly yak-shaving for the best possible package for very niche
+situations. Keeping a simple-and-preferred-built-in approach forces me
+to think twice about whether I really need the new shiny docker buffer
+editing package, or a SCSS-specific color-mapping mode. An end-goal may
+be to someday rely on no external packages, but that doesn't seem likely
+unless ~orderless~ somehow makes it into ~emacs.git~.
+
+Inspiration is, as always, taken from those more experienced and (much)
+more wise than myself. Credits to the (many) philosophies and
+configurations I took inspiration from over the years which are linked
+in a final section.
 
 * sane defaults and general emacs capabilities
 ** initial setup, keybinds, etc.
@@ -2405,6 +2409,7 @@ python3-proselint=
   (define-key eglot-mode-map (kbd "C-c y a") #'eglot-code-actions)
   (define-key eglot-mode-map (kbd "C-c y b") #'eglot-format-buffer)
   (define-key eglot-mode-map (kbd "C-c y h") #'eldoc)
+  (setq eglot-extend-to-xref t) ;; Allow eglot in corss-referenced non-project files
   )
 
 (lp-emacs-elpa-package 'eglot-java
@@ -2416,10 +2421,10 @@ python3-proselint=
 ;; for the crashes https://github.com/non-Jedi/eglot-jl/issues/30
 ;; https://discourse.julialang.org/t/emacs-based-workflow/19400/73
 (lp-emacs-elpa-package 'eglot-jl
-  (setq lsp-julia-package-dir nil)
   ;; Best way to do this: set this variable in a `.dir-locals.el' file
   ;; pointing to the directory where your Project.toml is. It should
-  ;; have both LanguageServer and SymbolServer installed
+  ;; have both LanguageServer and SymbolServer installed. For more info,
+  ;; https://pkgdocs.julialang.org/v1/environments/
   (setq eglot-jl-language-server-project (expand-file-name "~/.julia/environments/v1.7"))
   (setq eglot-connect-timeout 5000)
   (setq julia-repl-switches "-p NCORES")
@@ -2432,7 +2437,8 @@ python3-proselint=
 ** python
 #+begin_src emacs-lisp
 (lp-emacs-elpa-package 'python
-  (setq python-indent-offset 4)
+  (setq python-indent-offset 4
+        python-pdbtrack-activate t)
   (setq python-shell-interpreter "python"
         ;; python-shell-interpreter-args "console --simple-prompt"
         python-shell-prompt-detect-failure-warning nil)
