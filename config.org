@@ -2413,17 +2413,17 @@ python3-proselint=
   (add-hook 'java-mode-hook #'eglot-ensure)
   )
 
-(lp-emacs-elpa-package 'eglot-jl
-  (setq lsp-julia-package-dir nil)
-  (setq eglot-jl-language-server-project (expand-file-name "~/.julia/environments/v1.7"))
-  (setq eglot-connect-timeout 5000)
-
-  (setq julia-repl-switches "-p NCORES")
-
-  (eglot-jl-init)
-  )
 ;; for the crashes https://github.com/non-Jedi/eglot-jl/issues/30
 ;; https://discourse.julialang.org/t/emacs-based-workflow/19400/73
+(lp-emacs-elpa-package 'eglot-jl
+  (setq lsp-julia-package-dir nil)
+  ;; Best way to do this: set this variable in a `.dir-locals.el' file
+  ;; pointing to the directory where your Project.toml is. It should
+  ;; have both LanguageServer and SymbolServer installed
+  (setq eglot-jl-language-server-project (expand-file-name "~/.julia/environments/v1.7"))
+  (setq eglot-connect-timeout 5000)
+  (setq julia-repl-switches "-p NCORES")
+  (eglot-jl-init))
 
 (lp-emacs-elpa-package 'consult-eglot
   (define-key eglot-mode-map [remap xref-find-apropos] #'consult-eglot-symbols))
@@ -2436,16 +2436,17 @@ python3-proselint=
   (setq python-shell-interpreter "python"
         ;; python-shell-interpreter-args "console --simple-prompt"
         python-shell-prompt-detect-failure-warning nil)
+  (when (executable-find "ipython")
+    (setq python-shell-interpreter "ipython"))
   )
 
 (lp-emacs-elpa-package 'pyvenv)
 
 (when (executable-find "conda")
   (lp-emacs-elpa-package 'conda
-  ;; (conda-env-initialize-interactive-shells)
-  ;; (conda-env-initialize-eshell)
+  (conda-env-initialize-interactive-shells)
+  (conda-env-initialize-eshell)
   (setq
-   conda-anaconda-home "/Users/packell1/miniconda3/"
    conda-anaconda-home (expand-file-name "~/miniconda3/")
    conda-env-home-directory (expand-file-name "~/miniconda3/") ;; as in previous example; not required
    conda-env-subdirectory "envs")
