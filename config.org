@@ -129,8 +129,6 @@ Not all of the emacs defaults are quite sane. So here's to some sanity.
   (define-key global-map (kbd "M-z") #'zap-up-to-char) ;; i generally go up to a char non-inclusive
   (define-key global-map (kbd "M-Z") #'zap-to-char)
 
-  (define-key global-map (kbd "C-<tab>") 'next-window-any-frame)
-  (define-key global-map (kbd "<backtab>") 'previous-window-any-frame)
   (define-key global-map (kbd "C-x C-M-e") 'pp-macroexpand-last-sexp)
   (define-key global-map (kbd "C-h j") 'describe-keymap)
   (define-key global-map (kbd "C-c C-j") 'join-line)
@@ -808,11 +806,14 @@ completion options, minibuffer options, minibuffer history options, prompt faces
   (setq icomplete-matches-format "[%s/%s] ")
   (setq icomplete-in-buffer t)
   (setq icomplete-with-completion-tables t)
-  (setq icomplete-separator " * ")
+  (setq icomplete-separator " . ")
   (let ((map icomplete-minibuffer-map))
     (define-key icomplete-minibuffer-map (kbd "C-n") #'icomplete-forward-completions)
     (define-key icomplete-minibuffer-map (kbd "C-p") #'icomplete-backward-completions)
-    (define-key icomplete-minibuffer-map (kbd "TAB")  #'icomplete-force-complete))
+    (define-key icomplete-minibuffer-map (kbd "TAB")  #'icomplete-force-complete)
+    (define-key map (kbd "C-j") #'icomplete-ret) ;; reverse C-j and <RET> behavior
+    (define-key map (kbd "<RET>") #'icomplete-force-complete-and-exit)
+    )
   ;; TODO: toggle for switching to vertical mode when in minibuffer...
   )
 
@@ -929,9 +930,7 @@ shine, but for now I'm using it mostly for =embark-export= for batched editing o
 (lp-emacs-elpa-package 'embark
   (define-key global-map (kbd "C->") 'embark-become)
   (define-key global-map (kbd "M-a") 'embark-act)
-  (define-key completion-list-mode-map (kbd "M-a")
-              #'(lambda () (interactive) () (mct-focus-mini-or-completions) (embark-act)))
-  (define-key embark-collect-mode-map (kbd "o") 'consult-preview-at-point)
+
   ;; Hide the mode line of the Embark live/completions buffers
   (add-to-list 'display-buffer-alist
                '("\\`\\*Embark Collect \\(Live\\|Completions\\)\\*"
@@ -942,18 +941,8 @@ shine, but for now I'm using it mostly for =embark-export= for batched editing o
   (setq prefix-help-command #'embark-prefix-help-command))
 
 (lp-emacs-elpa-package 'embark-consult
-  (define-key embark-collect-mode-map (kbd "o") 'consult-preview-at-point))
-#+end_src
-
-** [disabled] marginalia -- enhanced minibuffer detail display
-
-Enhanced minibuffer information when using =switch-to-buffer=, =find-file=,
-=describe-variable=, etc.
-
-#+begin_src emacs-lisp :tangle no
-(lp-emacs-elpa-package 'marginalia
-  (setq marginalia-max-relative-age 0)  ; time is absolute here!
-  (marginalia-mode 1))
+  (define-key embark-collect-mode-map (kbd "o") 'consult-preview-at-point)
+  (define-key embark-collect-mode-map (kbd "C-o") 'consult-preview-at-point))
 #+end_src
 
 ** orderless  -- orderless filtering and mapping of symbols
@@ -1006,29 +995,6 @@ prefix the string with a "bang" =!=.
   (define-key minibuffer-local-completion-map (kbd "?") nil)
   ;; SPC should never complete: use it for `orderless' groups.
   )
-#+end_src
-
-** [disabled] vertico    -- VERTical Interactive COmpletion
-I'm kind of sick of the acronyms that only take pieces of words, but I like the package so
-it gets a pass.
-
-TODOs:
-- [ ] Minad has gone super hard on this package since I've last used it (around Jan2022),
-  with tons of extensions for fine-grained tweaking of the interface
-  (e.g. {~ivy~,~ido~,~helm~}-like interface possibilities)
-#+begin_src emacs-lisp :tangle no
-(lp-emacs-elpa-package 'vertico
-  (vertico-mode)
-  (setq vertico-resize nil)
-  (setq vertico-cycle t)
-  (let ((map vertico-map))
-    (define-key map (kbd "M-,") #'vertico-quick-insert)
-    (define-key map (kbd "M-.") #'vertico-quick-exit))
-  ;; This works with `file-name-shadow-mode'.  When you are in a
-  ;; sub-directory and use, say, `find-file' to go to your home '~/' or
-  ;; root '/' directory, Vertico will clear the old path to keep only
-  ;; your current input.
-  (add-hook 'rfn-eshadow-update-overlay-hook #'vertico-directory-tidy))
 #+end_src
 
 ** Cape -- Completion At Point Extensions
@@ -1121,8 +1087,6 @@ Its debatable whether xref should be in this category. May re-evaluate in future
 
 Access recent files, where recents exclude the annoying =.git=, =.elpa=, etc. files.
 
-=wgrep= allows editing =grep=-style buffer for batched editing, much like =wdired=.
-
 #+begin_src emacs-lisp
 (lp-emacs-builtin-package 'recentf                    ; Save recently visited files
   ;; :diminish recentf-mode
@@ -1140,6 +1104,17 @@ Access recent files, where recents exclude the annoying =.git=, =.elpa=, etc. fi
                          ;; And all other kinds of boring files
                          )))
 #+END_SRC
+
+** [disabled] marginalia -- enhanced minibuffer detail display
+
+Enhanced minibuffer information when using =switch-to-buffer=, =find-file=,
+=describe-variable=, etc.
+
+#+begin_src emacs-lisp :tangle no
+(lp-emacs-elpa-package 'marginalia
+  (setq marginalia-max-relative-age 0)  ; time is absolute here!
+  (marginalia-mode 1))
+#+end_src
 
 * reading, writing, and task keeping
 ** text-mode
@@ -1974,8 +1949,372 @@ actions specified in the manual.
   )
 #+end_src
 
+* unix environment interface
+** dired
+
+starting from prot's configuration since he always RTFMs. There's a lot of configuration
+that I haven't dug my teeth into yet. I like the setup below.
+
+#+begin_src emacs-lisp
+(lp-emacs-builtin-package 'dired
+  (add-hook 'dired-mode-hook
+            (lambda ()
+              (dired-hide-details-mode 1)))
+
+  ;; disable ls by default
+  (setq delete-by-moving-to-trash t)
+  (setq insert-directory-program "ls"
+        dired-use-ls-dired t)
+  (setq dired-listing-switches
+        "-AGFhlv --group-directories-first --time-style=long-iso")
+  (setq dired-dwim-target t)
+  (setq dired-auto-revert-buffer #'dired-directory-changed-p) ; also see `dired-do-revert-buffer'
+  (add-hook 'dired-mode-hook #'dired-hide-details-mode)
+  (add-hook 'dired-mode-hook #'hl-line-mode))
+
+(lp-emacs-builtin-package 'dired-aux
+  (setq dired-isearch-filenames 'dwim)
+  ;; The following variables were introduced in Emacs 27.1
+  (setq dired-create-destination-dirs 'ask)
+  (setq dired-vc-rename-file t)
+  ;; And this is for Emacs 28
+  (setq dired-do-revert-buffer (lambda (dir) (not (file-remote-p dir))))
+
+  (let ((map dired-mode-map))
+    (define-key map (kbd "C-+") #'dired-create-empty-file)
+    (define-key map (kbd "M-s f") #'consult-find)
+    (define-key map (kbd "C-x v v") #'dired-vc-next-action)))
+
+(lp-emacs-builtin-package 'dired-x
+  (setq dired-clean-up-buffers-too t)
+  (setq dired-clean-confirm-killing-deleted-buffers t)
+  (setq dired-x-hands-off-my-keys t)    ; easier to show the keys I use
+  (setq dired-bind-man nil)
+  (setq dired-bind-info nil)
+  (define-key dired-mode-map (kbd "I") #'dired-info))
+#+end_src
+
+** project management
+Instead of using =projectile=, there's now a wonderful built-in library, =project=, which
+has lots of overlap with =projectile=. Might as well remove a
+dependency.
+
+On top of =project=, there are the useful extensions in =project-x=,
+among which are
+- Any directory with a =.project= file is recognized as a project
+- Window configurations can be saved on a per-project basis as well as
+  re-loaded
+#+begin_src emacs-lisp
+(lp-emacs-builtin-package 'project
+  (define-key global-map (kbd "C-x p a") 'ff-find-other-file))
+
+(lp-emacs-git-package 'project-x
+  "https://github.com/karthink/project-x.git"
+  (setq project-x-window-list-file (locate-user-emacs-file "project-x-window-list"))
+  (setq project-x-local-identifier ".project")
+  (project-x-mode 1))
+#+end_src
+
+** vc
+=vc= is Emacs's built-in version control porcelain package. The benefit
+of =vc= is that it is simple, lightweight, built-in, and is designed to
+work with multiple different version control systems. Since I
+(unfortunately) have to deal with SVN on a periodic basis, =vc= has been
+a real god-send.
+
+There are a number of subgroups defined for =vc= to further refine the
+experience, such as =vc-dir=, =log-view=, =log-edit=, etc. which are
+used to define the user experience for sub-aspects of the version
+control system.
+
+The user experience for =vc= differs in some important ways from
+=magit=. Instead action choice being dictated by keychords, =vc= prefers
+to have contextual keymaps, where the location of the cursor determines
+which keymaps are active. For example, in =vc-dir= view, while hovering
+over the available stashes, =vc-git-stash-shared-map= becomes
+active. This allows precise customization of keybindings depending on
+what context the user is in.
+
+#+begin_src emacs-lisp
+(lp-emacs-builtin-package 'vc
+  (setq vc-handled-backends '(SVN Git))
+    ;;;  As always, from Prot. Directly copied. No shame. See https://protesilaos.com/emacs/dotemacs#h:31deeff4-dfae-48d9-a906-1f3272f29bc9
+
+  ;; Those offer various types of functionality, such as blaming,
+  ;; viewing logs, showing a dedicated buffer with changes to affected
+  ;; files.
+  (require 'vc-annotate)
+  (require 'vc-dir)
+  (require 'vc-git)
+  (require 'add-log)
+  (require 'log-view)
+
+  ;; This one is for editing commit messages.
+  (require 'log-edit)
+  (setq log-edit-confirm 'changed)
+  (setq log-edit-keep-buffer nil)
+  (setq log-edit-require-final-newline t)
+  (setq log-edit-setup-add-author nil)
+
+  (setq vc-find-revision-no-save t)
+  (setq vc-annotate-display-mode 'scale) ; scale to oldest
+
+  (setq add-log-keep-changes-together t)
+  (setq vc-git-diff-switches '("--patch-with-stat" "--histogram"))
+  (setq vc-git-print-log-follow t)
+  (setq vc-git-revision-complete-only-branches nil) ; Emacs 28
+  (setq vc-git-root-log-format
+        '("%d %h %ad %an: %s"
+          ;; The first shy group matches the characters drawn by --graph.
+          ;; We use numbered groups because `log-view-message-re' wants the
+          ;; revision number to be group 1.
+          "^\\(?:[*/\\|]+\\)\\(?:[*/\\| ]+\\)?\
+  \\(?2: ([^)]+) \\)?\\(?1:[0-9a-z]+\\) \
+  \\(?4:[0-9]\\{4\\}-[0-9]\\{2\\}-[0-9]\\{2\\}\\) \
+  \\(?3:.*?\\):"
+          ((1 'log-view-message)
+           (2 'change-log-list nil lax)
+           (3 'change-log-name)
+           (4 'change-log-date))))
+
+  (add-hook 'log-view-mode-hook #'hl-line-mode)
+
+  ;; NOTE: I override lots of the defaults
+  (let ((map global-map))
+    (define-key map (kbd "C-x v b") #'vc-retrieve-tag)  ; "branch" switch
+    (define-key map (kbd "C-x v t") #'vc-create-tag)
+    (define-key map (kbd "C-x v f") #'vc-log-incoming)  ; the actual git fetch
+    (define-key map (kbd "C-x v o") #'vc-log-outgoing)
+    (define-key map (kbd "C-x v F") #'vc-update)        ; "F" because "P" is push
+    (define-key map (kbd "C-x v d") #'vc-diff))
+  
+  (let ((map vc-dir-mode-map))
+    (define-key map (kbd "o") #'vc-log-outgoing)
+    (define-key map (kbd "f") #'vc-log-incoming) ; git fetch, replaces `vc-dir-find-file' (use RET)
+    (define-key map (kbd "F") #'vc-update)       ; symmetric with P: `vc-push'
+    (define-key map (kbd "d") #'vc-diff)         ; parallel to D: `vc-root-diff'
+    (define-key map (kbd "k") #'vc-dir-clean-files)
+    (define-key map (kbd "G") #'vc-revert)
+    (let ((lp-vc-git-branch-map (make-sparse-keymap)))
+      (define-key map "b" lp-vc-git-branch-map)
+      (define-key lp-vc-git-branch-map "n" #'vc-create-tag) ; new branch/tag
+      (define-key lp-vc-git-branch-map "b" #'vc-retrieve-tag) ; switch branch/tag
+      (define-key lp-vc-git-branch-map "l" #'vc-print-branch-log)))
+  
+  (let ((map vc-git-stash-shared-map))
+    (define-key map "a" 'vc-git-stash-apply-at-point)
+    (define-key map "c" 'vc-git-stash) ; "create" named stash
+    (define-key map "D" 'vc-git-stash-delete-at-point)
+    (define-key map "p" 'vc-git-stash-pop-at-point)
+    (define-key map "s" 'vc-git-stash-snapshot))
+  
+  (let ((map vc-annotate-mode-map))
+    (define-key map (kbd "C-c C-c") #'vc-annotate-toggle-annotation-visibility)
+    (define-key map (kbd "<return>") #'vc-annotate-goto-line)
+    (define-key map (kbd "M-<return>") #'vc-annotate-find-revision-at-line))
+  
+  (let ((map log-view-mode-map))
+    (define-key map (kbd "<tab>") #'log-view-toggle-entry-display)
+    (define-key map (kbd "<return>") #'log-view-find-revision)
+    (define-key map (kbd "s") #'vc-log-search)
+    (define-key map (kbd "o") #'vc-log-outgoing)
+    (define-key map (kbd "f") #'vc-log-incoming)
+    (define-key map (kbd "F") #'vc-update)
+    (define-key map (kbd "P") #'vc-push)))
+#+end_src
+
+** comint
+The =comint= package, or =command-interpreter-in-a-buffer= package,
+provides functionality for building specific process-in-a-buffer
+modes. This allows for the creation of buffers which embody
+intercommunication between a typing user and an underlying system
+process, e.g. a shell (see =shell=). All specific packages which provide
+this kind of shell-like interface will share the common ancestor
+=comint=, allowing for preferred configuration to propagate regardless
+of the specific process.
+
+#+begin_src emacs-lisp
+(lp-emacs-builtin-package 'comint
+  (setq comint-delete-old-input t)
+  (setq comint-eol-on-send t)
+  (setq comint-history-isearch nil) ;; Separate `C-r' and `C-M-r'
+  (setq comint-input-ring-size 500)
+  (setq comint-move-point-for-output nil) ;; Don't move point for new output
+  (setq comint-prompt-read-only t)
+  (setq comint-use-prompt-regexp nil)
+  (setq comint-completion-recexact t)
+  )
+#+end_src
+
+*** shell
+Emacs has a "shell-in-a-buffer" package, which provides an interactive
+shell interface using the built-in =comint= mode as the medium for
+communication.
+
+#+begin_src emacs-lisp
+(lp-emacs-builtin-package 'shell
+  (setq shell-command-prompt-show-cwd t) ; Emacs 27.1
+  (setq shell-kill-buffer-on-exit t)
+  (setq ansi-color-for-comint-mode t))
+#+end_src
+
+*** eshell
+
+Slowly using eshell more, especially given its smooth interop with =tramp= as well as its
+intermingle of features between bash, csh, and zsh.
+
+#+begin_src emacs-lisp
+(lp-emacs-builtin-package 'eshell
+  (require 'esh-mode)
+  (require 'esh-module)
+  (setq eshell-modules-list             ; It works but may need review
+        '(eshell-alias                  ; aliases
+          eshell-basic
+          eshell-cmpl                   ; tab completion
+          eshell-dirs                   ; view the ring with `cd =`
+          eshell-glob ; unix-style globbing (with recursive (**), not (~), {zero,one}-or-more (#, ##), ...)
+          eshell-hist ; unix-style history (!ls, !?ls, ...)
+          eshell-ls   ; ls
+          eshell-pred ; zsh-like argument predication (see its man page or zsh examples)
+          eshell-prompt       ; prompt navigation
+          eshell-script       ; running `eshell` script files (source, ./, ...)
+          eshell-term         ; for visual programs (vi, vim, top, ...)
+          eshell-tramp        ; u kno
+          eshell-unix))       ; standard unix commands
+  (setenv "PAGER" "cat")      ; solves issues, such as with 'git log' and the default 'less'
+  (require 'em-cmpl)
+  (require 'em-dirs)
+  (setq eshell-cd-on-directory t)
+
+  (require 'em-tramp)
+  (setq password-cache t)
+  (setq password-cache-expiry 600)
+
+  (require 'em-hist)
+  (setq eshell-hist-ignoredups t)
+  (setq eshell-save-history-on-exit t)
+
+  (setq eshell-buffer-shorthand t
+        eshell-destroy-buffer-when-process-dies t)
+  (global-set-key (kbd "<f1>") 'eshell))
+#+end_src
+
+** proced
+
+A =top=-like interface for emacs.
+
+#+begin_src emacs-lisp
+(lp-emacs-builtin-package 'proced
+  (setq proced-auto-update-flag t)
+  (setq proced-auto-update-interval 2)
+  (setq proced-descend t)
+  (setq prcoed-filter 'user))
+#+end_src
+
+** wgrep
+=wgrep= allows editing =grep=-style buffer for batched editing, much like =wdired=.
+
+#+begin_src emacs-lisp
+(lp-emacs-elpa-package 'wgrep
+  (define-key grep-mode-map (kbd "C-x C-q") 'wgrep-change-to-wgrep-mode))
+#+end_src
+
+** ediff
+#+begin_src emacs-lisp
+(lp-emacs-elpa-package 'ediff
+  ;; :diminish ediff-mode
+  (setq ediff-diff-options "-w"))
+#+end_src
+
+** Transparent Remote (file) Access, Multiple Protocol (TRAMP)
+
+The manual walks through a number of examples that demonstrate the hidden processes that
+TRAMP does so the user doesn't have to. The most sensible methods that I use are =ssh=
+(unix based) and =smb= (windows, samba).
+
+There's a couple of typical uses that are nice to have written down (more examples in [[info:tramp#File name
+syntax][tramp#File name syntax]]):
+- =/-::= -- Use the default TRAMP method and connect to the local host with the current
+  username
+- =/ssh:domain:= -- Use the =ssh= method to connect to domain name =domain=. =domain= can be
+  an an IPv4, an IPv6, or a resolvable domain name address.
+- =/ssh:username@domain:= -- connect to =domain= with the user =username=. This will
+  prompt a login sequence if no token or key is already registered.
+- =/ssh:username@domain|sudo::/path/to/file= connect to =domain= with username =username=,
+  to then tunnel into a =localhost= connection for =sudo=.
+- =/ssh:username@domain#port:= -- Connect to =domain= for user =username= on the port
+  =port=. This can be especially useful if tunneling occurs on specific open ports
+  (usually something like =:22= but could be different). Equivalent to =ssh -p PORT=.
+
+There is a distinction between =inline= and =external= methods. The inline methods include
+the ubiquitous =ssh=. External methods include =scp=, =rsync=, =ftp=, =smb= and so
+forth. Details on =smb= can be checked in [[info:tramp#External methods][the manual]]. =inline= methods should be used
+first since they generally work well with small files. =external= methods can be used
+after finding =internal= methods insufficient.
+
+To avoid repeated authentication, native caching mechanisms can be used and are generally
+prompted for in the natural TRAMP usage. Another package =auth-source.el= reads passwords
+from different sources stored in the default authentication file =~/.authinfo{,.gpg}= (but
+can be changed through the variable =auth-sources=). See [[info:auth#Help for users][auth#Help for users]] for more
+information on the format of this file and the details that =auth-source= goes through to
+access it.
+
+The usual very capable built-in packages interop well with tramp: =shell.el=, =eshell.el=,
+=compile.el= (commands like =compile= and =grep=) and =gud.el= (=gdb= or =perldb=). The
+most typical problem with these packages will be the problem with the remote =PATH= found
+by tramp (configurable through =tramp-remote-path=). This can help find programs in, say
+=~/.local/bin/, ~/bin=.
+
+=DISPLAY= can be problematic. [[info:tramp#Remote processes][tramp#Remote processes]] has some details. The upshot is that
+the =tramp-remote-process-environment= needs to have the variable =DISPLAY=(getenv
+"DISPLAY")= set (if X11 is configured properly on the hosting shell). You can also specify
+=ForwardX11 yes= or =ForwardX11Trusted yes= in =~/.ssh/config=.
+
+External =shell-command= usages use the remote host's file path system (not the
+=/ssh:host:...= system specified by tramp). =shell-command= will infer the host on which
+it is being used so that the relative file path is always "correct", given that you know
+the machine you're on.
+
+=eshell= has very tight interop with TRAMP. You can simply run =cd /sudo::/etc= to enter
+the local =/etc= directory in =sudo= mode. Any TRAMP file specification can be used to
+seamlessly remote in the eshell session.
+
+Running =gdb= through =gud.el= can be done, but as opposed to =shell-command= the TRAMP
+naming system must be used: =gdb -i=mi /ssh:host:~/program <RET>=. I/O will be restricted
+since =gdb= and =gdb-inferior= will not belong to the same process group on the remote
+host. Relative file paths are possible as well, but when in doubt the full path should be
+the go-to.
+
+#+begin_src emacs-lisp
+(lp-emacs-builtin-package 'tramp
+    ;;; I'm actually going to give scp a try as the default method for now. There might be benefits due to the encryption overhead required of ssh in =external= use cases.
+
+  ;; ssh > scp (the default).
+  ;; (setq tramp-default-method "ssh")
+  ;; (setq tramp-default-user "packell1")
+
+  (setq tramp-verbose 3) ;; can go up to 11! 3 is the default.
+  (add-to-list 'tramp-remote-process-environment
+               (format "DISPLAY=localhost:10"))
+  )
+#+end_src
+** magit
+The killer git porcelain. This may be the package which gives me the
+highest gain in productivity compared to not using it, although =vc= may
+give a run for its money when there's no need to do complicated
+rebasing and merging.
+#+begin_src emacs-lisp
+;;; Magit
+(lp-emacs-elpa-package 'magit
+  (setq
+   ;; don't put "origin-" in front of new branch names by default
+   magit-default-tracking-name-function 'magit-default-tracking-name-branch-only
+   magit-push-always-verify t)
+  (define-key global-map (kbd "C-x g") 'magit-status))
+#+END_SRC
+
 * programming languages and environments
-** programming mode
+** prog mode
 #+begin_src emacs-lisp
 (lp-emacs-builtin-package 'prog-mode
   ;; Mark TODOs , FIXME, BUG as red in src code
@@ -1993,110 +2332,6 @@ actions specified in the manual.
   (setq compilation-always-kill t)
   (setq compilation-auto-jump-to-first-error t)
   )
-#+end_src
-
-** lsp lol
-#+begin_src emacs-lisp
-(lp-emacs-elpa-package 'lsp-mode
-  (setq lsp-keymap-prefix "C-c l")
-  (setq lsp-auto-guess-root nil)
-  (setq lsp-prefer-flymake t)
-  (setq lsp-enable-file-watchers nil)
-  (setq lsp-enable-folding t) ; needed for lsp-jlia...
-  (setq lsp-keep-workspace-alive nil)
-  (setq lsp-eldoc-hook '(lsp-hover))
-
-  (setq lsp-file-watch-threshold 1500)  ; pyright has more than 1000
-
-
-  (define-key lsp-mode-map (kbd "C-c y a") #'lsp-execute-code-action)
-  (define-key lsp-mode-map (kbd "C-c y M-d") #'lsp-describe-thing-at-point)
-  (define-key lsp-mode-map (kbd "C-c y r") 'lsp-format-region)
-  (define-key lsp-mode-map (kbd "C-c y b") 'lsp-format-buffer)
-  (define-key lsp-mode-map (kbd "C-c n") 'lsp-format-buffer)
-
-  (setq read-process-output-max (* 1024 1024))
-  (setq base-lsp-mode-hooks
-        '(typescript-mode-hook tuareg-mode-hook))
-  (dolist (hook base-lsp-mode-hooks)
-    (add-hook hook #'lsp)))
-
-(lp-emacs-elpa-package 'lsp-ui
-  ;; sideline visualization of idagonstics, actions, hover info
-  (setq lsp-ui-sideline-show-diagnostics nil)
-  (setq lsp-ui-sideline-show-code-actions nil)
-  (setq lsp-ui-sideline-show-hover nil)
-  (setq lsp-ui-sideline-delay 1)
-
-  ;; documentation display
-  (setq lsp-ui-doc-enable t)
-  (setq lsp-ui-doc-include-signature t)
-  (setq lsp-ui-doc-enhanced-mardown t)
-  (setq lsp-ui-doc-show-with-cursor t)
-  (setq lsp-ui-doc-use-webkit nil)
-  (setq lsp-ui-doc-delay 1)
-
-  (define-key lsp-ui-mode-map (kbd "C-c y d") 'lsp-ui-doc-show)
-  (define-key lsp-ui-mode-map (kbd "C-c y C-d") 'lsp-ui-doc-hide)
-  (define-key lsp-ui-mode-map (kbd "C-c y i") 'lsp-ui-imenu))
-
-;; ;; LSPJavaPac
-(lp-emacs-elpa-package 'lsp-java
-  ;;(executable-find "mvn")
-  (setq lsp-java-server-install-dir (expand-file-name "~/.emacs.d/share/eclipse.jdt.ls/"))
-  (setq lsp-java-workspace-dir (expand-file-name "~/.emacs.d/share/eclipse.jdt.ls/workspace/"))
-  (setq lsp-java-configuration-maven-user-settings (expand-file-name "~/.m2/settings.xml"))
-  (setq lsp-java-configuration-runtimes '[(:name "JavaSE-11"
-                                                 :path "/Library/Java/JavaVirtualMachines/temurin-11.jdk/Contents/Home/"
-                                                 :default t)])
-  ;; (setq lsp-java-java-path "")...
-  (add-hook 'java-mode-hook #'lsp)
-  (define-key lsp-mode-map (kbd "C-c y t") #'lsp-java-type-hierarchy)
-  )
-;; ;; -LSPJavaPac
-
-;; (lp-emacs-elpa-package 'lsp-julia
-;;   (setq lsp-julia-default-environment "~/.julia/environments/v1.7")
-;;   (add-hook 'julia-mode-hook #'lsp))
-#+end_src
-
-** [disabled] eglot
-#+begin_src emacs-lisp :tangle no
-(lp-emacs-elpa-package 'eglot
-  (defvar eglot-prog-mode-hooks '(cc-mode-hook c-mode-hook c++-mode-hook cuda-mode-hook
-                                               rjsx-mode-hook
-                                               ))
-  (dolist (mode eglot-prog-mode-hooks)
-    (add-hook mode 'eglot-ensure))
-
-  (define-key eglot-mode-map (kbd "C-c y n") #'eglot-rename)
-  (define-key eglot-mode-map (kbd "C-c y o") #'eglot-reconnect)
-  (define-key eglot-mode-map (kbd "C-c y a") #'eglot-code-actions)
-  (define-key eglot-mode-map (kbd "C-c y b") #'eglot-format-buffer)
-  (define-key eglot-mode-map (kbd "C-c y h") #'eldoc)
-  (define-key eglot-mode-map (kbd "C-c y d") #'xref-find-definitions)
-  )
-
-;; (lp-emacs-elpa-package 'eglot-java
-;;   (eglot-java-init)
-;;   (setcdr (assq 'java-mode eglot-server-programs) '("/Users/packell1/.emacs.d/share/eclipse.jdt.ls/bin/jdtls"))
-;;   (add-hook 'java-mode-hook #'eglot-ensure)
-;;   )
-
-;; 4 julia
-;; (lp-emacs-elpa-package 'eglot-jl
-;;   (setq lsp-julia-package-dir nil)
-;;   (setq eglot-jl-language-server-project "~/.julia/environments/v1.7")
-;;   (setq eglot-connect-timeout 5000)
-
-;;   (setq julia-repl-switches "-p NCORES")
-
-;;   (eglot-jl-init)
-;;   )
-;; for the crashes https://github.com/non-Jedi/eglot-jl/issues/30
-
-(lp-emacs-elpa-package 'consult-eglot
-  (define-key eglot-mode-map [remap xref-find-apropos] #'consult-eglot-symbols))
 #+end_src
 
 ** flymake and its extras
@@ -2152,6 +2387,46 @@ python3-proselint=
 
 (lp-emacs-elpa-package 'flymake-python-pyflakes
   (add-hook 'python-mode-hook 'flymake-python-pyflakes-load))
+#+end_src
+
+** eglot
+[2022-09-13 Tue] It's back.
+
+#+begin_src emacs-lisp
+(lp-emacs-elpa-package 'eglot
+  (defvar eglot-prog-mode-hooks '(cc-mode-hook c-mode-hook c++-mode-hook cuda-mode-hook
+                                               rjsx-mode-hook python-mode-hook java-mode-hook
+                                               julia-mode-hook))
+  (dolist (mode eglot-prog-mode-hooks)
+    (add-hook mode 'eglot-ensure))
+
+  (define-key eglot-mode-map (kbd "C-c y n") #'eglot-rename)
+  (define-key eglot-mode-map (kbd "C-c y o") #'eglot-reconnect)
+  (define-key eglot-mode-map (kbd "C-c y a") #'eglot-code-actions)
+  (define-key eglot-mode-map (kbd "C-c y b") #'eglot-format-buffer)
+  (define-key eglot-mode-map (kbd "C-c y h") #'eldoc)
+  )
+
+(lp-emacs-elpa-package 'eglot-java
+  (eglot-java-init)
+  (setcdr (assq 'java-mode eglot-server-programs) (list (expand-file-name "~/.emacs.d/share/eclipse.jdt.ls/bin/jdtls")))
+  (add-hook 'java-mode-hook #'eglot-ensure)
+  )
+
+(lp-emacs-elpa-package 'eglot-jl
+  (setq lsp-julia-package-dir nil)
+  (setq eglot-jl-language-server-project (expand-file-name "~/.julia/environments/v1.7"))
+  (setq eglot-connect-timeout 5000)
+
+  (setq julia-repl-switches "-p NCORES")
+
+  (eglot-jl-init)
+  )
+;; for the crashes https://github.com/non-Jedi/eglot-jl/issues/30
+;; https://discourse.julialang.org/t/emacs-based-workflow/19400/73
+
+(lp-emacs-elpa-package 'consult-eglot
+  (define-key eglot-mode-map [remap xref-find-apropos] #'consult-eglot-symbols))
 #+end_src
 
 ** python
@@ -2346,376 +2621,71 @@ not gonna worry about it for now).
 (lp-emacs-elpa-package 'docker-tramp)
 #+end_src
 
-* unix environment interface
-** dired
+** [disabled] lsp lol
+#+begin_src emacs-lisp :tangle no
+(lp-emacs-elpa-package 'lsp-mode
+  ;; (setq lsp-keymap-prefix "C-c l")
+  (setq lsp-auto-guess-root nil)
+  (setq lsp-prefer-flymake t)
+  (setq lsp-enable-file-watchers nil)
+  (setq lsp-enable-folding t) ; needed for lsp-jlia...
+  (setq lsp-keep-workspace-alive nil)
+  (setq lsp-eldoc-hook '(lsp-hover))
 
-starting from prot's configuration since he always RTFMs. There's a lot of configuration
-that I haven't dug my teeth into yet. I like the setup below.
+  (setq lsp-file-watch-threshold 1500)  ; pyright has more than 1000
 
-#+begin_src emacs-lisp
-(lp-emacs-builtin-package 'dired
-  (add-hook 'dired-mode-hook
-            (lambda ()
-              (dired-hide-details-mode 1)))
 
-  ;; disable ls by default
-  (setq delete-by-moving-to-trash t)
-  (setq insert-directory-program "ls"
-        dired-use-ls-dired t)
-  (setq dired-listing-switches
-        "-AGFhlv --group-directories-first --time-style=long-iso")
-  (setq dired-dwim-target t)
-  (setq dired-auto-revert-buffer #'dired-directory-changed-p) ; also see `dired-do-revert-buffer'
-  (add-hook 'dired-mode-hook #'dired-hide-details-mode)
-  (add-hook 'dired-mode-hook #'hl-line-mode))
+  (define-key lsp-mode-map (kbd "C-c y a") #'lsp-execute-code-action)
+  (define-key lsp-mode-map (kbd "C-c y M-d") #'lsp-describe-thing-at-point)
+  (define-key lsp-mode-map (kbd "C-c y r") 'lsp-format-region)
+  (define-key lsp-mode-map (kbd "C-c y b") 'lsp-format-buffer)
+  (define-key lsp-mode-map (kbd "C-c n") 'lsp-format-buffer)
 
-(lp-emacs-builtin-package 'dired-aux
-  (setq dired-isearch-filenames 'dwim)
-  ;; The following variables were introduced in Emacs 27.1
-  (setq dired-create-destination-dirs 'ask)
-  (setq dired-vc-rename-file t)
-  ;; And this is for Emacs 28
-  (setq dired-do-revert-buffer (lambda (dir) (not (file-remote-p dir))))
+  (setq read-process-output-max (* 1024 1024))
+  (setq base-lsp-mode-hooks
+        '(typescript-mode-hook tuareg-mode-hook))
+  (dolist (hook base-lsp-mode-hooks)
+    (add-hook hook #'lsp)))
 
-  (let ((map dired-mode-map))
-    (define-key map (kbd "C-+") #'dired-create-empty-file)
-    (define-key map (kbd "M-s f") #'consult-find)
-    (define-key map (kbd "C-x v v") #'dired-vc-next-action)))
+(lp-emacs-elpa-package 'lsp-ui
+  ;; sideline visualization of idagonstics, actions, hover info
+  (setq lsp-ui-sideline-show-diagnostics nil)
+  (setq lsp-ui-sideline-show-code-actions nil)
+  (setq lsp-ui-sideline-show-hover nil)
+  (setq lsp-ui-sideline-delay 1)
 
-(lp-emacs-builtin-package 'dired-x
-  (setq dired-clean-up-buffers-too t)
-  (setq dired-clean-confirm-killing-deleted-buffers t)
-  (setq dired-x-hands-off-my-keys t)    ; easier to show the keys I use
-  (setq dired-bind-man nil)
-  (setq dired-bind-info nil)
-  (define-key dired-mode-map (kbd "I") #'dired-info))
-#+end_src
+  ;; documentation display
+  (setq lsp-ui-doc-enable t)
+  (setq lsp-ui-doc-include-signature t)
+  (setq lsp-ui-doc-enhanced-mardown t)
+  (setq lsp-ui-doc-show-with-cursor t)
+  (setq lsp-ui-doc-use-webkit nil)
+  (setq lsp-ui-doc-delay 1)
 
-** project management
-Instead of using =projectile=, there's now a wonderful built-in library, =project=, which
-has lots of overlap with =projectile=. Might as well remove a
-dependency.
+  (define-key lsp-ui-mode-map (kbd "C-c y d") 'lsp-ui-doc-show)
+  (define-key lsp-ui-mode-map (kbd "C-c y C-d") 'lsp-ui-doc-hide)
+  (define-key lsp-ui-mode-map (kbd "C-c y i") 'lsp-ui-imenu))
 
-On top of =project=, there are the useful extensions in =project-x=,
-among which are
-- Any directory with a =.project= file is recognized as a project
-- Window configurations can be saved on a per-project basis as well as
-  re-loaded
-#+begin_src emacs-lisp
-(lp-emacs-builtin-package 'project
-  (define-key global-map (kbd "C-x p a") 'ff-find-other-file))
-
-(lp-emacs-git-package 'project-x
-  "https://github.com/karthink/project-x.git"
-  (setq project-x-window-list-file (locate-user-emacs-file "project-x-window-list"))
-  (setq project-x-local-identifier ".project")
-  (project-x-mode 1))
-#+end_src
-
-** magit
-The killer git porcelain. This may be the package which gives me the
-highest gain in productivity compared to not using it, although =vc= may
-give a run for its money when there's no need to do complicated
-rebasing and merging.
-#+begin_src emacs-lisp
-;;; Magit
-(lp-emacs-elpa-package 'magit
-  (setq
-   ;; don't put "origin-" in front of new branch names by default
-   magit-default-tracking-name-function 'magit-default-tracking-name-branch-only
-   magit-push-always-verify t)
-  (define-key global-map (kbd "C-x g") 'magit-status))
-#+END_SRC
-
-** vc
-=vc= is Emacs's built-in version control porcelain package. The benefit
-of =vc= is that it is simple, lightweight, built-in, and is designed to
-work with multiple different version control systems. Since I
-(unfortunately) have to deal with SVN on a periodic basis, =vc= has been
-a real god-send.
-
-There are a number of subgroups defined for =vc= to further refine the
-experience, such as =vc-dir=, =log-view=, =log-edit=, etc. which are
-used to define the user experience for sub-aspects of the version
-control system.
-
-The user experience for =vc= differs in some important ways from
-=magit=. Instead action choice being dictated by keychords, =vc= prefers
-to have contextual keymaps, where the location of the cursor determines
-which keymaps are active. For example, in =vc-dir= view, while hovering
-over the available stashes, =vc-git-stash-shared-map= becomes
-active. This allows precise customization of keybindings depending on
-what context the user is in.
-
-#+begin_src emacs-lisp
-(lp-emacs-builtin-package 'vc
-  (setq vc-handled-backends '(SVN Git))
-    ;;;  As always, from Prot. Directly copied. No shame. See https://protesilaos.com/emacs/dotemacs#h:31deeff4-dfae-48d9-a906-1f3272f29bc9
-
-  ;; Those offer various types of functionality, such as blaming,
-  ;; viewing logs, showing a dedicated buffer with changes to affected
-  ;; files.
-  (require 'vc-annotate)
-  (require 'vc-dir)
-  (require 'vc-git)
-  (require 'add-log)
-  (require 'log-view)
-
-  ;; This one is for editing commit messages.
-  (require 'log-edit)
-  (setq log-edit-confirm 'changed)
-  (setq log-edit-keep-buffer nil)
-  (setq log-edit-require-final-newline t)
-  (setq log-edit-setup-add-author nil)
-
-  (setq vc-find-revision-no-save t)
-  (setq vc-annotate-display-mode 'scale) ; scale to oldest
-
-  (setq add-log-keep-changes-together t)
-  (setq vc-git-diff-switches '("--patch-with-stat" "--histogram"))
-  (setq vc-git-print-log-follow t)
-  (setq vc-git-revision-complete-only-branches nil) ; Emacs 28
-  (setq vc-git-root-log-format
-        '("%d %h %ad %an: %s"
-          ;; The first shy group matches the characters drawn by --graph.
-          ;; We use numbered groups because `log-view-message-re' wants the
-          ;; revision number to be group 1.
-          "^\\(?:[*/\\|]+\\)\\(?:[*/\\| ]+\\)?\
-  \\(?2: ([^)]+) \\)?\\(?1:[0-9a-z]+\\) \
-  \\(?4:[0-9]\\{4\\}-[0-9]\\{2\\}-[0-9]\\{2\\}\\) \
-  \\(?3:.*?\\):"
-          ((1 'log-view-message)
-           (2 'change-log-list nil lax)
-           (3 'change-log-name)
-           (4 'change-log-date))))
-
-  (add-hook 'log-view-mode-hook #'hl-line-mode)
-
-  ;; NOTE: I override lots of the defaults
-  (let ((map global-map))
-    (define-key map (kbd "C-x v b") #'vc-retrieve-tag)  ; "branch" switch
-    (define-key map (kbd "C-x v t") #'vc-create-tag)
-    (define-key map (kbd "C-x v f") #'vc-log-incoming)  ; the actual git fetch
-    (define-key map (kbd "C-x v o") #'vc-log-outgoing)
-    (define-key map (kbd "C-x v F") #'vc-update)        ; "F" because "P" is push
-    (define-key map (kbd "C-x v d") #'vc-diff))
-  
-  (let ((map vc-dir-mode-map))
-    (define-key map (kbd "o") #'vc-log-outgoing)
-    (define-key map (kbd "f") #'vc-log-incoming) ; git fetch, replaces `vc-dir-find-file' (use RET)
-    (define-key map (kbd "F") #'vc-update)       ; symmetric with P: `vc-push'
-    (define-key map (kbd "d") #'vc-diff)         ; parallel to D: `vc-root-diff'
-    (define-key map (kbd "k") #'vc-dir-clean-files)
-    (define-key map (kbd "G") #'vc-revert)
-    (let ((lp-vc-git-branch-map (make-sparse-keymap)))
-      (define-key map "b" lp-vc-git-branch-map)
-      (define-key lp-vc-git-branch-map "n" #'vc-create-tag) ; new branch/tag
-      (define-key lp-vc-git-branch-map "b" #'vc-retrieve-tag) ; switch branch/tag
-      (define-key lp-vc-git-branch-map "l" #'vc-print-branch-log)))
-  
-  (let ((map vc-git-stash-shared-map))
-    (define-key map "a" 'vc-git-stash-apply-at-point)
-    (define-key map "c" 'vc-git-stash) ; "create" named stash
-    (define-key map "D" 'vc-git-stash-delete-at-point)
-    (define-key map "p" 'vc-git-stash-pop-at-point)
-    (define-key map "s" 'vc-git-stash-snapshot))
-  
-  (let ((map vc-annotate-mode-map))
-    (define-key map (kbd "C-c C-c") #'vc-annotate-toggle-annotation-visibility)
-    (define-key map (kbd "<return>") #'vc-annotate-goto-line)
-    (define-key map (kbd "M-<return>") #'vc-annotate-find-revision-at-line))
-  
-  (let ((map log-view-mode-map))
-    (define-key map (kbd "<tab>") #'log-view-toggle-entry-display)
-    (define-key map (kbd "<return>") #'log-view-find-revision)
-    (define-key map (kbd "s") #'vc-log-search)
-    (define-key map (kbd "o") #'vc-log-outgoing)
-    (define-key map (kbd "f") #'vc-log-incoming)
-    (define-key map (kbd "F") #'vc-update)
-    (define-key map (kbd "P") #'vc-push)))
-#+end_src
-
-** comint
-The =comint= package, or =command-interpreter-in-a-buffer= package,
-provides functionality for building specific process-in-a-buffer
-modes. This allows for the creation of buffers which embody
-intercommunication between a typing user and an underlying system
-process, e.g. a shell (see =shell=). All specific packages which provide
-this kind of shell-like interface will share the common ancestor
-=comint=, allowing for preferred configuration to propagate regardless
-of the specific process.
-
-#+begin_src emacs-lisp
-(lp-emacs-builtin-package 'comint
-  (setq comint-delete-old-input t)
-  (setq comint-eol-on-send nil) ;; Don't require going to EOL before sending input
-  (setq comint-history-isearch nil) ;; Separate `C-r' and `C-M-r'
-  (setq comint-input-ring-size 500)
-  (setq comint-move-point-for-output nil) ;; Don't move point for new output
-  (setq comint-prompt-read-only t)
-  (setq comint-use-prompt-regexp t)
-  (setq comint-completion-recexact t)
+;; ;; LSPJavaPac
+(lp-emacs-elpa-package 'lsp-java
+  ;;(executable-find "mvn")
+  (setq lsp-java-server-install-dir (expand-file-name "~/.emacs.d/share/eclipse.jdt.ls/"))
+  (setq lsp-java-workspace-dir (expand-file-name "~/.emacs.d/share/eclipse.jdt.ls/workspace/"))
+  (setq lsp-java-configuration-maven-user-settings (expand-file-name "~/.m2/settings.xml"))
+  (setq lsp-java-configuration-runtimes '[(:name "JavaSE-11"
+                                                 :path "/Library/Java/JavaVirtualMachines/temurin-11.jdk/Contents/Home/"
+                                                 :default t)])
+  ;; (setq lsp-java-java-path "")...
+  (add-hook 'java-mode-hook #'lsp)
+  (define-key lsp-mode-map (kbd "C-c y t") #'lsp-java-type-hierarchy)
   )
+;; ;; -LSPJavaPac
+
+;; (lp-emacs-elpa-package 'lsp-julia
+;;   (setq lsp-julia-default-environment "~/.julia/environments/v1.7")
+;;   (add-hook 'julia-mode-hook #'lsp))
 #+end_src
 
-*** shell
-Emacs has a "shell-in-a-buffer" package, which provides an interactive
-shell interface using the built-in =comint= mode as the medium for
-communication.
-
-#+begin_src emacs-lisp
-(lp-emacs-builtin-package 'shell
-  (setq shell-command-prompt-show-cwd t) ; Emacs 27.1
-  (setq shell-kill-buffer-on-exit t)
-  (setq ansi-color-for-comint-mode t))
-#+end_src
-
-*** eshell
-
-Slowly using eshell more, especially given its smooth interop with =tramp= as well as its
-intermingle of features between bash, csh, and zsh.
-
-#+begin_src emacs-lisp
-(lp-emacs-builtin-package 'eshell
-  (require 'esh-mode)
-  (require 'esh-module)
-  (setq eshell-modules-list             ; It works but may need review
-        '(eshell-alias                  ; aliases
-          eshell-basic
-          eshell-cmpl                   ; tab completion
-          eshell-dirs                   ; view the ring with `cd =`
-          eshell-glob ; unix-style globbing (with recursive (**), not (~), {zero,one}-or-more (#, ##), ...)
-          eshell-hist ; unix-style history (!ls, !?ls, ...)
-          eshell-ls   ; ls
-          eshell-pred ; zsh-like argument predication (see its man page or zsh examples)
-          eshell-prompt       ; prompt navigation
-          eshell-script       ; running `eshell` script files (source, ./, ...)
-          eshell-term         ; for visual programs (vi, vim, top, ...)
-          eshell-tramp        ; u kno
-          eshell-unix))       ; standard unix commands
-  (setenv "PAGER" "cat")      ; solves issues, such as with 'git log' and the default 'less'
-  (require 'em-cmpl)
-  (require 'em-dirs)
-  (setq eshell-cd-on-directory t)
-
-  (require 'em-tramp)
-  (setq password-cache t)
-  (setq password-cache-expiry 600)
-
-  (require 'em-hist)
-  (setq eshell-hist-ignoredups t)
-  (setq eshell-save-history-on-exit t)
-
-  (setq eshell-buffer-shorthand t
-        eshell-destroy-buffer-when-process-dies t)
-  (global-set-key (kbd "<f1>") 'eshell))
-#+end_src
-
-** proced
-
-A =top=-like interface for emacs.
-
-#+begin_src emacs-lisp
-(lp-emacs-builtin-package 'proced
-  (setq proced-auto-update-flag t)
-  (setq proced-auto-update-interval 2)
-  (setq proced-descend t)
-  (setq prcoed-filter 'user))
-#+end_src
-
-** wgrep
-#+begin_src emacs-lisp
-(lp-emacs-elpa-package 'wgrep
-  (define-key grep-mode-map (kbd "C-x C-q") 'wgrep-change-to-wgrep-mode))
-#+end_src
-
-** ediff
-#+begin_src emacs-lisp
-(lp-emacs-elpa-package 'ediff
-  ;; :diminish ediff-mode
-  (setq ediff-diff-options "-w"))
-#+end_src
-
-** exec path from shell
-#+begin_src emacs-lisp
-(lp-emacs-elpa-package 'exec-path-from-shell
-  (setq exec-path-from-shell-variables '("PATH" "JAVA_HOME"))
-  (setenv "JAVA_HOME" "/usr/lib/jvm/java-1.11.0-openjdk-amd64/")
-  (exec-path-from-shell-initialize))
-#+end_src
-
-** Transparent Remote (file) Access, Multiple Protocol (TRAMP)
-
-The manual walks through a number of examples that demonstrate the hidden processes that
-TRAMP does so the user doesn't have to. The most sensible methods that I use are =ssh=
-(unix based) and =smb= (windows, samba).
-
-There's a couple of typical uses that are nice to have written down (more examples in [[info:tramp#File name
-syntax][tramp#File name syntax]]):
-- =/-::= -- Use the default TRAMP method and connect to the local host with the current
-  username
-- =/ssh:domain:= -- Use the =ssh= method to connect to domain name =domain=. =domain= can be
-  an an IPv4, an IPv6, or a resolvable domain name address.
-- =/ssh:username@domain:= -- connect to =domain= with the user =username=. This will
-  prompt a login sequence if no token or key is already registered.
-- =/ssh:username@domain|sudo::/path/to/file= connect to =domain= with username =username=,
-  to then tunnel into a =localhost= connection for =sudo=.
-- =/ssh:username@domain#port:= -- Connect to =domain= for user =username= on the port
-  =port=. This can be especially useful if tunneling occurs on specific open ports
-  (usually something like =:22= but could be different). Equivalent to =ssh -p PORT=.
-
-There is a distinction between =inline= and =external= methods. The inline methods include
-the ubiquitous =ssh=. External methods include =scp=, =rsync=, =ftp=, =smb= and so
-forth. Details on =smb= can be checked in [[info:tramp#External methods][the manual]]. =inline= methods should be used
-first since they generally work well with small files. =external= methods can be used
-after finding =internal= methods insufficient.
-
-To avoid repeated authentication, native caching mechanisms can be used and are generally
-prompted for in the natural TRAMP usage. Another package =auth-source.el= reads passwords
-from different sources stored in the default authentication file =~/.authinfo{,.gpg}= (but
-can be changed through the variable =auth-sources=). See [[info:auth#Help for users][auth#Help for users]] for more
-information on the format of this file and the details that =auth-source= goes through to
-access it.
-
-The usual very capable built-in packages interop well with tramp: =shell.el=, =eshell.el=,
-=compile.el= (commands like =compile= and =grep=) and =gud.el= (=gdb= or =perldb=). The
-most typical problem with these packages will be the problem with the remote =PATH= found
-by tramp (configurable through =tramp-remote-path=). This can help find programs in, say
-=~/.local/bin/, ~/bin=.
-
-=DISPLAY= can be problematic. [[info:tramp#Remote processes][tramp#Remote processes]] has some details. The upshot is that
-the =tramp-remote-process-environment= needs to have the variable =DISPLAY=(getenv
-"DISPLAY")= set (if X11 is configured properly on the hosting shell). You can also specify
-=ForwardX11 yes= or =ForwardX11Trusted yes= in =~/.ssh/config=.
-
-External =shell-command= usages use the remote host's file path system (not the
-=/ssh:host:...= system specified by tramp). =shell-command= will infer the host on which
-it is being used so that the relative file path is always "correct", given that you know
-the machine you're on.
-
-=eshell= has very tight interop with TRAMP. You can simply run =cd /sudo::/etc= to enter
-the local =/etc= directory in =sudo= mode. Any TRAMP file specification can be used to
-seamlessly remote in the eshell session.
-
-Running =gdb= through =gud.el= can be done, but as opposed to =shell-command= the TRAMP
-naming system must be used: =gdb -i=mi /ssh:host:~/program <RET>=. I/O will be restricted
-since =gdb= and =gdb-inferior= will not belong to the same process group on the remote
-host. Relative file paths are possible as well, but when in doubt the full path should be
-the go-to.
-
-#+begin_src emacs-lisp
-(lp-emacs-builtin-package 'tramp
-    ;;; I'm actually going to give scp a try as the default method for now. There might be benefits due to the encryption overhead required of ssh in =external= use cases.
-
-  ;; ssh > scp (the default).
-  ;; (setq tramp-default-method "ssh")
-  ;; (setq tramp-default-user "packell1")
-
-  (setq tramp-verbose 3) ;; can go up to 11! 3 is the default.
-  (add-to-list 'tramp-remote-process-environment
-               (format "DISPLAY=localhost:10"))
-  )
-#+end_src
 * external environment interface
 ** notmuch                                            -- mail in emacs
 #+begin_src emacs-lisp
