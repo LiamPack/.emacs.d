@@ -1,2 +1,3 @@
 # .emacs.d
-just my emacs config
+Just my emacs config. To see the literate-programming document form of
+my configuration, see [config.org](config.org).

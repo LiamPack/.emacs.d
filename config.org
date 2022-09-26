@@ -648,7 +648,7 @@ good themes
 ** Face Customization
 
 #+begin_src emacs-lisp :results none
-(load-theme 'ef-duo-dark :no-confirm)
+(load-theme 'ef-trio-light :no-confirm)
 (set-face-attribute 'default nil :font "Iosevka Comfy" :height 180)
 #+end_src
 
@@ -805,8 +805,8 @@ completion options, minibuffer options, minibuffer history options, prompt faces
   ;; use M-r, M-s for history stuff
   ;; icomplete... fido...
   (icomplete-mode +1)
-  (setq icomplete-compute-delay 0.6)
-  (setq icomplete-max-delay-chars 3)
+  (setq icomplete-compute-delay 2)
+  (setq icomplete-max-delay-chars 2)
   (setq icomplete-matches-format "[%s/%s] ")
   (setq icomplete-in-buffer t)
   (setq icomplete-with-completion-tables t)
@@ -1208,7 +1208,8 @@ Need to cleanup the conditional on using auctex or not.
   (org-babel-do-load-languages
    'org-babel-load-languages
    '((emacs-lisp . t)
-     (gnuplot . t)))
+     (gnuplot . t)
+     (shell . t)))
 
   (setq org-src-window-setup 'plain) ;; let display-buffer handle it
   (setq org-confirm-babel-evaluate nil)
