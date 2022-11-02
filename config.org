@@ -270,11 +270,11 @@ Not all of the emacs defaults are quite sane. So here's to some sanity.
   (defvar resize-window-repeat-map
     (let ((map (make-sparse-keymap)))
       ;; Standard keys:
-      (define-key map "^" 'enlarge-window)
-      (define-key map "}" 'enlarge-window-horizontally)
-      (define-key map "{" 'shrink-window-horizontally) ; prot note: those three are C-x KEY
+      (define-key map "}" 'enlarge-window)
+      (define-key map ">" 'enlarge-window-horizontally)
+      (define-key map "<" 'shrink-window-horizontally) ; prot note: those three are C-x KEY
       ;; Additional keys:
-      (define-key map "v" 'shrink-window) ; prot note: this is not bound by default
+      (define-key map "{" 'shrink-window) ; prot note: this is not bound by default
       map)
     "Keymap to repeat window resizing commands.  Used in `repeat-mode'.")
   (put 'enlarge-window 'repeat-map 'resize-window-repeat-map)
@@ -642,14 +642,15 @@ good themes
 
 ** ef-themes
 #+begin_src emacs-lisp
-(lp-emacs-elpa-package 'ef-themes)
+(lp-emacs-git-package 'ef-themes
+  "https://github.com/protesilaos/ef-themes.git")
 #+end_src
 
 ** Face Customization
 
 #+begin_src emacs-lisp :results none
-(load-theme 'ef-trio-light :no-confirm)
-(set-face-attribute 'default nil :font "Iosevka Comfy" :height 180)
+(load-theme 'modus-vivendi :no-confirm)
+(set-face-attribute 'default nil :font "Iosevka Comfy" :height 140)
 #+end_src
 
 * movement and editing
@@ -759,7 +760,7 @@ completion options, minibuffer options, minibuffer history options, prompt faces
 (lp-emacs-builtin-package 'minibuffer
 
   (setq completion-show-inline-help t)
-  (setq completions-detailed t)
+  (setq completions-detailed nil)
   (setq completion-ignore-case t)
 
   (setq completion-cycle-threshold nil)
@@ -796,29 +797,34 @@ completion options, minibuffer options, minibuffer history options, prompt faces
   ;;   (define-key map (kbd "C-p") #'minibuffer-previous-completion)
   ;;   (define-key map (kbd "C-n") #'minibuffer-next-completion))
 
-  (setq completion-auto-select 'second-tab)
   (setq completion-auto-wrap t)
   (setq completion-auto-help 'always) ;; TODO tweak
-  (setq completions-format 'vertical)
-  (setq completions-max-height 40)
+  (setq completions-format 'one-column)
+  (setq completions-max-height 20)
+  (setq completions-header-format nil)
+  (setq completion-auto-select 'second-tab)
 
   ;; use M-r, M-s for history stuff
   ;; icomplete... fido...
-  (icomplete-mode +1)
-  (setq icomplete-compute-delay 2)
-  (setq icomplete-max-delay-chars 2)
-  (setq icomplete-matches-format "[%s/%s] ")
-  (setq icomplete-in-buffer t)
-  (setq icomplete-with-completion-tables t)
-  (setq icomplete-separator " . ")
-  (let ((map icomplete-minibuffer-map))
-    (define-key icomplete-minibuffer-map (kbd "C-n") #'icomplete-forward-completions)
-    (define-key icomplete-minibuffer-map (kbd "C-p") #'icomplete-backward-completions)
-    (define-key icomplete-minibuffer-map (kbd "TAB")  #'icomplete-force-complete)
-    (define-key map (kbd "C-j") #'icomplete-ret) ;; reverse C-j and <RET> behavior
-    (define-key map (kbd "<RET>") #'icomplete-force-complete-and-exit)
-    )
+  ;; (icomplete-vertical-mode +1)
+  ;; (setq icomplete-compute-delay 2)
+  ;; (setq icomplete-max-delay-chars 2)
+  ;; (setq icomplete-matches-format "[%s/%s] ")
+  ;; (setq icomplete-in-buffer t)
+  ;; (setq icomplete-with-completion-tables t)
+  ;; (setq icomplete-separator " . ")
+  ;; (let ((map icomplete-minibuffer-map))
+  ;;   (define-key icomplete-minibuffer-map (kbd "C-n") #'icomplete-forward-completions)
+  ;;   (define-key icomplete-minibuffer-map (kbd "C-p") #'icomplete-backward-completions)
+  ;;   (define-key icomplete-minibuffer-map (kbd "TAB")  #'icomplete-force-complete)
+  ;;   (define-key map (kbd "C-j") #'icomplete-ret) ;; reverse C-j and <RET> behavior
+  ;;   (define-key map (kbd "<RET>") #'icomplete-force-complete-and-exit)
+  ;;   )
   ;; TODO: toggle for switching to vertical mode when in minibuffer...
+  (define-key minibuffer-mode-map (kbd "C-n") 'minibuffer-next-completion)
+  (define-key minibuffer-mode-map (kbd "C-p") 'minibuffer-previous-completion)  
+  (define-key completion-in-region-mode-map (kbd "C-n") 'minibuffer-next-completion)
+  (define-key completion-in-region-mode-map (kbd "C-p") 'minibuffer-previous-completion)
   )
 
        ;;; Minibuffer history
@@ -2451,13 +2457,13 @@ python3-proselint=
 
 (when (executable-find "conda")
   (lp-emacs-elpa-package 'conda
-  (conda-env-initialize-interactive-shells)
-  (conda-env-initialize-eshell)
-  (setq
-   conda-anaconda-home (expand-file-name "~/miniconda3/")
-   conda-env-home-directory (expand-file-name "~/miniconda3/") ;; as in previous example; not required
-   conda-env-subdirectory "envs")
-  ))
+    (conda-env-initialize-interactive-shells)
+    (conda-env-initialize-eshell)
+    (setq
+     conda-anaconda-home (expand-file-name "~/miniconda3/")
+     conda-env-home-directory (expand-file-name "~/miniconda3/") ;; as in previous example; not required
+     conda-env-subdirectory "envs")
+    ))
 
 (when (executable-find "jupyter") (lp-emacs-elpa-package 'ein))
 #+end_src
