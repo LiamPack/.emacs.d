@@ -760,9 +760,14 @@ completion options, minibuffer options, minibuffer history options, prompt faces
 (lp-emacs-builtin-package 'minibuffer
 
   (setq completion-show-inline-help t)
-  (setq completions-detailed nil)
+  (setq completions-detailed t)
   (setq completion-ignore-case t)
-
+  (setq completion-auto-wrap t)
+  (setq completion-auto-select t)
+  (setq completion-auto-help 'visible) ;; TODO tweak
+  (setq completions-format 'one-column)
+  (setq completions-max-height 20)
+  (setq completions-header-format nil)
   (setq completion-cycle-threshold nil)
 
   ;; emacs28 completion stuff
@@ -797,13 +802,6 @@ completion options, minibuffer options, minibuffer history options, prompt faces
   ;;   (define-key map (kbd "C-p") #'minibuffer-previous-completion)
   ;;   (define-key map (kbd "C-n") #'minibuffer-next-completion))
 
-  (setq completion-auto-wrap t)
-  (setq completion-auto-help 'always) ;; TODO tweak
-  (setq completions-format 'one-column)
-  (setq completions-max-height 20)
-  (setq completions-header-format nil)
-  (setq completion-auto-select 'second-tab)
-
   ;; use M-r, M-s for history stuff
   ;; icomplete... fido...
   ;; (icomplete-vertical-mode +1)
@@ -822,7 +820,7 @@ completion options, minibuffer options, minibuffer history options, prompt faces
   ;;   )
   ;; TODO: toggle for switching to vertical mode when in minibuffer...
   (define-key minibuffer-mode-map (kbd "C-n") 'minibuffer-next-completion)
-  (define-key minibuffer-mode-map (kbd "C-p") 'minibuffer-previous-completion)  
+  (define-key minibuffer-mode-map (kbd "C-p") 'minibuffer-previous-completion)
   (define-key completion-in-region-mode-map (kbd "C-n") 'minibuffer-next-completion)
   (define-key completion-in-region-mode-map (kbd "C-p") 'minibuffer-previous-completion)
   )
@@ -919,7 +917,9 @@ doesn't play well with lsp, but i haven't heard anything about =eglot=.
   (setq xref-show-definitions-function #'consult-xref)
   (define-key completion-list-mode-map (kbd "C-o") #'consult-preview-at-point)
 
-  (setq completion-in-region-function #'consult-completion-in-region))
+  (setq completion-in-region-function #'consult-completion-in-region)
+  (add-hook 'minibuffer-setup-hook #'(lambda () (interactive)
+                                       (setq-local completion-in-region-function #'completion--in-region))))
 
 (lp-emacs-elpa-package 'consult-dir
   (define-key global-map (kbd "C-x C-d") 'consult-dir)
@@ -2392,6 +2392,7 @@ python3-proselint=
 
   ;;; Flymake + Proselint
 (lp-emacs-elpa-package 'flymake-proselint
+  (add-hook 'text-mode-hook #'flymake-mode)
   (add-hook 'markdown-mode-hook #'flymake-proselint-setup)
   (add-hook 'org-mode-hook #'flymake-proselint-setup)
   (add-hook 'text-mode-hook #'flymake-proselint-setup))
