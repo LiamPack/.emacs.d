@@ -8,9 +8,9 @@ reasons.
 
 There's an emphasis on simple utilities and packages. I rely on many of
 the wonderful, but perhaps not-as-well-explored, built-in packages
-(~icomplete~, ~desktop~, ~dabbrev~ and ~abbrev~, ~xref~, ~isearch~,
+(~desktop~, ~dabbrev~ and ~abbrev~, ~xref~, ~isearch~,
 etc.), and some external-but-necessary packages (~embark~, ~consult~,
-~eglot~, programming-language specific, etc.). Simple packages
+~eglot~, ~orderless~, programming-language specific, etc.). Simple packages
 frequently permit composition: they generally promise that they won't
 step on their neighbors' toes, which reduces the cognitive overhead of
 evaluating, say, which search+jump function to use and whether it will
@@ -25,12 +25,13 @@ rather than "fix the underlying problem yourself with the tools you
 have."
 
 Without discipline restricting me from installing new packages, I was
-incessantly yak-shaving for the best possible package for very niche
-situations. Keeping a simple-and-preferred-built-in approach forces me
-to think twice about whether I really need the new shiny docker buffer
-editing package, or a SCSS-specific color-mapping mode. An end-goal may
-be to someday rely on no external packages, but that doesn't seem likely
-unless ~orderless~ somehow makes it into ~emacs.git~.
+incessantly yak-shaving for the best possible package for increasingly
+niche situations. Keeping a simple-and-preferred-built-in approach
+forces me to think twice about whether I really need the new shiny
+docker buffer editing package, or a SCSS-specific color-mapping mode. An
+end-goal may be to someday rely on no external packages, but that
+doesn't seem likely unless ~orderless~ somehow makes it into
+~emacs.git~.
 
 Inspiration is, as always, taken from those more experienced and (much)
 more wise than myself. Credits to the (many) philosophies and
@@ -58,18 +59,18 @@ Not all of the emacs defaults are quite sane. So here's to some sanity.
   ;; i fat-finger way too much to not have the confirmation
   (setq confirm-kill-emacs #'yes-or-no-p)
   (global-hl-line-mode t)               ; highlight current line
-  (setq-default fill-column 72)         ; column length
+  (setq fill-column 72)         ; column length
   (column-number-mode t)                ; show column number in the mode line
 
   ;; name on top of frame
-  (setq-default frame-title-format '("%b [%m]"))
+  (setq frame-title-format '("%b [%m]"))
 
   (setq warning-minimum-level :error)   ; avoid warning buffer
 
   ;; scroll
   (setq auto-window-vscroll nil)  ; avoid next-line to trigger line-move-partial
   (setq scroll-conservatively 10)
-  (setq scroll-margin 7)
+  (setq scroll-margin 5)
   (setq scroll-step 0)                  ; see info of `scroll-step`: as long as `scroll-conservatively`
                                         ; is a "large value" this should be fine
   (menu-bar-mode -1)
@@ -98,19 +99,17 @@ Not all of the emacs defaults are quite sane. So here's to some sanity.
       (blink-cursor-mode -1)
       (setq visible-cursor t)))
 
-  (setq-default
+  (setq
    initial-scratch-message ";; Present Day
 "
-   visible-bell t
-   create-lockfiles nil)
+   visible-bell t)
 
   (show-paren-mode t)
   (setq show-paren-style 'parenthesis)
 
   (setq indent-tabs-mode nil                 ; don't insert tab when indent
         help-window-select t                 ; focus on help window when openend
-        window-combination-resize nil)       ; i'd rather balance than have it auto-proportionally
-                                        ; balanace
+        window-combination-resize nil)
 
   (defun lp--clean-up-buffer-or-region ()
     "Untabifies, indents and deletes trailing whitespace from buffer or region."
@@ -133,9 +132,9 @@ Not all of the emacs defaults are quite sane. So here's to some sanity.
   (define-key global-map (kbd "M-z") #'zap-up-to-char) ;; i generally go up to a char non-inclusive
   (define-key global-map (kbd "M-Z") #'zap-to-char)
 
-  (define-key global-map (kbd "C-x C-M-e") 'pp-macroexpand-last-sexp)
-  (define-key global-map (kbd "C-h j") 'describe-keymap)
-  (define-key global-map (kbd "C-c C-j") 'join-line)
+  (define-key global-map (kbd "C-x C-M-e") #'pp-macroexpand-last-sexp)
+  (define-key global-map (kbd "C-h j") #'describe-keymap)
+  (define-key global-map (kbd "C-c C-j") #'join-line)
   (define-key global-map (kbd "C-S-p") #'(lambda () (interactive) (previous-line 7)))
   (define-key global-map (kbd "C-S-n") #'(lambda () (interactive) (next-line 7)))
   )
@@ -161,17 +160,7 @@ Not all of the emacs defaults are quite sane. So here's to some sanity.
   (setq ibuffer-default-sorting-mode 'filename/process)
   (setq ibuffer-use-header-line t)
   (setq ibuffer-default-shrink-to-minimum-size nil)
-  (setq ibuffer-formats
-        '((mark modified read-only locked " "
-                (name 40 40 :left :elide)
-                " "
-                (size 9 -1 :right)
-                " "
-                (mode 16 16 :left :elide)
-                " " filename-and-process)
-          (mark " "
-                (name 16 -1)
-                " " filename)))
+  
   (setq ibuffer-saved-filter-groups nil)
   (setq ibuffer-old-time 48)
   (add-hook 'ibuffer-mode-hook #'hl-line-mode)
@@ -196,8 +185,6 @@ Not all of the emacs defaults are quite sane. So here's to some sanity.
   (setq tab-bar-tab-name-function 'tab-bar-tab-name-current)
   (tab-bar-mode +1)
   (tab-bar-history-mode +1)
-  ;; (tab-bar-mode -1)
-  ;; (tab-bar-history-mode -1)
   (define-key global-map (kbd "<prior>") #'tab-previous)
   (define-key global-map (kbd "<next>") #'tab-next))
 
@@ -205,7 +192,6 @@ Not all of the emacs defaults are quite sane. So here's to some sanity.
 ;; https://protesilaos.com/dotemacs/#h:c110e399-3f43-4555-8427-b1afe44c0779)
 (lp-emacs-builtin-package 'window
   (define-key global-map (kbd "C-x C-o") 'display-buffer)
-  ;; [2021-12-21 Tue] C-x C-{p,n} go to next/previous buffer (new to me)
   (setq display-buffer-alist
         `(
           ;; below current window
@@ -285,11 +271,9 @@ Not all of the emacs defaults are quite sane. So here's to some sanity.
   (setq fit-window-to-buffer-horizontally t)
 
   (let ((map global-map))
-    (define-key map (kbd "C-x <down>") #'next-buffer)
-    (define-key map (kbd "C-x <up>") #'previous-buffer)
     (define-key map (kbd "C-x C-n") #'next-buffer)     ; override `set-goal-column'
-    (define-key map (kbd "C-`") #'next-buffer)
     (define-key map (kbd "C-x C-p") #'previous-buffer) ; override `mark-page'
+    (define-key map (kbd "C-`") #'next-buffer)
     (define-key map (kbd "C-~") #'previous-buffer)
     (define-key map (kbd "C-x !") #'delete-other-windows-vertically)
     (define-key map (kbd "C-x _") #'balance-windows)      ; underscore
@@ -311,13 +295,11 @@ Not all of the emacs defaults are quite sane. So here's to some sanity.
 
 #+end_src
 
-*** windmove
+*** =windmove=
 #+begin_src emacs-lisp
 (lp-emacs-builtin-package 'windmove
   (setq windmove-create-window nil)     ; Emacs 27.1
   (let ((map global-map))
-    ;; Those override some commands that are already available with
-    ;; C-M-u, C-M-f, C-M-b.
     (define-key map (kbd "C-M-<up>") #'windmove-up)
     (define-key map (kbd "C-M-<right>") #'windmove-right)
     (define-key map (kbd "C-M-<down>") #'windmove-down)
@@ -328,7 +310,7 @@ Not all of the emacs defaults are quite sane. So here's to some sanity.
     (define-key map (kbd "C-M-S-<left>") #'windmove-swap-states-left)))
 #+end_src
 
-** displaying the time
+** displaying the =time=
 #+begin_src emacs-lisp
 (lp-emacs-builtin-package 'time
   (setq display-time-world-time-format "%H:%M %Z, %d. %b"
@@ -346,7 +328,7 @@ Not all of the emacs defaults are quite sane. So here's to some sanity.
   (display-time-mode 1))
 #+end_src
 
-** man mode, info mode, WoMan
+** =man-mode=, =info-mode=, =WoMan=
 #+begin_src emacs-lisp
 (lp-emacs-builtin-package 'man
   (define-key Man-mode-map (kbd "i") #'Man-goto-section)
@@ -364,11 +346,12 @@ than having to open and load a full configuration every time.
   (add-hook 'after-init-hook #'server-start))
 #+end_src
 
-*** desktop
-I have a love-hate relationship with =desktop=. I haven't read the manual enough to
-find the right configuration required to have a more seamless start-up and shut-down. But
-it remains. At the moment I store no buffers or frames to load from since that generates
-too much friction on startup.
+*** =desktop=
+I have a love-hate relationship with =desktop=. I haven't read the
+manual enough to find the right configuration required to have a more
+seamless start-up and shut-down. But it remains. At the moment I store
+no buffers or frames to load from since that generates too much friction
+on startup.
 
 #+begin_src emacs-lisp
 (lp-emacs-builtin-package 'desktop
@@ -389,7 +372,7 @@ too much friction on startup.
   (desktop-save-mode 1))
 #+end_src
 
-*** saveplace
+*** =saveplace=
 Saving the cursor position in a file is a subtle hint of what you were doing. Its also
 very convenient!
 
@@ -431,18 +414,6 @@ very convenient!
 (define-advice load-theme (:before (&rest args) disable-active-themes)
   "Disable all active themes before loading a new theme."
   (mapc #'disable-theme custom-enabled-themes))
-
-(define-advice load-theme (:after (&rest args))
-  ;; add some fringes
-  (modify-all-frames-parameters
-   '((right-divider-width . 10)
-     (internal-border-width . 10)))
-  (dolist (face '(window-divider
-                  window-divider-first-pixel
-                  window-divider-last-pixel))
-    (face-spec-reset-face face)
-    (set-face-foreground face (face-attribute 'default :background)))
-  (set-face-background 'fringe (face-attribute 'default :background)))
 
 (defun block-undo (fn &rest args)
   "Wrap function `FN' with `ARGS' and allow block-undo of the `FN'
@@ -525,128 +496,22 @@ good themes
   (setq rainbow-x-colors nil))
 #+end_src
 
-** modus themes
+** =modus-themes=
 =modus-themes= is simply the goat at this point. Not much more to say than that.
 
 #+begin_src emacs-lisp
-(lp-emacs-elpa-package 'modus-themes
-  (setq modus-themes-italic-constructs t
-        modus-themes-bold-constructs t
-        modus-themes-mixed-fonts nil
-        modus-themes-subtle-line-numbers t
-        modus-themes-intense-mouseovers nil
-        modus-themes-deuteranopia nil
-        modus-themes-tabs-accented t
-        modus-themes-variable-pitch-ui nil
-        modus-themes-inhibit-reload nil ; only applies to `customize-set-variable' and related
-
-        modus-themes-fringes nil ; {nil,'subtle,'intense}
-
-        ;; Options for `modus-themes-lang-checkers' are either nil (the
-        ;; default), or a list of properties that may include any of those
-        ;; symbols: `straight-underline', `text-also', `background',
-        ;; `intense' OR `faint'.
-        modus-themes-lang-checkers '(straight-underline background)
-
-        ;; Options for `modus-themes-mode-line' are either nil, or a list
-        ;; that can combine any of `3d' OR `moody', `borderless',
-        ;; `accented', a natural number for extra padding (or a cons cell
-        ;; of padding and NATNUM), and a floating point for the height of
-        ;; the text relative to the base font size (or a cons cell of
-        ;; height and FLOAT)
-        modus-themes-mode-line '(accented 3d)
-
-        ;; Same as above:
-        ;; modus-themes-mode-line '(accented borderless 4 0.9)
-
-        ;; Options for `modus-themes-markup' are either nil, or a list
-        ;; that can combine any of `bold', `italic', `background',
-        ;; `intense'.
-        modus-themes-markup '(bold italic background)
-
-        ;; Options for `modus-themes-syntax' are either nil (the default),
-        ;; or a list of properties that may include any of those symbols:
-        ;; `faint', `yellow-comments', `green-strings', `alt-syntax'
-        modus-themes-syntax '(green-strings yellow-comments alt-syntax)
-
-        ;; Options for `modus-themes-hl-line' are either nil (the default),
-        ;; or a list of properties that may include any of those symbols:
-        ;; `accented', `underline', `intense'
-        modus-themes-hl-line '(underline)
-
-        ;; Options for `modus-themes-paren-match' are either nil (the
-        ;; default), or a list of properties that may include any of those
-        ;; symbols: `bold', `intense', `underline'
-        modus-themes-paren-match '(bold intense)
-
-        ;; Options for `modus-themes-links' are either nil (the default),
-        ;; or a list of properties that may include any of those symbols:
-        ;; `neutral-underline' OR `no-underline', `faint' OR `no-color',
-        ;; `bold', `italic', `background'
-        modus-themes-links '(neutral-underline background)
-
-        ;; Options for `modus-themes-box-buttons' are either nil (the
-        ;; default), or a list that can combine any of `flat', `accented',
-        ;; `faint', `variable-pitch', `underline', `all-buttons', the
-        ;; symbol of any font weight as listed in `modus-themes-weights',
-        ;; and a floating point number (e.g. 0.9) for the height of the
-        ;; button's text.
-        modus-themes-box-buttons '(variable-pitch flat faint 0.9)
-
-        ;; Options for `modus-themes-prompts' are either nil (the
-        ;; default), or a list of properties that may include any of those
-        ;; symbols: `background', `bold', `gray', `intense', `italic'
-        modus-themes-prompts '(intense bold)
-
-        ;; The `modus-themes-completions' is an alist that reads three
-        ;; keys: `matches', `selection', `popup'.  Each accepts a nil
-        ;; value (or empty list) or a list of properties that can include
-        ;; any of the following (for WEIGHT read further below):
-        ;;
-        ;; `matches' - `background', `intense', `underline', `italic', WEIGHT
-        ;; `selection' - `accented', `intense', `underline', `italic', `text-also' WEIGHT
-        ;; `popup' - same as `selected'
-        ;; `t' - applies to any key not explicitly referenced (check docs)
-        ;;
-        ;; WEIGHT is a symbol such as `semibold', `light', or anything
-        ;; covered in `modus-themes-weights'.  Bold is used in the absence
-        ;; of an explicit WEIGHT.
-        modus-themes-completions '((matches . (extrabold))
-                                   (selection . (semibold accented))
-                                   (popup . (accented intense)))
-
-        modus-themes-mail-citations nil ; {nil,'intense,'faint,'monochrome}
-
-        ;; Options for `modus-themes-region' are either nil (the default),
-        ;; or a list of properties that may include any of those symbols:
-        ;; `no-extend', `bg-only', `accented'
-        modus-themes-region '(bg-only no-extend)
-
-        ;; Options for `modus-themes-diffs': nil, 'desaturated, 'bg-only
-        modus-themes-diffs 'desaturated
-        
-        modus-themes-org-blocks 'tinted-background ; {nil,'gray-background,'tinted-background}
-
-        modus-themes-org-agenda ; this is an alist: read the manual or its doc string
-        '((header-block . (variable-pitch 1.2))
-          (header-date . (grayscale workaholic bold-today 1.1))
-          (event . (accented varied))
-          (scheduled . uniform)
-          (habit . traffic-light))
-
-        modus-themes-headings ; this is an alist: read the manual or its doc string
-        '((1 . (overline background 1.0))
-          (2 . (rainbow overline 1.0))
-          (t . (semibold)))))
+(lp-emacs-git-package 'modus-themes
+  "https://github.com/protesilaos/modus-themes.git"
+  )
 #+end_src
 
-** ef-themes
+** =ef-themes=
 #+begin_src emacs-lisp
 (lp-emacs-git-package 'ef-themes
   "https://github.com/protesilaos/ef-themes.git")
 #+end_src
 
-** standard-themes !!
+** =standard-themes=
 #+begin_src emacs-lisp :results none
 (lp-emacs-git-package 'standard-themes
   "https://github.com/protesilaos/standard-themes.git"
@@ -654,7 +519,7 @@ good themes
   ;; sample values.
   (setq standard-themes-bold-constructs t
         standard-themes-italic-constructs t
-        standard-themes-mixed-fonts t
+        standard-themes-mixed-fonts nil
         standard-themes-variable-pitch-ui t
         standard-themes-mode-line-accented t
 
@@ -663,7 +528,7 @@ good themes
 
         ;; The following accept lists of properties
         standard-themes-links '(neutral-underline)
-        standard-themes-region '(no-extend neutral intense)
+        standard-themes-region '(no-extend intense)
         standard-themes-prompts '(bold italic)
 
         ;; more complex alist to set weight, height, and optional
@@ -689,7 +554,7 @@ good themes
 #+end_src
 
 * movement and editing
-** isearch and replace
+** =isearch= and =replace=
 =isearch= isn't gonna go out of style anytime soon that's for sure. And especially not if
 you know some of the configuration options. Below is configured for isearch to "fuzzy
 search" on its candidates. This is accomplished by setting =search-whitespace-regexp= to
@@ -721,18 +586,17 @@ match =.*?=, i.e all characters are whitespace.
     (define-key map (kbd "C-g") #'isearch-cancel) ; instead of `isearch-abort'
     (define-key map (kbd "M-/") #'isearch-complete)))
 
-(require 'replace)
+(lp-emacs-builtin-package 'replace
+  (define-key global-map (kbd "M-s M-o") 'multi-occur)
+  (define-key occur-mode-map (kbd "t") 'toggle-truncate-lines)
+  (add-hook 'occur-mode-hook #'(lambda () (interactive) (toggle-truncate-lines t)))
+  (add-hook 'occur-mode-hook #'hl-line-mode)
 
-(define-key global-map (kbd "M-s M-o") 'multi-occur)
-(define-key occur-mode-map (kbd "t") 'toggle-truncate-lines)
-(add-hook 'occur-mode-hook #'(lambda () (interactive) (toggle-truncate-lines t)))
-(add-hook 'occur-mode-hook #'hl-line-mode)
-
-(setq list-matching-lines-jump-to-current-line t)
+  (setq list-matching-lines-jump-to-current-line t))
 
 #+end_src
 
-** avy
+** =avy=
 #+begin_src emacs-lisp
 (lp-emacs-elpa-package 'avy
   (avy-setup-default) ;; binds C-' in the isearch map :O
@@ -750,6 +614,8 @@ match =.*?=, i.e all characters are whitespace.
     (define-key map (kbd "c") #'clear-rectangle)
     (define-key map (kbd "n") #'rectangle-number-lines)
     (define-key map (kbd "x") #'rectangle-exchange-point-and-mark)
+    (define-key map (kbd "k") #'kill-rectangle)
+    (define-key map (kbd "y") #'copy-rectangle-as-kill)
     (define-key map (kbd "*") #'calc-grab-rectangle)
     (define-key map (kbd ":") #'calc-grab-sum-down)
     (define-key map (kbd "_") #'calc-grab-sum-across)))
@@ -793,7 +659,6 @@ completion options, minibuffer options, minibuffer history options, prompt faces
 
 #+begin_src emacs-lisp :results none
 (lp-emacs-builtin-package 'minibuffer
-
   (setq completion-show-inline-help t)
   (setq completions-detailed t)
   (setq completion-ignore-case t)
@@ -832,11 +697,6 @@ completion options, minibuffer options, minibuffer history options, prompt faces
         '(read-only t cursor-intangible t face minibuffer-prompt))
   (setq suggest-key-bindings t)
 
-  ;;emacs29 completion utilities, similar in spirit to `mct'. use if not using icomplete...
-  ;; (let ((map minibuffer-local-completion-map))
-  ;;   (define-key map (kbd "C-p") #'minibuffer-previous-completion)
-  ;;   (define-key map (kbd "C-n") #'minibuffer-next-completion))
-
   ;; use M-r, M-s for history stuff
   ;; icomplete... fido...
   ;; (icomplete-vertical-mode +1)
@@ -853,6 +713,7 @@ completion options, minibuffer options, minibuffer history options, prompt faces
   ;;   (define-key map (kbd "C-j") #'icomplete-ret) ;; reverse C-j and <RET> behavior
   ;;   (define-key map (kbd "<RET>") #'icomplete-force-complete-and-exit)
   ;;   )
+
   ;; TODO: toggle for switching to vertical mode when in minibuffer...
   (define-key minibuffer-mode-map (kbd "C-n") 'minibuffer-next-completion)
   (define-key minibuffer-mode-map (kbd "C-p") 'minibuffer-previous-completion)
@@ -869,7 +730,7 @@ completion options, minibuffer options, minibuffer history options, prompt faces
   (add-hook 'after-init-hook #'savehist-mode))
 #+end_src
 
-** consult    -- enhanced minibuffer completion functions and utilities
+** =consult=    -- enhanced minibuffer completion functions and utilities
 consult is an important set of utilities that extend a number of important built-in
 functions (like =list-buffers=, =goto-line=), where comprehensive completions and
 additional utilities are provided within-command.
@@ -953,8 +814,9 @@ doesn't play well with lsp, but i haven't heard anything about =eglot=.
   (define-key completion-list-mode-map (kbd "C-o") #'consult-preview-at-point)
 
   (setq completion-in-region-function #'consult-completion-in-region)
-  (add-hook 'minibuffer-setup-hook #'(lambda () (interactive)
-                                       (setq-local completion-in-region-function #'completion--in-region))))
+  (add-hook 'minibuffer-setup-hook
+            #'(lambda () (interactive)
+                (setq-local completion-in-region-function #'completion--in-region))))
 
 (lp-emacs-elpa-package 'consult-dir
   (define-key global-map (kbd "C-x C-d") 'consult-dir)
@@ -962,7 +824,7 @@ doesn't play well with lsp, but i haven't heard anything about =eglot=.
   (define-key minibuffer-local-completion-map (kbd "C-x C-j") 'consult-dir-jump-file))
 #+end_src
 
-** embark     -- Mini-buffer actions rooted in Keymaps (contextual actions)
+** =embark=     -- Mini-buffer actions rooted in Keymaps (contextual actions)
 
 An absolute beast of a package in its design and possible use-cases. Whether you're
 unmarked, in minibuffer, in an =info-mode= buffer, Embark will gather useful actions for
@@ -984,13 +846,13 @@ shine, but for now I'm using it mostly for =embark-export= for batched editing o
   
   ;; Optionally replace the key help with a completing-read interface
   (setq prefix-help-command #'embark-prefix-help-command))
-
+g
 (lp-emacs-elpa-package 'embark-consult
   (define-key embark-collect-mode-map (kbd "o") 'consult-preview-at-point)
   (define-key embark-collect-mode-map (kbd "C-o") 'consult-preview-at-point))
 #+end_src
 
-** orderless  -- orderless filtering and mapping of symbols
+** =orderless=  -- orderless filtering and mapping of symbols
 
 For matching symbols without regard for order, we use =orderless=.
 
@@ -1042,25 +904,45 @@ prefix the string with a "bang" =!=.
   )
 #+end_src
 
-** Cape -- Completion At Point Extensions
+** xref
+
+Its debatable whether xref should be in this category. May re-evaluate in future.
+
 #+begin_src emacs-lisp
-(lp-emacs-elpa-package 'cape
-  (add-to-list 'completion-at-point-functions #'cape-file)
-  (add-to-list 'completion-at-point-functions #'cape-dabbrev)
-  ;;(add-to-list 'completion-at-point-functions #'cape-history)
-  ;;(add-to-list 'completion-at-point-functions #'cape-keyword)
-  ;;(add-to-list 'completion-at-point-functions #'cape-tex)
-  ;;(add-to-list 'completion-at-point-functions #'cape-sgml)
-  ;;(add-to-list 'completion-at-point-functions #'cape-rfc1345)
-  ;;(add-to-list 'completion-at-point-functions #'cape-abbrev)
-  ;;(add-to-list 'completion-at-point-functions #'cape-ispell)
-  ;;(add-to-list 'completion-at-point-functions #'cape-dict)
-  ;;(add-to-list 'completion-at-point-functions #'cape-symbol)
-  ;;(add-to-list 'completion-at-point-functions #'cape-line)
+(lp-emacs-builtin-package 'xref
+  ;; All these have been changed for Emacs 28
+  (setq xref-show-definitions-function #'xref-show-definitions-completing-read) ; for M-.
+  (setq xref-show-xrefs-function #'xref-show-definitions-buffer) ; for grep and the like
+  (setq xref-file-name-display 'project-relative)
+  (setq xref-search-program 'ripgrep)
   )
+#+END_SRC
+
+** built-in completion utilities (abbrev, dabbrev)
+
+#+begin_src emacs-lisp
+(lp-emacs-builtin-package 'abbrev
+  (setq abbrev-suggest t)
+  (setq save-abbrevs 'silently)
+  (setq abbrev-file-name (locate-user-emacs-file "abbrevs"))
+  (setq only-global-abbrevs nil))
+
+(lp-emacs-builtin-package 'dabbrev
+  (define-key global-map (kbd "M-/") 'dabbrev-completion)
+  (define-key global-map (kbd "C-M-/") 'dabbrev-expand)
+  (setq dabbrev-abbrev-char-regexp "\\sw\\|\\s_") ;; same as nil technically
+  (setq dabbrev-abbrev-skip-leading-regexp "[$*/=~']")
+  (setq dabbrev-backward-only nil)
+  (setq dabbrev-case-distinction 'case-replace)
+  (setq dabbrev-case-fold-search nil)
+  (setq dabbrev-case-replace 'case-replace)
+  (setq dabbrev-check-other-buffers t)
+  (setq dabbrev-eliminate-newlines t)
+  (setq dabbrev-upcase-means-case-search t))
+
 #+end_src
 
-** tempel     -- Simple templates for Emacs
+** =tempel=     -- Simple templates for Emacs
 #+begin_src emacs-lisp
 (lp-emacs-elpa-package 'tempel
   (let ((map global-map))
@@ -1090,45 +972,25 @@ prefix the string with a "bang" =!=.
   )
 #+end_src
 
-** built-in completion utilities (abbrev, dabbrev)
-
+** =cape= -- Completion At Point Extensions
 #+begin_src emacs-lisp
-(lp-emacs-builtin-package 'abbrev
-  (setq abbrev-suggest t)
-  (setq save-abbrevs 'silently)
-  (setq abbrev-file-name (locate-user-emacs-file "abbrevs"))
-  (setq only-global-abbrevs nil))
-
-(lp-emacs-builtin-package 'dabbrev
-  (define-key global-map (kbd "M-/") 'dabbrev-completion)
-  (define-key global-map (kbd "C-M-/") 'dabbrev-expand)
-  (setq dabbrev-abbrev-char-regexp "\\sw\\|\\s_") ;; same as nil technically
-  (setq dabbrev-abbrev-skip-leading-regexp "[$*/=~']")
-  (setq dabbrev-backward-only nil)
-  (setq dabbrev-case-distinction 'case-replace)
-  (setq dabbrev-case-fold-search nil)
-  (setq dabbrev-case-replace 'case-replace)
-  (setq dabbrev-check-other-buffers t)
-  (setq dabbrev-eliminate-newlines t)
-  (setq dabbrev-upcase-means-case-search t))
-
+(lp-emacs-elpa-package 'cape
+  (add-to-list 'completion-at-point-functions #'cape-file)
+  (add-to-list 'completion-at-point-functions #'cape-dabbrev)
+  ;;(add-to-list 'completion-at-point-functions #'cape-history)
+  ;;(add-to-list 'completion-at-point-functions #'cape-keyword)
+  ;;(add-to-list 'completion-at-point-functions #'cape-tex)
+  ;;(add-to-list 'completion-at-point-functions #'cape-sgml)
+  ;;(add-to-list 'completion-at-point-functions #'cape-rfc1345)
+  ;;(add-to-list 'completion-at-point-functions #'cape-abbrev)
+  ;;(add-to-list 'completion-at-point-functions #'cape-ispell)
+  ;;(add-to-list 'completion-at-point-functions #'cape-dict)
+  ;;(add-to-list 'completion-at-point-functions #'cape-symbol)
+  ;;(add-to-list 'completion-at-point-functions #'cape-line)
+  )
 #+end_src
 
-** xref
-
-Its debatable whether xref should be in this category. May re-evaluate in future.
-
-#+begin_src emacs-lisp
-(lp-emacs-builtin-package 'xref
-  ;; All these have been changed for Emacs 28
-  (setq xref-show-definitions-function #'xref-show-definitions-completing-read) ; for M-.
-  (setq xref-show-xrefs-function #'xref-show-definitions-buffer) ; for grep and the like
-  (setq xref-file-name-display 'project-relative)
-  (setq xref-search-program 'ripgrep)
-  )
-#+END_SRC
-
-** recentf
+** =recentf=
 
 Access recent files, where recents exclude the annoying =.git=, =.elpa=, etc. files.
 
@@ -1150,7 +1012,7 @@ Access recent files, where recents exclude the annoying =.git=, =.elpa=, etc. fi
                          )))
 #+END_SRC
 
-** [disabled] marginalia -- enhanced minibuffer detail display
+** [disabled] =marginalia= -- enhanced minibuffer detail display
 
 Enhanced minibuffer information when using =switch-to-buffer=, =find-file=,
 =describe-variable=, etc.
@@ -1162,20 +1024,21 @@ Enhanced minibuffer information when using =switch-to-buffer=, =find-file=,
 #+end_src
 
 * reading, writing, and task keeping
-** text-mode
+** =text-mode=
 
 It's nice to define paragraphs for text-mode that roughly mimic bullet
 points and those kinds of syntactic forms.
 
 #+begin_src emacs-lisp
 (lp-emacs-builtin-package 'text-mode
+  ;; TODO: append to the default paragraph-start
   (add-hook 'text-mode-hook
             #'(lambda ()
                 (interactive)
                 (setq-local paragraph-start "\\|\\*\\| *-\\| *[1-9]\\.\\|[ 	]*$"))))
 #+end_src
 
-** outline-mode
+** =outline-mode=
 - ~text-mode~ derived, so invoking ~outline-mode~ also invokes ~text-mode-hook~
 - ~C-c @~ prefix in ~outline-minor-mode~
 - ~consult-outline~ matches regexp defined in the ~outline-regexp~ variable
@@ -1231,7 +1094,37 @@ Need to cleanup the conditional on using auctex or not.
   (add-hook 'latex-mode-hook #'cdlatex-mode))
 #+end_src
 
-** org
+** bibtex and citation management
+#+begin_src emacs-lisp
+(lp-emacs-builtin-package 'bibtex)
+(lp-emacs-elpa-package 'bibtex-completion
+  (setq bibtex-completion-bibliography '(
+                                         "~/org/bib/index.bib"
+                                         "~/org/bib/archive.bib"
+                                         )
+        bibtex-completion-library-path '("~/org/bib/pdfs/")
+        bibtex-completion-notes-path "~/org/bib/notes/"))
+
+(lp-emacs-git-package
+    'consult-bibtex "https://github.com/mohkale/consult-bibtex.git"
+    (with-eval-after-load 'embark
+      (add-to-list 'embark-keymap-alist '(bibtex-completion . consult-bibtex-embark-map)))
+    (setq consult-bibtex-default-action #'consult-bibtex-edit-notes))
+#+end_src
+
+*** =org-ref=                                                      :disabled:
+#+begin_src emacs-lisp :tangle no
+(lp-emacs-elpa-package 'async)
+(lp-emacs-elpa-package 'org-ref
+  (require 'org-ref-bibtex)
+  (require 'doi-utils)
+  (require 'org-ref-arxiv)
+
+  (define-key org-mode-map (kbd "C-c ]") 'org-ref-insert-link)
+  (define-key org-mode-map (kbd "C-c ]") 'org-ref-insert-link))
+#+end_src
+
+** =org-mode=
 
 #+begin_src emacs-lisp
 
@@ -1697,7 +1590,7 @@ much anymore, and I have no clue how i configured the below anymore.
   (add-hook 'org-agenda-finalize-hook #'org-modern-agenda))
 #+end_src
 
-** diary, calendar
+** =diary= and =calendar=
 #+begin_src emacs-lisp
 (lp-emacs-builtin-package 'calendar
   ;; lots ripped from prot
@@ -1784,44 +1677,10 @@ much anymore, and I have no clue how i configured the below anymore.
 
 (require 'holidays)
 
-;; This weirdly needs to come after =org-roam=. otherwise these binds are shadowed by the
-;; =org-roam-dailies-map= assignment
 (let ((map global-map))
   (define-key map (kbd "C-c d c") #'calendar)
-  ;; (define-key map (kbd "C-c d d") #'prot-diary-display-entries)
-  ;; (define-key map (kbd "C-c d e") #'prot-diary-edit-diary)
   (define-key map (kbd "C-c d i") #'diary-insert-entry)
   (define-key map (kbd "C-c d m") #'diary-mail-entries))
-#+end_src
-
-** bibtex and citation management
-#+begin_src emacs-lisp
-(lp-emacs-builtin-package 'bibtex)
-(lp-emacs-elpa-package 'bibtex-completion
-  (setq bibtex-completion-bibliography '(
-                                         "~/org/bib/index.bib"
-                                         "~/org/bib/archive.bib"
-                                         )
-        bibtex-completion-library-path '("~/org/bib/pdfs/")
-        bibtex-completion-notes-path "~/org/bib/notes/"))
-
-(lp-emacs-git-package
-    'consult-bibtex "https://github.com/mohkale/consult-bibtex.git"
-    (with-eval-after-load 'embark
-      (add-to-list 'embark-keymap-alist '(bibtex-completion . consult-bibtex-embark-map)))
-    (setq consult-bibtex-default-action #'consult-bibtex-edit-notes))
-#+end_src
-
-*** org-ref :disabled:
-#+begin_src emacs-lisp :tangle no
-(lp-emacs-elpa-package 'async)
-(lp-emacs-elpa-package 'org-ref
-  (require 'org-ref-bibtex)
-  (require 'doi-utils)
-  (require 'org-ref-arxiv)
-
-  (define-key org-mode-map (kbd "C-c ]") 'org-ref-insert-link)
-  (define-key org-mode-map (kbd "C-c ]") 'org-ref-insert-link))
 #+end_src
 
 ** markdown
@@ -1831,7 +1690,7 @@ A time-tested classic mark-up language. Not much more to say; the customizations
 (lp-emacs-elpa-package 'markdown-mode)
 #+end_src
 
-** ~denote~, prot's note-taking package
+** =denote= -- prot's note-taking package
 #+begin_src emacs-lisp
 (lp-emacs-elpa-package 'denote
   ;; highly recommneded to make this directory a git repo, or at least a
@@ -1865,10 +1724,11 @@ A time-tested classic mark-up language. Not much more to say; the customizations
     (define-key map (kbd "C-c f b") #'denote-link-backlinks)
     (define-key map (kbd "C-c f r") #'denote-rename-file)
     (define-key map (kbd "C-c f R") #'denote-rename-file-using-front-matter)
+    
     ))
 #+end_src
 
-** ~tmr~, timing and time-keeping in Emacs
+** =tmr= -- timing and time-keeping in Emacs
 
 #+begin_src emacs-lisp
 (lp-emacs-elpa-package 'tmr
@@ -1876,10 +1736,11 @@ A time-tested classic mark-up language. Not much more to say; the customizations
   (setq tmr-sound-file "/usr/share/sounds/freedesktop/stereo/alarm-clock-elapsed.oga")
   (setq tmr-notification-urgency 'normal)
   (setq tmr-descriptions-list
-        (list "Class Readings"
-              "Class Homework"
+        (list "Readings"
+              "Homework"
               "Work"
-              "Break"))
+              "Break"
+              "Pomo"))
 
   (let ((map global-map))
     (define-key map (kbd "C-c t t") #'tmr)
@@ -1890,7 +1751,7 @@ A time-tested classic mark-up language. Not much more to say; the customizations
     (define-key map (kbd "C-c t l") #'tmr-tabulated-view)))
 #+end_src
 
-** ~logos~, a simple focus mode for emacs
+** =logos= -- a simple focus mode for emacs
 #+begin_src emacs-lisp
 (lp-emacs-elpa-package 'olivetti
   (setq olivetti-body-width 0.7
@@ -1921,7 +1782,7 @@ A time-tested classic mark-up language. Not much more to say; the customizations
 
 **
 
-** pdf-tools
+** =pdf-tools=
 #+begin_src emacs-lisp
 (lp-emacs-elpa-package 'pdf-tools
   (setq pdf-tools-enabled-modes
@@ -1941,6 +1802,7 @@ A time-tested classic mark-up language. Not much more to say; the customizations
   (pdf-loader-install)
 
   (with-eval-after-load 'modus-themes
+
     ;;; credits to prot as always!
     ;; Those functions and hooks are adapted from the manual of my modus-themes.
     ;; The idea is to (i) add a backdrop that is distinct from the background of
@@ -1954,7 +1816,8 @@ A time-tested classic mark-up language. Not much more to say; the customizations
 
     (defun prot/pdf-tools-midnight-mode-toggle ()
       (when (derived-mode-p 'pdf-view-mode)
-        (if (eq (car custom-enabled-themes) 'modus-vivendi)
+        (if (or (eq (car (custom-enabled-themes)) 'standard-dark)
+                (eq (car custom-enabled-themes) 'modus-vivendi))
             (pdf-view-midnight-minor-mode 1)
           (pdf-view-midnight-minor-mode -1))
         (prot/pdf-tools-backdrop)))
@@ -1963,7 +1826,7 @@ A time-tested classic mark-up language. Not much more to say; the customizations
     (add-hook 'modus-themes-after-load-theme-hook #'prot/pdf-tools-midnight-mode-toggle)))
 #+end_src
 
-** ispell+flyspell
+** =ispell= and =flyspell=
 =ispell= and =flyspell= are built-in utilities to interface with externally installed
 spelling programs (=hunspell=, =aspell=, =ispell=, etc.). =flyspell= is much like
 =flymake= where, on the fly, misspelled words are highlighted as you type them or move
@@ -1996,7 +1859,83 @@ actions specified in the manual.
 #+end_src
 
 * unix environment interface
-** dired
+** =comint=
+The =comint= package, or =command-interpreter-in-a-buffer= package,
+provides functionality for building specific process-in-a-buffer
+modes. This allows for the creation of buffers which embody
+intercommunication between a typing user and an underlying system
+process, e.g. a shell (see =shell=). All specific packages which provide
+this kind of shell-like interface will share the common ancestor
+=comint=, allowing for preferred configuration to propagate regardless
+of the specific process.
+
+#+begin_src emacs-lisp
+(lp-emacs-builtin-package 'comint
+  (setq comint-delete-old-input t)
+  (setq comint-eol-on-send t)
+  (setq comint-history-isearch nil) ;; Separate `C-r' and `C-M-r'
+  (setq comint-input-ring-size 500)
+  (setq comint-move-point-for-output nil) ;; Don't move point for new output
+  (setq comint-prompt-read-only t)
+  (setq comint-use-prompt-regexp nil)
+  (setq comint-completion-recexact t)
+  )
+#+end_src
+
+*** shell
+Emacs has a "shell-in-a-buffer" package, which provides an interactive
+shell interface using the built-in =comint= mode as the medium for
+communication.
+
+#+begin_src emacs-lisp
+(lp-emacs-builtin-package 'shell
+  (setq shell-command-prompt-show-cwd t) ; Emacs 27.1
+  (setq shell-kill-buffer-on-exit t)
+  (setq ansi-color-for-comint-mode t))
+#+end_src
+
+*** eshell
+
+Slowly using eshell more, especially given its smooth interop with =tramp= as well as its
+intermingle of features between bash, csh, and zsh.
+
+#+begin_src emacs-lisp
+(lp-emacs-builtin-package 'eshell
+  (require 'esh-mode)
+  (require 'esh-module)
+  (setq eshell-modules-list             ; It works but may need review
+        '(eshell-alias                  ; aliases
+          eshell-basic
+          eshell-cmpl                   ; tab completion
+          eshell-dirs                   ; view the ring with `cd =`
+          eshell-glob ; unix-style globbing (with recursive (**), not (~), {zero,one}-or-more (#, ##), ...)
+          eshell-hist ; unix-style history (!ls, !?ls, ...)
+          eshell-ls   ; ls
+          eshell-pred ; zsh-like argument predication (see its man page or zsh examples)
+          eshell-prompt       ; prompt navigation
+          eshell-script       ; running `eshell` script files (source, ./, ...)
+          eshell-term         ; for visual programs (vi, vim, top, ...)
+          eshell-tramp        ; u kno
+          eshell-unix))       ; standard unix commands
+  (setenv "PAGER" "cat")      ; solves issues, such as with 'git log' and the default 'less'
+  (require 'em-cmpl)
+  (require 'em-dirs)
+  (setq eshell-cd-on-directory t)
+
+  (require 'em-tramp)
+  (setq password-cache t)
+  (setq password-cache-expiry 600)
+
+  (require 'em-hist)
+  (setq eshell-hist-ignoredups t)
+  (setq eshell-save-history-on-exit t)
+
+  (setq eshell-buffer-shorthand t
+        eshell-destroy-buffer-when-process-dies t)
+  (global-set-key (kbd "<f1>") 'eshell))
+#+end_src
+
+** =dired=
 
 starting from prot's configuration since he always RTFMs. There's a lot of configuration
 that I haven't dug my teeth into yet. I like the setup below.
@@ -2040,6 +1979,117 @@ that I haven't dug my teeth into yet. I like the setup below.
   (define-key dired-mode-map (kbd "I") #'dired-info))
 #+end_src
 
+** =wgrep=
+=wgrep= allows editing =grep=-style buffer for batched editing, much like =wdired=.
+
+#+begin_src emacs-lisp
+(lp-emacs-elpa-package 'wgrep
+  (define-key grep-mode-map (kbd "C-x C-q") 'wgrep-change-to-wgrep-mode))
+#+end_src
+
+** =ediff=
+#+begin_src emacs-lisp
+(lp-emacs-elpa-package 'ediff
+  ;; :diminish ediff-mode
+  (setq ediff-diff-options "-w"))
+#+end_src
+
+** =proced=
+
+A =top=-like interface for emacs.
+
+#+begin_src emacs-lisp
+(lp-emacs-builtin-package 'proced
+  (setq proced-auto-update-flag t)
+  (setq proced-auto-update-interval 2)
+  (setq proced-descend t)
+  (setq prcoed-filter 'user))
+#+end_src
+
+** =tramp= -- Transparent Remote (file) Access, Multiple Protocol 
+
+The manual walks through a number of examples that demonstrate the
+hidden processes that TRAMP does so the user doesn't have to. The most
+sensible methods that I use are =ssh= (unix based) and =smb= (windows,
+samba).
+
+There's a couple of typical uses that are nice to have written down
+(more examples in [[info:tramp#File name syntax][tramp#File name
+syntax]]):
+- =/-::= -- Use the default TRAMP method and connect to the local host
+  with the current username
+- =/ssh:domain:= -- Use the =ssh= method to connect to domain name
+  =domain=. =domain= can be an an IPv4, an IPv6, or a resolvable domain
+  name address.
+- =/ssh:username@domain:= -- connect to =domain= with the user
+  =username=. This will prompt a login sequence if no token or key is
+  already registered.
+- =/ssh:username@domain|sudo::/path/to/file= connect to =domain= with
+  username =username=, to then tunnel into a =localhost= connection for
+  =sudo=.
+- =/ssh:username@domain#port:= -- Connect to =domain= for user
+  =username= on the port =port=. This can be especially useful if
+  tunneling occurs on specific open ports (usually something like =:22=
+  but could be different). Equivalent to =ssh -p PORT=.
+
+There is a distinction between =inline= and =external= methods. The
+inline methods include the ubiquitous =ssh=. External methods include
+=scp=, =rsync=, =ftp=, =smb= and so forth. Details on =smb= can be
+checked in [[info:tramp#External methods][the manual]]. =inline= methods should be used first since they
+generally work well with small files. =external= methods can be used
+after finding =internal= methods insufficient.
+
+To avoid repeated authentication, native caching mechanisms can be used
+and are generally prompted for in the natural TRAMP usage. Another
+package =auth-source.el= reads passwords from different sources stored
+in the default authentication file =~/.authinfo{,.gpg}= (but can be
+changed through the variable =auth-sources=). See [[info:auth#Help for users][auth#Help for users]]
+for more information on the format of this file and the details that
+=auth-source= goes through to access it.
+
+The usual very capable built-in packages interop well with tramp:
+=shell.el=, =eshell.el=, =compile.el= (commands like =compile= and
+=grep=) and =gud.el= (=gdb= or =perldb=). The most typical problem with
+these packages will be the problem with the remote =PATH= found by tramp
+(configurable through =tramp-remote-path=). This can help find programs
+in, say =~/.local/bin/, ~/bin=.
+
+=DISPLAY= can be problematic. [[info:tramp#Remote processes][tramp#Remote processes]] has some
+details. The upshot is that the =tramp-remote-process-environment= needs
+to have the variable =DISPLAY=(getenv "DISPLAY")= set (if X11 is
+configured properly on the hosting shell). You can also specify
+=ForwardX11 yes= or =ForwardX11Trusted yes= in =~/.ssh/config=.
+
+External =shell-command= usages use the remote host's file path system
+(not the =/ssh:host:...= system specified by tramp). =shell-command=
+will infer the host on which it is being used so that the relative file
+path is always "correct", given that you know the machine you're on.
+
+=eshell= has very tight interop with TRAMP. You can simply run =cd
+/sudo::/etc= to enter the local =/etc= directory in =sudo= mode. Any
+TRAMP file specification can be used to seamlessly remote in the eshell
+session.
+
+Running =gdb= through =gud.el= can be done, but as opposed to
+=shell-command= the TRAMP naming system must be used: =gdb -i=mi
+/ssh:host:~/program <RET>=. I/O will be restricted since =gdb= and
+=gdb-inferior= will not belong to the same process group on the remote
+host. Relative file paths are possible as well, but when in doubt the
+full path should be the go-to.
+
+#+begin_src emacs-lisp
+(lp-emacs-builtin-package 'tramp
+    ;;; I'm actually going to give scp a try as the default method for now. There might be benefits due to the encryption overhead required of ssh in =external= use cases.
+
+  ;; ssh > scp (the default).
+  ;; (setq tramp-default-method "ssh")
+  ;; (setq tramp-default-user "packell1")
+
+  (setq tramp-verbose 3) ;; can go up to 11! 3 is the default.
+  (add-to-list 'tramp-remote-process-environment
+               (format "DISPLAY=localhost:10"))
+  )
+#+end_src
 ** project management
 Instead of using =projectile=, there's now a wonderful built-in library, =project=, which
 has lots of overlap with =projectile=. Might as well remove a
@@ -2061,7 +2111,7 @@ among which are
   (project-x-mode 1))
 #+end_src
 
-** vc
+** =vc=
 =vc= is Emacs's built-in version control porcelain package. The benefit
 of =vc= is that it is simple, lightweight, built-in, and is designed to
 work with multiple different version control systems. Since I
@@ -2169,186 +2219,12 @@ what context the user is in.
     (define-key map (kbd "P") #'vc-push)))
 #+end_src
 
-** comint
-The =comint= package, or =command-interpreter-in-a-buffer= package,
-provides functionality for building specific process-in-a-buffer
-modes. This allows for the creation of buffers which embody
-intercommunication between a typing user and an underlying system
-process, e.g. a shell (see =shell=). All specific packages which provide
-this kind of shell-like interface will share the common ancestor
-=comint=, allowing for preferred configuration to propagate regardless
-of the specific process.
-
-#+begin_src emacs-lisp
-(lp-emacs-builtin-package 'comint
-  (setq comint-delete-old-input t)
-  (setq comint-eol-on-send t)
-  (setq comint-history-isearch nil) ;; Separate `C-r' and `C-M-r'
-  (setq comint-input-ring-size 500)
-  (setq comint-move-point-for-output nil) ;; Don't move point for new output
-  (setq comint-prompt-read-only t)
-  (setq comint-use-prompt-regexp nil)
-  (setq comint-completion-recexact t)
-  )
-#+end_src
-
-*** shell
-Emacs has a "shell-in-a-buffer" package, which provides an interactive
-shell interface using the built-in =comint= mode as the medium for
-communication.
-
-#+begin_src emacs-lisp
-(lp-emacs-builtin-package 'shell
-  (setq shell-command-prompt-show-cwd t) ; Emacs 27.1
-  (setq shell-kill-buffer-on-exit t)
-  (setq ansi-color-for-comint-mode t))
-#+end_src
-
-*** eshell
-
-Slowly using eshell more, especially given its smooth interop with =tramp= as well as its
-intermingle of features between bash, csh, and zsh.
-
-#+begin_src emacs-lisp
-(lp-emacs-builtin-package 'eshell
-  (require 'esh-mode)
-  (require 'esh-module)
-  (setq eshell-modules-list             ; It works but may need review
-        '(eshell-alias                  ; aliases
-          eshell-basic
-          eshell-cmpl                   ; tab completion
-          eshell-dirs                   ; view the ring with `cd =`
-          eshell-glob ; unix-style globbing (with recursive (**), not (~), {zero,one}-or-more (#, ##), ...)
-          eshell-hist ; unix-style history (!ls, !?ls, ...)
-          eshell-ls   ; ls
-          eshell-pred ; zsh-like argument predication (see its man page or zsh examples)
-          eshell-prompt       ; prompt navigation
-          eshell-script       ; running `eshell` script files (source, ./, ...)
-          eshell-term         ; for visual programs (vi, vim, top, ...)
-          eshell-tramp        ; u kno
-          eshell-unix))       ; standard unix commands
-  (setenv "PAGER" "cat")      ; solves issues, such as with 'git log' and the default 'less'
-  (require 'em-cmpl)
-  (require 'em-dirs)
-  (setq eshell-cd-on-directory t)
-
-  (require 'em-tramp)
-  (setq password-cache t)
-  (setq password-cache-expiry 600)
-
-  (require 'em-hist)
-  (setq eshell-hist-ignoredups t)
-  (setq eshell-save-history-on-exit t)
-
-  (setq eshell-buffer-shorthand t
-        eshell-destroy-buffer-when-process-dies t)
-  (global-set-key (kbd "<f1>") 'eshell))
-#+end_src
-
-** proced
-
-A =top=-like interface for emacs.
-
-#+begin_src emacs-lisp
-(lp-emacs-builtin-package 'proced
-  (setq proced-auto-update-flag t)
-  (setq proced-auto-update-interval 2)
-  (setq proced-descend t)
-  (setq prcoed-filter 'user))
-#+end_src
-
-** wgrep
-=wgrep= allows editing =grep=-style buffer for batched editing, much like =wdired=.
-
-#+begin_src emacs-lisp
-(lp-emacs-elpa-package 'wgrep
-  (define-key grep-mode-map (kbd "C-x C-q") 'wgrep-change-to-wgrep-mode))
-#+end_src
-
-** ediff
-#+begin_src emacs-lisp
-(lp-emacs-elpa-package 'ediff
-  ;; :diminish ediff-mode
-  (setq ediff-diff-options "-w"))
-#+end_src
-
-** Transparent Remote (file) Access, Multiple Protocol (TRAMP)
-
-The manual walks through a number of examples that demonstrate the hidden processes that
-TRAMP does so the user doesn't have to. The most sensible methods that I use are =ssh=
-(unix based) and =smb= (windows, samba).
-
-There's a couple of typical uses that are nice to have written down (more examples in [[info:tramp#File name
-syntax][tramp#File name syntax]]):
-- =/-::= -- Use the default TRAMP method and connect to the local host with the current
-  username
-- =/ssh:domain:= -- Use the =ssh= method to connect to domain name =domain=. =domain= can be
-  an an IPv4, an IPv6, or a resolvable domain name address.
-- =/ssh:username@domain:= -- connect to =domain= with the user =username=. This will
-  prompt a login sequence if no token or key is already registered.
-- =/ssh:username@domain|sudo::/path/to/file= connect to =domain= with username =username=,
-  to then tunnel into a =localhost= connection for =sudo=.
-- =/ssh:username@domain#port:= -- Connect to =domain= for user =username= on the port
-  =port=. This can be especially useful if tunneling occurs on specific open ports
-  (usually something like =:22= but could be different). Equivalent to =ssh -p PORT=.
-
-There is a distinction between =inline= and =external= methods. The inline methods include
-the ubiquitous =ssh=. External methods include =scp=, =rsync=, =ftp=, =smb= and so
-forth. Details on =smb= can be checked in [[info:tramp#External methods][the manual]]. =inline= methods should be used
-first since they generally work well with small files. =external= methods can be used
-after finding =internal= methods insufficient.
-
-To avoid repeated authentication, native caching mechanisms can be used and are generally
-prompted for in the natural TRAMP usage. Another package =auth-source.el= reads passwords
-from different sources stored in the default authentication file =~/.authinfo{,.gpg}= (but
-can be changed through the variable =auth-sources=). See [[info:auth#Help for users][auth#Help for users]] for more
-information on the format of this file and the details that =auth-source= goes through to
-access it.
-
-The usual very capable built-in packages interop well with tramp: =shell.el=, =eshell.el=,
-=compile.el= (commands like =compile= and =grep=) and =gud.el= (=gdb= or =perldb=). The
-most typical problem with these packages will be the problem with the remote =PATH= found
-by tramp (configurable through =tramp-remote-path=). This can help find programs in, say
-=~/.local/bin/, ~/bin=.
-
-=DISPLAY= can be problematic. [[info:tramp#Remote processes][tramp#Remote processes]] has some details. The upshot is that
-the =tramp-remote-process-environment= needs to have the variable =DISPLAY=(getenv
-"DISPLAY")= set (if X11 is configured properly on the hosting shell). You can also specify
-=ForwardX11 yes= or =ForwardX11Trusted yes= in =~/.ssh/config=.
-
-External =shell-command= usages use the remote host's file path system (not the
-=/ssh:host:...= system specified by tramp). =shell-command= will infer the host on which
-it is being used so that the relative file path is always "correct", given that you know
-the machine you're on.
-
-=eshell= has very tight interop with TRAMP. You can simply run =cd /sudo::/etc= to enter
-the local =/etc= directory in =sudo= mode. Any TRAMP file specification can be used to
-seamlessly remote in the eshell session.
-
-Running =gdb= through =gud.el= can be done, but as opposed to =shell-command= the TRAMP
-naming system must be used: =gdb -i=mi /ssh:host:~/program <RET>=. I/O will be restricted
-since =gdb= and =gdb-inferior= will not belong to the same process group on the remote
-host. Relative file paths are possible as well, but when in doubt the full path should be
-the go-to.
-
-#+begin_src emacs-lisp
-(lp-emacs-builtin-package 'tramp
-    ;;; I'm actually going to give scp a try as the default method for now. There might be benefits due to the encryption overhead required of ssh in =external= use cases.
-
-  ;; ssh > scp (the default).
-  ;; (setq tramp-default-method "ssh")
-  ;; (setq tramp-default-user "packell1")
-
-  (setq tramp-verbose 3) ;; can go up to 11! 3 is the default.
-  (add-to-list 'tramp-remote-process-environment
-               (format "DISPLAY=localhost:10"))
-  )
-#+end_src
-** magit
+** =magit=
 The killer git porcelain. This may be the package which gives me the
 highest gain in productivity compared to not using it, although =vc= may
-give a run for its money when there's no need to do complicated
-rebasing and merging.
+give a run for its money when there's no need to do complicated rebasing
+and merging.
+
 #+begin_src emacs-lisp
 ;;; Magit
 (lp-emacs-elpa-package 'magit
@@ -2360,7 +2236,7 @@ rebasing and merging.
 #+END_SRC
 
 * programming languages and environments
-** prog mode
+** =prog-mode=
 #+begin_src emacs-lisp
 (lp-emacs-builtin-package 'prog-mode
   ;; Mark TODOs , FIXME, BUG as red in src code
@@ -2380,13 +2256,13 @@ rebasing and merging.
   )
 #+end_src
 
-** flymake and its extras
+** =flymake= and its extras
 
-=flymake= is a package that provides on-the-fly "make"-esque errors to the user. Similar to
-=flyspell= in spirit.
+=flymake= is a package that provides on-the-fly "make"-esque errors to
+the user. Similar to =flyspell= in spirit.
 
-Writing prose is tough and proselint is a nice tool. To install, run =sudo apt install
-python3-proselint=
+Writing prose is tough and proselint is a nice tool. To install, run
+=sudo apt install python3-proselint=
 
 #+begin_src emacs-lisp
 (lp-emacs-builtin-package 'flymake
@@ -2424,57 +2300,15 @@ python3-proselint=
 (lp-emacs-elpa-package 'flymake-shellcheck
   (add-hook 'sh-mode-hook 'flymake-shellcheck-load))
 
-
   ;;; Flymake + Proselint
-(lp-emacs-elpa-package 'flymake-proselint
-  (add-hook 'text-mode-hook #'flymake-mode)
-  (add-hook 'markdown-mode-hook #'flymake-proselint-setup)
-  (add-hook 'org-mode-hook #'flymake-proselint-setup)
-  (add-hook 'text-mode-hook #'flymake-proselint-setup))
+;; (lp-emacs-elpa-package 'flymake-proselint
+;;   (add-hook 'text-mode-hook #'flymake-mode)
+;;   (add-hook 'markdown-mode-hook #'flymake-proselint-setup)
+;;   (add-hook 'org-mode-hook #'flymake-proselint-setup)
+;;   (add-hook 'text-mode-hook #'flymake-proselint-setup))
 
 (lp-emacs-elpa-package 'flymake-python-pyflakes
   (add-hook 'python-mode-hook 'flymake-python-pyflakes-load))
-#+end_src
-
-** eglot
-[2022-09-13 Tue] It's back.
-
-#+begin_src emacs-lisp
-(lp-emacs-elpa-package 'eglot
-  (defvar eglot-prog-mode-hooks '(cc-mode-hook c-mode-hook c++-mode-hook cuda-mode-hook
-                                               rjsx-mode-hook python-mode-hook java-mode-hook
-                                               julia-mode-hook))
-  (dolist (mode eglot-prog-mode-hooks)
-    (add-hook mode 'eglot-ensure))
-
-  (define-key eglot-mode-map (kbd "C-c y n") #'eglot-rename)
-  (define-key eglot-mode-map (kbd "C-c y o") #'eglot-reconnect)
-  (define-key eglot-mode-map (kbd "C-c y a") #'eglot-code-actions)
-  (define-key eglot-mode-map (kbd "C-c y b") #'eglot-format-buffer)
-  (define-key eglot-mode-map (kbd "C-c y h") #'eldoc)
-  (setq eglot-extend-to-xref t) ;; Allow eglot in corss-referenced non-project files
-  )
-
-(lp-emacs-elpa-package 'eglot-java
-  (eglot-java-init)
-  (setcdr (assq 'java-mode eglot-server-programs) (list (expand-file-name "~/.emacs.d/share/eclipse.jdt.ls/bin/jdtls")))
-  (add-hook 'java-mode-hook #'eglot-ensure)
-  )
-
-;; for the crashes https://github.com/non-Jedi/eglot-jl/issues/30
-;; https://discourse.julialang.org/t/emacs-based-workflow/19400/73
-(lp-emacs-elpa-package 'eglot-jl
-  ;; Best way to do this: set this variable in a `.dir-locals.el' file
-  ;; pointing to the directory where your Project.toml is. It should
-  ;; have both LanguageServer and SymbolServer installed. For more info,
-  ;; https://pkgdocs.julialang.org/v1/environments/
-  (setq eglot-jl-language-server-project (expand-file-name "~/.julia/environments/v1.7"))
-  (setq eglot-connect-timeout 5000)
-  (setq julia-repl-switches "-p NCORES")
-  (eglot-jl-init))
-
-(lp-emacs-elpa-package 'consult-eglot
-  (define-key eglot-mode-map [remap xref-find-apropos] #'consult-eglot-symbols))
 #+end_src
 
 ** python
@@ -2482,11 +2316,13 @@ python3-proselint=
 (lp-emacs-elpa-package 'python
   (setq python-indent-offset 4
         python-pdbtrack-activate t)
+  
   (setq python-shell-interpreter "python"
-        ;; python-shell-interpreter-args "console --simple-prompt"
         python-shell-prompt-detect-failure-warning nil)
+  
   (when (executable-find "ipython")
-    (setq python-shell-interpreter "ipython"))
+    (setq python-shell-interpreter "ipython")
+    (setq python-shell-interpreter-args "console --simple-prompt"))
   )
 
 (lp-emacs-elpa-package 'pyvenv)
@@ -2495,6 +2331,9 @@ python3-proselint=
   (lp-emacs-elpa-package 'conda
     (conda-env-initialize-interactive-shells)
     (conda-env-initialize-eshell)
+
+    ;; TODO: these need to be based on environment variables from conda
+    ;; ~/.conda configuration
     (setq
      conda-anaconda-home (expand-file-name "~/miniconda3/")
      conda-env-home-directory (expand-file-name "~/miniconda3/") ;; as in previous example; not required
@@ -2520,23 +2359,23 @@ python3-proselint=
 #+end_src
 
 ** java
+Java's parent mode is =cc-mode=, where most of the magic happens. Just
+need to override defaults with a hook in =java-mode-hook=.
+
 #+begin_src emacs-lisp
-(lp-emacs-builtin-package 'cc-mode
-  (add-hook 'java-mode-hook
-            #'(lambda ()
-                (interactive)
-                (setq-local indent-tabs-mode nil
-                            tab-width 2))))
+(add-hook 'java-mode-hook
+          #'(lambda ()
+              (interactive)
+              (setq-local tab-width 2)))
 #+end_src
 
-** c{,++} environment
+** c{,++}
 #+begin_src emacs-lisp
 (lp-emacs-builtin-package 'cc-mode
   :config
   (setq gdb-many-windows 't)
   (setq tab-width 2)
   (setq c-basic-offset 4)
-  (setq-default indent-tabs-mode nil)
 
   (define-key c-mode-map (kbd "C-j") 'c-indent-new-comment-line)
   (define-key c++-mode-map (kbd "C-j") 'c-indent-new-comment-line)
@@ -2569,6 +2408,20 @@ python3-proselint=
 
 (lp-emacs-elpa-package 'eldoc-cmake
   (add-hook 'cmake-mode-hook 'eldoc-cmake-enable))
+#+end_src
+
+** ocaml
+#+begin_src emacs-lisp
+(lp-emacs-elpa-package 'tuareg
+  (setq tuareg-opam-insinuate t))
+
+(lp-emacs-elpa-package 'utop
+  (setq utop-command "opam config exec -- dune utop . -- -emacs")
+  ;; (setq utop-command "opam config exec -- dune utop . -- -emacs")
+
+  (autoload 'utop-minor-mode "utop" "Minor mode for utop" t)
+  (add-hook 'tuareg-mode-hook 'utop-minor-mode))
+(lp-emacs-elpa-package 'dune)
 #+end_src
 
 ** (common) lisp, scheme, and racket
@@ -2643,20 +2496,6 @@ python3-proselint=
 (lp-emacs-elpa-package 'literate-calc-mode)
 #+end_src
 
-** ocaml
-#+begin_src emacs-lisp
-(lp-emacs-elpa-package 'tuareg
-  (setq tuareg-opam-insinuate t))
-
-(lp-emacs-elpa-package 'utop
-  (setq utop-command "opam config exec -- dune utop . -- -emacs")
-  ;; (setq utop-command "opam config exec -- dune utop . -- -emacs")
-
-  (autoload 'utop-minor-mode "utop" "Minor mode for utop" t)
-  (add-hook 'tuareg-mode-hook 'utop-minor-mode))
-(lp-emacs-elpa-package 'dune)
-#+end_src
-
 ** docker
 
 Docker is just too prevalent not to be ready for it. =docker-tramp= is an incredibly useful
@@ -2671,7 +2510,56 @@ not gonna worry about it for now).
 (lp-emacs-elpa-package 'docker-tramp)
 #+end_src
 
-** [disabled] lsp lol
+** =eglot=
+[2022-09-13 Tue] It's back.
+
+#+begin_src emacs-lisp
+(lp-emacs-elpa-package 'eglot
+  (defvar eglot-prog-mode-hooks
+    '(cc-mode-hook c-mode-hook c++-mode-hook cuda-mode-hook
+                   rjsx-mode-hook python-mode-hook java-mode-hook
+                   julia-mode-hook))
+  (dolist (mode eglot-prog-mode-hooks)
+    (add-hook mode 'eglot-ensure))
+
+  (define-key eglot-mode-map (kbd "C-c y r") #'eglot-rename)
+  (define-key eglot-mode-map (kbd "C-c y o") #'eglot-reconnect)
+  (define-key eglot-mode-map (kbd "C-c y a") #'eglot-code-actions)
+  (define-key eglot-mode-map (kbd "C-c y b") #'eglot-format-buffer)
+  (define-key eglot-mode-map (kbd "C-c y h") #'eldoc)
+
+  (setq eglot-extend-to-xref t) ;; Allow eglot in corss-referenced
+
+  ;; non-project files its easy to use other servers, but pylsp has the
+  ;; least problems imo
+  (add-to-list 'eglot-server-programs '(python-mode "pylsp"))
+  )
+
+(lp-emacs-elpa-package 'eglot-java
+  (eglot-java-init)
+  (setcdr (assq 'java-mode eglot-server-programs) (list (expand-file-name "~/.emacs.d/share/eclipse.jdt.ls/bin/jdtls")))
+  (add-hook 'java-mode-hook #'eglot-ensure)
+  )
+
+;; for the crashes https://github.com/non-Jedi/eglot-jl/issues/30
+;; https://discourse.julialang.org/t/emacs-based-workflow/19400/73
+(lp-emacs-elpa-package 'eglot-jl
+
+  ;; Best way to do this: set this variable in a `.dir-locals.el' file
+  ;; pointing to the directory where your Project.toml is. It should
+  ;; have both LanguageServer and SymbolServer installed. For more info,
+  ;; https://pkgdocs.julialang.org/v1/environments/
+  (setq eglot-jl-language-server-project (expand-file-name "~/.julia/environments/v1.6"))
+  (setq eglot-connect-timeout 5000)
+  (setq julia-repl-switches "-p 4")
+  (add-hook 'julia-mode-hook 'eglot-jl-init))
+
+(lp-emacs-elpa-package 'consult-eglot
+  (define-key eglot-mode-map [remap xref-find-apropos] #'consult-eglot-symbols))
+#+end_src
+
+** [disabled] =lsp=
+hate this package honestly
 #+begin_src emacs-lisp :tangle no
 (lp-emacs-elpa-package 'lsp-mode
   ;; (setq lsp-keymap-prefix "C-c l")
@@ -2737,7 +2625,7 @@ not gonna worry about it for now).
 #+end_src
 
 * external environment interface
-** notmuch                                            -- mail in emacs
+** =notmuch=                                            -- mail in emacs
 #+begin_src emacs-lisp
 (lp-emacs-elpa-package 'notmuch
   (setq notmuch-show-logo nil)
@@ -2895,18 +2783,18 @@ not gonna worry about it for now).
   (setq send-mail-function 'smtpmail-send-it))
 #+END_SRC
 
-** eww                                                -- web browsing
+** =eww=                                                -- web browsing
 R, b, l, r are good keybinds.
 
 #+begin_src emacs-lisp
 (lp-emacs-builtin-package 'eww
   (define-key global-map (kbd "<f12>") 'eww)
   (define-key global-map (kbd "M-(") 'eww)
-  (setq shr-use-colors nil)             ; t is bad for accessibility
-  (setq shr-use-fonts nil)              ; t is not for me
+  (setq shr-use-colors nil)
+  (setq shr-use-fonts nil)
   (setq shr-max-image-proportion 0.6)
   (setq shr-image-animate nil)          ; No GIFs, thank you!
-  (setq shr-width nil)                  ; check `prot-eww-readable'
+  (setq shr-width nil)
   (setq shr-discard-aria-hidden t)
   (setq shr-cookie-policy nil)
 
@@ -2936,7 +2824,7 @@ R, b, l, r are good keybinds.
   )
 #+end_src
 
-** elfeed                                             -- RSS feed reader
+** =elfeed=                                             -- RSS feed reader
 
 #+begin_src emacs-lisp
 (lp-emacs-elpa-package 'elfeed
@@ -2949,7 +2837,7 @@ R, b, l, r are good keybinds.
   (setq elfeed-search-filter "@4-months-ago +unread")
   (setq elfeed-sort-order 'descending)
   (setq elfeed-search-clipboard-type 'CLIPBOARD)
-  (setq elfeed-search-title-max-width 110)
+  (setq elfeed-search-title-max-width 140)
   (setq elfeed-search-title-min-width 30)
   (setq elfeed-search-trailing-width 25)
   (setq elfeed-show-truncate-long-urls t)
@@ -2959,26 +2847,22 @@ R, b, l, r are good keybinds.
   (let ((map elfeed-search-mode-map))
     (define-key map (kbd "w") #'elfeed-search-yank)
     (define-key map (kbd "g") #'elfeed-update)
-    (define-key map (kbd "G") #'elfeed-search-update--force)) ; "hop" mnemonic
+    (define-key map (kbd "G") #'elfeed-search-update--force))
   (let ((map elfeed-show-mode-map))
     (define-key map (kbd "w") #'elfeed-show-yank))
-  ;; Make sure to also check the section on shr and eww for how I handle
-  ;; `shr-width' there.
-  (add-hook 'elfeed-show-mode-hook
-            (lambda () (setq-local shr-width (max 80 (current-fill-column)))))
 
   ;; This is set in two places now, once in =eww= and once here.
-  (setq browse-url-browser-function 'eww-browse-url)
-  (setq browse-url-secondary-browser-function 'browse-url-default-browser)
+  ;; (setq browse-url-browser-function 'eww-browse-url)
+  ;; (setq browse-url-secondary-browser-function 'browse-url-default-browser)
+  (setq lp--elfeed-tags '(star stats leftist programming philosophy emacs academic pl writing lisp dead))
   (setq elfeed-feeds '(("https://freddiedeboer.substack.com/feed.rss" leftist) ;; marxist i think
-                       ("https://www.juliabloggers.com/feed/" julia) ;; julia blogs
-                       ("https://protesilaos.com/master.xml" leftist philosphy emacs)
-                       ("https://hnrss.org/newest?points=100" hacker tech)
+                       ("https://www.juliabloggers.com/feed/" programming) ;; julia blogs
+                       ("https://protesilaos.com/master.xml" star philosophy emacs)
+                       "https://hnrss.org/newest?points=100"
                        "https://dynomight.net/feed.xml"
-                       ("https://computer.rip/rss.xml" tech) ;; "computers are bad
-                       ("http://rachelbythebay.com/w/2021/11/06/sql/" tech)
-                       ("https://matt.might.net/articles/feed.rss" tech academia pl)
-                       ("https://www.nayuki.io/rss20.xml" hacker)
+                       "http://rachelbythebay.com/w/2021/11/06/sql/"
+                       ("https://matt.might.net/articles/feed.rss" academic pl)
+                       ("https://www.nayuki.io/rss20.xml" programming)
                        ("https://ava.substack.com/feed" writing)
                        ("https://askmolly.substack.com/feed" writing)
                        ("https://askpolly.substack.com/feed" writing)
@@ -2986,22 +2870,29 @@ R, b, l, r are good keybinds.
                        ("https://griefbacon.substack.com/feed" writing)
                        ("https://defaultfriend.substack.com/feed" writing)
                        ("https://jdahl.substack.com/feed" writing)
-                       ("http://inconvergent.net/atom.xml" infrequent)
-                       ("http://nullprogram.com/feed/" infrequent)
-                       ("http://feeds.feedburner.com/datacolada/" infrequent)
+                       "http://inconvergent.net/atom.xml" 
+                       "http://nullprogram.com/feed/" 
+                       ("http://feeds.feedburner.com/datacolada/" stats academic)
                        ("http://planet.emacsen.org/atom.xml" lisp) ;; emacs
                        ("https://planet.lisp.org/rss20.xml" lisp) ;; lisp
                        ("https://tymoon.eu/api/reader/atom" lisp) ;; lisp, gamedev
                        ("https://40ants.com/lisp-project-of-the-day/rss.xml" lisp) ;; lisp project of the day
                        ("https://ambrevar.xyz/atom.xml" lisp) ;; lisper, maker of nyxt browser
                        ("https://alhassy.github.io/rss.xml" lisp) ;; lisper, had that great post about emacs lisp's type system
-                       ("http://understandinguncertainty.org/blog" infrequent)
-                       ("https://sive.rs/podcast.rss" infrequent)
-                       ("https://lacker.io/feed.xml" ai tech)
-                       ("https://graymirror.substack.com/feed" leftist))))
+                       ("http://understandinguncertainty.org/blog" dead)
+                       "https://sive.rs/podcast.rss"
+                       "https://lacker.io/feed.xml"
+                       ("https://graymirror.substack.com/feed" leftist)
+                       "http://bactra.org/notebooks/index.rss"
+                       "https://www.benkuhn.net/index.xml"
+                       ("https://sashachapin.substack.com/feed" writing)
+                       ("https://blog.nelhage.com/atom.xml" programming)
+                       ("https://danluu.com/atom.xml" star stats)
+                       "https://gwern.substack.com/feed"
+                       )))
 #+end_src
 
-** nov                                                -- epub reader
+** =nov=                                                -- epub reader
 
 #+begin_src emacs-lisp
 (lp-emacs-elpa-package 'nov
@@ -3017,7 +2908,7 @@ R, b, l, r are good keybinds.
   (add-hook 'nov-mode-hook 'my-nov-font-setup))
 #+end_src
 
-** bongo                                              -- music player
+** =bongo=                                              -- music player
 #+begin_src emacs-lisp
 (lp-emacs-elpa-package 'bongo
   (setq bongo-default-directory "/home/liamp/Desktop/musics/")
@@ -3071,7 +2962,7 @@ In the below, I'm testing things out. No commentary, no thoughts, no brain on ho
 about them is detailed. that's for the main packages. this is the hyper-safe toxic-waste
 testing zone
 
-** moldable-emacs, code-compass, tree-sitter
+** =moldable-emacs= and =tree-sitter=
 #+begin_src emacs-lisp
 (lp-emacs-elpa-package 'simple-httpd)
 (lp-emacs-elpa-package 'f)
@@ -3082,11 +2973,6 @@ testing zone
 (lp-emacs-elpa-package 'tree-sitter)
 (lp-emacs-elpa-package 'tree-sitter-langs)
 (lp-emacs-elpa-package 'org-ql) ;; for updating note molds via org export
-
-(lp-emacs-git-package
-    'code-compass "https://github.com/ag91/code-compass.git"
-    (setq c/display-icon nil)
-    )
 
 (lp-emacs-git-package
     'moldable-emacs "https://github.com/ag91/moldable-emacs.git"
@@ -3104,7 +2990,7 @@ testing zone
     )
 #+end_src
 
-** [disabled] ~lp-journal~ for simple, low-overhead journaling     :noexport:
+** [disabled] =lp-journal= for simple, low-overhead journaling     :noexport:
 #+begin_src emacs-lisp :tangle no
 (require 'lp-scratch)
 (setq lp--journal-dir (file-truename "~/org/roam/daily/"))
@@ -3113,7 +2999,7 @@ testing zone
 (define-key global-map (kbd "C-c f j p") 'lp-journal-visit-backward-one-day)
 #+end_src
 
-** [disabled] ~lp-notes~ for simple, low-cost notes management     :noexport:
+** [disabled] =lp-notes= for simple, low-cost notes management     :noexport:
 #+begin_src emacs-lisp :tangle no
 (require 'lp-scratch)
 (setq lp--notes-dir (file-truename "~/org/roam/"))
@@ -3122,13 +3008,14 @@ testing zone
 (define-key global-map (kbd "C-c f n") 'lp-notes-make-file)
 #+end_src
 
-* configurations and people i took inspiration from
-- Emacs itself 
+* configurations and people i take inspiration from
+- Emacs
 - Skeeto's configuration, https://github.com/skeeto/.emacs.d. This is
   the first configuration which I tried to modify for my own means back
   when I first started to take courses in CS at college. It's where it
   all began, and I intend to look back to see where he's traveled with
-  it sometime soon.
+  it sometime soon. I think we also coincidentally work at the same
+  place (very weird).
 - Prot, of course. [[potesilaos.com/emacs/dotemacs]]. So much of the little
   things he picks up on in the manuals and specifications is incredibly
   useful in day-to-day use. That's not even mentioning his incredibly
