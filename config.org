@@ -2858,7 +2858,7 @@ R, b, l, r are good keybinds.
   (setq elfeed-feeds '(("https://freddiedeboer.substack.com/feed.rss" leftist) ;; marxist i think
                        ("https://www.juliabloggers.com/feed/" programming) ;; julia blogs
                        ("https://protesilaos.com/master.xml" star philosophy emacs)
-                       "https://hnrss.org/newest?points=100"
+                       ;; "https://hnrss.org/newest?points=100"
                        "https://dynomight.net/feed.xml"
                        "http://rachelbythebay.com/w/2021/11/06/sql/"
                        ("https://matt.might.net/articles/feed.rss" academic pl)
@@ -2885,7 +2885,6 @@ R, b, l, r are good keybinds.
                        ("https://graymirror.substack.com/feed" leftist)
                        "http://bactra.org/notebooks/index.rss"
                        "https://www.benkuhn.net/index.xml"
-                       ("https://sashachapin.substack.com/feed" writing)
                        ("https://blog.nelhage.com/atom.xml" programming)
                        ("https://danluu.com/atom.xml" star stats)
                        "https://gwern.substack.com/feed"
