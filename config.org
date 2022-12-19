@@ -846,7 +846,7 @@ shine, but for now I'm using it mostly for =embark-export= for batched editing o
   
   ;; Optionally replace the key help with a completing-read interface
   (setq prefix-help-command #'embark-prefix-help-command))
-g
+
 (lp-emacs-elpa-package 'embark-consult
   (define-key embark-collect-mode-map (kbd "o") 'consult-preview-at-point)
   (define-key embark-collect-mode-map (kbd "C-o") 'consult-preview-at-point))
