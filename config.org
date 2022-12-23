@@ -546,11 +546,20 @@ good themes
           (t . (variable-pitch 1.1)))))
 #+end_src
 
+** =lambda-themes=
+#+begin_src emacs-lisp
+(lp-emacs-git-package 'lambda-themes
+  "https://github.com/Lambda-Emacs/lambda-themes.git"
+  (setq lambda-themes-set-italic-comments t)
+  (setq lambda-themes-set-italic-keywords t)
+  (setq lambda-themes-set-variable-pitch t))
+#+end_src
+
 ** Face Customization
 
 #+begin_src emacs-lisp :results none
-(load-theme 'standard-dark :no-confirm)
-(set-face-attribute 'default nil :height 140)
+(load-theme 'lambda-light :no-confirm)
+(set-face-attribute 'default nil :height 110)
 #+end_src
 
 * movement and editing
@@ -1826,7 +1835,19 @@ A time-tested classic mark-up language. Not much more to say; the customizations
     (add-hook 'modus-themes-after-load-theme-hook #'prot/pdf-tools-midnight-mode-toggle)))
 #+end_src
 
-** =ispell= and =flyspell=
+** smog -- style checking and evaluation for emacs buffers
+
+#+begin_src emacs-lisp
+(lp-emacs-elpa-package 'smog)
+#+end_src
+
+
+** writegood -- a mode to write good in
+#+begin_src emacs-lisp
+(lp-emacs-elpa-package 'writegood-mode)
+#+end_src
+
+** ispell+flyspell
 =ispell= and =flyspell= are built-in utilities to interface with externally installed
 spelling programs (=hunspell=, =aspell=, =ispell=, etc.). =flyspell= is much like
 =flymake= where, on the fly, misspelled words are highlighted as you type them or move
@@ -2536,9 +2557,10 @@ not gonna worry about it for now).
   )
 
 (lp-emacs-elpa-package 'eglot-java
-  (eglot-java-init)
-  (setcdr (assq 'java-mode eglot-server-programs) (list (expand-file-name "~/.emacs.d/share/eclipse.jdt.ls/bin/jdtls")))
+  ;; (setcdr (assq 'java-mode eglot-server-programs) (list
+  ;; (expand-file-name "~/.emacs.d/share/eclipse.jdt.ls/bin/jdtls")))
   (add-hook 'java-mode-hook #'eglot-ensure)
+  (add-hook 'java-mode-hook #'eglot-java-mode)
   )
 
 ;; for the crashes https://github.com/non-Jedi/eglot-jl/issues/30
@@ -2855,7 +2877,7 @@ R, b, l, r are good keybinds.
   ;; (setq browse-url-browser-function 'eww-browse-url)
   ;; (setq browse-url-secondary-browser-function 'browse-url-default-browser)
   (setq lp--elfeed-tags '(star stats leftist programming philosophy emacs academic pl writing lisp dead))
-  (setq elfeed-feeds '(("https://freddiedeboer.substack.com/feed.rss" leftist) ;; marxist i think
+  (setq elfeed-feeds '("https://freddiedeboer.substack.com/feed.rss" ;; marxist i think
                        ("https://www.juliabloggers.com/feed/" programming) ;; julia blogs
                        ("https://protesilaos.com/master.xml" star philosophy emacs)
                        ;; "https://hnrss.org/newest?points=100"
