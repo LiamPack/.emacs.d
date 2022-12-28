@@ -1298,9 +1298,10 @@ A classic.
   (add-hook 'org-mode-hook #'turn-on-auto-fill)
 
   ;;; capture
+  (setq lp--tasks-file (car (directory-files org-directory nil ".*tasks.*org")))
   (setq org-capture-templates
         `(("b" "Basic task for future review" entry
-           (file+headline "20220827T135640--tasks__meta.org" "Tasks")
+           (file+headline lp--tasks-file "Tasks")
            ,(concat "* %^{Title}\n"
                     ":PROPERTIES:\n"
                     ":CAPTURED: %U\n"
@@ -1308,7 +1309,7 @@ A classic.
                     "%i%l")
            :empty-lines-after 1)
           ("c" "Clock in to a task" entry
-           (file+headline "20220827T135640--tasks__meta.org" "Clocked tasks")
+           (file+headline lp--tasks-file "Clocked tasks")
            ,(concat "* TODO %^{Title}\n"
                     "SCHEDULED: %T\n"
                     ":PROPERTIES:\n"
@@ -1321,7 +1322,7 @@ A classic.
            :immediate-finish t
            :empty-lines-after 1)
           ("m" "Memorandum of conversation" entry
-           (file+headline "20220827T135640--tasks__meta.org" "Tasks")
+           (file+headline lp--tasks-flie "Tasks")
            ,(concat "* Memorandum of conversation with %^{Person}\n"
                     ":PROPERTIES:\n"
                     ":CAPTURED: %U\n"
@@ -1329,7 +1330,7 @@ A classic.
                     "%i%?")
            :empty-lines-after 1)
           ("t" "Task with a due date" entry
-           (file+headline "20220827T135640--tasks__meta.org" "Tasks")
+           (file+headline lp--tasks-file "Tasks")
            ,(concat "* TODO %^{Title} %^g\n"
                     "SCHEDULED: %^t\n"
                     ":PROPERTIES:\n"
@@ -1355,7 +1356,8 @@ A classic.
 
   ;;; agenda
   (setq org-default-notes-file (expand-file-name "notes.org" org-directory))
-  (setq org-agenda-file-regexp '(".*tasks.*.org"))
+  (setq org-agenda-files (list org-directory))
+  (setq org-agenda-file-regexp ".*tasks.*\.org")
   (setq org-agenda-span 'week)
   (setq org-agenda-start-on-weekday 1)  ; Monday
   (setq org-agenda-show-all-dates t)
@@ -1481,6 +1483,7 @@ A classic.
                       ;; (org-agenda-skip-function
 		      ;;  `(org-agenda-skip-entry-if
 		      ;; 	'notregexp ,(format "\\[#%s\\]" (char-to-string org-priority-highest))))
+		      (org-agenda-block-separator ?=)
                       (org-agenda-overriding-header "Basic tasks to review\n")))
 	  (agenda "" ((org-agenda-time-grid nil)
                       (org-agenda-start-on-weekday nil)
@@ -1500,6 +1503,7 @@ A classic.
                       ;; We don't need the `org-agenda-date-today'
                       ;; highlight because that only has a practical
                       ;; utility in multi-day views.
+		      (org-agenda-block-separator nil)
                       (org-agenda-day-face-function (lambda (date) 'org-agenda-date))
                       (org-agenda-format-date "%A %-e %B %Y")
                       (org-agenda-overriding-header "\nToday's agenda\n")))
@@ -1508,6 +1512,7 @@ A classic.
                       (org-agenda-start-day "+1d")
                       (org-agenda-span 3)
                       (org-deadline-warning-days 0)
+		      (org-agenda-block-separator nil)
                       (org-agenda-skip-function '(org-agenda-skip-entry-if 'todo 'done))
                       (org-agenda-overriding-header "\nNext three days\n")))
 	  (agenda "" ((org-agenda-time-grid nil)
@@ -1523,7 +1528,7 @@ A classic.
                       (org-agenda-overriding-header "\nUpcoming deadlines (+14d)\n")))))
 
   (setq lp--custom-toreads
- 	`((tags-todo "*"
+ 	`((tags-todo "+sites+blogs+textbooks+utils+papers"
 		     ((org-agenda-skip-function '(org-agenda-skip-if nil '(timestamp)))
                       (org-agenda-skip-function
 		       `(org-agenda-skip-entry-if
@@ -1544,8 +1549,7 @@ A classic.
 	    (org-agenda-prefix-format "%t %s")
 	    (org-agenda-current-time-string ,(car (last org-agenda-time-grid)))
 	    (org-agenda-remove-tags t)
-	    (org-agenda-file-regexp '(".*to-read.*.org"))
-	    ))))
+	    (org-agenda-file-regexp ".*to-read.*.org")))))
   
 
 ;;;;; Agenda habits
