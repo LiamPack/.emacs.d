@@ -158,6 +158,7 @@ Not all of the emacs defaults are quite sane. So here's to some sanity.
   (define-key global-map (kbd "C-c C-j") #'join-line)
   (define-key global-map (kbd "C-S-p") #'(lambda () (interactive) (previous-line 7)))
   (define-key global-map (kbd "C-S-n") #'(lambda () (interactive) (next-line 7)))
+  (define-key global-map (kbd "C-S-w") #'(lambda () (interactive) (duplicate-line) (next-line 1)))
   )
 
 (lp-emacs-builtin-package 'repeat
@@ -521,17 +522,21 @@ good themes
 ** =modus-themes=
 =modus-themes= is simply the goat at this point. Not much more to say than that.
 
-#+begin_src emacs-lisp
+#+begin_src emacs-lisp :results none
 (lp-emacs-git-package 'modus-themes
   "https://github.com/protesilaos/modus-themes.git"
 
-  (setopt modus-themes-mixed-fonts t
+  (setq modus-themes-mixed-fonts t
           modus-themes-variable-pitch-ui t
           modus-themes-italic-constructs t
-          modus-themes-bold-constructs t)
+          modus-themes-bold-constructs t
+	  modus-themes-org-blocks 'gray-background
+	  modus-themes-prompts '(italic bold)
+	  modus-themes-region '(bg-only)
+	  )
 
-  ;; (setq modus-themes-vivendi-color-overrides
-  ;; 	'())
+  (setq modus-themes-common-palette-overrides
+	modus-themes-preset-overrides-intense)
   )
 #+end_src
 
@@ -1331,18 +1336,28 @@ A classic.
                     ":CAPTURED: %U\n"
                     ":END:\n\n"
                     "%a\n%i%?")
-           :empty-lines-after 1)))  
+           :empty-lines-after 1)))
 
-  ;;; Use org-agenda for viewing diary entries
-  (setq org-agenda-insert-diary-strategy 'date-tree)
-  (setq org-agenda-insert-diary-extract-time t)
-  (setq org-agenda-include-diary t)
-;;;;; Basic agenda setup
+  ;;; archiving
+  (setq org-archive-skip-archived-trees t)
+  (setq org-archive-location "::* Archive")
+  (setq org-archive-skip-archived-trees t)
+  (setq org-archive-mark-done "DONE")
+  (setq org-archive-reversed-order t)
+  (setq org-archive-save-context-info '(time file ltags itags todo category olpath))
+  (setq org-archive-stamp-time t)
+  (setq org-archive-subtree-add-inherited-tags t)
+  (setq org-columns-skip-archived-trees t)
+  (setq org-cycle-open-archived-trees nil)
+  (setq org-loop-over-headlines-in-active-region t)
+  (setq org-sparse-tree-open-archived-trees t) ; not sure about this
+					; yet...
+
+  ;;; agenda
   (setq org-default-notes-file (expand-file-name "notes.org" org-directory))
-  (setq org-agenda-files '("20220827T135640--tasks__meta.org"))
+  (setq org-agenda-file-regexp '(".*tasks.*.org"))
   (setq org-agenda-span 'week)
   (setq org-agenda-start-on-weekday 1)  ; Monday
-;;   (setq org-agenda-confirm-kill t)
   (setq org-agenda-show-all-dates t)
   (setq org-agenda-show-outline-path nil)
   (setq org-agenda-window-setup 'current-window)
@@ -1354,42 +1369,10 @@ A classic.
   (setq org-agenda-max-todos nil)
   (setq org-agenda-max-tags nil)
   (setq org-agenda-max-effort nil)
-
-;;   ;; NOTE 2021-12-07: Check further below my `org-agenda-custom-commands'
-;;   ;; (setq org-agenda-prefix-format
-;;   ;;       '((agenda . " %i %-12:c%?-12t% s")
-;;   ;;         (todo . " %i %-12:c")
-;;   ;;         (tags . " %i %-12:c")
-;;   ;;         (search . " %i %-12:c")))
-  (setq org-agenda-sorting-strategy
-        '(((agenda habit-down time-up priority-down category-keep)
-           (todo priority-down category-keep)
-           (tags priority-down category-keep)
-           (search category-keep))))
-  (setq org-agenda-breadcrumbs-separator "->")
-  (setq org-agenda-todo-keyword-format "%-1s")
-  (setq org-agenda-remove-times-when-in-prefix nil)
-  (setq org-agenda-remove-timeranges-from-blocks nil)
-  (setq org-agenda-compact-blocks nil)
-  (setq org-agenda-block-separator ?—)
-
-;; ;;;;; Agenda marks
-  (setq org-agenda-bulk-mark-char "*")
-  (setq org-agenda-persistent-marks nil)
-
-;; ;;;;; Agenda follow mode
-  (setq org-agenda-start-with-follow-mode nil)
-  (setq org-agenda-follow-indirect t)
-
-;; ;;;;; Agenda multi-item tasks
   (setq org-agenda-dim-blocked-tasks t)
   (setq org-agenda-todo-list-sublevels t)
 
-;; ;;;;; Agenda filters and restricted views
-  (setq org-agenda-persistent-filter nil)
-  (setq org-agenda-restriction-lock-highlight-subtree t)
-
-;; ;;;;; Agenda items with deadline and scheduled timestamps
+  (setq org-agenda-format-date "%A %-e %B %Y")
   (setq org-agenda-include-deadlines t)
   (setq org-deadline-warning-days 7)
   (setq org-scheduled-past-days 365)
@@ -1397,95 +1380,108 @@ A classic.
   (setq org-agenda-move-date-from-past-immediately-to-today t)
   (setq org-agenda-show-future-repeats t)
   (setq org-agenda-prefer-last-repeat nil)
-;;   (setq org-agenda-timerange-leaders
-;;         '("" "(%d/%d): "))
-;;   (setq org-agenda-scheduled-leaders
-;;         '(" Scheduled: " " Sched.%2dx: "))
-;;   (setq org-agenda-inactive-leader "[")
-;;   (setq org-agenda-deadline-leaders
-;;         '(" Deadline:  " "In %3d d.: " "%2d d. ago: "))
-;;   ;; Time grid
+
+  (setq org-agenda-skip-timestamp-if-deadline-is-shown t)
+  (setq org-agenda-skip-deadline-if-done t)
+  (setq org-agenda-time-leading-zero t)
+
+  (setq org-agenda-start-with-follow-mode nil) ; Press F! it'll pop up
+					; an indirect buffer
+  (setq org-agenda-follow-indirect t)
+
+;;; Use org-agenda for viewing diary entries
+  (setq org-agenda-add-entry-text-descriptive-links t)
+  (setq org-agenda-add-entry-text-maxlines 0) ; see
+					; entry-text-maxlines
+					; below
+  (setq org-agenda-auto-exclude-function nil)
+
+  (setq org-agenda-bulk-custom-functions nil) ; there's potential here
+  (setq org-agenda-bulk-mark-char ?*)
+  (setq org-agenda-persistent-marks nil) 
+  (setq org-agenda-persistent-filter nil)
+
+
+  (setq org-agenda-block-separator ?=)
+  (setq org-agenda-compact-blocks nil)
+  (setq org-agenda-confirm-kill nil)
+
+  (setq org-agenda-diary-file 'diary-file) ; for inserting diary
+					; entries from agenda
+  (setq org-agenda-include-diary t)
+  (setq org-agenda-insert-diary-strategy 'date-tree-last)
+  (setq org-agenda-insert-diary-extract-time t)
+  (setq org-agenda-insert-diary-exact-time t)
+
+  ;;; viewing gagenda entries
+  (setq org-agenda-entry-text-exclude-regexps nil)
+  (setq org-agenda-entry-text-leaders "        > ")
+  (setq org-agenda-entry-text-maxlines 6) ; press E!, it'll sohw the lines.
+
+  (setq org-agenda-ignore-properties nil)
+  (setq org-agenda-inhibit-startup nil)
+
+  (setq org-agenda-menu-show-matcher t)
+  (setq org-agenda-menu-show-matcher t)
+  (setq org-agenda-sort-noeffort-is-high t) ; Org 9.4
+  (setq org-agenda-restriction-lock-highlight-subtree t) ;honestly idk
+					;what this
+					;does yet
+  (setq org-agenda-skip-unavailable-files t) ; just skip it man.
+  (setq org-agenda-timegrid-use-ampm nil)
+
+  ;;; agenda line format
+  (setq org-agenda-tags-column -80)
+  (setq org-agenda-show-inherited-tags t)
+  (setq org-agenda-todo-keyword-format "%-1s")
+  (setq org-agenda-breadcrumbs-separator "->")
+  (setq org-agenda-prefix-format
+        '((agenda . " %i %-12:c%?-12t% s")
+          (todo . " %i %-12:c")
+          (tags . " %i %-12:c")
+          (search . " %i %-12:c")))
+  (setq org-agenda-remove-timeranges-from-blocks nil)
+  (setq org-agenda-remove-times-when-in-prefix nil)
+  (setq org-agenda-inactive-leader "[")
+  (setq org-agenda-scheduled-leaders
+	'(" Scheduled: " " Sched.%2dx: "))
+  (setq org-agenda-timerange-leaders
+        '("" "(%d/%d): "))
+  (setq org-agenda-deadline-leaders
+        '(" Deadline:  " "In %3d d.: " "%2d d. ago: "))
+  (setq org-agenda-sorting-strategy
+        '(((agenda habit-down time-up priority-down category-keep)
+           (todo priority-down category-keep)
+           (tags priority-down category-keep)
+           (search category-keep))))
+
+;;; agenda time grid
   (setq org-agenda-time-leading-zero t)
   (setq org-agenda-timegrid-use-ampm nil)
   (setq org-agenda-use-time-grid t)
-;;   (setq org-agenda-show-current-time-in-grid t)
-;;   (setq org-agenda-current-time-string
-;;         (concat "Now " (make-string 70 ?-)))
+  (setq org-agenda-show-current-time-in-grid t)
+  (setq org-agenda-current-time-string
+        (concat "Now " (make-string 70 ?-)))
   (setq org-agenda-time-grid
         '((daily today require-timed)
           (0600 0700 0800 0900 1000 1100
                 1200 1300 1400 1500 1600
                 1700 1800 1900 2000 2100)
           " ....." "-----------------"))
-;;   (setq org-agenda-default-appointment-duration nil)
 
-;; ;;;;; Agenda global to-do list
-;;   (setq org-agenda-todo-ignore-with-date t)
-;;   (setq org-agenda-todo-ignore-timestamp t)
-;;   (setq org-agenda-todo-ignore-scheduled t)
-;;   (setq org-agenda-todo-ignore-deadlines t)
-;;   (setq org-agenda-todo-ignore-time-comparison-use-seconds t)
-;;   (setq org-agenda-tags-todo-honor-ignore-options nil)
-
-;; ;;;;; Agenda tagged items
-  (setq org-agenda-show-inherited-tags t)
-  (setq org-agenda-use-tag-inheritance
-        '(todo search agenda))
-  (setq org-agenda-hide-tags-regexp nil)
-  (setq org-agenda-remove-tags nil)
-  (setq org-agenda-tags-column -100)
-
-;; ;;;;; Agenda entry
-;;   ;; NOTE: I do not use this right now.  Leaving everything to its
-;;   ;; default value.
-;;   (setq org-agenda-start-with-entry-text-mode nil)
-;;   (setq org-agenda-entry-text-maxlines 5)
-;;   (setq org-agenda-entry-text-exclude-regexps nil)
-;;   (setq org-agenda-entry-text-leaders "    > ")
-
-;; ;;;;; Agenda logging and clocking
-;;   ;; NOTE: I do not use these yet, though I plan to.  Leaving everything
-;;   ;; to its default value for the time being.
-;;   (setq org-agenda-log-mode-items '(closed clock))
-;;   (setq org-agenda-clock-consistency-checks
-;;         '((:max-duration "10:00" :min-duration 0 :max-gap "0:05" :gap-ok-around
-;;                          ("4:00")
-;;                          :default-face ; This should definitely be reviewed
-;;                          ((:background "DarkRed")
-;;                           (:foreground "white"))
-;;                          :overlap-face nil :gap-face nil :no-end-time-face nil
-;;                          :long-face nil :short-face nil)))
-;;   (setq org-agenda-log-mode-add-notes t)
-;;   (setq org-agenda-start-with-log-mode nil)
-;;   (setq org-agenda-start-with-clockreport-mode nil)
-;;   (setq org-agenda-clockreport-parameter-plist '(:link t :maxlevel 2))
-;;   (setq org-agenda-search-view-always-boolean nil)
-;;   (setq org-agenda-search-view-force-full-words nil)
-;;   (setq org-agenda-search-view-max-outline-level 0)
-;;   (setq org-agenda-search-headline-for-time t)
-;;   (setq org-agenda-cmp-user-defined nil)
-;;   (setq org-agenda-sort-notime-is-late t) ; Org 9.4
-;;   (setq org-agenda-sort-noeffort-is-high t) ; Org 9.4
-
-;; ;;;;; Agenda column view
-;;   ;; NOTE I do not use these, but may need them in the future.
+;;; agenda column
   (setq org-agenda-view-columns-initially nil)
   (setq org-agenda-columns-show-summaries t)
   (setq org-agenda-columns-compute-summary-properties t)
   (setq org-agenda-columns-add-appointments-to-effort-sum nil)
-  (setq org-agenda-auto-exclude-function nil)
-  (setq org-agenda-bulk-custom-functions nil)
 
-
-  ;; Check the variable `prot-org-custom-daily-agenda' in prot-org.el
   (setq lp--custom-agenda
 	`((tags-todo "*"
-		    ((org-agenda-skip-function '(org-agenda-skip-if nil '(timestamp)))
-                     ;; (org-agenda-skip-function
-		     ;;  `(org-agenda-skip-entry-if
-		     ;; 	'notregexp ,(format "\\[#%s\\]" (char-to-string org-priority-highest))))
-                     (org-agenda-block-separator nil)
-                     (org-agenda-overriding-header "Basic tasks to review\n")))
+		     ((org-agenda-skip-function '(org-agenda-skip-if nil '(timestamp)))
+                      ;; (org-agenda-skip-function
+		      ;;  `(org-agenda-skip-entry-if
+		      ;; 	'notregexp ,(format "\\[#%s\\]" (char-to-string org-priority-highest))))
+                      (org-agenda-overriding-header "Basic tasks to review\n")))
 	  (agenda "" ((org-agenda-time-grid nil)
                       (org-agenda-start-on-weekday nil)
                       (org-agenda-span 1)
@@ -1493,7 +1489,6 @@ A classic.
                       (org-scheduled-past-days 365)
                       ;; Excludes today's scheduled items
                       (org-scheduled-delay-days 1)
-                      (org-agenda-block-separator nil)
                       (org-agenda-entry-types '(:scheduled))
                       (org-agenda-skip-function '(org-agenda-skip-entry-if 'todo 'done))
                       (org-agenda-day-face-function (lambda (date) 'org-agenda-date))
@@ -1501,7 +1496,6 @@ A classic.
                       (org-agenda-overriding-header "\nPending scheduled tasks")))
 	  (agenda "" ((org-agenda-span 1)
                       (org-deadline-warning-days 0)
-                      (org-agenda-block-separator nil)
                       (org-scheduled-past-days 0)
                       ;; We don't need the `org-agenda-date-today'
                       ;; highlight because that only has a practical
@@ -1514,7 +1508,6 @@ A classic.
                       (org-agenda-start-day "+1d")
                       (org-agenda-span 3)
                       (org-deadline-warning-days 0)
-                      (org-agenda-block-separator nil)
                       (org-agenda-skip-function '(org-agenda-skip-entry-if 'todo 'done))
                       (org-agenda-overriding-header "\nNext three days\n")))
 	  (agenda "" ((org-agenda-time-grid nil)
@@ -1525,20 +1518,18 @@ A classic.
                       (org-agenda-span 14)
                       (org-agenda-show-all-dates nil)
                       (org-deadline-warning-days 0)
-                      (org-agenda-block-separator nil)
                       (org-agenda-entry-types '(:deadline))
                       (org-agenda-skip-function '(org-agenda-skip-entry-if 'todo 'done))
                       (org-agenda-overriding-header "\nUpcoming deadlines (+14d)\n")))))
 
   (setq lp--custom-toreads
  	`((tags-todo "*"
-		    ((org-agenda-skip-function '(org-agenda-skip-if nil '(timestamp)))
-                     (org-agenda-skip-function
-		      `(org-agenda-skip-entry-if
-			'notregexp ,(format "\\[#%s\\]" (char-to-string org-priority-highest))))
-                     (org-agenda-block-separator nil)
-                     (org-agenda-overriding-header "to-reads\n")
-		     ))))
+		     ((org-agenda-skip-function '(org-agenda-skip-if nil '(timestamp)))
+                      (org-agenda-skip-function
+		       `(org-agenda-skip-entry-if
+			 'notregexp ,(format "\\[#%s\\]" (char-to-string org-priority-highest))))
+                      (org-agenda-overriding-header "to-reads\n")
+		      ))))
 
 
   (setq org-agenda-custom-commands
@@ -1549,11 +1540,11 @@ A classic.
 	  ("r" "to-read articles"
 	   ,lp--custom-toreads
 	   ((org-agenda-with-colors nil)
+	    (org-agenda-fontify-priorities nil)
 	    (org-agenda-prefix-format "%t %s")
 	    (org-agenda-current-time-string ,(car (last org-agenda-time-grid)))
-	    (org-agenda-fontify-priorities nil)
 	    (org-agenda-remove-tags t)
-	    (org-agenda-files '("~/Dropbox/denotes/20221125T145152--to-read__list_meta.org"))
+	    (org-agenda-file-regexp '(".*to-read.*.org"))
 	    ))))
   
 
@@ -1588,7 +1579,8 @@ A classic.
     (define-key map (kbd "C-M-S-<right>") nil)
     (define-key map (kbd "C-M-S-<left>") nil)
     (define-key map (kbd "C-c M-l") #'org-insert-last-stored-link)
-    (define-key map (kbd "C-c C-M-l") #'org-toggle-link-display)))
+    (define-key map (kbd "C-c C-M-l") #'org-toggle-link-display))
+  )
 
 #+end_src
 
