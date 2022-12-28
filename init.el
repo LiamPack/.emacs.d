@@ -1,4 +1,3 @@
-(add-to-list 'load-path "~/.emacs.d/lisp/personal-packages/")
 (add-to-list 'load-path "~/.emacs.d/lisp/")
 
 (require 'package)
@@ -20,11 +19,9 @@
 (require 'comp)
 (setq native-comp-async-report-warnings-errors 'silent)
 
-
 (defvar lp-emacs-ensure-builtin-missed '()
   "A set of built-in packages which failed a `require' call.")
-;; inspired by prot, but quoting the package name isn't necessary. Look for
-;; `prot-emacs-builtin-package'
+
 (defmacro lp-emacs-builtin-package (package &rest body)
   (declare (indent 1))
   `(progn
@@ -83,23 +80,26 @@
   (setenv "JAVA_HOME" "/usr/lib/jvm/java-1.11.0-openjdk-amd64/")
   (exec-path-from-shell-initialize))
 
-;; Mark safe variables early so that tangling won't break
-(put 'after-save-hook 'safe-local-variable
-     (lambda (value) (equal value '(org-babel-tangle t))))
+(defvar lp--lisp-packages
+  '(lp-defaults
+    lp-aesthetics
+    lp-calendar
+    lp-completion
+    lp-editing
+    lp-experimental
+    lp-external
+    lp-minibuffer
+    lp-org
+    lp-pdf
+    lp-programming
+    lp-project-vc
+    lp-tex
+    lp-time
+    lp-unix
+    lp-window
+    lp-writing))
 
-(put 'display-line-numbers-width 'safe-local-variable 'integerp)
-
-(require 'org nil 'noerror)
-(require 'denote nil 'noerror)
-;; Tangle and compile if necessary only, then load the configuration
-(let* ((.org (expand-file-name "config.org" user-emacs-directory))
-       (.el (concat (file-name-sans-extension .org) ".el"))
-       (modification-time
-        (file-attribute-modification-time (file-attributes .org))))
-  (require 'org-macs)
-  (unless (org-file-newer-than-p .el modification-time)
-    (require 'ob-tangle)
-    (org-babel-tangle-file .org .el "emacs-lisp"))
-  (load-file .el))
+(dolist (p lp--lisp-packages)
+  (require p))
 
 (load-file (expand-file-name "post-init.el" user-emacs-directory))

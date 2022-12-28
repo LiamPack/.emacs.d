@@ -1,16 +1,10 @@
 #+TITLE: Another Emacs Configuration
 
-Documenting this configuration is a way to consolidate the knowledge of
-my own environment. This could serve as an entry-point for someone
-(bless their heart) to try to see what this configuration has to offer,
-but this is primarily (and perhaps counter-intuitively) for selfish
-reasons.
-
-There's an emphasis on simple utilities and packages. I rely on many of
-the wonderful, but perhaps not-as-well-explored, built-in packages
-(~desktop~, ~dabbrev~ and ~abbrev~, ~xref~, ~isearch~,
-etc.), and some external-but-necessary packages (~embark~, ~consult~,
-~eglot~, ~orderless~, programming-language specific, etc.). Simple packages
+I emphasize simple utilities and packages. I rely on many of the
+wonderful, but perhaps not-as-well-explored, built-in packages
+(=desktop=, =dabbrev= and =abbrev=, =xref=, =isearch=, etc.), and some
+external-but-necessary packages (=embark=, =consult=, =eglot=,
+=orderless=, programming-language specific, etc.). Simple packages
 frequently permit composition: they generally promise that they won't
 step on their neighbors' toes, which reduces the cognitive overhead of
 evaluating, say, which search+jump function to use and whether it will
@@ -30,8 +24,8 @@ niche situations. Keeping a simple-and-preferred-built-in approach
 forces me to think twice about whether I really need the new shiny
 docker buffer editing package, or a SCSS-specific color-mapping mode. An
 end-goal may be to someday rely on no external packages, but that
-doesn't seem likely unless ~orderless~ somehow makes it into
-~emacs.git~.
+doesn't seem likely unless =orderless= somehow makes it into
+=emacs.git=.
 
 Inspiration is, as always, taken from those more experienced and (much)
 more wise than myself. Credits to the (many) philosophies and
@@ -527,13 +521,12 @@ good themes
   "https://github.com/protesilaos/modus-themes.git"
 
   (setq modus-themes-mixed-fonts t
-          modus-themes-variable-pitch-ui t
-          modus-themes-italic-constructs t
-          modus-themes-bold-constructs t
-	  modus-themes-org-blocks 'gray-background
-	  modus-themes-prompts '(italic bold)
-	  modus-themes-region '(bg-only)
-	  )
+        modus-themes-variable-pitch-ui t
+        modus-themes-italic-constructs t
+        modus-themes-bold-constructs t
+	modus-themes-org-blocks 'gray-background
+	modus-themes-prompts '(italic bold)
+	modus-themes-region '(bg-only))
 
   (setq modus-themes-common-palette-overrides
 	modus-themes-preset-overrides-intense)
@@ -555,7 +548,7 @@ good themes
   (setq standard-themes-bold-constructs t
         standard-themes-italic-constructs t
         standard-themes-mixed-fonts nil
-        standard-themes-variable-pitch-ui t
+        standard-themes-variable-pitch-ui nil
         standard-themes-mode-line-accented t
 
         ;; Accepts a symbol value:
@@ -570,15 +563,15 @@ good themes
         ;; `variable-pitch' per heading level (t is for any level not
         ;; specified):
         standard-themes-headings
-        '((0 . (variable-pitch light 1.9))
-          (1 . (variable-pitch light 1.8))
-          (2 . (variable-pitch light 1.7))
-          (3 . (variable-pitch semilight 1.6))
-          (4 . (variable-pitch semilight 1.5))
-          (5 . (variable-pitch 1.4))
-          (6 . (variable-pitch 1.3))
-          (7 . (variable-pitch 1.2))
-          (t . (variable-pitch 1.1)))))
+        '((0 . (light 1.9))
+          (1 . (light 1.8))
+          (2 . (light 1.7))
+          (3 . (semilight 1.6))
+          (4 . (semilight 1.5))
+          (5 . (1.4))
+          (6 . (1.3))
+          (7 . (1.2))
+          (t . (1.1)))))
 #+end_src
 
 ** =lambda-themes=
@@ -1302,7 +1295,7 @@ A classic.
   (setq org-capture-templates
         `(("b" "Basic task for future review" entry
            (file+headline lp--tasks-file "Tasks")
-           ,(concat "* %^{Title}\n"
+           ,(concat "* TODO %^{Title} %^g\n"
                     ":PROPERTIES:\n"
                     ":CAPTURED: %U\n"
                     ":END:\n\n"
@@ -1534,8 +1527,7 @@ A classic.
                       (org-agenda-skip-function
 		       `(org-agenda-skip-entry-if
 			 'notregexp ,(format "\\[#%s\\]" (char-to-string org-priority-highest))))
-                      (org-agenda-overriding-header "to-reads\n")
-		      ))))
+                      (org-agenda-overriding-header "to-reads\n")))))
 
   (setq org-agenda-custom-commands
         `(("A" "Daily agenda and top priority tasks"
