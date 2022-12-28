@@ -1191,7 +1191,7 @@ A classic.
 
   ;;; TODOs and refiles -- courtesy of some of prot's configuration of course
   (setq org-refile-targets
-        '((org-agenda-files . (:maxlevel . 2))
+        `((,(directory-files org-directory t ".*.org") . (:maxlevel . 2))
           (nil . (:maxlevel . 2))))
   (setq org-refile-use-outline-path t)
   (setq org-refile-allow-creating-parent-nodes 'confirm)
@@ -1527,15 +1527,15 @@ A classic.
                       (org-agenda-skip-function '(org-agenda-skip-entry-if 'todo 'done))
                       (org-agenda-overriding-header "\nUpcoming deadlines (+14d)\n")))))
 
+  
   (setq lp--custom-toreads
- 	`((tags-todo "+sites+blogs+textbooks+utils+papers"
+ 	`((tags-todo "*" ;; "+sites+blogs+textbooks+utils+papers"
 		     ((org-agenda-skip-function '(org-agenda-skip-if nil '(timestamp)))
                       (org-agenda-skip-function
 		       `(org-agenda-skip-entry-if
 			 'notregexp ,(format "\\[#%s\\]" (char-to-string org-priority-highest))))
                       (org-agenda-overriding-header "to-reads\n")
 		      ))))
-
 
   (setq org-agenda-custom-commands
         `(("A" "Daily agenda and top priority tasks"
@@ -1549,9 +1549,8 @@ A classic.
 	    (org-agenda-prefix-format "%t %s")
 	    (org-agenda-current-time-string ,(car (last org-agenda-time-grid)))
 	    (org-agenda-remove-tags t)
-	    (org-agenda-file-regexp ".*to-read.*.org")))))
+	    (org-agenda-file-regexp ".*to-read.*\.org")))))
   
-
 ;;;;; Agenda habits
   (require 'org-habit)
   (setq org-habit-graph-column 50)
@@ -1565,8 +1564,9 @@ A classic.
   (define-key global-map (kbd "C-c A") (lambda () (interactive) (org-agenda nil "A")))
   (define-key global-map (kbd "C-c r") (lambda () (interactive) (org-agenda nil "r")))
 
-  (define-key org-mode-map (kbd "C-c q") #'auto-fill-mode)
+  (define-key text-mode-map (kbd "C-c q") #'auto-fill-mode)
   (define-key global-map (kbd "C-c l") #'org-store-link)
+  (define-key global-map (kbd "C-c C-l") #'org-insert-link-global)
   (let ((map global-map))
     (define-key map (kbd "C-c a") #'org-agenda)
     (define-key map (kbd "C-c c") #'org-capture)
@@ -1895,7 +1895,7 @@ of the specific process.
   )
 #+end_src
 
-*** shell
+** shell
 Emacs has a "shell-in-a-buffer" package, which provides an interactive
 shell interface using the built-in =comint= mode as the medium for
 communication.
@@ -1907,7 +1907,7 @@ communication.
   (setq ansi-color-for-comint-mode t))
 #+end_src
 
-*** eshell
+** eshell
 
 Slowly using eshell more, especially given its smooth interop with =tramp= as well as its
 intermingle of features between bash, csh, and zsh.
@@ -2269,7 +2269,7 @@ and merging.
   )
 #+end_src
 
-** =flymake= and its extras
+** =flymake= and some extras
 
 =flymake= is a package that provides on-the-fly "make"-esque errors to
 the user. Similar to =flyspell= in spirit.
