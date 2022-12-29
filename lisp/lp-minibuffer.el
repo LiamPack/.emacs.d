@@ -118,13 +118,15 @@
         (let ((map (make-sparse-keymap)))
           (define-key map (kbd "e") #'consult-compile-error)
           (define-key map (kbd "l") #'consult-flymake)
-          (define-key map (kbd "f") #'consult-flymake)               ;; Alternative: consult-flycheck
-          (define-key map (kbd "o") #'consult-outline)               ;; Alternative: consult-org-heading
+          (define-key map (kbd "f") #'consult-flymake)
+          (define-key map (kbd "o") #'consult-outline)
           (define-key map (kbd "m") #'consult-mark)
           (define-key map (kbd "k") #'consult-global-mark)
           (define-key map (kbd "i") #'consult-imenu)
           (define-key map (kbd "I") #'consult-imenu-multi)
-          (define-key map (kbd "b") #'consult-bibtex)               ;; Needs to be done here else we need to re-create and bind the keymap. w/e.
+	  ;; `consult-bibtex' is not yet defined, but the symbol will
+	  ;; be when emacs is done loading
+          (define-key map (kbd "b") #'consult-bibtex)
           map))
 
   (let ((map global-map))
@@ -132,7 +134,8 @@
     (define-key map (kbd "C-x r l") #'consult-register-load)
     (define-key map (kbd "C-x r s") #'consult-register-store)          ;; orig. abbrev-prefix-mark (unrelated)
     (define-key map (kbd "C-x r r") #'consult-register)
-    (define-key map (kbd "C-x r b") #'consult-bookmark))
+    (define-key map (kbd "C-x r b") #'consult-bookmark)
+    (define-key map (kbd "C-x r B") #'list-bookmarks))
 
   (setq consult-mode-mode-map
         (let ((map (make-sparse-keymap)))

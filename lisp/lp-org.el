@@ -164,7 +164,7 @@
   ;;; archiving
   (setq org-archive-skip-archived-trees t)
   (setq org-archive-location "::* Archive")
-  (setq org-archive-skip-archived-trees t)
+  (setq org-agenda-skip-archived-trees t)
   (setq org-archive-mark-done "DONE")
   (setq org-archive-reversed-order t)
   (setq org-archive-save-context-info '(time file ltags itags todo category olpath))
@@ -255,7 +255,7 @@
   (setq org-agenda-timegrid-use-ampm nil)
 
   ;;; agenda line format
-  (setq org-agenda-tags-column -80)
+  (setq org-agenda-tags-column 80)
   (setq org-agenda-show-inherited-tags t)
   (setq org-agenda-todo-keyword-format "%-1s")
   (setq org-agenda-breadcrumbs-separator "->")

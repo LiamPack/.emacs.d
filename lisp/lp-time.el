@@ -18,7 +18,7 @@
     (define-key map (kbd "C-c t r") #'tmr-remove-finished)
     (define-key map (kbd "C-c t l") #'tmr-tabulated-view)))
 
-;;;
+;;; time on the modeline
 (lp-emacs-builtin-package 'time
   (setq display-time-world-time-format "%H:%M %Z, %d. %b"
         display-time-world-list '(("America/New_York" "New York (USA)")

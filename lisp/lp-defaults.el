@@ -117,6 +117,8 @@
 ;;; Repeating commands
 (lp-emacs-builtin-package 'repeat
   (setq repeat-on-final-keystroke t)
+  ;; `C-u C-SPC' will pop mark from the buffer-local mark ring, and
+  ;; repeating C-SPC will continue popping mark
   (setq set-mark-command-repeat-pop t)
   (repeat-mode 1))
 

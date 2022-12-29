@@ -1,4 +1,4 @@
-# .emacs.d
+# just another .emacs.d
 Just my emacs config. To see the deprecated literate-programming
 document form of my configuration, see [config.org](config.org), which
 may or may not be out of date now. Lisp and configuration is defined
