@@ -32,6 +32,7 @@
   (defun crm-indicator (args)
     (cons (concat "[CRM] " (car args)) (cdr args)))
   (advice-add #'completing-read-multiple :filter-args #'crm-indicator)
+  (setq crm-separator "[ 	]*;[ 	]*")
 
   ;; Do not allow the cursor in the minibuffer prompt
   (setq minibuffer-prompt-properties

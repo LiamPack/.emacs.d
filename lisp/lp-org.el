@@ -121,6 +121,7 @@
 
   ;;; capture
   (setq lp--tasks-file (car (directory-files org-directory t ".*tasks.*org")))
+  (setq lp--to-read-file (car (directory-files org-directory t ".*to-read.*org")))
   (setq org-capture-templates
         `(("b" "Basic task for future review" entry
            (file+headline lp--tasks-file "Tasks")
@@ -159,7 +160,15 @@
                     ":CAPTURED: %U\n"
                     ":END:\n\n"
                     "%a\n%i%?")
-           :empty-lines-after 1)))
+           :empty-lines-after 1)
+	  ("r" "New to-read entry" entry
+	   (file+headline lp--to-read-file "inbox")
+	   ,(concat "* TODO [#A] %^{Title} %^g\n"
+                    ":PROPERTIES:\n"
+                    ":CAPTURED: %U\n"
+                    ":END:\n\n"
+                    "%x\n\n%a\n\n%?")
+	   :empty-lines-after 1)))
 
   ;;; archiving
   (setq org-archive-skip-archived-trees t)

@@ -256,6 +256,8 @@
 		       ("https://borretti.me/feed.xml" lisp writing)
 		       ("https://statisticaloddsandends.wordpress.com/" stats)
 		       ("https://alpof.wordpress.com/" math music)
+		       "https://www.jefftk.com/news.rss"
+		       "http://www.jefftk.com/news/back_from_1395.rss"
                        )))
 
 ;;; epub reader
