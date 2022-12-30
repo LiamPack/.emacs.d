@@ -32,55 +32,6 @@
   ;;(add-to-list 'completion-at-point-functions #'cape-line)
   )
 
-;;; orderless minibuffer completion
-(lp-emacs-elpa-package 'orderless
-  (setq completion-styles '(basic orderless))
-  (setq completion-category-defaults nil
-        completion-category-overrides '((file (styles . (basic partial-completion initials substring)))
-                                        (project-file (styles . (basic substring partial-completion orderless)))
-                                        (imenu (styles . (basic substring orderless)))
-                                        (kill-ring (styles . (basic substring orderless)))
-                                        (consult-location (styles . (basic substring orderless)))))
-  (setq orderless-matching-styles '(orderless-prefixes
-                                    orderless-initialism
-                                    orderless-regexp))
-
-  (defun literal-if-comma (pattern _index _total)
-    (when (string-suffix-p "," pattern)
-      `(orderless-literal . ,(substring pattern 0 -1))))
-
-  (defun flex-if-tilde (pattern _index _total)
-    (when (string-suffix-p "~" pattern)
-      `(orderless-flex . ,(substring pattern 0 -1))))
-
-  (defun initialism-if-eql (pattern _index _total)
-    (when (string-suffix-p "=" pattern)
-      `(orderless-initialism . ,(substring pattern 0 -1))))
-
-  (defun without-if-bang (pattern _index _total)
-    (cond
-     ((equal "!" pattern)
-      '(orderless-literal . ""))
-     ((string-prefix-p "!" pattern)
-      `(orderless-without-literal . ,(substring pattern 1)))))
-
-  (setq orderless-style-dispatchers '(literal-if-comma without-if-bang flex-if-tilde initialism-if-eql))
-
-  (define-key minibuffer-local-completion-map (kbd "SPC") nil)
-  (define-key minibuffer-local-completion-map (kbd "?") nil)
-  ;; SPC should never complete: use it for `orderless' groups.
-  )
-
-;;; cross-referencing 
-(lp-emacs-builtin-package 'xref
-  ;; All these have been changed for Emacs 28
-  (setq xref-show-definitions-function #'xref-show-definitions-completing-read) ; for M-.
-  (setq xref-show-xrefs-function #'xref-show-definitions-buffer) ; for grep and the like
-  (setq xref-file-name-display 'project-relative)
-  (setq xref-search-program 'ripgrep)
-  )
-
-
 ;;; simple templates for expansion
 (lp-emacs-elpa-package 'tempel
   (let ((map global-map))

@@ -1,3 +1,6 @@
+;;;; This file is has perhaps the most ambiguous name. Packages
+;;;; specified here are derived from the `minibuffer' group, which you
+;;;; can reach via "M-x customize-group RET minibuffer".
 ;;; minibuffer defaults
 (lp-emacs-builtin-package 'minibuffer
   (setq completion-show-inline-help t)
@@ -12,8 +15,7 @@
   (setq completions-header-format nil)
   (setq completion-cycle-threshold nil)
   (setq copmletion-flex-nospace nil)
-
-  
+  (setq read-minibuffer-restore-windows t)
 
   ;; emacs28 completion stuff
   (setq completions-group t)
