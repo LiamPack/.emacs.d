@@ -6,9 +6,9 @@ in [lisp/](lisp/).
 
 I emphasize simple utilities and packages. I rely on many of the
 wonderful, but perhaps not-as-well-explored, built-in packages
-(=desktop=, =dabbrev= and =abbrev=, =xref=, =isearch=, etc.), and some
-external-but-necessary packages (=embark=, =consult=, =eglot=,
-=orderless=, programming-language specific, etc.). Simple packages
+(`desktop`, `dabbrev` and `abbrev`, `xref`, `isearch`, etc.), and some
+external-but-necessary packages (`embark`, `consult`, `eglot`,
+`orderless`, programming-language specific, etc.). Simple packages
 frequently permit composition: they generally promise that they won't
 step on their neighbors' toes, which reduces the cognitive overhead of
 evaluating, say, which search+jump function to use and whether it will
@@ -28,8 +28,8 @@ niche situations. Keeping a simple-and-preferred-built-in approach
 forces me to think twice about whether I really need the new shiny
 docker buffer editing package, or a SCSS-specific color-mapping
 mode. An end-goal may be to someday rely on no external packages, but
-that doesn't seem likely unless =orderless= somehow makes it into
-=emacs.git=.
+that doesn't seem likely unless `orderless` somehow makes it into
+`emacs.git`.
 
 Inspiration is, as always, taken from those more experienced and
 (much) more wise than myself. Credits to the (many) philosophies and
