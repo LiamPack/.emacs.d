@@ -5,11 +5,15 @@
   (setq completion-ignore-case t)
   (setq completion-auto-wrap t)
   (setq completion-auto-select t)
+  (setq completion-auto-choose t)
   (setq completion-auto-help 'visible) ;; TODO tweak
   (setq completions-format 'one-column)
   (setq completions-max-height 20)
   (setq completions-header-format nil)
   (setq completion-cycle-threshold nil)
+  (setq copmletion-flex-nospace nil)
+
+  
 
   ;; emacs28 completion stuff
   (setq completions-group t)
@@ -39,8 +43,7 @@
         '(read-only t cursor-intangible t face minibuffer-prompt))
   (setq suggest-key-bindings t)
 
-  (when (and (>= emacs-major-version 29)
-	     (>= emacs-minor-version 1))
+  (when (and (>= emacs-major-version 29))
     (define-key minibuffer-mode-map (kbd "C-n") 'minibuffer-next-completion)
     (define-key minibuffer-mode-map (kbd "C-p") 'minibuffer-previous-completion)
     (define-key completion-in-region-mode-map (kbd "C-n") 'minibuffer-next-completion)
@@ -55,8 +58,7 @@
   (add-hook 'after-init-hook #'savehist-mode))
 
 ;;; for when things are really tough, some icomplete
-(when (and (<= emacs-major-version 27)
-	   (<= emacs-minor-version 1))
+(when (and (<= emacs-major-version 27))
   (lp-emacs-builtin-package 'icomplete
     (icomplete-vertical-mode +1)
     (setq icomplete-compute-delay 2)

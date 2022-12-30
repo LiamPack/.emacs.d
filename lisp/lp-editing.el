@@ -51,8 +51,16 @@
     (define-key map (kbd ":") #'calc-grab-sum-down)
     (define-key map (kbd "_") #'calc-grab-sum-across)))
 
+(defun unfill-paragraph ()
+  (interactive)
+  (replace-string-in-region
+   "\n" " "
+   (progn (backward-paragraph) (forward-line) (point)) (progn (forward-paragraph) (previous-line) (point))))
+
+(define-key global-map (kbd "M-Q") #'unfill-paragraph)
+
 ;;; TODO useful editing functions to implement:
-;; - unfill paragraph
+;; - [X] unfill paragraph
 ;; - mark-line
 ;; - mark-word
 ;; - goto-random-line
