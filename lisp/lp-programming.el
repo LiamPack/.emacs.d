@@ -188,11 +188,17 @@
   (add-hook 'geiser-mode-hook #'paredit-mode)
   (setq auto-mode-alist (cons '("\\.scm" . scheme-mode) auto-mode-alist))
   (setq auto-mode-alist (cons '("\\.sls" . scheme-mode) auto-mode-alist))
+  (require 'geiser-mode)
+  (define-key geiser-mode-map (kbd "C-.") nil) ; embark
+
   (setq geiser-scheme-implementation 'chez))
 
 
 ;; (lp-emacs-elpa-package 'geiser-guile)
-(lp-emacs-elpa-package 'geiser-chez)
+(lp-emacs-elpa-package 'geiser-chez
+  (define-key geiser-mode-map (kbd "C-.") nil) ; embark
+  
+  )
 ;; (lp-emacs-elpa-package 'geiser-kawa
 ;;   (setq geiser-kawa-use-included-kawa t))
 

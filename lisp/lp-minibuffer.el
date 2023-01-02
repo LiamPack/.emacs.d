@@ -51,7 +51,7 @@
     (define-key completion-in-region-mode-map (kbd "C-n") 'minibuffer-next-completion)
     (define-key completion-in-region-mode-map (kbd "C-p") 'minibuffer-previous-completion)
     (define-key completion-list-mode-map (kbd "C-n") 'next-completion)
-    (define-key completion-list-mode-map (kbd "C-p") 'previous-completion))
+    (define-key completion-list-mode-map (kbd "C-p") 'previous-completion)))
 
 ;;; Minibuffer history
 (lp-emacs-builtin-package 'savehist
