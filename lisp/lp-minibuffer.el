@@ -49,7 +49,9 @@
     (define-key minibuffer-mode-map (kbd "C-n") 'minibuffer-next-completion)
     (define-key minibuffer-mode-map (kbd "C-p") 'minibuffer-previous-completion)
     (define-key completion-in-region-mode-map (kbd "C-n") 'minibuffer-next-completion)
-    (define-key completion-in-region-mode-map (kbd "C-p") 'minibuffer-previous-completion)))
+    (define-key completion-in-region-mode-map (kbd "C-p") 'minibuffer-previous-completion)
+    (define-key completion-list-mode-map (kbd "C-n") 'next-completion)
+    (define-key completion-list-mode-map (kbd "C-p") 'previous-completion))
 
 ;;; Minibuffer history
 (lp-emacs-builtin-package 'savehist
@@ -200,24 +202,6 @@
   (define-key minibuffer-local-completion-map (kbd "C-x C-j") 'consult-dir-jump-file))
 
 
-;;; Right-click equivalent for emacs
-(lp-emacs-elpa-package 'embark
-  (define-key global-map (kbd "C->") 'embark-become)
-  (define-key global-map (kbd "M-a") 'embark-act)
-
-  ;; Hide the mode line of the Embark live/completions buffers
-  (add-to-list 'display-buffer-alist
-               '("\\`\\*Embark Collect \\(Live\\|Completions\\)\\*"
-                 nil
-                 (window-parameters (mode-line-format . none))))
-  
-  ;; Optionally replace the key help with a completing-read interface
-  (setq prefix-help-command #'embark-prefix-help-command))
-
-(lp-emacs-elpa-package 'embark-consult
-  (define-key embark-collect-mode-map (kbd "o") 'consult-preview-at-point)
-  (define-key embark-collect-mode-map (kbd "C-o") 'consult-preview-at-point))
-
 ;;; cross-referencing 
 (lp-emacs-builtin-package 'xref
   ;; All these have been changed for Emacs 28
@@ -227,9 +211,8 @@
   (setq xref-search-program 'ripgrep)
   )
 
-(when nil
-  (lp-emacs-elpa-package 'marginalia
-    (setq marginalia-max-relative-age 0) ; time is absolute here!
-    (marginalia-mode 1)))
+(lp-emacs-elpa-package 'marginalia
+  (setq marginalia-max-relative-age 0) ; time is absolute here!
+  (marginalia-mode 1))
 
 (provide 'lp-minibuffer)

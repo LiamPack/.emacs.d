@@ -23,11 +23,12 @@
           (underline-link-visited border)
           (underline-link-symbolic border)
 
-	  (bg-region bg-sage) ; try to replace `bg-ochre' with `bg-lavender', `bg-sage'
+	  (bg-region bg-red-subtle) ; try to replace `bg-ochre' with `bg-lavender', `bg-sage'
 	  (bg-paren-match bg-green-intense)
 	  (underline-paren-match fg-main)
 
-	  (bg-hl-line bg-green-subtle)
+	  (bg-hl-line bg-sage)
+
 	  (builtin green)
           (comment yellow-faint)
           (constant blue)

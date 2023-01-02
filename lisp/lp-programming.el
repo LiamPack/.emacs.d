@@ -156,15 +156,15 @@
 (lp-emacs-elpa-package 'dune)
 
 ;;; structured parenthesis editing, paredit replacement
-(lp-emacs-elpa-package 'puni
-  (setq lp--puni-mode-hooks
-	'(prog-mode-hook sgml-mode-hook nxml-mode-hook tex-mode-hook eval-expression-minibuffer-setup-hook))
+;; (lp-emacs-elpa-package 'puni
+;;   (setq lp--puni-mode-hooks
+;; 	'(prog-mode-hook sgml-mode-hook nxml-mode-hook tex-mode-hook eval-expression-minibuffer-setup-hook))
 
-  (dolist (hook lp--puni-mode-hooks)
-    (add-hook hook #'puni-mode))
+;;   (dolist (hook lp--puni-mode-hooks)
+;;     (add-hook hook #'puni-mode))
 
-  (define-key puni-mode-map [remap puni-kill-active-region] #'kill-region)
-  (add-hook 'term-mode-hook #'puni-disable-puni-mode))
+;;   (define-key puni-mode-map [remap puni-kill-active-region] #'kill-region)
+;;   (add-hook 'term-mode-hook #'puni-disable-puni-mode))
 
 ;;; lisps and schemes and racket
 (lp-emacs-elpa-package 'sly
@@ -183,6 +183,7 @@
 
 ;; since chez has no docs implemented for geiser, i'd rather just generate tags and use
 ;; xref-etags-mode to do most of the heavy lifting...
+(lp-emacs-elpa-package 'paredit)
 (lp-emacs-elpa-package 'geiser
   (add-hook 'geiser-mode-hook #'paredit-mode)
   (setq auto-mode-alist (cons '("\\.scm" . scheme-mode) auto-mode-alist))

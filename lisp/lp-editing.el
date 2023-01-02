@@ -37,6 +37,36 @@
   (define-key global-map (kbd "C-'") 'avy-goto-char-timer)
   (define-key global-map (kbd "M-'") 'avy-resume))
 
+;;; Right-click equivalent for emacs
+(lp-emacs-elpa-package 'embark
+  (define-key global-map (kbd "C->") 'embark-become)
+  (define-key global-map (kbd "C-.") 'embark-act)
+
+  ;; Hide the mode line of the Embark live/completions buffers
+  (add-to-list 'display-buffer-alist
+               '("\\`\\*Embark Collect \\(Live\\|Completions\\)\\*"
+                 nil
+                 (window-parameters (mode-line-format . none))))
+  
+  ;; Optionally replace the key help with a completing-read interface
+  ;; (setq prefix-help-command #'embark-prefix-help-command)
+  (setq embark-confirm-act-all t)
+  (setq embark-quit-after-action nil)
+
+  ;; I prefer the non-verbose indicators; that buffer gets fucking
+  ;; huge
+  (setq embark-indicators
+	'(embark-minimal-indicator embark-highlight-indicator embark-isearch-highlight-indicator))
+
+  ;; but if i ever reactivate verbose indicators:
+  (setq embark-mixed-indicator-both t)
+  (setq embark-mixed-indicator-delay 1))
+
+(lp-emacs-elpa-package 'embark-consult
+  (define-key embark-collect-mode-map (kbd "o") 'consult-preview-at-point)
+  (define-key embark-collect-mode-map (kbd "C-o") 'consult-preview-at-point))
+
+
 ;;; Rectangle editing
 (lp-emacs-builtin-package 'rect
   (let ((map rectangle-mark-mode-map))
@@ -53,22 +83,24 @@
 
 (defun unfill-paragraph ()
   (interactive)
-  (replace-string-in-region
-   "\n" " "
-   (progn (backward-paragraph) (forward-line) (point)) (progn (forward-paragraph) (previous-line) (point))))
+  (let ((fill-column (point-max)))
+    (fill-paragraph nil)))
 
 (define-key global-map (kbd "M-Q") #'unfill-paragraph)
+(define-key global-map (kbd "C-M-l") #'mark-line)
 
 ;;; TODO useful editing functions to implement:
 ;; - [X] unfill paragraph
-;; - mark-line
-;; - mark-word
+;; - [x] mark-line
+;; - [x] mark-word C-M-SPC should be fine, or embark
 ;; - goto-random-line
-;; - kill-inside-sexp 
-;; - mark-inside-sexp 
+;; - [x] kill-inside-sexp  embark w
+;; - [x] mark-inside-sexp  embark SPC
 ;; - unwrap-sexp 
 ;; - unwrap-mark-sexp 
-;; - upcase-dwim
-;; - downcase-dwim
+;; - [x] upcase-dwim (exists)
+;; - [x] downcase-dwim (exists)
+
+;; TODO: someday, `meow' https://github.com/meow-edit/meow
 
 (provide 'lp-editing)
