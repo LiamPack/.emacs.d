@@ -16,7 +16,49 @@
 	modus-themes-region '(bg-only))
 
   (setq modus-themes-common-palette-overrides
-	modus-themes-preset-overrides-intense))
+	`((fg-region unspecified)
+	  (fringe unspecified)
+
+	  (underline-link border)
+          (underline-link-visited border)
+          (underline-link-symbolic border)
+
+	  (bg-region bg-sage) ; try to replace `bg-ochre' with `bg-lavender', `bg-sage'
+	  (bg-paren-match bg-green-intense)
+	  (underline-paren-match fg-main)
+
+	  (bg-hl-line bg-green-subtle)
+	  (builtin green)
+          (comment yellow-faint)
+          (constant blue)
+          (fnname green-warmer)
+          (keyword green-cooler)
+          (preprocessor green)
+          (docstring green-faint)
+          (string magenta)
+          (type cyan-warmer)
+          (variable blue-warmer)
+
+	  (border-mode-line-active unspecified)
+          (border-mode-line-inactive unspecified)
+	  (bg-mode-line-active bg-green-subtle)))
+
+  ;; add some padding to modeline
+  (defun my-modus-themes-custom-faces ()
+    (modus-themes-with-colors
+      (custom-set-faces
+       ;; Add "padding" to the mode lines
+       `(mode-line ((,c :underline ,border-mode-line-active
+			:overline ,border-mode-line-active
+			:box (:line-width 10 :color ,bg-mode-line-active))))
+       `(mode-line-inactive ((,c :underline ,border-mode-line-inactive
+				 :overline ,border-mode-line-inactive
+				 :box (:line-width 10 :color ,bg-mode-line-inactive)))))))
+
+  ;; ESSENTIAL to make the underline move to the bottom of the box:
+  (setq x-underline-at-descent-line t)
+
+  (add-hook 'modus-themes-after-load-theme-hook #'my-modus-themes-custom-faces))
 
 (lp-emacs-git-package 'ef-themes
   "https://github.com/protesilaos/ef-themes.git")
@@ -62,7 +104,7 @@
   (setq lambda-themes-set-variable-pitch t))
 
 
-(load-theme 'standard-dark :no-confirm)
+(load-theme 'modus-vivendi :no-confirm)
 (set-face-attribute 'default nil :height 110)
 
 (provide 'lp-aesthetics)
