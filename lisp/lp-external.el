@@ -202,8 +202,8 @@
   (setq elfeed-search-filter "@4-months-ago +unread")
   (setq elfeed-sort-order 'descending)
   (setq elfeed-search-clipboard-type 'CLIPBOARD)
-  (setq elfeed-search-title-max-width 140)
-  (setq elfeed-search-title-min-width 30)
+  (setq elfeed-search-title-max-width 60)
+  (setq elfeed-search-title-min-width 40)
   (setq elfeed-search-trailing-width 70)
   (setq elfeed-show-truncate-long-urls t)
   (setq elfeed-show-unique-buffers t)
@@ -288,7 +288,6 @@
   (setq bongo-join-inserted-tracks nil)
   (setq bongo-field-separator (propertize " · " 'face 'shadow))
   (setq bongo-mark-played-tracks t)
-  ;; (setq bongo-vlc-program-name "cvlc")
   (bongo-mode-line-indicator-mode -1)
   (bongo-header-line-mode -1)
   (let ((map global-map))
@@ -299,18 +298,7 @@
     (define-key map (kbd "<C-M-XF86AudioPlay>") #'bongo-play-random)
     (define-key map (kbd "<M-XF86AudioPlay>") #'bongo-show)
     (define-key map (kbd "<S-XF86AudioNext>") #'bongo-seek-forward-10)
-    (define-key map (kbd "<S-XF86AudioPrev>") #'bongo-seek-backward-10)
-    ;; Same as above for the pgtk build of Emacs 29.  Only tested it
-    ;; with SwayWM.  GNOME 42 may have its own bindings for the
-    ;; multimedia keys that require changes at the level of the desktop
-    ;; environment.
-    (define-key map (kbd "C-<AudioPlay>") #'bongo-pause/resume)
-    (define-key map (kbd "C-<AudioNext>") #'bongo-next)
-    (define-key map (kbd "C-<AudioPrev>") #'bongo-previous)
-    (define-key map (kbd "C-M-<AudioPlay>") #'bongo-play-random)
-    (define-key map (kbd "M-<AudioPlay>") #'bongo-show)
-    (define-key map (kbd "S-<AudioNext>") #'bongo-seek-forward-10)
-    (define-key map (kbd "S-<AudioPrev>") #'bongo-seek-backward-10))
+    (define-key map (kbd "<S-XF86AudioPrev>") #'bongo-seek-backward-10))
   (let ((map bongo-playlist-mode-map))
     (define-key map (kbd "n") #'bongo-next-object)
     (define-key map (kbd "p") #'bongo-previous-object)

@@ -16,6 +16,8 @@
 	modus-themes-region '(bg-only))
 
   (setq modus-themes-common-palette-overrides
+	modus-themes-preset-overrides-intense)
+  (setq modus-vivendi-palette-overrides
 	`((fg-region unspecified)
 	  (fringe unspecified)
 
@@ -106,6 +108,6 @@
 
 
 (load-theme 'modus-vivendi :no-confirm)
-(set-face-attribute 'default nil :height 110)
+(set-face-attribute 'default nil :height 140)
 
 (provide 'lp-aesthetics)
