@@ -1,5 +1,14 @@
+;;; Fringe mode
+(lp-emacs-builtin-package 'fringe
+  (fringe-mode nil)
+  (setq-default fringes-outside-margins nil)
+  (setq-default indicate-buffer-boundaries nil)
+  (setq-default indicate-empty-lines nil)
+  (setq-default overflow-newline-into-fringe t))
+
 ;;; Color designing
-(lp-emacs-elpa-package 'ct)
+;; used to have 'ct but its a melpa package and im sticking to non-gnu
+;; and gnu-elpa
 (lp-emacs-elpa-package 'rainbow-mode
   (setq rainbow-ansi-colors nil)
   (setq rainbow-x-colors nil))
@@ -106,8 +115,8 @@
   (setq lambda-themes-set-italic-keywords t)
   (setq lambda-themes-set-variable-pitch t))
 
-
 (load-theme 'modus-vivendi :no-confirm)
 (set-face-attribute 'default nil :height 140)
+
 
 (provide 'lp-aesthetics)

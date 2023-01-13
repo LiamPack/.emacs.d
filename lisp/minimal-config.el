@@ -116,6 +116,7 @@
     (repeat-mode 1)))
 
 (let (window)
+  (customize-set-variable 'even-window-sizes nil)
 
   (define-key global-map (kbd "M-o") 'other-window)
   (define-key global-map (kbd "M-O") (lambda () (interactive) (other-window -1)))
@@ -124,66 +125,71 @@
   ;; https://protesilaos.com/dotemacs/#h:c110e399-3f43-4555-8427-b1afe44c0779)
   (define-key global-map (kbd "C-x C-o") 'display-buffer)
   ;; [2021-12-21 Tue] C-x C-{p,n} go to next/previous buffer (new to me)
-  (setq display-buffer-alist
-        `(
-          ;; below current window
-          ("\\*\\(e?shell\\|v?term\\|.*geiser.*\\|\\)\\*"
-           (display-buffer-below-selected)
-           (window-height . 0.3))
-          ("\\*Org Agenda\\*"
-           (display-buffer-reuse-window display-buffer-same-window))
-          (".*eww.*"
-           (display-buffer-reuse-window display-buffer-same-window))
-          ("\\*Org Src.*"
-           (display-buffer-reuse-window display-buffer-same-window)
-           (window-height . fit-window-to-buffer))
-          ("\\`\\*Async Shell Command\\*\\'"
-           (display-buffer-no-window))
-          ;; top side window
-          ("\\*\\(Flymake diagnostics\\|Package-Lint\\|flycheck\\).*"
-           (display-buffer-in-side-window)
-           (window-height . 0.16)
-           (side . top)
-           (slot . 0))
-          ("\\*Messages.*"
-           (display-buffer-in-side-window)
-           (window-height . 0.16)
-           (side . top)
-           (slot . 1))
-          ("\\*\\(Backtrace\\|Warnings\\|Compile-Log\\|Flymake log\\|compilation\\|\\)\\*"
-           (display-buffer-in-side-window)
-           (window-height . 0.16)
-           (side . top)
-           (slot . 2))
-          ;; left side window
-          ("\\*\\(.* # Help.*\\|Help\\)\\*" ; See the hooks for `visual-line-mode'
-           (display-buffer-in-side-window)
-           (window-width . 0.25)
-           (side . left)
-           (slot . 0))
-          ;; bottom buffer (NOT side window)
-          ("\\*Embark Actions\\*"
-           ( display-buffer-at-bottom)
-           (window-height . fit-window-to-buffer)
-           (window-parameters . ((no-other-window . t)
-                                 (mode-line-format . none))))
-          ("\\*\\(Embark\\)?.*Completions.*"
-           ( display-buffer-at-bottom)
-           (window-parameters . ((no-other-window . t))))
-          ("\\*\\(Output\\|Register Preview\\).*"
-           ( display-buffer-at-bottom))
+  (customize-set-variable
+   'display-buffer-base-action
+   '((display-buffer-reuse-window display-buffer-same-window)
+     ("\\*\\(e?shell\\|v?term\\|.*geiser.*\\|\\)\\*"
+      (display-buffer-below-selected)
+      (window-height . 0.3))
+     
+     (reusable-frames . t))))
 
-          ("\\*\\vc-\\(incoming\\|outgoing\\|git : \\).*"
-           ( display-buffer-below-selected)
-           ;; NOTE 2021-10-06: we cannot `fit-window-to-buffer' because
-           ;; the height is not known in advance.
-           (window-height . 0.4))
-          ("magit: .*"
-           ( display-buffer-below-selected)
-           (window-height . 0.4))
-          ("\\*\\(Calendar\\|Bookmark Annotation\\).*"
-           ( display-buffer-below-selected)
-           (window-height . fit-window-to-buffer))))
+  ;; (setq display-buffer-alist
+  ;;       `(
+  ;;         ("\\*Org Agenda\\*"
+  ;;          (display-buffer-reuse-window display-buffer-same-window))
+  ;;         (".*eww.*"
+  ;;          (display-buffer-reuse-window display-buffer-same-window))
+  ;;         ("\\*Org Src.*"
+  ;;          (display-buffer-reuse-window display-buffer-same-window)
+  ;;          (window-height . fit-window-to-buffer))
+  ;;         ("\\`\\*Async Shell Command\\*\\'"
+  ;;          (display-buffer-no-window))
+  ;;         ;; top side window
+  ;;         ("\\*\\(Flymake diagnostics\\|Package-Lint\\|flycheck\\).*"
+  ;;          (display-buffer-in-side-window)
+  ;;          (window-height . 0.16)
+  ;;          (side . top)
+  ;;          (slot . 0))
+  ;;         ("\\*Messages.*"
+  ;;          (display-buffer-in-side-window)
+  ;;          (window-height . 0.16)
+  ;;          (side . top)
+  ;;          (slot . 1))
+  ;;         ("\\*\\(Backtrace\\|Warnings\\|Compile-Log\\|Flymake log\\|compilation\\|\\)\\*"
+  ;;          (display-buffer-in-side-window)
+  ;;          (window-height . 0.16)
+  ;;          (side . top)
+  ;;          (slot . 2))
+  ;;         ;; left side window
+  ;;         ("\\*\\(.* # Help.*\\|Help\\)\\*" ; See the hooks for `visual-line-mode'
+  ;;          (display-buffer-in-side-window)
+  ;;          (window-width . 0.25)
+  ;;          (side . left)
+  ;;          (slot . 0))
+  ;;         ;; bottom buffer (NOT side window)
+  ;;         ("\\*Embark Actions\\*"
+  ;;          ( display-buffer-at-bottom)
+  ;;          (window-height . fit-window-to-buffer)
+  ;;          (window-parameters . ((no-other-window . t)
+  ;;                                (mode-line-format . none))))
+  ;;         ("\\*\\(Embark\\)?.*Completions.*"
+  ;;          ( display-buffer-at-bottom)
+  ;;          (window-parameters . ((no-other-window . t))))
+  ;;         ("\\*\\(Output\\|Register Preview\\).*"
+  ;;          ( display-buffer-at-bottom))
+
+  ;;         ("\\*\\vc-\\(incoming\\|outgoing\\|git : \\).*"
+  ;;          ( display-buffer-below-selected)
+  ;;          ;; NOTE 2021-10-06: we cannot `fit-window-to-buffer' because
+  ;;          ;; the height is not known in advance.
+  ;;          (window-height . 0.4))
+  ;;         ("magit: .*"
+  ;;          ( display-buffer-below-selected)
+  ;;          (window-height . 0.4))
+  ;;         ("\\*\\(Calendar\\|Bookmark Annotation\\).*"
+  ;;          ( display-buffer-below-selected)
+  ;;          (window-height . fit-window-to-buffer)))
 
   (defvar resize-window-repeat-map
     (let ((map (make-sparse-keymap)))
@@ -221,9 +227,9 @@
   (add-hook 'eww-mode-hook #'visual-line-mode)
   (add-hook 'text-mode-hook #'visual-line-mode)
 
-  (lp-emacs-builtin-package 'winner
+(lp-emacs-builtin-package 'winner
     (winner-mode t)     ; move between windows configuration
-    ))
+    )
 
 (lp-emacs-builtin-package 'time
   (setq display-time-world-time-format "%H:%M %Z, %d. %b"

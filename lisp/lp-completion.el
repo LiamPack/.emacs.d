@@ -64,7 +64,6 @@
   ;; (global-tempel-abbrev-mode)
   )
 
-
 (lp-emacs-builtin-package 'recentf                    ; Save recently visited files
   ;; :diminish recentf-mode
   (recentf-mode)

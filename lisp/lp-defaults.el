@@ -15,7 +15,7 @@
   (global-hl-line-mode t)               ; highlight current line
   (setq fill-column 72)         ; column length
 
-  (setq mode-line-compact nil)            ; Emacs 28
+  (setq mode-line-compact nil)
   (setq-default mode-line-format
 		'("%e"
                   mode-line-front-space
@@ -33,9 +33,6 @@
                   "  "
                   mode-line-misc-info
                   mode-line-end-spaces))
-
-  (add-hook 'after-init-hook #'column-number-mode)
-
 
   ;; name on top of frame
   (setq frame-title-format '("%b [%m]"))
@@ -74,17 +71,16 @@
       (blink-cursor-mode -1)
       (setq visible-cursor t)))
 
-  (setq
-   initial-scratch-message ";; Present Day
+  (setq initial-scratch-message ";; Present Day
 "
-   visible-bell t)
+        visible-bell t)
 
   (show-paren-mode t)
-  (setq show-paren-style 'parenthesis)
+  (setq show-paren-style 'mixed)
 
   (setq indent-tabs-mode nil                 ; don't insert tab when indent
         help-window-select t                 ; focus on help window when openend
-        window-combination-resize nil)
+        window-combination-resize nil) ; i'd rather do this myself
 
   (defun lp--clean-up-buffer-or-region ()
     "Untabifies, indents and deletes trailing whitespace from buffer or region."

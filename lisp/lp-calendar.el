@@ -78,7 +78,7 @@
 
   (run-at-time 10 nil #'appt-activate 1))
 
-  ;;; modified from prot. while its a great idea, it can be problematic to automatically email from different (work) computers
+;;; modified from prot. while its a great idea, it can be problematic to automatically email from different (work) computers
 ;; The idea is to get a reminder via email when I launch Emacs in the
 ;; morning and this file is evaluated.  Obviously this is not a super
 ;; sophisticated approach, though I do not need one.

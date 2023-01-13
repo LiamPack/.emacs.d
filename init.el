@@ -86,7 +86,6 @@
     lp-calendar
     lp-completion
     lp-editing
-    lp-experimental
     lp-external
     lp-minibuffer
     lp-org
@@ -97,7 +96,10 @@
     lp-time
     lp-unix
     lp-window
-    lp-writing))
+    lp-writing
+    lp-denote
+    ;; lp-experimental
+    ))
 
 (dolist (p lp--lisp-packages)
   (require p))

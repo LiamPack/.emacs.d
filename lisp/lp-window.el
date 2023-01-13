@@ -43,67 +43,61 @@
 ;; Thank you prot (see
 ;; https://protesilaos.com/dotemacs/#h:c110e399-3f43-4555-8427-b1afe44c0779)
 (lp-emacs-builtin-package 'window
-  (define-key global-map (kbd "C-x C-o") 'display-buffer)
-  (setq display-buffer-alist
-        `(
-          ;; below current window
-          ("\\*\\(e?shell\\|v?term\\|.*geiser.*\\|\\)\\*"
-           (display-buffer-below-selected)
-           (window-height . 0.3))
-          ("\\*Org Agenda\\*"
-           (display-buffer-reuse-window display-buffer-same-window))
-          (".*eww.*"
-           (display-buffer-reuse-window display-buffer-same-window))
-          ("\\*Org Src.*"
-           (display-buffer-reuse-window display-buffer-same-window)
-           (window-height . fit-window-to-buffer))
-          ("\\`\\*Async Shell Command\\*\\'"
-           (display-buffer-no-window))
-          ;; top side window
-          ("\\*\\(Flymake diagnostics\\|Package-Lint\\|flycheck\\).*"
-           (display-buffer-in-side-window)
-           (window-height . 0.16)
-           (side . top)
-           (slot . 0))
-          ("\\*Messages.*"
-           (display-buffer-in-side-window)
-           (window-height . 0.16)
-           (side . top)
-           (slot . 1))
-          ("\\*\\(Backtrace\\|Warnings\\|Compile-Log\\|Flymake log\\|compilation\\|\\)\\*"
-           (display-buffer-in-side-window)
-           (window-height . 0.16)
-           (side . top)
-           (slot . 2))
-          ;; left side window
-          ("\\*\\(.* # Help.*\\|Help\\)\\*" ; See the hooks for `visual-line-mode'
-           (display-buffer-reuse-mode-window display-buffer-in-side-window)
-           (window-width . 0.25)
-           (side . left)
-           (slot . 0))
-          ;; bottom buffer (NOT side window)
-          ("\\*Embark Actions\\*"
-           (display-buffer-reuse-mode-window display-buffer-at-bottom)
-           (window-height . fit-window-to-buffer)
-           (window-parameters . ((no-other-window . t)
-                                 (mode-line-format . none))))
-          ("\\*\\(Embark\\)?.*Completions.*"
-           (display-buffer-reuse-mode-window display-buffer-at-bottom)
-           (window-parameters . ((no-other-window . t))))
-          ("\\*\\(Output\\|Register Preview\\).*"
-           (display-buffer-reuse-mode-window display-buffer-at-bottom))
+  (let ((map global-map))
+    (define-key map (kbd "C-x C-o") #'display-buffer)
+    (define-key map (kbd "C-1") #'delete-other-windows)
+    (define-key map (kbd "C-2") #'split-window-below)
+    (define-key map (kbd "C-3") #'split-window-right)
+    (define-key map (kbd "C-0") #'delete-window))
+  (setq switch-to-prev-buffer-skip 'this)
+  (customize-set-variable 'even-window-sizes nil)
 
-          ("\\*\\vc-\\(incoming\\|outgoing\\|git : \\).*"
-           (display-buffer-reuse-mode-window display-buffer-below-selected)
-           ;; NOTE 2021-10-06: we cannot `fit-window-to-buffer' because
-           ;; the height is not known in advance.
-           (window-height . 0.4))
-          ("magit: .*"
-           (display-buffer-reuse-mode-window display-buffer-below-selected)
-           (window-height . 0.4))
-          ("\\*\\(Calendar\\|Bookmark Annotation\\).*"
-           (display-buffer-reuse-mode-window display-buffer-below-selected)
-           (window-height . fit-window-to-buffer))))
+  (customize-set-variable
+   'display-buffer-base-action
+   '(
+     ;; (display-buffer-reuse-window display-buffer-same-window)
+     ;; i'd really like this to work, but so many things fuck with this
+     ;; that its annoying. e.g. magit-commit
+     ;; (reusable-frames . t)
+     ))
+
+  (setq display-buffer-alist
+	`(("\\*\\(e?shell\\|v?term\\|.*geiser.*\\|\\)\\*"
+	   (display-buffer-below-selected)
+	   (window-height . 0.3))
+	  ("\\*\\(Flymake diagnostics\\|Package-Lint\\|flycheck\\).*"
+	   (display-buffer-in-side-window)
+	   (window-height . 0.16)
+	   (side . top)
+	   (slot . 0))
+	  ("\\*Messages.*"
+	   (display-buffer-in-side-window)
+	   (window-height . 0.16)
+	   (side . top)
+	   (slot . 1))     
+	  ("\\*\\(Backtrace\\|Warnings\\|Compile-Log\\|Flymake log\\|compilation\\|\\)\\*"
+	   (display-buffer-in-side-window)
+	   (window-height . 0.16)
+	   (side . top)
+	   (slot . 2))
+	  ("\\*\\(.* # Help.*\\|Help\\)\\*" ; See the hooks for `visual-line-mode'
+	   (display-buffer-reuse-mode-window display-buffer-in-side-window)
+	   (window-width . 0.25)
+	   (side . top)
+	   (slot . 0))
+	  ("\\*\\(Output\\|Register Preview\\).*"
+	   (display-buffer-reuse-mode-window display-buffer-at-bottom))     
+	  ("\\*\\vc-\\(incoming\\|outgoing\\|git : \\).*"
+	   (display-buffer-reuse-mode-window display-buffer-below-selected)
+	   ;; NOTE 2021-10-06: we cannot `fit-window-to-buffer' because
+	   ;; the height is not known in advance.
+	   (window-height . 0.4))
+	  ("magit: .*"
+	   (display-buffer-reuse-mode-window display-buffer-below-selected)
+	   (window-height . 0.4))
+	  ("\\*\\(Calendar\\|Bookmark Annotation\\).*"
+	   (display-buffer-reuse-mode-window display-buffer-below-selected)
+	   (window-height . fit-window-to-buffer))))
 
   (defvar resize-window-repeat-map
     (let ((map (make-sparse-keymap)))
@@ -115,6 +109,7 @@
       (define-key map "{" 'shrink-window) ; prot note: this is not bound by default
       map)
     "Keymap to repeat window resizing commands.  Used in `repeat-mode'.")
+
   (put 'enlarge-window 'repeat-map 'resize-window-repeat-map)
   (put 'enlarge-window-horizontally 'repeat-map 'resize-window-repeat-map)
   (put 'shrink-window-horizontally 'repeat-map 'resize-window-repeat-map)
@@ -141,8 +136,8 @@
   (add-hook 'eww-mode-hook #'visual-line-mode)
   (add-hook 'text-mode-hook #'visual-line-mode))
 
-(lp-emacs-builtin-package 'winner
-  (winner-mode t)     ; move between windows configuration
-  )
+;; (lp-emacs-builtin-package 'winner
+;;   (winner-mode t)     ; move between windows configuration
+;;   )
 
 (provide 'lp-window)

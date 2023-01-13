@@ -6,6 +6,32 @@
                nil
                '(("\\<\\(FIXME\\|TODO\\|BUG\\)" 1 font-lock-warning-face prepend))))))
 
+
+;;; `electric' behavior
+(lp-emacs-builtin-package 'electric
+  (setq electric-pair-inhibit-predicate 'electric-pair-conservative-inhibit)
+  (setq electric-pair-preserve-balance t)
+  (setq electric-pair-pairs
+        '((8216 . 8217)
+          (8220 . 8221)
+          (171 . 187)))
+  (setq electric-pair-skip-self 'electric-pair-default-skip-self)
+  (setq electric-pair-skip-whitespace nil)
+  (setq electric-pair-skip-whitespace-chars '(9 10 32))
+  (setq electric-quote-context-sensitive t)
+  (setq electric-quote-paragraph t)
+  (setq electric-quote-string nil)
+  (setq electric-quote-replace-double t)
+  
+  (electric-pair-mode -1)
+  (electric-quote-mode -1)
+  ;; I don't like auto indents in Org and related.  They are okay for
+  ;; programming.
+  (electric-indent-mode -1)
+  (add-hook 'prog-mode-hook #'electric-indent-local-mode))
+
+
+
 (lp-emacs-builtin-package 'compile
   (setq compilation-ask-about-save nil)
   (setq compilation-scroll-output 'next-error)
@@ -19,9 +45,9 @@
   (setq flymake-fringe-indicator-position 'left-fringe)
   (setq flymake-suppress-zero-counters t)
   (setq flymake-start-on-flymake-mode t)
-  (setq flymake-no-changes-timeout nil)
+  (setq flymake-no-changes-timeout 1.0)
   (setq flymake-start-on-save-buffer t)
-  (setq flymake-proc-compilation-prevents-syntax-check t)
+  (setq flymake-proc-compilation-prevents-syntax-check nil)
   (setq flymake-wrap-around nil)
   (setq flymake-mode-line-format
         '("" flymake-mode-line-exception flymake-mode-line-counters))
@@ -57,7 +83,7 @@
 (lp-emacs-elpa-package 'flymake-python-pyflakes
   (add-hook 'python-mode-hook 'flymake-python-pyflakes-load))
 
-;;; pyton
+;;; pyton :)
 (lp-emacs-elpa-package 'python
   (setq python-indent-offset 4
         python-pdbtrack-activate t)
@@ -67,8 +93,7 @@
   
   (when (executable-find "ipython")
     (setq python-shell-interpreter "ipython")
-    (setq python-shell-interpreter-args "console --simple-prompt"))
-  )
+    (setq python-shell-interpreter-args "--simple-prompt")))
 
 (lp-emacs-elpa-package 'pyvenv)
 
@@ -79,10 +104,9 @@
 
     ;; TODO: these need to be based on environment variables from conda
     ;; ~/.conda configuration
-    (setq
-     conda-anaconda-home (expand-file-name "~/miniconda3/")
-     conda-env-home-directory (expand-file-name "~/miniconda3/") ;; as in previous example; not required
-     conda-env-subdirectory "envs")
+    (setq conda-anaconda-home (expand-file-name "~/miniconda3/")
+					conda-env-home-directory (expand-file-name "~/miniconda3/")
+					conda-env-subdirectory "envs")
     ))
 
 (when (executable-find "jupyter") (lp-emacs-elpa-package 'ein))
@@ -97,8 +121,7 @@
   (setq julia-snail-multimedia-enable t)
   (setq julia-snail-multimedia-buffer-autoswitch t)
   (setq julia-snail-multimedia-buffer-style :multi)
-  (setq julia-snail-extensions '(repl-history formatter))
-  )
+  (setq julia-snail-extensions '(repl-history formatter)))
 
 ;;; java, unfortunately
 (add-hook 'java-mode-hook
