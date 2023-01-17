@@ -62,7 +62,7 @@
      ))
 
   (setq display-buffer-alist
-	`(("\\*\\(e?shell\\|v?term\\|.*geiser.*\\|\\)\\*"
+	`(("\\*\\(e?shell\\|v?term\\|.*geiser.*\\|\\*julia\\)\\*"
 	   (display-buffer-below-selected)
 	   (window-height . 0.3))
 	  ("\\*\\(Flymake diagnostics\\|Package-Lint\\|flycheck\\).*"

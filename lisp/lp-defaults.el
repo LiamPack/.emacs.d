@@ -1,4 +1,4 @@
-;;; Emacs defaultsx
+;;; Emacs defaults
 (lp-emacs-builtin-package 'emacs
   ;; hacky way to remove the =custom-variables= generation in =init.el=
   (setq custom-file (make-temp-file "emacs-custom-"))

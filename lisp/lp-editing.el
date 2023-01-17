@@ -31,6 +31,9 @@
 
   (setq list-matching-lines-jump-to-current-line t))
 
+;; prot's simple substitution package
+(lp-emacs-elpa-package 'substitute)
+
 ;;; Still trying to get used to jumping around
 (lp-emacs-elpa-package 'avy
   (avy-setup-default) ; binds C-' in the isearch map

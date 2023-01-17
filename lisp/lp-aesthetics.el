@@ -54,6 +54,20 @@
 	  (border-mode-line-active unspecified)
           (border-mode-line-inactive unspecified)
 	  (bg-mode-line-active bg-green-subtle)))
+  (setq modus-vivendi-deuteranopia-palette-overrides
+	`((fg-region unspecified)
+	  (fringe unspecified)
+
+	  (underline-link border)
+          (underline-link-visited border)
+          (underline-link-symbolic border)
+
+	  (bg-region bg-red-subtle) ; try to replace `bg-ochre' with `bg-lavender', `bg-sage'
+	  (underline-paren-match fg-main)
+	  (bg-hl-line bg-lavender)
+
+	  (border-mode-line-active unspecified)
+          (border-mode-line-inactive unspecified)))
 
   ;; add some padding to modeline
   (defun my-modus-themes-custom-faces ()
@@ -115,7 +129,7 @@
   (setq lambda-themes-set-italic-keywords t)
   (setq lambda-themes-set-variable-pitch t))
 
-(load-theme 'modus-vivendi :no-confirm)
+(load-theme 'modus-vivendi-deuteranopia :no-confirm)
 (set-face-attribute 'default nil :height 140)
 
 

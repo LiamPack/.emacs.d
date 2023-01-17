@@ -110,6 +110,7 @@
     ))
 
 (when (executable-find "jupyter") (lp-emacs-elpa-package 'ein))
+(lp-emacs-elpa-package 'code-cells) ; for generic code-block editing
 
 ;;; julia
 (lp-emacs-elpa-package 'julia-mode)
@@ -121,7 +122,8 @@
   (setq julia-snail-multimedia-enable t)
   (setq julia-snail-multimedia-buffer-autoswitch t)
   (setq julia-snail-multimedia-buffer-style :multi)
-  (setq julia-snail-extensions '(repl-history formatter)))
+  (setq julia-snail-extensions '(repl-history formatter))
+  (setq julia-snail-repl-display-eval-results t))
 
 ;;; java, unfortunately
 (add-hook 'java-mode-hook
@@ -204,8 +206,6 @@
 (lp-emacs-elpa-package 'rainbow-delimiters
   (add-hook 'prog-mode-hook 'rainbow-delimiters-mode))
 
-;; since chez has no docs implemented for geiser, i'd rather just generate tags and use
-;; xref-etags-mode to do most of the heavy lifting...
 (lp-emacs-elpa-package 'paredit)
 (lp-emacs-elpa-package 'geiser
   (add-hook 'geiser-mode-hook #'paredit-mode)
@@ -216,14 +216,9 @@
 
   (setq geiser-scheme-implementation 'chez))
 
-
-;; (lp-emacs-elpa-package 'geiser-guile)
 (lp-emacs-elpa-package 'geiser-chez
   (define-key geiser-mode-map (kbd "C-.") nil) ; embark
-  
-  )
-;; (lp-emacs-elpa-package 'geiser-kawa
-;;   (setq geiser-kawa-use-included-kawa t))
+)
 
 
 (lp-emacs-elpa-package 'racket-mode
@@ -235,8 +230,7 @@
 ;;; symbolic computation
 (lp-emacs-builtin-package 'calc
   ;; TODO types for bytes and stuff
-  (setq math-additional-units '(
-                                (GiB "1024 * MiB" "Giga Byte")
+  (setq math-additional-units '((GiB "1024 * MiB" "Giga Byte")
                                 (MiB "1024 * KiB" "Mega Byte")
                                 (KiB "1024 * B" "Kilo Byte")
                                 (B nil "Byte")
@@ -252,9 +246,7 @@
   (add-hook 'maxima-inferior-mode-hook #'maxima-hook-function)
   (setq maxima-display-maxima-buffer t)
   (setq auto-mode-alist (cons '("\\.mac" . maxima-mode) auto-mode-alist))
-  (setq auto-mode-alist (cons '("\\.mc" . maxima-mode) auto-mode-alist))
-
-  )
+  (setq auto-mode-alist (cons '("\\.mc" . maxima-mode) auto-mode-alist)))
 
 ;;; docker
 (lp-emacs-elpa-package 'dockerfile-mode)
