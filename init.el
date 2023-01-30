@@ -42,8 +42,10 @@
 (defmacro lp-emacs-elpa-package (package &rest body)
   (declare (indent 1))
   `(progn
-     (when (not (package-installed-p ,package))
-       (package-install ,package))
+     (condition-case nil
+	 (when (not (package-installed-p ,package))
+	   (package-install ,package))
+       nil)
      (if (require ,package nil 'noerror)
          (progn ,@body)
        (print (format "[Warning]: Loading `%s' failed" ,package))
