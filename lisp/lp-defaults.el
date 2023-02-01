@@ -76,7 +76,7 @@
         visible-bell t)
 
   (show-paren-mode t)
-  (setq show-paren-style 'mixed)
+  (setq show-paren-style 'parenthesis)
 
   (setq indent-tabs-mode nil                 ; don't insert tab when indent
         help-window-select t                 ; focus on help window when openend

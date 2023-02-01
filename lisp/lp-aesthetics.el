@@ -67,24 +67,7 @@
 	  (bg-hl-line bg-lavender)
 
 	  (border-mode-line-active unspecified)
-          (border-mode-line-inactive unspecified)))
-
-  ;; add some padding to modeline
-  (defun my-modus-themes-custom-faces ()
-    (modus-themes-with-colors
-      (custom-set-faces
-       ;; Add "padding" to the mode lines
-       `(mode-line ((,c :underline ,border-mode-line-active
-			:overline ,border-mode-line-active
-			:box (:line-width 10 :color ,bg-mode-line-active))))
-       `(mode-line-inactive ((,c :underline ,border-mode-line-inactive
-				 :overline ,border-mode-line-inactive
-				 :box (:line-width 10 :color ,bg-mode-line-inactive)))))))
-
-  ;; ESSENTIAL to make the underline move to the bottom of the box:
-  (setq x-underline-at-descent-line t)
-
-  (add-hook 'modus-themes-after-load-theme-hook #'my-modus-themes-custom-faces))
+          (border-mode-line-inactive unspecified))))
 
 (lp-emacs-git-package 'ef-themes
   "https://github.com/protesilaos/ef-themes.git")
@@ -129,8 +112,7 @@
   (setq lambda-themes-set-italic-keywords t)
   (setq lambda-themes-set-variable-pitch t))
 
-(load-theme 'modus-vivendi-deuteranopia :no-confirm)
+(load-theme 'standard-dark :no-confirm)
 (set-face-attribute 'default nil :height 140)
-
 
 (provide 'lp-aesthetics)
