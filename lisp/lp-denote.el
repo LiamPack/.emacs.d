@@ -23,9 +23,11 @@
 		      t
 		      (concat ".*" (denote-sluggify (downcase date)) ".*")))
 		(switch-to-buffer-obey-display-actions t))
-	(progn
-	  (find-file-noselect (car fns))
-	  (switch-to-buffer (file-name-nondirectory (car fns))))
+	(cond
+	 ((get-buffer-window (file-name-nondirectory (car fns)))
+	  (delete-window (get-buffer-window (file-name-nondirectory (car fns)))))
+	 (t (find-file-noselect (car fns))
+	    (switch-to-buffer (file-name-nondirectory (car fns)))))
       (denote date '("journal") 'text journal-dir))))
 
   (let ((map global-map))
