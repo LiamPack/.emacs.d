@@ -81,7 +81,7 @@
         standard-themes-italic-constructs t
         standard-themes-mixed-fonts nil
         standard-themes-variable-pitch-ui nil
-        standard-themes-mode-line-accented t
+        standard-themes-mode-line-accented nil
 
         ;; Accepts a symbol value:
         standard-themes-fringes 'subtle
@@ -95,15 +95,15 @@
         ;; `variable-pitch' per heading level (t is for any level not
         ;; specified):
         standard-themes-headings
-        '((0 . (light 1.9))
-          (1 . (light 1.8))
-          (2 . (light 1.7))
-          (3 . (semilight 1.6))
-          (4 . (semilight 1.5))
-          (5 . (1.4))
-          (6 . (1.3))
-          (7 . (1.2))
-          (t . (1.1)))))
+        '((0 . (light 1.0))
+          (1 . (light 1.0))
+          (2 . (light 1.0))
+          (3 . (semilight 1.0))
+          (4 . (semilight 1.0))
+          (5 . (1.0))
+          (6 . (1.0))
+          (7 . (1.0))
+          (t . (1.0)))))
 
 ;;; Softer themes for that kind of mood
 (lp-emacs-git-package 'lambda-themes
