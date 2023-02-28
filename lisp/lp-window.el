@@ -1,44 +1,62 @@
 (define-key global-map (kbd "M-o") 'other-window)
 (define-key global-map (kbd "M-O") (lambda () (interactive) (other-window -1)))
 
-(lp-emacs-builtin-package 'ibuffer                    ; Better buffer list
-  (define-key global-map [remap list-buffers] #'ibuffer)
-  ;; as always, from prot:
-  (setq ibuffer-expert t)
-  (setq ibuffer-display-summary nil)
-  (setq ibuffer-show-empty-filter-groups t)
-  (setq ibuffer-movement-cycle nil)
-  (setq ibuffer-default-sorting-mode 'filename/process)
-  (setq ibuffer-use-header-line t)
-  (setq ibuffer-default-shrink-to-minimum-size nil)
+;; (lp-emacs-builtin-package 'ibuffer                    ; Better buffer list
+;;   (define-key global-map [remap list-buffers] #'ibuffer)
+;;   ;; as always, from prot:
+;;   (setq ibuffer-expert t)
+;;   (setq ibuffer-display-summary nil)
+;;   (setq ibuffer-show-empty-filter-groups t)
+;;   (setq ibuffer-movement-cycle nil)
+;;   (setq ibuffer-default-sorting-mode 'filename/process)
+;;   (setq ibuffer-use-header-line t)
+;;   (setq ibuffer-default-shrink-to-minimum-size nil)
   
-  (setq ibuffer-saved-filter-groups nil)
-  (setq ibuffer-old-time 48)
-  (add-hook 'ibuffer-mode-hook #'hl-line-mode)
-  (define-key global-map (kbd "C-x C-b") #'ibuffer)
-  (let ((map ibuffer-mode-map))
-    (define-key map (kbd "* f") #'ibuffer-mark-by-file-name-regexp)
-    (define-key map (kbd "* g") #'ibuffer-mark-by-content-regexp) ; "g" is for "grep"
-    (define-key map (kbd "* n") #'ibuffer-mark-by-name-regexp)
-    (define-key map (kbd "s n") #'ibuffer-do-sort-by-alphabetic)  ; "sort name" mnemonic
-    (define-key map (kbd "/ g") #'ibuffer-filter-by-content))
-  )
+;;   (setq ibuffer-saved-filter-groups nil)
+;;   (setq ibuffer-old-time 48)
+;;   (add-hook 'ibuffer-mode-hook #'hl-line-mode)
+;;   (define-key global-map (kbd "C-x C-b") #'ibuffer)
+;;   (let ((map ibuffer-mode-map))
+;;     (define-key map (kbd "* f") #'ibuffer-mark-by-file-name-regexp)
+;;     (define-key map (kbd "* g") #'ibuffer-mark-by-content-regexp) ; "g" is for "grep"
+;;     (define-key map (kbd "* n") #'ibuffer-mark-by-name-regexp)
+;;     (define-key map (kbd "s n") #'ibuffer-do-sort-by-alphabetic)  ; "sort name" mnemonic
+;;     (define-key map (kbd "/ g") #'ibuffer-filter-by-content))
+;;   )
 
-(lp-emacs-builtin-package 'tab-bar
-  (setq tab-bar-close-button-show nil)
-  ;; (setq tab-bar-close-last-tab-choice 'tab-bar-mode-disable)
-  (setq tab-bar-close-tab-select 'recent)
-  (setq tab-bar-new-tab-choice t)
-  (setq tab-bar-new-tab-to 'right)
-  (setq tab-bar-position nil)
-  (setq tab-bar-show 1)
-  (setq tab-bar-tab-hints t)
-  (setq tab-bar-tab-name-function 'tab-bar-tab-name-current)
-  (setq tab-bar-auto-width-max '(120 . 20)) 
-  (tab-bar-mode +1)
-  (tab-bar-history-mode +1)
-  (define-key global-map (kbd "<prior>") #'tab-previous)
-  (define-key global-map (kbd "<next>") #'tab-next))
+(lp-emacs-elpa-package 'beframe
+  (setq beframe-functions-in-frames '(project-prompt-project-dir))
+  (setq beframe-global-buffers '("*scratch*" "*Messages*" "*Backtrace*"))
+
+  (beframe-mode 1)
+
+  ;; This is just an example.  We do not define any key bindings.  You
+  ;; do not need this command if you enable `beframe-mode', as
+  ;; `switch-to-buffer' only shows a list of beframed buffers.
+  (define-key global-map (kbd "C-x B") #'beframe-switch-buffer)
+
+  (define-key global-map (kbd "C-x f") #'other-frame-prefix) ; override `set-fill-column'
+  (define-key global-map (kbd "C-x C-b") #'beframe-buffer-menu)
+
+  (defvar consult-buffer-sources)
+  (declare-function consult--buffer-state "consult")
+
+  (with-eval-after-load 'consult
+    (defface beframe-buffer
+      '((t :inherit font-lock-string-face))
+      "Face for `consult' framed buffers.")
+
+    (defvar beframe--consult-source
+      `( :name     "Frame-specific buffers (current frame)"
+	 :narrow   ?F
+	 :category buffer
+	 :face     beframe-buffer
+	 :history  beframe-history
+	 :items    ,#'beframe--buffer-names
+	 :action   ,#'switch-to-buffer
+	 :state    ,#'consult--buffer-state))
+
+    (add-to-list 'consult-buffer-sources 'beframe--consult-source)))
 
 ;; Thank you prot (see
 ;; https://protesilaos.com/dotemacs/#h:c110e399-3f43-4555-8427-b1afe44c0779)

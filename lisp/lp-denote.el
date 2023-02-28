@@ -14,6 +14,7 @@
 
   
   (setq lp--journal-date-format "%A %e %B %Y") ; format like Tuesday 14 June 2022
+  (setq lp--monthly-date-format "%b %Y")
   (defun lp-denote-pop-journal ()
     (interactive)
     (let ((date (format-time-string lp--journal-date-format))
