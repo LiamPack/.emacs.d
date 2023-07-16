@@ -1,6 +1,6 @@
 ;;; Fringe mode
 (lp-emacs-builtin-package 'fringe
-  (fringe-mode nil)
+  (fringe-mode +1)
   (setq-default fringes-outside-margins nil)
   (setq-default indicate-buffer-boundaries nil)
   (setq-default indicate-empty-lines nil)
@@ -15,7 +15,6 @@
 
 (lp-emacs-git-package 'modus-themes
   "https://github.com/protesilaos/modus-themes.git"
-
   (setq modus-themes-mixed-fonts t
         modus-themes-variable-pitch-ui t
         modus-themes-italic-constructs t
@@ -25,56 +24,56 @@
 	modus-themes-region '(bg-only))
 
   (setq modus-themes-common-palette-overrides
-	modus-themes-preset-overrides-intense)
-  (setq modus-vivendi-palette-overrides
-	`((fg-region unspecified)
-	  (fringe unspecified)
+	'())
+  ;; (setq modus-vivendi-palette-overrides
+  ;; 	`((fg-region unspecified)
+  ;; 	  (fringe unspecified)
 
-	  (underline-link border)
-          (underline-link-visited border)
-          (underline-link-symbolic border)
+  ;; 	  (underline-link border)
+  ;;         (underline-link-visited border)
+  ;;         (underline-link-symbolic border)
 
-	  (bg-region bg-red-subtle) ; try to replace `bg-ochre' with `bg-lavender', `bg-sage'
-	  (bg-paren-match bg-green-intense)
-	  (underline-paren-match fg-main)
+  ;; 	  (bg-region bg-red-subtle) ; try to replace `bg-ochre' with `bg-lavender', `bg-sage'
+  ;; 	  (bg-paren-match bg-green-intense)
+  ;; 	  (underline-paren-match fg-main)
 
-	  (bg-hl-line bg-sage)
+  ;; 	  (bg-hl-line bg-sage)
 
-	  (builtin green)
-          (comment yellow-faint)
-          (constant blue)
-          (fnname green-warmer)
-          (keyword green-cooler)
-          (preprocessor green)
-          (docstring green-faint)
-          (string magenta)
-          (type cyan-warmer)
-          (variable blue-warmer)
+  ;; 	  (builtin green)
+  ;;         (comment yellow-faint)
+  ;;         (constant blue)
+  ;;         (fnname green-warmer)
+  ;;         (keyword green-cooler)
+  ;;         (preprocessor green)
+  ;;         (docstring green-faint)
+  ;;         (string magenta)
+  ;;         (type cyan-warmer)
+  ;;         (variable blue-warmer)
 
-	  (border-mode-line-active unspecified)
-          (border-mode-line-inactive unspecified)
-	  (bg-mode-line-active bg-green-subtle)))
-  (setq modus-vivendi-deuteranopia-palette-overrides
-	`((fg-region unspecified)
-	  (fringe unspecified)
+  ;; 	  (border-mode-line-active unspecified)
+  ;;         (border-mode-line-inactive unspecified)
+  ;; 	  (bg-mode-line-active bg-green-subtle)))
+  ;; (setq modus-vivendi-deuteranopia-palette-overrides
+  ;; 	`((fg-region unspecified)
+  ;; 	  (fringe unspecified)
 
-	  (underline-link border)
-          (underline-link-visited border)
-          (underline-link-symbolic border)
+  ;; 	  (underline-link border)
+  ;;         (underline-link-visited border)
+  ;;         (underline-link-symbolic border)
 
-	  (bg-region bg-red-subtle) ; try to replace `bg-ochre' with `bg-lavender', `bg-sage'
-	  (underline-paren-match fg-main)
-	  (bg-hl-line bg-lavender)
+  ;; 	  (bg-region bg-red-subtle) ; try to replace `bg-ochre' with `bg-lavender', `bg-sage'
+  ;; 	  (underline-paren-match fg-main)
+  ;; 	  (bg-hl-line bg-lavender)
 
-	  (border-mode-line-active unspecified)
-          (border-mode-line-inactive unspecified))))
+  ;; 	  (border-mode-line-active unspecified)
+  ;;         (border-mode-line-inactive unspecified)))
+  )
 
-(lp-emacs-git-package 'ef-themes
-  "https://github.com/protesilaos/ef-themes.git")
+(lp-emacs-elpa-package 'ef-themes)
 
 ;;; I've grown fond of the default emacs themes
-(lp-emacs-git-package 'standard-themes
-  "https://github.com/protesilaos/standard-themes.git"
+(lp-emacs-elpa-package 'standard-themes
+  ;; "https://github.com/protesilaos/standard-themes.git"
   ;; Read the doc string of each of those user options.  These are some
   ;; sample values.
   (setq standard-themes-bold-constructs t
@@ -103,16 +102,16 @@
           (5 . (1.0))
           (6 . (1.0))
           (7 . (1.0))
-          (t . (1.0)))))
+          (t . (1.0))))
 
-;;; Softer themes for that kind of mood
-(lp-emacs-git-package 'lambda-themes
-  "https://github.com/Lambda-Emacs/lambda-themes.git"
-  (setq lambda-themes-set-italic-comments t)
-  (setq lambda-themes-set-italic-keywords t)
-  (setq lambda-themes-set-variable-pitch t))
+  ;; (setq standard-themes-common-palette-overrides '((cursor white)))
+  )
 
-(load-theme 'standard-dark :no-confirm)
-(set-face-attribute 'default nil :height 140)
+(lp-emacs-elpa-package 'spacious-padding
+  (spacious-padding-mode +1))
+
+(load-theme 'modus-vivendi-tritanopia :no-confirm)
+(set-face-attribute 'default nil :font "Noto Sans Mono" :height 110)
 
 (provide 'lp-aesthetics)
+ 
