@@ -8,6 +8,7 @@
   (setq comint-prompt-read-only t)
   (setq comint-use-prompt-regexp nil)
   (setq comint-completion-recexact t)
+  (setq comint-buffer-maximum-size 9999)
   )
 
 ;;; shells

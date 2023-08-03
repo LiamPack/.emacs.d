@@ -108,6 +108,8 @@
   )
 
 (lp-emacs-elpa-package 'spacious-padding
+  (setq spacious-padding-widths
+	'(:internal-border-width 18 :right-divider-width 10 :scroll-bar-width 8))
   (spacious-padding-mode +1))
 
 (load-theme 'modus-vivendi-tritanopia :no-confirm)

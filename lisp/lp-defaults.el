@@ -19,17 +19,16 @@
   (setq-default mode-line-format
 		'("%e"
                   mode-line-front-space
-                  mode-line-mule-info
-                  mode-line-client
-                  mode-line-modified
-                  mode-line-remote
+                  (:propertize
+		   ("" mode-line-mule-info mode-line-client mode-line-modified mode-line-remote)
+		   display (min-width (5.0)))
                   mode-line-frame-identification
                   mode-line-buffer-identification
                   "  "
                   mode-line-position
+		  (vc-mode vc-mode)
+		  "  "
                   mode-line-modes
-                  "  "
-                  (vc-mode vc-mode)
                   "  "
                   mode-line-misc-info
                   mode-line-end-spaces))
@@ -113,6 +112,10 @@
 ;;; Repeating commands
 (lp-emacs-builtin-package 'repeat
   (setq repeat-on-final-keystroke t)
+  (setq repeat-exit-timeout 5)
+  (setq repeat-exit-key "<escape>")
+  (setq repeat-keep-prefix nil)
+  (setq repeat-check-key t)
   ;; `C-u C-SPC' will pop mark from the buffer-local mark ring, and
   ;; repeating C-SPC will continue popping mark
   (setq set-mark-command-repeat-pop t)
@@ -167,6 +170,45 @@
   (setq save-place-forget-unreadable-files t)
   (save-place-mode 1))
 
+;;; Minibuffer history
+(lp-emacs-builtin-package 'savehist
+  (setq savehist-file (locate-user-emacs-file "savehist"))
+  (setq history-length 10000)
+  (setq history-delete-duplicates t)
+  (setq savehist-save-minibuffer-history t)
+  (setq savehist-additional-variables '(register-alist kill-ring))
+  (add-hook 'after-init-hook #'savehist-mode))
+
+(lp-emacs-builtin-package 'bookmark
+;;;; Built-in bookmarking framework (bookmark.el)
+  (setq bookmark-use-annotations nil)
+  (setq bookmark-automatically-show-annotations nil)
+  (setq bookmark-fringe-mark nil) ; Emacs 29 to hide bookmark fringe icon
+  ;; Write changes to the bookmark file as soon as 1 modification is
+  ;; made (addition or deletion).  Otherwise Emacs will only save the
+  ;; bookmarks when it closes, which may never happen properly
+  ;; (e.g. power failure).
+  (setq bookmark-save-flag 1)
+
+  ;; thanks prot for the idea to autosave bookmarks :)
+  (advice-add 'bookmark-set-internal :after (lambda (&rest _) (funcall 'bookmark-save)))
+    
+  )
+
+;; thanks prot for showing this package off :) !
+(lp-emacs-builtin-package 'tooltip
+  (setq tooltip-delay 0.5
+        tooltip-short-delay 0.5
+        x-gtk-use-system-tooltips nil
+        tooltip-frame-parameters
+        '((name . "tooltip")
+          (internal-border-width . 10)
+          (border-width . 0)
+          (no-special-glyphs . t)))
+
+  (autoload #'tooltip-mode "tooltip")
+  (tooltip-mode 1)
+  )
 
 ;;; Visualize unwanted whitespace
 (lp-emacs-builtin-package 'whitespace

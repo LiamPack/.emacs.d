@@ -53,14 +53,6 @@
     (define-key completion-list-mode-map (kbd "C-n") 'next-completion)
     (define-key completion-list-mode-map (kbd "C-p") 'previous-completion)))
 
-;;; Minibuffer history
-(lp-emacs-builtin-package 'savehist
-  (setq savehist-file (locate-user-emacs-file "savehist"))
-  (setq history-length 10000)
-  (setq history-delete-duplicates t)
-  (setq savehist-save-minibuffer-history t)
-  (add-hook 'after-init-hook #'savehist-mode))
-
 ;;; for when things are really tough, some icomplete
 (when (and (<= emacs-major-version 27))
   (lp-emacs-builtin-package 'icomplete
