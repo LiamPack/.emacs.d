@@ -171,7 +171,7 @@
   (define-key global-map (kbd "C-M-y") 'consult-yank-pop)
   (define-key global-map (kbd "C-:") 'consult-complex-command)
 
-  (setq consult-preview-key (kbd "C-o")) ;; disable live preview
+  (setq consult-preview-key  "C-o") ;; disable live preview
   ;; (setq consult-project-root-function #'project-roots)
   (setq consult-async-min-input 3)
   (setq consult-async-input-debounce 0.5)

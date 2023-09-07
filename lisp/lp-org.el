@@ -1,6 +1,6 @@
 (lp-emacs-builtin-package 'org
   ;;; general
-  (setq org-directory "~/Dropbox/denotes/")
+  (setq org-directory "~/dropbox/denotes/")
   (setq org-adapt-indentation nil)      ; No, non, nein, όχι!
   (setq org-startup-folded t)
   (setq org-M-RET-may-split-line '((default . nil)))

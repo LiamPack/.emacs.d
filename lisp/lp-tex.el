@@ -26,7 +26,7 @@
   (setq-default TeX-master nil)
 
   ;; most crucial: turn-on-reftex
-  (setq lp--latex-hooks-fns '(auto-fill-mode TeX-source-correlate-mode flyspell-mode flyspell-buffer turn-on-reftex))
+  (setq lp--latex-hooks-fns '(auto-fill-mode TeX-source-correlate-mode flyspell-mode flyspell-buffer turn-on-reftex cdlatex-mode prettify-symbols-mode))
   (dolist (fn lp--latex-hooks-fns)
     (add-hook 'LaTeX-mode-hook fn)))
 

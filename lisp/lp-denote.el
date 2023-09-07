@@ -1,5 +1,5 @@
 (lp-emacs-elpa-package 'denote
-  (setq denote-directory "~/Dropbox/denotes/")
+  (setq denote-directory "~/dropbox/denotes/")
   (setq denote-allow-multi-word-keywords t)
   (setq denote-known-keywords '("emacs" "school" "food" "programming"
                                 "personal"
