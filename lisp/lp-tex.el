@@ -26,10 +26,10 @@
   (setq-default TeX-master nil)
 
   ;; most crucial: turn-on-reftex
-  (setq lp--latex-hooks-fns '(auto-fill-mode TeX-source-correlate-mode flyspell-mode flyspell-buffer turn-on-reftex cdlatex-mode prettify-symbols-mode))
+  (setq lp--latex-hooks-fns '(auto-fill-mode TeX-source-correlate-mode flyspell-mode flyspell-buffer turn-on-reftex prettify-symbols-mode cdlatex-mode))
   (dolist (fn lp--latex-hooks-fns)
     (add-hook 'LaTeX-mode-hook fn)))
-
+;; https://karthinks.com/software/latex-input-for-impatient-scholars/
 (lp-emacs-builtin-package 'tex-mode)
 
 (lp-emacs-builtin-package 'reftex)

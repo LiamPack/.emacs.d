@@ -30,8 +30,11 @@
 
     (defun prot/pdf-tools-midnight-mode-toggle ()
       (when (derived-mode-p 'pdf-view-mode)
-        (if (or (eq (car (custom-enabled-themes)) 'standard-dark)
-                (eq (car custom-enabled-themes) 'modus-vivendi))
+        (if (or (custom-theme-enabled-p 'modus-vivendi)
+		(custom-theme-enabled-p 'modus-vivendi-tinted)
+		(custom-theme-enabled-p' modus-vivendi-deuteranopia)
+		(custom-theme-enabled-p' modus-vivendi-tritanopia)
+		(custom-theme-enabled-p 'standard-dark))
             (pdf-view-midnight-minor-mode 1)
           (pdf-view-midnight-minor-mode -1))
         (prot/pdf-tools-backdrop)))

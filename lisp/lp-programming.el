@@ -293,7 +293,7 @@
   ;; pointing to the directory where your Project.toml is. It should
   ;; have both LanguageServer and SymbolServer installed. For more info,
   ;; https://pkgdocs.julialang.org/v1/environments/
-  (setq eglot-jl-language-server-project (expand-file-name "~/.julia/environments/v1.6"))
+  (setq eglot-jl-language-server-project (expand-file-name "~/.julia/environments/v1.9"))
   (setq eglot-connect-timeout 5000)
   (setq julia-repl-switches "-p 4")
   (add-hook 'julia-mode-hook 'eglot-jl-init))

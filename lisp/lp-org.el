@@ -311,9 +311,9 @@
   (setq lp--custom-agenda
 	`((tags-todo "*"
 		     ((org-agenda-skip-function '(org-agenda-skip-if nil '(timestamp)))
-                      ;; (org-agenda-skip-function
-		      ;;  `(org-agenda-skip-entry-if
-		      ;; 	'notregexp ,(format "\\[#%s\\]" (char-to-string org-priority-highest))))
+                      (org-agenda-skip-function
+		       `(org-agenda-skip-entry-if
+			'notregexp ,(format "\\[#%s\\]" (char-to-string org-priority-highest))))
 		      (org-agenda-block-separator ?=)
                       (org-agenda-overriding-header "Basic tasks to review\n")))
 	  (agenda "" ((org-agenda-time-grid nil)
