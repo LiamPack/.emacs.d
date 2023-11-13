@@ -73,4 +73,6 @@
 		 (window-height 0.3)))
   )
 
+(lp-emacs-elpa-package 'denote-menu)
+
 (provide 'lp-denote)
