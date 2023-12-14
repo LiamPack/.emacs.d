@@ -144,8 +144,8 @@
 
 
 ;;; Emacs state saving, server starting, saveplace
-(lp-emacs-builtin-package 'server
-  (add-hook 'after-init-hook #'server-start))
+;; (lp-emacs-builtin-package 'server
+;;   (add-hook 'after-init-hook #'server-start))
 
 (lp-emacs-builtin-package 'desktop
   (setq desktop-auto-save-timeout 300)

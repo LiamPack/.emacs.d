@@ -1,11 +1,14 @@
 (lp-emacs-elpa-package 'denote
   (setq denote-directory "~/dropbox/denotes/")
   (setq denote-allow-multi-word-keywords t)
-  (setq denote-known-keywords '("emacs" "school" "food" "programming"
-                                "personal"
-                                "games" "philosophy" "work" "exercise" "bouldering" "journal"))
+  (setq denote-known-keywords '("notes" "philosophy" "pedagogy" "meta" "list"
+				"probability" "research" ))
 
-  (setq denote-infer-keywords t)
+  ;; (setq denote-known-keywords '("emacs" "school" "food" "programming"
+  ;;                               "personal"
+  ;;                               "games" "philosophy" "work" "exercise" "bouldering" "journal"))
+
+  (setq denote-infer-keywords nil)
   (setq denote-sort-keywords t)
   (setq denote-file-type 'text)
   (setq denote-prompts '(signature title keywords file-type))
@@ -64,8 +67,7 @@
     (define-key map (kbd "C-c f l") #'denote-link-find-file) ; "list" links
     (define-key map (kbd "C-c f b") #'denote-link-backlinks)
     (define-key map (kbd "C-c f r") #'denote-rename-file)
-    (define-key map (kbd "C-c f R") #'denote-rename-file-using-front-matter)
-    )
+    (define-key map (kbd "C-c f R") #'denote-rename-file-using-front-matter))
 
   (add-to-list 'display-buffer-alist
 	       '("\\.*\\(_journal\\|_monthly\\).*.\\(org\\|txt\\)\\.*"
