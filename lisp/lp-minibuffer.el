@@ -194,8 +194,6 @@
   (define-key minibuffer-local-completion-map (kbd "C-x C-d") 'consult-dir)
   (define-key minibuffer-local-completion-map (kbd "C-x C-j") 'consult-dir-jump-file))
 
-(lp-emacs-elpa-package 'consult-notes
-  (consult-notes-denote-mode +1))
 
 ;;; cross-referencing 
 (lp-emacs-builtin-package 'xref

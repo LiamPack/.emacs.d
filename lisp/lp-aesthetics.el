@@ -78,9 +78,12 @@
   ;; sample values.
   (setq standard-themes-bold-constructs t
         standard-themes-italic-constructs t
-        standard-themes-mixed-fonts nil
-        standard-themes-variable-pitch-ui nil
-        standard-themes-mode-line-accented nil
+	standard-themes-disable-other-themes t
+        standard-themes-mixed-fonts t
+        standard-themes-variable-pitch-ui t
+        standard-themes-prompts '(bold italic)
+
+        standard-themes-mode-line-accented t
 
         ;; Accepts a symbol value:
         standard-themes-fringes 'subtle
@@ -88,32 +91,37 @@
         ;; The following accept lists of properties
         standard-themes-links '(neutral-underline)
         standard-themes-region '(no-extend intense)
-        standard-themes-prompts '(bold italic)
 
         ;; more complex alist to set weight, height, and optional
         ;; `variable-pitch' per heading level (t is for any level not
         ;; specified):
-        standard-themes-headings
-        '((0 . (light 1.0))
-          (1 . (light 1.0))
-          (2 . (light 1.0))
-          (3 . (semilight 1.0))
-          (4 . (semilight 1.0))
-          (5 . (1.0))
-          (6 . (1.0))
-          (7 . (1.0))
-          (t . (1.0))))
+	standard-themes-headings
+	      '((1 . (variable-pitch 1.5))
+		(2 . (1.3))
+		(agenda-date . (1.3))
+		(agenda-structure . (variable-pitch light 1.8))
+		(t . (1.1))))
 
-  ;; (setq standard-themes-common-palette-overrides '((cursor white)))
+  (setq standard-dark-palette-overrides
+	'((bg-mode-line-active "#303030")
+	  (border-mode-line-active "#303030")
+
+	  (bg-mode-line-inactive "#101010")
+	  ;; (border-mode-line-inactive "#101010")
+
+	  (cursor red-warmer)
+	  (bg-region bg-yellow-intense)
+	  (bg-magenta-intense bg-yellow-intense)
+	  ))
   )
 
 
-(load-theme 'modus-vivendi-tritanopia :no-confirm)
+(load-theme 'standard-dark :no-confirm)
 (set-face-attribute 'default nil :font "Noto Sans Mono" :height 110)
 
 (lp-emacs-elpa-package 'spacious-padding
   (setq spacious-padding-widths
-	'(:internal-border-width 18 :right-divider-width 10 :scroll-bar-width 8))
+	'(:internal-border-width 14 :right-divider-width 8 :scroll-bar-width 5))
   (spacious-padding-mode +1))
 
 (provide 'lp-aesthetics)

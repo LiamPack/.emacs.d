@@ -15,7 +15,7 @@
   (global-hl-line-mode t)               ; highlight current line
   (setq fill-column 72)         ; column length
 
-  (setq mode-line-compact nil)
+  (setq mode-line-compact t)
   (setq-default mode-line-format
 		'("%e"
                   mode-line-front-space
@@ -24,12 +24,12 @@
 		   display (min-width (5.0)))
                   mode-line-frame-identification
                   mode-line-buffer-identification
-                  "  "
+                  " -- "
                   mode-line-position
 		  (vc-mode vc-mode)
-		  "  "
+		  " -- "
                   mode-line-modes
-                  "  "
+                  " -- "
                   mode-line-misc-info
                   mode-line-end-spaces))
 
