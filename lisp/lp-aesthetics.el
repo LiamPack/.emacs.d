@@ -117,7 +117,7 @@
 
 
 (load-theme 'standard-dark :no-confirm)
-(set-face-attribute 'default nil :font "Noto Sans Mono" :height 110)
+(set-face-attribute 'default nil :font "Noto Mono" :height 110)
 
 (lp-emacs-elpa-package 'spacious-padding
   (setq spacious-padding-widths
