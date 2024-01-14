@@ -20,4 +20,15 @@
       (define-key map (kbd "C-c m g") #'me-goto-mold-source)
       (define-key map (kbd "C-c m e a") #'me-mold-add-last-example)))
 
+
+(lp-emacs-elpa-package 'gptel ; christ almighty am i actually using this
+ ;Available models
+  (setq-default gptel-model "mistral-7b-openorca.Q4_0.gguf" ;Pick your default model
+		gptel-backend (gptel-make-gpt4all "GPT4All"
+						  :protocol "http"
+						  :host "localhost:4891"                 ;Where it's running
+						  :models '("mistral-7b-openorca.Q4_0.gguf")) ;Available models
+		)
+  (setq-default gptel-max-tokens 500))
+
 (provide 'lp-experimental)

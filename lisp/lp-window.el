@@ -152,10 +152,15 @@
   (add-hook 'help-mode-hook #'visual-line-mode)
   (add-hook 'custom-mode-hook #'visual-line-mode)
   (add-hook 'eww-mode-hook #'visual-line-mode)
-  (add-hook 'text-mode-hook #'visual-line-mode))
+  (add-hook 'text-mode-hook #'visual-line-mode)
 
-;; (lp-emacs-builtin-package 'winner
-;;   (winner-mode t)     ; move between windows configuration
-;;   )
+  (define-key global-map (kbd "C-x u") #'undelete-frame) ; I use only C-/ for `undo'
+  (undelete-frame-mode 1))
+
+(lp-emacs-builtin-package 'winner
+  (winner-mode 1)
+  (let ((map global-map)) 
+    (define-key map (kbd "C-x <right>") #'winner-redo)
+    (define-key map (kbd "C-x <left>") #'winner-undo)))
 
 (provide 'lp-window)

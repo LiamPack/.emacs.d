@@ -104,25 +104,24 @@
 
   (setq standard-dark-palette-overrides
 	'((bg-mode-line-active "#303030")
-	  (border-mode-line-active "#303030")
-
 	  (bg-mode-line-inactive "#101010")
-	  ;; (border-mode-line-inactive "#101010")
 
 	  (cursor red-warmer)
-	  (bg-region bg-yellow-intense)
-	  (bg-magenta-intense bg-yellow-intense)
-	  ))
-  )
+	  (bg-region bg-yellow-intense))))
 
-
+;; https://madmalik.github.io/mononoki/
 (load-theme 'standard-dark :no-confirm)
-(set-face-attribute 'default nil :font "Noto Mono" :height 110)
+(set-face-attribute 'default nil
+		    :font "mononoki"
+		    :height 110
+		    :weight 'normal
+		    :width 'normal)
 
 (lp-emacs-elpa-package 'spacious-padding
   (setq spacious-padding-widths
 	'(:internal-border-width 14 :right-divider-width 8 :scroll-bar-width 5))
-  (spacious-padding-mode +1))
+  (setq spacious-padding-subtle-mode-line nil)
+  (spacious-padding-mode 1))
 
 (provide 'lp-aesthetics)
  

@@ -8,13 +8,12 @@
   (setq completion-ignore-case t)
   (setq completion-auto-wrap t)
   (setq completion-auto-select t)
-  (setq completion-auto-choose t)
   (setq completion-auto-help 'visible) ;; TODO tweak
+  (setq completion-auto-choose nil)
   (setq completions-format 'one-column)
   (setq completions-max-height 20)
   (setq completions-header-format nil)
   (setq completion-cycle-threshold nil)
-  (setq copmletion-flex-nospace nil)
   (setq read-minibuffer-restore-windows t)
 
   ;; emacs28 completion stuff

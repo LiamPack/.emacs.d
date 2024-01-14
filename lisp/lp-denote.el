@@ -55,7 +55,7 @@
 		      t
 		      (concat ".*" (denote-sluggify (downcase date)) ".*")))
 		(switch-to-buffer-obey-display-actions t)
-		(monthly-name  (lp--denote-rename-fn (car fns)))		)
+		(monthly-name  (lp--denote-rename-fn (car fns))))
 	(cond
 	 ;; need this "window" since it should pop only if displaying
 	 ((get-buffer-window monthly-name)
@@ -72,7 +72,6 @@
     (define-key map (kbd "C-c f d") #'(lambda ()
                                         (interactive)
                                         (dired (denote-directory))))
-
     (define-key map (kbd "C-c f i") #'denote-link-or-create) ; "insert" mnemonic
     (define-key map (kbd "C-c f I") #'denote-link-add-links)
     (define-key map (kbd "C-c f l") #'denote-link-find-file) ; "list" links
