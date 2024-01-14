@@ -107,13 +107,21 @@
 	  (bg-mode-line-inactive "#101010")
 
 	  (cursor red-warmer)
-	  (bg-region bg-yellow-intense))))
+	  (bg-region bg-yellow-intense)))
+
+  (with-eval-after-load 'denote
+    (standard-themes-with-colors
+    (set-face-attribute 'denote-faces-title nil
+			:foreground fg-main
+			:box bg-alt))))
 
 ;; https://madmalik.github.io/mononoki/
+;; https://leahneukirchen.org/fonts/
+;; bdftopcf, https://thristian.livejournal.com/90017.html
 (load-theme 'standard-dark :no-confirm)
 (set-face-attribute 'default nil
-		    :font "mononoki"
-		    :height 110
+		    :font "Smalltalk"
+		    :height 100
 		    :weight 'normal
 		    :width 'normal)
 

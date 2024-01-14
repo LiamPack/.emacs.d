@@ -4,8 +4,6 @@
 (lp-emacs-elpa-package 'dash)
 (lp-emacs-elpa-package 'async)
 
-(lp-emacs-elpa-package 'tree-sitter)
-(lp-emacs-elpa-package 'tree-sitter-langs)
 (lp-emacs-elpa-package 'org-ql) ;; for updating note molds via org export
 
 (lp-emacs-git-package
@@ -23,12 +21,11 @@
 
 (lp-emacs-elpa-package 'gptel ; christ almighty am i actually using this
  ;Available models
-  (setq-default gptel-model "mistral-7b-openorca.Q4_0.gguf" ;Pick your default model
-		gptel-backend (gptel-make-gpt4all "GPT4All"
+  (setq gptel-model "mistral-7b-openorca.Q4_0.gguf") ;Pick your default model
+  (setq gptel-backend (gptel-make-gpt4all "GPT4All"
 						  :protocol "http"
 						  :host "localhost:4891"                 ;Where it's running
-						  :models '("mistral-7b-openorca.Q4_0.gguf")) ;Available models
-		)
+						  :models '("mistral-7b-openorca.Q4_0.gguf"))) ;Available models
   (setq-default gptel-max-tokens 500))
 
 (provide 'lp-experimental)

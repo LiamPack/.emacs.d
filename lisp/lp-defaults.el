@@ -251,4 +251,12 @@
 (lp-emacs-builtin-package 'so-long
   (global-so-long-mode +1))
 
+(lp-emacs-builtin-package 'pixel-scroll
+  (let ((map global-map))
+    (define-key map [remap scroll-up-command] #'pixel-scroll-interpolate-down)
+    (define-key map [remap scroll-down-command] #'pixel-scroll-interpolate-up))
+  
+  (setq pixel-scroll-precision-interpolate-page t)
+  (pixel-scroll-precision-mode 1))
+
 (provide 'lp-defaults)

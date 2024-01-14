@@ -157,7 +157,7 @@
 ;;; internet browsing
 (lp-emacs-builtin-package 'eww
   (define-key global-map (kbd "<f12>") 'eww)
-  (define-key global-map (kbd "M-(") 'eww)
+  ;; (define-key global-map (kbd "M-(") 'eww)
   (setq shr-use-colors nil)
   (setq shr-use-fonts nil)
   (setq shr-max-image-proportion 0.6)
@@ -220,6 +220,8 @@
   ;; (setq browse-url-browser-function 'eww-browse-url)
   ;; (setq browse-url-secondary-browser-function 'browse-url-default-browser)
   (setq lp--elfeed-tags '(star stats leftist programming philosophy emacs academic pl writing lisp dead))
+  ;;; Elfeed feeds
+  ;; https://leahneukirchen.org/MySubscriptions.cgi
   (setq elfeed-feeds '("https://freddiedeboer.substack.com/feed.rss" ;; classical marxist
                        ("https://www.juliabloggers.com/feed/" programming) ;; julia blogs
                        ("https://protesilaos.com/master.xml" star philosophy emacs)
@@ -231,7 +233,6 @@
                        ("https://griefbacon.substack.com/feed" writing)
                        ("https://defaultfriend.substack.com/feed" writing)
 		       ("https://internetprincess.substack.com/feed" writing)
-
                        ("https://graymirror.substack.com/feed" leftist)
                        ("https://jdahl.substack.com/feed" writing)
                        ("http://inconvergent.net/atom.xml" art lisp)
@@ -251,9 +252,10 @@
 		       ("http://www.math3ma.com/blog/rss.xml" math)
 		       ("https://golem.ph.utexas.edu/category/rss.html" math)
 		       ("https://johncarlosbaez.wordpress.com/atom.xml" math physics)
-		       "http://bactra.org/weblog/index.rss"
-                       "http://bactra.org/notebooks/index.rss" ;; cmu guy
-		       "https://prospect.org/api/rss/content_full.rss"
+		       ;; "http://bactra.org/weblog/index.rss"
+                       ;; "http://bactra.org/notebooks/index.rss" ;; cmu guy
+		       ;; "https://prospect.org/api/rss/content_full.rss"
+		       "https://leahneukirchen.org/trivium/index.atom"
                        ;; ("http://understandinguncertainty.org/blog" dead) ;; dead shit
                        )))
 

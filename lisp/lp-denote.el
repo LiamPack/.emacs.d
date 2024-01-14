@@ -14,7 +14,7 @@
 
   (setq denote-infer-keywords nil)
   (setq denote-sort-keywords t)
-  (setq denote-file-type 'org)
+  (setq denote-file-type 'text)
   (setq denote-prompts '(signature title keywords file-type))
 
   (denote-rename-buffer-mode 1)
@@ -30,7 +30,7 @@
   (setq lp--journal-date-format "%A %e %B %Y") ; format like Tuesday 14 June 2022
   (setq lp--monthly-date-format "%b %Y")
 
-  (defun lp--deonte-pop-journal ()
+  (defun lp--denote-pop-journal ()
     (interactive)
     (denote-journal-extras-new-or-existing-entry (format-time-string lp--journal-date-format)))
 
@@ -86,5 +86,90 @@
 		 (window-height 0.3))))
 ;; (lp-emacs-elpa-package 'consult-notes
 ;;   (consult-notes-denote-mode +1))
+
+;; https://leahneukirchen.org/blog/archive/2022/03/note-taking-in-emacs-with-howm.html
+;; https://kaorahi.github.io/howm/README.html
+(lp-emacs-elpa-package 'howm
+  ;; Directory configuration
+  (setq howm-home-directory "~/dropbox/denotes/_howm/")
+  (setq howm-directory "~/dropbox/denotes/_howm/")
+  (setq howm-keyword-file (expand-file-name ".howm-keys" howm-home-directory))
+  (setq howm-history-file (expand-file-name ".howm-history" howm-home-directory))
+  (setq howm-file-name-format "%Y%m%dT%H%M%S.txt")
+
+  ;; Use ripgrep as grep
+  (setq howm-view-use-grep t)
+  (setq howm-view-grep-command "rg")
+  (setq howm-view-grep-option "-nH --no-heading --color never")
+  (setq howm-view-grep-extended-option nil)
+  (setq howm-view-grep-fixed-option "-F")
+  (setq howm-view-grep-expr-option nil)
+  (setq howm-view-grep-file-stdin-option nil)
+
+  ;; counsel-rg for howm
+  (defun howm-list--counsel-rg (match)
+    (if (string= match "")
+	(howm-list-all)
+      (if (or (null ivy--old-cands)
+	      (equal ivy--old-cands '("No matches found")))
+          (message "No match")
+	(let ((howm-view-use-grep
+	       #'(lambda (str file-list &optional fixed-p force-case-fold)
+                   (mapcar
+                    (lambda (cand)
+		      (if (string-match "\\`\\(.*\\):\\([0-9]+\\):\\(.*\\)\\'" cand)
+                          (let ((file (match-string-no-properties 1 cand))
+				(line (match-string-no-properties 2 cand))
+				(match-line (match-string-no-properties 3 cand)))
+                            (list (expand-file-name file howm-directory)
+                                  (string-to-number line)
+                                  match-line))))
+                    ivy--old-cands))))
+          (howm-search ivy--old-re t)
+          (riffle-set-place
+	   (1+ (cl-position match ivy--old-cands :test 'string=)))))))
+
+  (defun howm-counsel-rg ()
+    "Interactively grep for a string in your howm notes using rg."
+    (interactive)
+    (let ((default-directory howm-directory)
+          (counsel-ag-base-command counsel-rg-base-command)
+          (counsel-ag-command (counsel--format-ag-command "--glob=!*~" "%s")))
+      (ivy-read "Search all (rg): "
+		#'counsel-ag-function
+		:dynamic-collection t
+		:keymap counsel-ag-map
+		:action #'howm-list--counsel-rg
+		:require-match t
+		:caller 'counsel-rg)))
+
+  (define-key global-map (concat howm-prefix "r") 'howm-counsel-rg)
+
+  ;; Default recent to sorting by mtime
+  (advice-add 'howm-list-recent :after #'howm-view-sort-by-mtime)
+  ;; Default all to sorting by creation, newest first
+  (advice-add 'howm-list-all :after #'(lambda () (howm-view-sort-by-date t)))
+
+  ;; Rename buffers to their title
+  (add-hook 'howm-mode-hook 'howm-mode-set-buffer-name)
+  (add-hook 'after-save-hook 'howm-mode-set-buffer-name)
+
+  (define-key howm-menu-mode-map "\C-h" nil)
+  (define-key riffle-summary-mode-map "\C-h" nil)
+  (define-key howm-view-contents-mode-map "\C-h" nil)
+
+  ;; zotero://
+  (add-to-list 'action-lock-default-rules
+               (list "\\<zotero://\\S +" (lambda (&optional dummy)
+                                           (browse-url (match-string-no-properties 0)))))
+  ;; @bibtex
+  (add-to-list 'action-lock-default-rules
+               (list "\\s-\\(@\\([a-zA-Z0-9:-]+\\)\\)\\>"
+                     (lambda (&optional dummy)
+                       (browse-url (concat "zotero://select/items/bbt:"
+                                           (match-string-no-properties 2))))
+                     1))
+
+  )
 
 (provide 'lp-denote)
