@@ -97,6 +97,7 @@
   (setq org-confirm-babel-evaluate nil)
   (setq org-edit-src-persistent-message nil)
   (setq org-src-fontify-natively t)
+  (setq org-highlight-latex-and-related '(latex script entities))
   (setq org-src-preserve-indentation t)
   (setq org-src-tab-acts-natively t)
   (setq org-edit-src-content-indentation 0)
@@ -414,5 +415,19 @@
     (define-key map (kbd "C-M-S-<left>") nil)
     (define-key map (kbd "C-c M-l") #'org-insert-last-stored-link)
     (define-key map (kbd "C-c C-M-l") #'org-toggle-link-display)))
+
+
+(with-eval-after-load 'ox-latex
+  (add-to-list 'org-latex-classes
+               '("org-plain-latex"
+		 "\\documentclass{article}
+           [NO-DEFAULT-PACKAGES]
+           [PACKAGES]
+           [EXTRA]"
+		 ("\\section{%s}" . "\\section*{%s}")
+		 ("\\subsection{%s}" . "\\subsection*{%s}")
+		 ("\\subsubsection{%s}" . "\\subsubsection*{%s}")
+		 ("\\paragraph{%s}" . "\\paragraph*{%s}")
+		 ("\\subparagraph{%s}" . "\\subparagraph*{%s}"))))
 
 (provide 'lp-org)
