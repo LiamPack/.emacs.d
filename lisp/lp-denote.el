@@ -25,14 +25,8 @@
   (add-hook 'find-file-hook #'denote-link-buttonize-buffer)
   (require 'denote-journal-extras)
   (setq denote-journal-extras-keyword "journal")
-  (setq denote-journal-extras-directory "journal")
-
-  (setq lp--journal-date-format "%A %e %B %Y") ; format like Tuesday 14 June 2022
+  (setq denote-journal-extras-title-format 'day-date-month-year)
   (setq lp--monthly-date-format "%b %Y")
-
-  (defun lp--denote-pop-journal ()
-    (interactive)
-    (denote-journal-extras-new-or-existing-entry (format-time-string lp--journal-date-format)))
 
   (defun lp--denote-rename-fn (file)
     (let ((type (denote-filetype-heuristics file)))
@@ -66,7 +60,7 @@
 
   (let ((map global-map))
     (define-key map (kbd "C-c f j") #'denote-subdirectory) ; our custom command
-    (define-key map (kbd "C-c C-o") #'lp--denote-pop-journal)
+    (define-key map (kbd "C-c C-o") #'denote-journal-extras-new-or-existing-entry)
     (define-key map (kbd "C-c C-m") #'lp--denote-pop-monthly)
     (define-key map (kbd "C-c f n") #'denote)
     (define-key map (kbd "C-c f d") #'(lambda ()

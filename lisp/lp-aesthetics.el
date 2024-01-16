@@ -111,16 +111,16 @@
 
   (with-eval-after-load 'denote
     (standard-themes-with-colors
-    (set-face-attribute 'denote-faces-title nil
-			:foreground fg-main
-			:box bg-alt))))
+      (set-face-attribute 'denote-faces-title nil
+			  :foreground fg-main
+			  :box bg-alt))))
 
 ;; https://madmalik.github.io/mononoki/
 ;; https://leahneukirchen.org/fonts/
 ;; bdftopcf, https://thristian.livejournal.com/90017.html
 (load-theme 'standard-dark :no-confirm)
 (set-face-attribute 'default nil
-		    :font "Smalltalk"
+		    :font "DejaVu Sans Mono"
 		    :height 100
 		    :weight 'normal
 		    :width 'normal)
@@ -130,6 +130,27 @@
 	'(:internal-border-width 14 :right-divider-width 8 :scroll-bar-width 5))
   (setq spacious-padding-subtle-mode-line nil)
   (spacious-padding-mode 1))
+
+ (defun toggle-transparency ()
+   (interactive)
+   (let ((alpha (frame-parameter nil 'alpha)))
+     (set-frame-parameter
+      nil 'alpha
+      (if (eql (cond ((numberp alpha) alpha)
+                     ((numberp (cdr alpha)) (cdr alpha))
+                     ;; Also handle undocumented (<active> <inactive>) form.
+                     ((numberp (cadr alpha)) (cadr alpha)))
+               100)
+          '(80 . 79) '(100 . 100)))))
+
+
+ ;;(set-frame-parameter (selected-frame) 'alpha '(<active> . <inactive>))
+ ;;(set-frame-parameter (selected-frame) 'alpha <both>)
+(set-frame-parameter (selected-frame) 'alpha '(80 . 79))
+(add-to-list 'default-frame-alist '(alpha . (80 . 79)))
+
+(global-set-key (kbd "C-c &") 'toggle-transparency)
+
 
 (provide 'lp-aesthetics)
  
