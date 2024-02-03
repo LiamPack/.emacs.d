@@ -115,15 +115,6 @@
 			  :foreground fg-main
 			  :box bg-alt))))
 
-;; https://madmalik.github.io/mononoki/
-;; https://leahneukirchen.org/fonts/
-;; bdftopcf, https://thristian.livejournal.com/90017.html
-(load-theme 'standard-dark :no-confirm)
-(set-face-attribute 'default nil
-		    :font "DejaVu Sans Mono"
-		    :height 100
-		    :weight 'normal
-		    :width 'normal)
 
 (lp-emacs-elpa-package 'spacious-padding
   (setq spacious-padding-widths
@@ -141,16 +132,34 @@
                      ;; Also handle undocumented (<active> <inactive>) form.
                      ((numberp (cadr alpha)) (cadr alpha)))
                100)
-          '(80 . 79) '(100 . 100)))))
+          '(85 . 79) '(100 . 100)))))
 
 
  ;;(set-frame-parameter (selected-frame) 'alpha '(<active> . <inactive>))
  ;;(set-frame-parameter (selected-frame) 'alpha <both>)
-(set-frame-parameter (selected-frame) 'alpha '(80 . 79))
-(add-to-list 'default-frame-alist '(alpha . (80 . 79)))
+(set-frame-parameter (selected-frame) 'alpha '(85 . 79))
+(add-to-list 'default-frame-alist '(alpha . (85 . 79)))
 
 (global-set-key (kbd "C-c &") 'toggle-transparency)
 
+;; https://madmalik.github.io/mononoki/
+;; https://leahneukirchen.org/fonts/
+;; bdftopcf, https://thristian.livejournal.com/90017.html
+(global-set-key (kbd "C-c *") #'standard-themes-toggle)
+(load-theme 'standard-dark :no-confirm)
+(set-face-attribute 'default nil
+		    :font "Fira Code"
+		    :height 110
+		    :weight 'normal
+		    :width 'normal)
+(set-face-attribute 'variable-pitch nil
+		    :font "ETBembo"
+		    :height 110
+		    :weight 'normal
+		    :width 'normal)
+
+
+(add-hook 'text-mode-hook #'variable-pitch-mode)
+
 
 (provide 'lp-aesthetics)
- 

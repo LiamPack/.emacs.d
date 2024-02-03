@@ -117,8 +117,8 @@
   (setq org-insert-heading-respect-content t)
 
   ;; Auto wrap paragraphs in some modes (auto-fill-mode)
-  (add-hook 'text-mode-hook #'turn-on-auto-fill)
-  (add-hook 'org-mode-hook #'turn-on-auto-fill)
+  ;; (add-hook 'text-mode-hook #'turn-on-auto-fill)
+  ;; (add-hook 'org-mode-hook #'turn-on-auto-fill)
 
   ;;; capture
   (setq lp--tasks-file (car (directory-files org-directory t ".*tasks.*org")))
@@ -428,6 +428,18 @@
 		 ("\\subsection{%s}" . "\\subsection*{%s}")
 		 ("\\subsubsection{%s}" . "\\subsubsection*{%s}")
 		 ("\\paragraph{%s}" . "\\paragraph*{%s}")
-		 ("\\subparagraph{%s}" . "\\subparagraph*{%s}"))))
+		 ("\\subparagraph{%s}" . "\\subparagraph*{%s}")))
+
+  ;; update the list of LaTeX classes and associated header (encoding, etc.)
+  ;; and structure
+  '(add-to-list 'org-latex-classes
+                `("beamer"
+                  ,(concat "\\documentclass[presentation]{beamer}\n"
+                           "[DEFAULT-PACKAGES]"
+                           "[PACKAGES]"
+                           "[EXTRA]\n")
+                  ("\\section{%s}" . "\\section*{%s}")
+                  ("\\subsection{%s}" . "\\subsection*{%s}")
+                  ("\\subsubsection{%s}" . "\\subsubsection*{%s}"))))
 
 (provide 'lp-org)

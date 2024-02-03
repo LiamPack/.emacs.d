@@ -206,7 +206,9 @@
 (lp-emacs-elpa-package 'rainbow-delimiters
   (add-hook 'prog-mode-hook 'rainbow-delimiters-mode))
 
-(lp-emacs-elpa-package 'paredit)
+(lp-emacs-elpa-package 'paredit
+  (add-hook 'lisp-mode-map #'paredit-mode))
+
 (lp-emacs-elpa-package 'geiser
   (add-hook 'geiser-mode-hook #'paredit-mode)
   (setq auto-mode-alist (cons '("\\.scm" . scheme-mode) auto-mode-alist))
