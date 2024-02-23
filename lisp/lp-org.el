@@ -91,7 +91,8 @@
    'org-babel-load-languages
    '((emacs-lisp . t)
      (gnuplot . t)
-     (shell . t)))
+     (shell . t)
+     (julia . t)))
 
   (setq org-src-window-setup 'plain) ;; let display-buffer handle it
   (setq org-confirm-babel-evaluate nil)
@@ -428,18 +429,7 @@
 		 ("\\subsection{%s}" . "\\subsection*{%s}")
 		 ("\\subsubsection{%s}" . "\\subsubsection*{%s}")
 		 ("\\paragraph{%s}" . "\\paragraph*{%s}")
-		 ("\\subparagraph{%s}" . "\\subparagraph*{%s}")))
+		 ("\\subparagraph{%s}" . "\\subparagraph*{%s}"))))
 
-  ;; update the list of LaTeX classes and associated header (encoding, etc.)
-  ;; and structure
-  '(add-to-list 'org-latex-classes
-                `("beamer"
-                  ,(concat "\\documentclass[presentation]{beamer}\n"
-                           "[DEFAULT-PACKAGES]"
-                           "[PACKAGES]"
-                           "[EXTRA]\n")
-                  ("\\section{%s}" . "\\section*{%s}")
-                  ("\\subsection{%s}" . "\\subsection*{%s}")
-                  ("\\subsubsection{%s}" . "\\subsubsection*{%s}"))))
 
 (provide 'lp-org)

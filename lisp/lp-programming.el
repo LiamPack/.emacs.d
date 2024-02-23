@@ -193,7 +193,9 @@
 
 ;;; lisps and schemes and racket
 (lp-emacs-elpa-package 'sly
-  (setq inferior-lisp-program "/usr/bin/sbcl"))
+  (setq inferior-lisp-program "/usr/bin/sbcl")
+	(define-key sly-mode-map (kbd "C-c C-k") #'sly-eval-buffer)
+	)
 
 (lp-emacs-elpa-package 'sly-asdf)
 
