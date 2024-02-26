@@ -1,5 +1,5 @@
 (lp-emacs-builtin-package 'abbrev
-  (setq abbrev-suggest t)
+  (setq abbrev-suggest nil)
   (setq save-abbrevs 'silently)
   (setq abbrev-file-name (locate-user-emacs-file "abbrevs"))
   (setq only-global-abbrevs nil))
@@ -40,8 +40,10 @@
   (let ((map tempel-map))
     (define-key map (kbd "RET") #'tempel-done)
     (define-key map (kbd "C-p") #'tempel-previous)
-    (define-key map (kbd "C-n") #'tempel-next))
+    (define-key map (kbd "C-n") #'tempel-next)
+    (define-key map (kbd "TAB") #'tempel-next))
 
+  (setq tempel-trigger-prefix
   ;; Setup completion at point
   (defun tempel-setup-capf ()
     ;; Add the Tempel Capf to `completion-at-point-functions'.
@@ -60,7 +62,10 @@
 
   ;; Optionally make the Tempel templates available to Abbrev,
   ;; either locally or globally. `expand-abbrev' is bound to C-x '.
-  ;; (add-hook 'prog-mode-hook #'tempel-abbrev-mode)
+  (add-hook 'org-cdlatex-mode-hook #'tempel-abbrev-mode)
+  (add-hook 'org-cdlatex-mode-hook #'abbrev-mode)
+  (add-hook 'latex-mode-hook #'tempel-abbrev-mode)
+  (add-hook 'text-mode-hook #'tempel-abbrev-mode)
   ;; (global-tempel-abbrev-mode)
   )
 
