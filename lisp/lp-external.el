@@ -306,4 +306,11 @@
     (define-key map (kbd "J") #'dired-jump)             ; Jump to library buffer
     (define-key map (kbd "I") #'bongo-insert-special)))
 
+
+(lp-emacs-elpa-package 'arxiv-mode
+  (setq arxiv-pop-up-new-frame nil)
+  (setq arxiv-startup-with-abstract-window t)
+  (setq arxiv-default-category "math.pr")
+  )
+
 (provide 'lp-external)

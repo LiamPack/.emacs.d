@@ -13,10 +13,47 @@
   (setq rainbow-ansi-colors nil)
   (setq rainbow-x-colors nil))
 
+ (defun toggle-transparency ()
+   (interactive)
+   (let ((alpha (frame-parameter nil 'alpha)))
+     (set-frame-parameter
+      nil 'alpha
+      (if (eql (cond ((numberp alpha) alpha)
+                     ((numberp (cdr alpha)) (cdr alpha))
+                     ;; Also handle undocumented (<active> <inactive>) form.
+                     ((numberp (cadr alpha)) (cadr alpha)))
+               100)
+          '(85 . 79) '(100 . 100)))))
+
+
+ ;;(set-frame-parameter (selected-frame) 'alpha '(<active> . <inactive>))
+ ;;(set-frame-parameter (selected-frame) 'alpha <both>)
+
+(global-set-key (kbd "C-c &") 'toggle-transparency)
+
+;; https://madmalik.github.io/mononoki/
+;; https://leahneukirchen.org/fonts/
+;; bdftopcf, https://thristian.livejournal.com/90017.html
+
+(set-face-attribute 'default nil
+		    :font "sq"
+		    :height 110
+		    :weight 'normal
+		    :width 'normal)
+;; (set-face-attribute 'variable-pitch nil
+;; 		    :font "ETBembo"
+;; 		    :height 110
+;; 		    :weight 'normal
+;; 		    :width 'normal)
+
+
+;; (add-hook 'text-mode-hook #'variable-pitch-mode)
+
+
 (lp-emacs-git-package 'modus-themes
   "https://github.com/protesilaos/modus-themes.git"
   (setq modus-themes-mixed-fonts t
-        modus-themes-variable-pitch-ui t
+        modus-themes-variable-pitch-ui nil
         modus-themes-italic-constructs t
         modus-themes-bold-constructs t
 	modus-themes-org-blocks 'gray-background
@@ -80,7 +117,7 @@
         standard-themes-italic-constructs t
 	standard-themes-disable-other-themes t
         standard-themes-mixed-fonts t
-        standard-themes-variable-pitch-ui t
+        standard-themes-variable-pitch-ui nil
         standard-themes-prompts '(bold italic)
 
         standard-themes-mode-line-accented t
@@ -122,42 +159,8 @@
   (setq spacious-padding-subtle-mode-line nil)
   (spacious-padding-mode 1))
 
- (defun toggle-transparency ()
-   (interactive)
-   (let ((alpha (frame-parameter nil 'alpha)))
-     (set-frame-parameter
-      nil 'alpha
-      (if (eql (cond ((numberp alpha) alpha)
-                     ((numberp (cdr alpha)) (cdr alpha))
-                     ;; Also handle undocumented (<active> <inactive>) form.
-                     ((numberp (cadr alpha)) (cadr alpha)))
-               100)
-          '(85 . 79) '(100 . 100)))))
-
-
- ;;(set-frame-parameter (selected-frame) 'alpha '(<active> . <inactive>))
- ;;(set-frame-parameter (selected-frame) 'alpha <both>)
-
-(global-set-key (kbd "C-c &") 'toggle-transparency)
-
-;; https://madmalik.github.io/mononoki/
-;; https://leahneukirchen.org/fonts/
-;; bdftopcf, https://thristian.livejournal.com/90017.html
 (global-set-key (kbd "C-c *") #'standard-themes-toggle)
 (load-theme 'standard-dark :no-confirm)
-(set-face-attribute 'default nil
-		    :font "Fira Code"
-		    :height 110
-		    :weight 'normal
-		    :width 'normal)
-(set-face-attribute 'variable-pitch nil
-		    :font "ETBembo"
-		    :height 110
-		    :weight 'normal
-		    :width 'normal)
-
-
-(add-hook 'text-mode-hook #'variable-pitch-mode)
 
 
 (provide 'lp-aesthetics)
