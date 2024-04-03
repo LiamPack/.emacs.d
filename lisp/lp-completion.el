@@ -43,7 +43,6 @@
     (define-key map (kbd "C-n") #'tempel-next)
     (define-key map (kbd "TAB") #'tempel-next))
 
-  (setq tempel-trigger-prefix
   ;; Setup completion at point
   (defun tempel-setup-capf ()
     ;; Add the Tempel Capf to `completion-at-point-functions'.

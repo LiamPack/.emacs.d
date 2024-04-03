@@ -36,7 +36,7 @@
 ;; bdftopcf, https://thristian.livejournal.com/90017.html
 
 (set-face-attribute 'default nil
-		    :font "sq"
+		    :font "Fira Code"
 		    :height 110
 		    :weight 'normal
 		    :width 'normal)
@@ -132,12 +132,13 @@
         ;; more complex alist to set weight, height, and optional
         ;; `variable-pitch' per heading level (t is for any level not
         ;; specified):
-	standard-themes-headings
-	      '((1 . (variable-pitch 1.5))
-		(2 . (1.3))
-		(agenda-date . (1.3))
-		(agenda-structure . (variable-pitch light 1.8))
-		(t . (1.1))))
+	;; standard-themes-headings
+	;;       '((1 . (variable-pitch 1.5))
+	;; 	(2 . (1.3))
+	;; 	(agenda-date . (1.3))
+	;; 	(agenda-structure . (variable-pitch light 1.8))
+	;; 	(t . (1.1)))
+	      )
 
   (setq standard-dark-palette-overrides
 	'((bg-mode-line-active "#303030")
