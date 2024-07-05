@@ -36,7 +36,7 @@
 ;; bdftopcf, https://thristian.livejournal.com/90017.html
 
 (set-face-attribute 'default nil
-		    :font "Fira Code"
+		    :font "DejaVu Sans Mono"
 		    :height 110
 		    :weight 'normal
 		    :width 'normal)
@@ -147,11 +147,12 @@
 	  (cursor red-warmer)
 	  (bg-region bg-yellow-intense)))
 
-  (with-eval-after-load 'denote
-    (standard-themes-with-colors
-      (set-face-attribute 'denote-faces-title nil
-			  :foreground fg-main
-			  :box bg-alt))))
+  ;; (with-eval-after-load 'denote
+  ;;   (standard-themes-with-colors
+  ;;     (set-face-attribute 'denote-faces-title nil
+  ;; 			  :foreground fg-main
+  ;; 			  :box bg-alt)))
+  )
 
 
 (lp-emacs-elpa-package 'spacious-padding

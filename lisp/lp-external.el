@@ -222,41 +222,24 @@
   (setq lp--elfeed-tags '(star stats leftist programming philosophy emacs academic pl writing lisp dead))
   ;;; Elfeed feeds
   ;; https://leahneukirchen.org/MySubscriptions.cgi
-  (setq elfeed-feeds '("https://freddiedeboer.substack.com/feed.rss" ;; classical marxist
-                       ("https://www.juliabloggers.com/feed/" programming) ;; julia blogs
-                       ("https://protesilaos.com/master.xml" star philosophy emacs)
-                       ;; "http://rachelbythebay.com/w/atom.xml"
+  (setq elfeed-feeds '(("https://protesilaos.com/master.xml" star philosophy emacs)
                        ("https://ava.substack.com/feed" writing)
-                       ("https://askmolly.substack.com/feed" writing)
-                       ("https://askpolly.substack.com/feed" writing)
-                       ("https://cherylstrayed.substack.com/feed" writing)
-                       ("https://griefbacon.substack.com/feed" writing)
-                       ("https://defaultfriend.substack.com/feed" writing)
-		       ("https://internetprincess.substack.com/feed" writing)
-                       ("https://graymirror.substack.com/feed" leftist)
-                       ("https://jdahl.substack.com/feed" writing)
                        ("http://inconvergent.net/atom.xml" art lisp)
                        "http://nullprogram.com/feed/"
-                       ("http://feeds.feedburner.com/datacolada/" stats)
-                       ("https://tymoon.eu/api/reader/atom" lisp gamedev) ;; kandria dev
                        ("https://alhassy.github.io/rss.xml" lisp) ;; lisper, had that great post about emacs lisp's type system
 		       ("https://borretti.me/feed.xml" lisp writing) ;; guy who did the astro+lisp post 
                        "https://gwern.substack.com/feed"
                        "https://www.benkuhn.net/index.xml" ;; harvard xd
                        ("https://www.nayuki.io/rss20.xml" programming) ;; swe in canada with classic math posts
-                       ("https://blog.nelhage.com/atom.xml" programming swe) ;; guy who made the networks classic guy
-                       ("https://lacker.io/feed.xml" data-science)
-                       ("https://danluu.com/atom.xml" star stats)
+                       ("https://danluu.com/atom.xml" star stats) ;; plain blog but very good
 		       ("https://statisticaloddsandends.wordpress.com/atom.xml" stats)
 		       ("https://mathematicaloddsandends.wordpress.com/atom.xml" math)
-		       ("http://www.math3ma.com/blog/rss.xml" math)
-		       ("https://golem.ph.utexas.edu/category/rss.html" math)
+		       ("http://www.math3ma.com/blog/rss.xml" math) ;; tai danae bradley
+		       ("https://golem.ph.utexas.edu/category/rss.html" math) ;; n-category cafe
 		       ("https://johncarlosbaez.wordpress.com/atom.xml" math physics)
-		       ;; "http://bactra.org/weblog/index.rss"
-                       ;; "http://bactra.org/notebooks/index.rss" ;; cmu guy
-		       ;; "https://prospect.org/api/rss/content_full.rss"
 		       "https://leahneukirchen.org/trivium/index.atom"
-                       ;; ("http://understandinguncertainty.org/blog" dead) ;; dead shit
+		       ("https://rss.arxiv.org/rss/math.PR" math prob)
+		       ("https://terrytao.wordpress.com/feed/" math)
                        )))
 
 ;;; epub reader

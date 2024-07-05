@@ -20,9 +20,8 @@
   (denote-rename-buffer-mode 1)
   (setq denote-rename-buffer-format "[D] %s = %>25t")
 
-
   (add-hook 'dired-mode-hook #'denote-dired-mode)
-  (add-hook 'find-file-hook #'denote-link-buttonize-buffer)
+  ;; (add-hook 'find-file-hook #'denote-link-buttonize-buffer)
   (require 'denote-journal-extras)
   (setq denote-journal-extras-keyword "journal")
   (setq denote-journal-extras-title-format 'day-date-month-year)
@@ -81,6 +80,9 @@
 ;; (lp-emacs-elpa-package 'consult-notes
 ;;   (consult-notes-denote-mode +1))
 
+(lp-emacs-elpa-package 'consult-denote
+  (consult-denote-mode +1))
+
 ;; https://leahneukirchen.org/blog/archive/2022/03/note-taking-in-emacs-with-howm.html
 ;; https://kaorahi.github.io/howm/README.html
 (lp-emacs-elpa-package 'howm
@@ -99,45 +101,6 @@
   (setq howm-view-grep-fixed-option "-F")
   (setq howm-view-grep-expr-option nil)
   (setq howm-view-grep-file-stdin-option nil)
-
-  ;; counsel-rg for howm
-  (defun howm-list--counsel-rg (match)
-    (if (string= match "")
-	(howm-list-all)
-      (if (or (null ivy--old-cands)
-	      (equal ivy--old-cands '("No matches found")))
-          (message "No match")
-	(let ((howm-view-use-grep
-	       #'(lambda (str file-list &optional fixed-p force-case-fold)
-                   (mapcar
-                    (lambda (cand)
-		      (if (string-match "\\`\\(.*\\):\\([0-9]+\\):\\(.*\\)\\'" cand)
-                          (let ((file (match-string-no-properties 1 cand))
-				(line (match-string-no-properties 2 cand))
-				(match-line (match-string-no-properties 3 cand)))
-                            (list (expand-file-name file howm-directory)
-                                  (string-to-number line)
-                                  match-line))))
-                    ivy--old-cands))))
-          (howm-search ivy--old-re t)
-          (riffle-set-place
-	   (1+ (cl-position match ivy--old-cands :test 'string=)))))))
-
-  (defun howm-counsel-rg ()
-    "Interactively grep for a string in your howm notes using rg."
-    (interactive)
-    (let ((default-directory howm-directory)
-          (counsel-ag-base-command counsel-rg-base-command)
-          (counsel-ag-command (counsel--format-ag-command "--glob=!*~" "%s")))
-      (ivy-read "Search all (rg): "
-		#'counsel-ag-function
-		:dynamic-collection t
-		:keymap counsel-ag-map
-		:action #'howm-list--counsel-rg
-		:require-match t
-		:caller 'counsel-rg)))
-
-  (define-key global-map (concat howm-prefix "r") 'howm-counsel-rg)
 
   ;; Default recent to sorting by mtime
   (advice-add 'howm-list-recent :after #'howm-view-sort-by-mtime)

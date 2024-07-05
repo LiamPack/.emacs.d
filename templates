@@ -77,7 +77,7 @@ text-mode rst-mode
 (h2 "" n
     "- " (p "Title: " title) " -" n
     "--" (make-string (length title) ?-) "--" n n)
-
+(logt "<<< log" n (format-time-string "%Y-%m-%d") "; ")
 
 java-mode
 

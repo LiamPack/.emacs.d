@@ -69,7 +69,7 @@
                      local-dir (file-name-base ,repo-name))))
      (if (require ,package nil 'noerror)
          (progn ,@body)
-       (print (format "[Warning]: Loading `%s' failed" ,package))
+       (print (format "[Warning]: Loading `%s' Failed" ,package))
        (display-warning 'lp-emacs (format "Loading `%s' failed" ,package) :warning)
        (display-warning
         'lp-emacs
@@ -84,7 +84,6 @@
 
 (defvar lp--lisp-packages
   '(lp-defaults
-    lp-aesthetics
     lp-calendar
     lp-completion
     lp-editing
@@ -100,10 +99,17 @@
     lp-window
     lp-writing
     lp-denote
-    ;; lp-experimental
+    lp-experimental
     ))
 
-(dolist (p lp--lisp-packages)
-  (require p))
+    (dolist (p lp--lisp-packages)
+      (require p))
+(if (daemonp)
+    (add-hook 'after-make-frame-functions
+	      (lambda (frame)
+		(select-frame frame)
+		(require 'lp-aesthetics)))
+    (require 'lp-aesthetics))
+
 
 (load-file (expand-file-name "post-init.el" user-emacs-directory))
