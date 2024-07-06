@@ -104,7 +104,6 @@
   (setq org-edit-src-content-indentation 0)
 
   (setq org-list-allow-alphabetical t)
-
   (setq org-structure-template-alist
         '(("s" . "src")
           ("E" . "src emacs-lisp")
