@@ -14,8 +14,8 @@
   (setq rainbow-x-colors nil))
 
 (lp-emacs-elpa-package 'modus-themes
-  (setq modus-themes-mixed-fonts t
-        modus-themes-variable-pitch-ui t
+  (setq modus-themes-mixed-fonts nil
+        modus-themes-variable-pitch-ui nil
         modus-themes-italic-constructs t
         modus-themes-bold-constructs t
 	modus-themes-org-blocks 'gray-background
