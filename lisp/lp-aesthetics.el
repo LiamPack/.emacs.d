@@ -2,7 +2,7 @@
 (lp-emacs-builtin-package 'fringe
   (fringe-mode +1)
   (setq-default fringes-outside-margins nil)
-  (setq-default indicate-buffer-boundaries nil)
+  (setq-default indicate-buffer-boundaries t)
   (setq-default indicate-empty-lines nil)
   (setq-default overflow-newline-into-fringe t))
 
@@ -82,8 +82,6 @@
         standard-themes-variable-pitch-ui nil
         standard-themes-prompts '(bold italic)
 
-        standard-themes-mode-line-accented t
-
         ;; Accepts a symbol value:
         standard-themes-fringes 'subtle
 
@@ -104,9 +102,19 @@
   (setq standard-dark-palette-overrides
 	'((bg-mode-line-active "#303030")
 	  (bg-mode-line-inactive "#101010")
-
 	  (cursor red-warmer)
 	  (bg-region bg-yellow-intense)))
+
+  (setq standard-light-palette-overrides
+	'(;; (bg-mode-line-active "#3F3F3F")
+	  ;; (bg-mode-line-inactive "#1F1F1F")
+	  ;; (bg-mode-line-active bg-green-subtle)
+	  ;; (bg-mode-line-inactive bg-green-nuanced)
+	  (bg-mode-line-active bg-alt)
+	  (bg-mode-line-inactive bg-dim)
+	  (cursor red-warmer)
+	  (bg-region bg-yellow-intense))
+	)
 
   ;; (with-eval-after-load 'denote
   ;;   (standard-themes-with-colors
@@ -145,24 +153,24 @@
 ;; bdftopcf, https://thristian.livejournal.com/90017.html
 ;; https://moritzfuerst.net/projects/smalltalk-type
 
-;; (load-theme 'standard-dark :no-confirm)
-(ef-themes-load-random)
+(load-theme 'standard-light :no-confirm)
+;; (ef-themes-load-random)
 ;; (global-set-key (kbd "C-c *") #'(lambda () (interactive) (standard-themes-toggle)
 ;; 				  (standard-themes-with-colors
 ;; 				    (set-face-attribute 'denote-faces-title nil
 ;; 							:foreground fg-main
 ;; 							:box bg-alt))))
 
-;; (set-face-attribute 'default nil
-;; 		    :font "Smalltalk Sans12"
-;; 		    :height 155
-;; 		    :weight 'normal
-;; 		    :width 'normal)
 (set-face-attribute 'default nil
-		    :font "DejaVu Sans Mono"
-		    :height 140
+		    :font "sq"
+		    :height 110
 		    :weight 'normal
 		    :width 'normal)
+;; (set-face-attribute 'default nil
+;; 		    :font "DejaVu Sans Mono"
+;; 		    :height 140
+;; 		    :weight 'normal
+;; 		    :width 'normal)
 ;; (set-face-attribute 'variable-pitch nil
 ;; 		    :font "Cardo"
 ;; 		    :height 110

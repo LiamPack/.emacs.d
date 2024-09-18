@@ -64,9 +64,9 @@
   (add-hook 'org-cdlatex-mode-hook #'tempel-abbrev-mode)
   (add-hook 'org-cdlatex-mode-hook #'abbrev-mode)
   (add-hook 'latex-mode-hook #'tempel-abbrev-mode)
-  (add-hook 'text-mode-hook #'tempel-abbrev-mode)
-  ;; (global-tempel-abbrev-mode)
-  )
+  (add-hook 'latex-mode-hook #'abbrev-mode)
+  (global-tempel-abbrev-mode))
+
 
 (lp-emacs-builtin-package 'recentf                    ; Save recently visited files
   ;; :diminish recentf-mode
