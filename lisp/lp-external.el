@@ -257,7 +257,7 @@
 
 ;;; music player
 (lp-emacs-elpa-package 'bongo
-  (setq bongo-default-directory "/home/liamp/Desktop/musics/")
+  (setq bongo-default-directory "/media/lim/X1/")
   (setq bongo-display-inline-playback-progress t)
   (setq bongo-prefer-library-buffers nil)
   (setq bongo-insert-whole-directory-trees t)
