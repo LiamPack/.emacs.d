@@ -100,6 +100,7 @@ org-mode
 (ascii & "#+begin_export ascii" n> r> n "#+end_export")
 
 tex-mode org-mode
+(bar "" :post (backward-char) (cdlatex-math-modify ?-) (cdlatex-tab))
 (tit "\\textit{" q "} ")
 (lrnorm "\\|" q "\\| " )
 (eqref "\\eqnref{" q "} ")
@@ -176,6 +177,7 @@ tex-mode org-mode
 (prob "\\PP(" q ") ")
 (par "\\partial ")
 (ddx "\\frac{d}{dx} ")
+(ddt "\\frac{d}{dt} ")
 (ddxi "\\frac{d}{d "(s "x_i") "} ")
 (ddxf "\\frac{ d " (s "f") "}{ \\partial " (s "dx") "} ")
 (ddx2f "\\frac{ d^2 " (s "f") "}{ \\partial " (s "dx^2") "} ")

@@ -6,15 +6,17 @@
           pdf-outline-minor-mode
           pdf-misc-size-indication-minor-mode
           pdf-occur-global-minor-mode
-	  pdf-view-themed-minor-mode))
+	  pdf-view-themed-minor-mode
+	  pdf-annot-minor-mode
+	  pdf-sync-minor-mode
+	  )
 
+	)
   (setq pdf-view-display-size 'fit-width)
   (setq pdf-view-continuous t)
-  (setq pdf-view-use-dedicated-register nil)
+  (setq pdf-view-use-dedicated-register t)
   (setq pdf-view-max-image-width 2160)
   (setq pdf-outline-imenu-use-flat-menus t)
-
-  
 
   (pdf-loader-install))
 
