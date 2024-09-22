@@ -156,7 +156,6 @@
 ;; (load-theme 'standard-light :no-confirm)
 (load-theme 'standard-dark :no-confirm)
 
->>>>>>> f3e34a5 (F)
 ;; (global-set-key (kbd "C-c *") #'(lambda () (interactive) (standard-themes-toggle)
 ;; 				  (standard-themes-with-colors
 ;; 				    (set-face-attribute 'denote-faces-title nil
