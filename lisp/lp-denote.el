@@ -170,6 +170,27 @@ Perform the comparison with `string<'."
 (lp-emacs-elpa-package 'consult-denote
   (consult-denote-mode +1))
 
+(lp-emacs-elpa-package 'citar
+  (setq citar-bibliography '("~/dropbox/grad/My Library.bib"))
+  (setq citar-notes-paths (list (denote-directory))))
+
+(lp-emacs-elpa-package 'citar-denote
+  ;; Package defaults
+  (setq citar-denote-keyword "bib")
+  (let ((map global-map))
+    (define-key map (kbd "C-c w n") #'citar-denote-open-note)
+    (define-key map (kbd "C-c w c") #'citar-create-note)
+    (define-key map (kbd "C-c w d") #'citar-denote-dwim)
+    (define-key map (kbd "C-c w e") #'citar-denote-open-reference-entry)
+    (define-key map (kbd "C-c w a") #'citar-denote-add-citekey)
+    (define-key map (kbd "C-c w k") #'citar-denote-remove-citekey)
+    (define-key map (kbd "C-c w r") #'citar-denote-find-reference)
+    (define-key map (kbd "C-c w l") #'citar-denote-link-reference)
+    (define-key map (kbd "C-c w f") #'citar-denote-find-citation)
+    (define-key map (kbd "C-c w x") #'citar-denote-nocite)
+    (define-key map (kbd "C-c w y") #'citar-denote-cite-nocite)
+    (define-key map (kbd "C-c w z") #'citar-denote-nobib)))
+
 ;; https://leahneukirchen.org/blog/archive/2022/03/note-taking-in-emacs-with-howm.html
 ;; https://kaorahi.github.io/howm/README.html
 (lp-emacs-elpa-package 'howm
