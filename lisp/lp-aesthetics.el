@@ -168,11 +168,11 @@
 ;; 		    :weight 'normal
 ;; 		    :width 'normal)
 
-(set-face-attribute 'default nil
-		    :font "sq12"
-		    :height 140
-		    :weight 'normal
-		    :width 'normal)
+;; (set-face-attribute 'default nil
+;; 		    :font "sq12"
+;; 		    :height 140
+;; 		    :weight 'normal
+;; 		    :width 'normal)
 ;; (set-face-attribute 'variable-pitch nil
 ;; 		    :font "Cardo"
 ;; 		    :height 110

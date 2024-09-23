@@ -65,6 +65,8 @@
   (add-hook 'org-cdlatex-mode-hook #'abbrev-mode)
   (add-hook 'latex-mode-hook #'tempel-abbrev-mode)
   (add-hook 'latex-mode-hook #'abbrev-mode)
+  (add-hook 'tex-mode-hook #'tempel-abbrev-mode)
+  (add-hook 'tex-mode-hook #'abbrev-mode)
   (global-tempel-abbrev-mode))
 
 

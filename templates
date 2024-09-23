@@ -142,6 +142,7 @@ tex-mode org-mode
 (eqd "\\stackrel{d}{=} ")
 (eq "= ")
 (aeq "&= ")
+(aneq "\n&= ")
 (amp "& ")
 (lt "< ")
 (gt "> ")

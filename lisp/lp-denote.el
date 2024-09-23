@@ -5,7 +5,7 @@
   (setq denote-directory "~/dropbox/denotes/")
   (setq denote-excluded-directories-regexp "/_.*/")  
   (setq denote-allow-multi-word-keywords t)
-  (setq denote-known-keywords '("meeting" "note" "research" "writing" "meta" "list" "unfinished"
+  (setq denote-known-keywords '("meeting" "note" "research" "writing" "emote" "meta" "list" "unfinished"
 				"movie" "anime" "book"))
 
   (setq denote-infer-keywords nil)
