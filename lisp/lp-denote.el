@@ -4,9 +4,11 @@
 
   (setq denote-directory "~/dropbox/denotes/")
   (setq denote-excluded-directories-regexp "/_.*/")  
+  (setq denote-excluded-files-regexp "/_.*/")  
   (setq denote-allow-multi-word-keywords t)
   (setq denote-known-keywords '("meeting" "note" "research" "writing" "emote" "meta" "list" "unfinished"
-				"movie" "anime" "book"))
+				"movie" "anime" "book" "meeting" "bib"))
+  (setq denote-file-name-components-order '(identifier keywords signature title))
 
   (setq denote-infer-keywords nil)
   (setq denote-sort-keywords t)
@@ -25,7 +27,7 @@
 		 (window-height 0.3)))
   
   ;;;; recurring notes
-  (defvar my-denote-colleagues '("socratis" "platon" "aristotelis")
+  (defvar my-denote-colleagues '("phil" "kihoon" "xieqing drp" "prob seminar")
     "List of names I collaborate with.
 There is at least one file in the variable `denote-directory' that has
 the name of this person.")
@@ -50,7 +52,7 @@ If there are more than one files, prompt with completion for one among
 them.
 
 NAME is one among `my-denote-colleagues'."
-    (if-let ((files (denote-directory-files name))
+    (if-let ((files (denote-directory-files (format "%s.*_meeting" name)))
              (length-of-files (length files)))
 	(cond
 	 ((= length-of-files 1)
@@ -153,6 +155,7 @@ Perform the comparison with `string<'."
     (define-key map (kbd "C-c C-o") #'denote-journal-extras-new-or-existing-entry)
     (define-key map (kbd "C-c C-m") #'lp--denote-pop-monthly)
     (define-key map (kbd "C-c f n") #'denote)
+    (define-key map (kbd "C-c f m") #'my-denote-colleagues-new-meeting)
     (define-key map (kbd "C-c f d") #'(lambda ()
                                         (interactive)
                                         (dired (denote-directory))))

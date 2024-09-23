@@ -153,8 +153,8 @@
 ;; bdftopcf, https://thristian.livejournal.com/90017.html
 ;; https://moritzfuerst.net/projects/smalltalk-type
 
-;; (load-theme 'standard-light :no-confirm)
-(load-theme 'standard-dark :no-confirm)
+(load-theme 'standard-light :no-confirm)
+;; (load-theme 'standard-dark :no-confirm)
 
 ;; (global-set-key (kbd "C-c *") #'(lambda () (interactive) (standard-themes-toggle)
 ;; 				  (standard-themes-with-colors
@@ -168,11 +168,11 @@
 ;; 		    :weight 'normal
 ;; 		    :width 'normal)
 
-;; (set-face-attribute 'default nil
-;; 		    :font "sq12"
-;; 		    :height 140
-;; 		    :weight 'normal
-;; 		    :width 'normal)
+(set-face-attribute 'default nil
+		    :font "Smalltalk Sans12"
+		    :height 100
+		    :weight 'normal
+		    :width 'normal)
 ;; (set-face-attribute 'variable-pitch nil
 ;; 		    :font "Cardo"
 ;; 		    :height 110
