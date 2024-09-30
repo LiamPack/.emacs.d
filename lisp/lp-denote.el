@@ -27,7 +27,7 @@
 		 (window-height 0.3)))
   
   ;;;; recurring notes
-  (defvar my-denote-colleagues '("phil" "kihoon" "xieqing drp" "prob seminar")
+  (defvar my-denote-colleagues '("phil" "kihoon" "xieqing-drp" "prob-seminar")
     "List of names I collaborate with.
 There is at least one file in the variable `denote-directory' that has
 the name of this person.")
@@ -52,7 +52,7 @@ If there are more than one files, prompt with completion for one among
 them.
 
 NAME is one among `my-denote-colleagues'."
-    (if-let ((files (denote-directory-files (format "%s.*_meeting" name)))
+    (if-let ((files (denote-directory-files (format "_meeting.*%s" name)))
              (length-of-files (length files)))
 	(cond
 	 ((= length-of-files 1)

@@ -26,7 +26,7 @@
   (setq-default TeX-master nil)
 
   ;; most crucial: turn-on-reftex
-  (setq lp--latex-hooks-fns '(auto-fill-mode TeX-source-correlate-mode flyspell-mode flyspell-buffer turn-on-reftex prettify-symbols-mode cdlatex-mode))
+  (setq lp--latex-hooks-fns '(auto-fill-mode TeX-source-correlate-mode flyspell-mode flyspell-buffer turn-on-reftex prettify-symbols-mode cdlatex-mode abbrev-mode))
   (dolist (fn lp--latex-hooks-fns)
     (add-hook 'LaTeX-mode-hook fn)))
 ;; https://karthinks.com/software/latex-input-for-impatient-scholars/

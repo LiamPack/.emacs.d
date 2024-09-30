@@ -140,7 +140,7 @@
                      ;; Also handle undocumented (<active> <inactive>) form.
                      ((numberp (cadr alpha)) (cadr alpha)))
                100)
-          '(85 . 79) '(100 . 100)))))
+          '(92 . 92) '(100 . 100)))))
 
 
  ;;(set-frame-parameter (selected-frame) 'alpha '(<active> . <inactive>))
