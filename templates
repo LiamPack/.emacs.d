@@ -100,6 +100,7 @@ org-mode
 (ascii & "#+begin_export ascii" n> r> n "#+end_export")
 
 tex-mode org-mode
+(rd "{\\color{red} " q "}")
 (bar "" :post (backward-char) (cdlatex-math-modify ?-) (cdlatex-tab))
 (tit "\\textit{" q "} ")
 (lrnorm "\\|" q "\\| " )
@@ -120,7 +121,7 @@ tex-mode org-mode
 (bbeta "\\beta ")
 (ggam "\\gamma ")
 (ddelt "\\delta ")
-(DDELT "\\Delta ")
+(lap "\\Delta ")
 (ssig "\\sigma  ")
 (pphi "\\phi ")
 (eps "\\epsilon ")
@@ -132,6 +133,7 @@ tex-mode org-mode
 (norml "\mathcal{N}(" p ", " q ") ")
 (expt "e^{" p "} ")
 (expp "\\exp^{" p "} ")
+(xp "^{" p "} ")
 (sinn "\\sin(" p ") ")
 (coss "\\cos(" p ") ")
 (fr "\\frac{" p "}{" q "} ")
@@ -157,7 +159,7 @@ tex-mode org-mode
 (Xsub "X_{" p "} " q)
 (Ysub "X_{" p "} " q)
 (Zsub "Z_{" p "} " q)
-(subb "_{" p "} ")
+(sub "_{" p "} ")
 (sq "^2 ")
 (sqrt "\\sqrt{" q "} ")
 (lg "\log (" q ") ")

@@ -154,6 +154,7 @@
 ;; https://moritzfuerst.net/projects/smalltalk-type
 
 (load-theme 'standard-light :no-confirm)
+;; (load-theme 'standard-light :no-confirm)
 ;; (load-theme 'standard-dark :no-confirm)
 
 ;; (global-set-key (kbd "C-c *") #'(lambda () (interactive) (standard-themes-toggle)
@@ -168,11 +169,6 @@
 ;; 		    :weight 'normal
 ;; 		    :width 'normal)
 
-(set-face-attribute 'default nil
-		    :font "Smalltalk Sans12"
-		    :height 100
-		    :weight 'normal
-		    :width 'normal)
 ;; (set-face-attribute 'variable-pitch nil
 ;; 		    :font "Cardo"
 ;; 		    :height 110
