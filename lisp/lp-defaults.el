@@ -53,6 +53,7 @@
   (setq mouse-wheel-scroll-amount '(1 ((shift) . 3) ((control) . nil)))
   (setq mouse-wheel-follow-mouse 't)
 
+  ;;; TODO: sort or remove duplicates
   ;; other basiscs
   (setq ring-bell-function 'ignore)
   (setq inhibit-startup-screen t)
@@ -73,6 +74,7 @@
   (setq initial-scratch-message ";; Present Day
 "
         visible-bell t)
+  (define-key global-map (kbd "C-c s") #'scratch-buffer)
 
   (show-paren-mode t)
   (setq show-paren-style 'parenthesis)
@@ -95,7 +97,7 @@
 
   (define-key global-map (kbd "C-x k") #'(lambda () (interactive) (kill-buffer nil)))
   (define-key global-map (kbd "C-x K") #'(lambda () (interactive) (kill-buffer nil) (delete-window)))
-  (define-key global-map (kbd "C-c n") #'(lambda () (interactive) (whitespace-cleanup)))
+  (define-key global-map (kbd "C-c n") #'(lambda () (interactive) (whitespace-cleanup))) ;;; TODO doesn't really work anymore. taking up keybind
   (define-key global-map (kbd "<f5>")  #'revert-buffer)
 
   (define-key global-map (kbd "M-z") #'zap-up-to-char) ;; i generally go up to a char non-inclusive
@@ -251,12 +253,27 @@
 (lp-emacs-builtin-package 'so-long
   (global-so-long-mode +1))
 
-(lp-emacs-builtin-package 'pixel-scroll
-  (let ((map global-map))
-    (define-key map [remap scroll-up-command] #'pixel-scroll-interpolate-down)
-    (define-key map [remap scroll-down-command] #'pixel-scroll-interpolate-up))
-  
-  (setq pixel-scroll-precision-interpolate-page t)
-  (pixel-scroll-precision-mode 1))
+  ;;;; Mouse and mouse wheel behaviour
+(lp-emacs-builtin-package 'mouse
+  (mouse-wheel-mode +1)
+  (setq mouse-autoselect-window t)
+
+  ;; In Emacs 27+, use Control + mouse wheel to scale text.
+  (setq mouse-wheel-scroll-amount
+        '(1
+          ((shift) . 5)
+          ((meta) . 0.5)
+          ((control) . text-scale))
+        mouse-drag-copy-region nil
+        make-pointer-invisible t
+        mouse-wheel-progressive-speed t
+        mouse-wheel-follow-mouse t)
+
+  ;; Scrolling behaviour
+  (setq-default scroll-preserve-screen-position t
+                scroll-conservatively 1 ; affects `scroll-step'
+                scroll-margin 0
+                next-screen-context-lines 0))
+
 
 (provide 'lp-defaults)

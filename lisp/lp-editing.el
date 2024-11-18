@@ -31,16 +31,20 @@
 
   (setq list-matching-lines-jump-to-current-line t))
 
-;; prot's simple substitution package
-(lp-emacs-elpa-package 'substitute)
+;;; Simple QoL substitutions
+(lp-emacs-elpa-package 'substitute
+  (setopt substitute-highlight t)
+  (setq substitute-fixed-letter-case nil)
+  (add-hook 'substitute-post-replace-hook #'substitute-report-operation)
+  (define-key global-map (kbd "C-c r") #'substitute-prefix-map))
 
-;;; Still trying to get used to jumping around
+;;; Avy jumping
 (lp-emacs-elpa-package 'avy
   (avy-setup-default) ; binds C-' in the isearch map
   (define-key global-map (kbd "C-'") 'avy-goto-char-timer)
   (define-key global-map (kbd "M-'") 'avy-resume))
 
-;;; Right-click equivalent for emacs
+;;; Right-click menus for emacs
 (lp-emacs-elpa-package 'embark
   (define-key global-map (kbd "C->") 'embark-become)
   (define-key global-map (kbd "C-.") 'embark-act)

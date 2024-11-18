@@ -7,6 +7,7 @@
   (setq project-x-local-identifier ".project")
   (project-x-mode 1))
 
+;;; TODO: notes on vc use-cases
 (lp-emacs-builtin-package 'vc
   (setq vc-handled-backends '(SVN Git))
     ;;;  As always, from Prot. Directly copied. No shame. See https://protesilaos.com/emacs/dotemacs#h:31deeff4-dfae-48d9-a906-1f3272f29bc9

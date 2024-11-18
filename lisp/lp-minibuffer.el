@@ -210,8 +210,9 @@
       (define-key map (kbd "<RET>") #'icomplete-force-complete-and-exit))
     ))
 
-(lp-emacs-elpa-package 'mct
 
+;;; Minibuffer Commander. 
+(lp-emacs-elpa-package 'mct
   (setq mct-completion-window-size (cons #'mct-frame-height-third 1))
   (setq mct-remove-shadowed-file-names t) ; works when `file-name-shadow-mode' is enabled
   (setq mct-hide-completion-mode-line t)

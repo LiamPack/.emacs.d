@@ -1,3 +1,4 @@
+;;; TODO: paragraph-start tuning. what's a paragraph, and is it consistent with an outline expression?
 (lp-emacs-builtin-package 'text-mode
   (add-hook 'text-mode-hook
             #'(lambda ()

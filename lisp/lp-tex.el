@@ -37,6 +37,7 @@
 (lp-emacs-elpa-package 'cdlatex
   (add-hook 'latex-mode-hook #'cdlatex-mode))
 
+;;; TODO: synchronize with CITAR or remove bibtex-completion.
 (lp-emacs-builtin-package 'bibtex)
 (lp-emacs-elpa-package 'bibtex-completion
   (setq bibtex-completion-bibliography '(
@@ -46,6 +47,7 @@
         bibtex-completion-library-path '("~/org/bib/pdfs/")
         bibtex-completion-notes-path "~/org/bib/notes/"))
 
+;;; TODO: what even is this.
 (lp-emacs-git-package
     'consult-bibtex "https://github.com/mohkale/consult-bibtex.git"
     (with-eval-after-load 'embark

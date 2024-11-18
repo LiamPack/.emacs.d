@@ -16,6 +16,7 @@
   (setq shell-command-prompt-show-cwd t) ; Emacs 27.1
   (setq shell-kill-buffer-on-exit t)
   (setq ansi-color-for-comint-mode t))
+;;; TODO: perosnalize.
 (lp-emacs-builtin-package 'eshell
   (require 'esh-mode)
   (require 'esh-module)
@@ -52,6 +53,7 @@
 
 
 ;;; directory editing
+;;; TODO: personalize, check manual and settings.
 (lp-emacs-builtin-package 'dired
   (add-hook 'dired-mode-hook
             (lambda ()

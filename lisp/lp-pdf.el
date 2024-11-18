@@ -1,3 +1,6 @@
+;;; TODO: personalize. This could be the most important part of the
+;;; config.  (scrolling, bookmarking and marking, seamless transition
+;;; between pdfs).
 (lp-emacs-elpa-package 'pdf-tools
   (setq pdf-tools-enabled-modes
         '(pdf-history-minor-mode
@@ -8,10 +11,7 @@
           pdf-occur-global-minor-mode
 	  pdf-view-themed-minor-mode
 	  pdf-annot-minor-mode
-	  pdf-sync-minor-mode
-	  )
-
-	)
+	  pdf-sync-minor-mode))
   (setq pdf-view-display-size 'fit-width)
   (setq pdf-view-continuous t)
   (setq pdf-view-use-dedicated-register t)

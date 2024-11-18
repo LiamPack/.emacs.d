@@ -6,6 +6,7 @@
   (setq denote-excluded-directories-regexp "/_.*/")  
   (setq denote-excluded-files-regexp "/_.*/")  
   (setq denote-allow-multi-word-keywords t)
+  ;;; TODO: taxonomy could be better
   (setq denote-known-keywords '("meeting" "note" "research" "writing" "emote" "meta" "list" "unfinished"
 				"movie" "anime" "book" "meeting" "bib"))
   (setq denote-file-name-components-order '(identifier keywords signature title))
@@ -27,7 +28,8 @@
 		 (window-height 0.3)))
   
   ;;;; recurring notes
-  (defvar my-denote-colleagues '("phil" "kihoon" "xieqing-drp" "prob-seminar")
+  ;;; TODO: potential here. (phil, kihoon, pierre, digestion, LIST, X-seminar).
+  (defvar my-denote-colleagues '("phil" "kihoon" "xieqing-drp" "prob-seminar" "digestion")
     "List of names I collaborate with.
 There is at least one file in the variable `denote-directory' that has
 the name of this person.")
@@ -80,6 +82,7 @@ Names are defined in `my-denote-colleagues'."
 	(insert (format "* [%s]\n\n" time)))))
 
 ;;;; templates
+  ;;; TODO: tune. (paper, thought, list, snippet).
   (setq denote-templates
 	`((report . "* Some heading\n\n* Another heading")
           (memo . ,(concat "* Some heading"
@@ -88,7 +91,6 @@ Names are defined in `my-denote-colleagues'."
                            "\n\n"))))
 
   ;;;; Luhman signature sorting
-
   (defun my-denote--split-luhman-sig (signature)
     "Split numbers and letters in Luhmann-style SIGNATURE string."
     (replace-regexp-in-string
@@ -115,6 +117,7 @@ Perform the comparison with `string<'."
   (setq denote-sort-signature-comparison-function #'my-denote-sort-for-signatures)
 
   ;;;; Journal
+  ;;; TODO: not as useful as i'd like
   (require 'denote-journal-extras)
   (setq denote-journal-extras-keyword "journal")
   (setq denote-journal-extras-title-format 'day-date-month-year)
@@ -173,10 +176,12 @@ Perform the comparison with `string<'."
 (lp-emacs-elpa-package 'consult-denote
   (consult-denote-mode +1))
 
+;;; TODO: what's the point here
 (lp-emacs-elpa-package 'citar
   (setq citar-bibliography '("~/dropbox/grad/My Library.bib"))
   (setq citar-notes-paths (list (denote-directory))))
 
+;;; TODO: does this work
 (lp-emacs-elpa-package 'citar-denote
   ;; Package defaults
   (setq citar-denote-keyword "bib")
@@ -196,6 +201,7 @@ Perform the comparison with `string<'."
 
 ;; https://leahneukirchen.org/blog/archive/2022/03/note-taking-in-emacs-with-howm.html
 ;; https://kaorahi.github.io/howm/README.html
+;;; TODO: failed experiment
 (lp-emacs-elpa-package 'howm
   ;; Directory configuration
   (setq howm-home-directory "~/dropbox/denotes/_howm/")

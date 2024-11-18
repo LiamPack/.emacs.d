@@ -24,6 +24,7 @@
 ;;     (define-key map (kbd "/ g") #'ibuffer-filter-by-content))
 ;;   )
 
+;;; TODO: read manual
 (lp-emacs-elpa-package 'beframe
   (setq beframe-functions-in-frames '(project-prompt-project-dir))
   (setq beframe-global-buffers '("*scratch*" "*Messages*" "*Backtrace*"))
@@ -135,6 +136,7 @@
 
   (setq fit-window-to-buffer-horizontally t)
 
+  ;;; TODO: personalize
   (let ((map global-map))
     (define-key map (kbd "C-x C-n") #'next-buffer)     ; override `set-goal-column'
     (define-key map (kbd "C-x C-p") #'previous-buffer) ; override `mark-page'

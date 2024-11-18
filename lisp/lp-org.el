@@ -208,7 +208,7 @@
   (setq org-agenda-dim-blocked-tasks t)
   (setq org-agenda-todo-list-sublevels t)
 
-  (setq org-agenda-format-date "%A %-e %B %Y")
+N  (setq org-agenda-format-date "%A %-e %B %Y")
   (setq org-agenda-include-deadlines t)
   (setq org-deadline-warning-days 7)
   (setq org-scheduled-past-days 365)
@@ -394,8 +394,8 @@
   ;; org directory location
   ;; org display agenda preferences
   ;; binds
-  (define-key global-map (kbd "C-c A") (lambda () (interactive) (org-agenda nil "A")))
-  (define-key global-map (kbd "C-c r") (lambda () (interactive) (org-agenda nil "r")))
+  ;; (define-key global-map (kbd "C-c A") (lambda () (interactive) (org-agenda nil "A")))
+  ;; (define-key global-map (kbd "C-c r") (lambda () (interactive) (org-agenda nil "r")))
 
   (define-key text-mode-map (kbd "C-c q") #'auto-fill-mode)
   (define-key global-map (kbd "C-c l") #'org-store-link)

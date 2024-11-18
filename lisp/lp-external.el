@@ -1,169 +1,13 @@
-;;; email
-(lp-emacs-elpa-package 'notmuch
-  (setq notmuch-show-logo nil)
-  (setq notmuch-column-control t)
-  (setq notmuch-hello-auto-refresh t)
-  (setq notmuch-hello-recent-searches-max 20)
-  (setq notmuch-hello-thousands-separator "")
-  ;; ;; See my variant of it in `prot-notmuch' below.
-  (setq notmuch-hello-sections '(notmuch-hello-insert-saved-searches))
-  (setq notmuch-show-all-tags-list t)
-
-  (setq notmuch-search-oldest-first nil)
-
-  (setq notmuch-search-line-faces
-        '(("unread" . notmuch-search-unread-face)
-          ("flag" . notmuch-search-flagged-face)))
-  (setq notmuch-show-empty-saved-searches t)
-
-  (setq notmuch-saved-searches
-        `(( :name "all"
-            :query "not tag:archived and not tag:list and not tag:lists and not tag:spam"
-            :sort-order newest-first
-            :key ,(kbd "a"))
-          ( :name "inbox"
-            :query "tag:inbox not tag:archived"
-            :sort-order newest-first
-            :key ,(kbd "i"))
-          ( :name "unread (inbox)"
-            :query "tag:unread and tag:inbox"
-            :sort-order newest-first
-            :key ,(kbd "u"))
-          ( :name "unread all"
-            :query "tag:unread and not tag:archived and not tag:list and not tag:lists"
-            :sort-order newest-first
-            :key ,(kbd "U"))
-          ( :name "personal"
-            :query "tag:personal not tag:archived"
-            :sort-order newest-first
-            :key ,(kbd "p"))
-          ( :name "personal all"
-            :query "tag:personal"
-            :sort-order newest-first
-            :key ,(kbd "P"))
-          ( :name "todo"
-            :query "tag:todo not tag:archived"
-            :sort-order newest-first
-            :key ,(kbd "t"))
-          ( :name "todo all"
-            :query "tag:todo"
-            :sort-order newest-first
-            :key ,(kbd "T"))
-          ( :name "done"
-            :query "tag:done"
-            :sort-order newest-first
-            :key ,(kbd "d"))
-          ( :name "flagged"
-            :query "tag:flag or tag:flagged or tag:important or tag:starred"
-            :sort-order newest-first
-            :key ,(kbd "f"))
-          ( :name "mailing lists"
-            :query "tag:list or tag:lists not tag:archived"
-            :key ,(kbd "m"))
-          ))
-
-  (setq notmuch-archive-tags '("-inbox" "+archived"))
-  (setq notmuch-message-replied-tags '("+replied"))
-  (setq notmuch-message-forwarded-tags '("+forwarded"))
-  (setq notmuch-show-mark-read-tags '("-unread"))
-  (setq notmuch-draft-tags '("+draft"))
-  (setq notmuch-draft-folder "drafts")
-  (setq notmuch-draft-save-plaintext 'ask)
-
-  ;; ;; NOTE 2021-06-18: See an updated version in the `prot-notmuch'
-  ;; ;; section below.
-  (setq notmuch-tagging-keys
-        `((,(kbd "a") notmuch-archive-tags "Archive (remove from inbox)")
-          (,(kbd "c") ("+archived" "-inbox" "-list" "-todo" "-ref" "-unread" "+done") "Complete and archive")
-          (,(kbd "d") ("+del" "-inbox" "-archived" "-unread") "Mark for deletion")
-          (,(kbd "f") ("+flag" "-unread") "Flag as important")
-          ;; (,(kbd "r") notmuch-show-mark-read-tags "Mark as read")
-          (,(kbd "r") ("+ref" "+notes" "-unread") "Reference for the future")
-          (,(kbd "s") ("+spam" "+del" "-inbox" "-unread") "Mark as spam")
-          (,(kbd "t") ("+todo" "-unread") "To-do")
-          (,(kbd "u") ("+unread") "Mark as unread")))
-
-  (setq notmuch-tag-formats
-        '(("unread" (propertize tag 'face 'notmuch-tag-unread))
-          ("flag" (propertize tag 'face 'notmuch-tag-flagged))))
-  (setq notmuch-tag-deleted-formats
-        '(("unread" (notmuch-apply-face bare-tag `notmuch-tag-deleted))
-          (".*" (notmuch-apply-face tag `notmuch-tag-deleted))))
-
-  ;;; Email composition
-  (setq notmuch-mua-compose-in 'current-window)
-  (setq notmuch-mua-hidden-headers nil) ; TODO 2021-05-12: Review hidden headers
-  (setq notmuch-address-command nil)    ; FIXME 2021-05-13: Make it work with EBDB
-  (setq notmuch-always-prompt-for-sender t)
-  (setq notmuch-mua-cite-function 'message-cite-original-without-signature)
-  (setq notmuch-mua-reply-insert-header-p-function 'notmuch-show-reply-insert-header-p-never)
-  (setq notmuch-mua-user-agent-function #'notmuch-mua-user-agent-full)
-  (setq notmuch-maildir-use-notmuch-insert t)
-  (setq notmuch-crypto-process-mime t)
-  (setq notmuch-crypto-get-keys-asynchronously t)
-  (setq notmuch-mua-attachment-regexp   ; see `notmuch-mua-send-hook'
-        (concat "\\b\\(attache\?ment\\|attached\\|attach\\)"
-                "\\b"))
-
-  ;;; Reading messages
-  (setq notmuch-show-relative-dates t)
-  (setq notmuch-show-all-multipart/alternative-parts nil)
-  (setq notmuch-show-indent-messages-width 0)
-  (setq notmuch-show-indent-multipart nil)
-  (setq notmuch-show-part-button-default-action 'notmuch-show-save-part)
-  (setq notmuch-show-text/html-blocked-images ".") ; block everything
-  (setq notmuch-wash-citation-lines-prefix 6)
-  (setq notmuch-wash-citation-lines-suffix 6)
-  (setq notmuch-wash-wrap-lines-length 100)
-  (setq notmuch-unthreaded-show-out nil)
-  (setq notmuch-message-headers '("To" "Cc" "Subject" "Date"))
-  (setq notmuch-message-headers-visible t)
-
-  ;;; Hooks and key bindings
-  (add-hook 'notmuch-mua-send-hook #'notmuch-mua-attachment-check)
-  (remove-hook 'notmuch-show-hook #'notmuch-show-turn-on-visual-line-mode)
-  (add-hook 'notmuch-show-hook (lambda () (setq-local header-line-format nil)))
-
-  ;; Use alternating backgrounds, if `stripes' is available.
-  (with-eval-after-load 'stripes
-    (add-hook 'notmuch-search-hook #'stripes-mode)
-    ;; ;; To disable `hl-line-mode':
-    ;; (setq notmuch-search-hook nil)
-    ;; (add-hook 'notmuch-search-hook #'prot-common-disable-hl-line)
-    )
-
-  (let ((map global-map))
-    ;; (define-key map (kbd "C-c m") #'notmuch)
-    (define-key map (kbd "C-x m") #'notmuch-mua-new-mail)) ; override `compose-mail'
-  (define-key notmuch-search-mode-map (kbd "/") #'notmuch-search-filter) ; alias for l
-  (define-key notmuch-hello-mode-map (kbd "C-<tab>") nil)
-  )
-
-
-  ;;; Sending email (SMTP)
-(lp-emacs-builtin-package 'smtpmail
-  (setq smtpmail-stream-type 'ssl)
-  (setq smtpmail-smtp-service 465)
-  (setq smtpmail-queue-mail nil)
-  ;; (setq smtpmail-smtp-server "smtp.gmail.com")
-  ;; (setq smtpmail-auth-credentials '(("smtp.gmail.com" 465 "liampacker@gmail.com" "acydhqtbgeudyvxm")))
-  (setq smtpmail-debug-info t)
-  (setq smtpmail-debug-verb t)
-  )
-
-(lp-emacs-builtin-package 'sendmail
-  (setq send-mail-function 'smtpmail-send-it))
-
 ;;; internet browsing
 (lp-emacs-builtin-package 'eww
   (define-key global-map (kbd "<f12>") 'eww)
   ;; (define-key global-map (kbd "M-(") 'eww)
-  (setq shr-use-colors nil)
+  (setq shr-use-colors t)
   (setq shr-use-fonts nil)
   (setq shr-max-image-proportion 0.6)
-  (setq shr-image-animate nil)          ; No GIFs, thank you!
+  (setq shr-image-animate nil)
   (setq shr-width nil)
-  (setq shr-discard-aria-hidden t)
+  (setq shr-discard-aria-hidden nil)
   (setq shr-cookie-policy nil)
 
   (setq eww-search-prefix "https://www.duckduckgo.com/?q=")
@@ -172,8 +16,8 @@
   (setq browse-url-secondary-browser-function 'browse-url-default-browser)
   (setq eww-restore-desktop t)
   (setq eww-desktop-remove-duplicates t)
-  (setq eww-header-line-format nil)
-  (setq eww-download-directory (expand-file-name "~/Documents/eww-downloads"))
+  (setq eww-header-line-format "%t: %u")
+  (setq eww-download-directory (locate-user-emacs-file "eww-downloads/"))
   (setq eww-suggest-uris
         '(eww-links-at-point
           thing-at-point-url-at-point))
@@ -195,16 +39,16 @@
 (lp-emacs-elpa-package 'elfeed
   (define-key global-map (kbd "C-c e") #'elfeed)
 
-  (setq elfeed-use-curl t)
+  (setq elfeed-use-curl nil)
   (setq elfeed-curl-max-connections 10)
   (setq elfeed-db-directory (concat user-emacs-directory "elfeed/"))
   (setq elfeed-enclosure-default-dir "~/Downloads/")
-  (setq elfeed-search-filter "@4-months-ago +unread")
+  (setq elfeed-search-filter "@2-weeks-ago +unread")
   (setq elfeed-sort-order 'descending)
   (setq elfeed-search-clipboard-type 'CLIPBOARD)
-  (setq elfeed-search-title-max-width 60)
-  (setq elfeed-search-title-min-width 40)
-  (setq elfeed-search-trailing-width 70)
+  (setq elfeed-search-title-max-width 80)
+  (setq elfeed-search-title-min-width 30)
+  (setq elfeed-search-trailing-width 25)
   (setq elfeed-show-truncate-long-urls t)
   (setq elfeed-show-unique-buffers t)
   (setq elfeed-search-date-format '("%F %R" 16 :left))
@@ -216,33 +60,35 @@
   (let ((map elfeed-show-mode-map))
     (define-key map (kbd "w") #'elfeed-show-yank))
 
-  ;; This is set in two places now, once in =eww= and once here.
-  ;; (setq browse-url-browser-function 'eww-browse-url)
-  ;; (setq browse-url-secondary-browser-function 'browse-url-default-browser)
-  (setq lp--elfeed-tags '(star stats leftist programming philosophy emacs academic pl writing lisp dead))
+  (setq lp--elfeed-tags '(critical important personal))
+
   ;;; Elfeed feeds
-  ;; https://leahneukirchen.org/MySubscriptions.cgi
-  (setq elfeed-feeds '(("https://protesilaos.com/master.xml" star philosophy emacs)
-                       ("https://ava.substack.com/feed" writing)
-                       ("http://inconvergent.net/atom.xml" art lisp)
+  ;; TODO: update
+  (setq elfeed-feeds '("https://protesilaos.com/master.xml"
+                       "https://ava.substack.com/feed"
+
+		       "https://rss.arxiv.org/rss/math.PR"
+		       "https://terrytao.wordpress.com/feed/"
+		       "https://johncarlosbaez.wordpress.com/atom.xml"
+		       "https://statisticaloddsandends.wordpress.com/atom.xml"
+		       "https://mathematicaloddsandends.wordpress.com/atom.xml"
+		       "http://www.math3ma.com/blog/rss.xml" ;; tai danae bradley
+
+		       "https://borretti.me/feed.xml" ;; guy who did the astro+lisp post 
+                       "http://inconvergent.net/atom.xml"
                        "http://nullprogram.com/feed/"
-                       ("https://alhassy.github.io/rss.xml" lisp) ;; lisper, had that great post about emacs lisp's type system
-		       ("https://borretti.me/feed.xml" lisp writing) ;; guy who did the astro+lisp post 
+		       "https://leahneukirchen.org/trivium/index.atom"
+
                        "https://gwern.substack.com/feed"
                        "https://www.benkuhn.net/index.xml" ;; harvard xd
-                       ("https://www.nayuki.io/rss20.xml" programming) ;; swe in canada with classic math posts
-                       ("https://danluu.com/atom.xml" star stats) ;; plain blog but very good
-		       ("https://statisticaloddsandends.wordpress.com/atom.xml" stats)
-		       ("https://mathematicaloddsandends.wordpress.com/atom.xml" math)
-		       ("http://www.math3ma.com/blog/rss.xml" math) ;; tai danae bradley
-		       ("https://golem.ph.utexas.edu/category/rss.html" math) ;; n-category cafe
-		       ("https://johncarlosbaez.wordpress.com/atom.xml" math physics)
-		       "https://leahneukirchen.org/trivium/index.atom"
-		       ("https://rss.arxiv.org/rss/math.PR" math prob)
-		       ("https://terrytao.wordpress.com/feed/" math)
+                       "https://www.nayuki.io/rss20.xml" ;; swe in canada with classic math posts
+                       "https://danluu.com/atom.xml" ;; plain blog but very good
+
+
                        )))
 
 ;;; epub reader
+;;; TODO: i don't like this
 (lp-emacs-elpa-package 'nov
   (add-to-list 'auto-mode-alist '("\\.epub\\'" . nov-mode))
 
@@ -256,6 +102,7 @@
   (add-hook 'nov-mode-hook 'my-nov-font-setup))
 
 ;;; music player
+;;; TODO: this isn't personalized
 (lp-emacs-elpa-package 'bongo
   (setq bongo-default-directory "/media/lim/X1/")
   (setq bongo-display-inline-playback-progress t)
@@ -290,6 +137,7 @@
     (define-key map (kbd "I") #'bongo-insert-special)))
 
 
+;;; TODO: what can i do with this
 (lp-emacs-elpa-package 'arxiv-mode
   (setq arxiv-pop-up-new-frame nil)
   (setq arxiv-startup-with-abstract-window t)
