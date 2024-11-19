@@ -134,6 +134,19 @@
   (put 'shrink-window-horizontally 'repeat-map 'resize-window-repeat-map)
   (put 'shrink-window 'repeat-map 'resize-window-repeat-map)
 
+  (defvar traverse-buffer-repeat-map
+    (let ((map (make-sparse-keymap)))
+      (define-key map "C-n" #'next-buffer)
+      (define-key map "C-p" #'previous-buffer)
+      (define-key map "C-f" #'find-file)
+      (define-key map "b" #'consult-buffer)
+      (define-key map "r" #'consult-ripgrep)
+      map)
+    "Keymap to repeat buffer-traversing commands. Used in `repeat-mode'.")
+
+  (put 'next-buffer 'repeat-map 'traverse-buffer-repeat-map)
+  (put 'previous-buffer 'repeat-map 'traverse-buffer-repeat-map)
+
   (setq fit-window-to-buffer-horizontally t)
 
   ;;; TODO: personalize

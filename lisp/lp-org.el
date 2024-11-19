@@ -208,7 +208,7 @@
   (setq org-agenda-dim-blocked-tasks t)
   (setq org-agenda-todo-list-sublevels t)
 
-N  (setq org-agenda-format-date "%A %-e %B %Y")
+  (setq org-agenda-format-date "%A %-e %B %Y")
   (setq org-agenda-include-deadlines t)
   (setq org-deadline-warning-days 7)
   (setq org-scheduled-past-days 365)

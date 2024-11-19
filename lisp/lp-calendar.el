@@ -1,3 +1,12 @@
+(lp-emacs-builtin-package 'sendmail
+ (setq send-mail-function 'sendmail-send-it
+        ;; ;; NOTE 2023-08-08: We do not need this if we have the Arch
+        ;; ;; Linux `msmtp-mta' package installed: it replaces the
+        ;; ;; generic sendmail executable with msmtp.
+        ;;
+        ;; sendmail-program (executable-find "msmtp")
+        message-sendmail-envelope-from 'header))
+
 (lp-emacs-builtin-package 'calendar
   ;; lots ripped from prot
   (setq calendar-mark-diary-entries-flag t)
@@ -21,7 +30,7 @@
   (setq calendar-daylight-time-zone-name "EDT")
 
   (require 'diary-lib)
-  (setq diary-file (file-truename "~/org/diary"))
+  (setq diary-file (file-truename "~/dropbox/denotes/diary"))
   (setq user-mail-address "liamp@TheCave")
   (setq diary-mail-addr user-mail-address)
   (setq diary-date-forms diary-iso-date-forms)
@@ -68,15 +77,23 @@
   )
 
 (lp-emacs-builtin-package 'appt
-  (setq appt-display-diary nil)
+  ;; (setq appt-display-diary nil)
   (setq appt-disp-window-function #'appt-disp-window)
   (setq appt-display-mode-line t)
-  (setq appt-display-interval 5)
+  (setq appt-display-interval 3)
   (setq appt-audible nil)
   (setq appt-warning-time-regexp "appt \\([0-9]+\\)")
-  (setq appt-message-warning-time 15)
+  (setq appt-message-warning-time 6)
 
-  (run-at-time 10 nil #'appt-activate 1))
+  (appt-activate 1))
+
+(lp-emacs-builtin-package 'timeclock
+  (let ((map global-map))
+    (define-key map (kbd "C-c k i") #'timeclock-in)
+    (define-key map (kbd "C-c k o") #'timeclock-out)
+    (define-key map (kbd "C-c k c") #'timeclock-change))
+  (setq timeclock-file "~/dropbox/denotes/timelog")
+  (setq timeclock-project-list '(research homework reading)))
 
 ;;; modified from prot. while its a great idea, it can be problematic to automatically email from different (work) computers
 ;; The idea is to get a reminder via email when I launch Emacs in the

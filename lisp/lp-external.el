@@ -30,7 +30,7 @@
 
   (define-key eww-link-keymap (kbd "v") nil) ; stop overriding `eww-view-source'
   (define-key eww-mode-map (kbd "L") #'eww-list-bookmarks)
-  (define-key dired-mode-map (kbd "E") #'eww-open-file) ; to render local HTML files
+  ;; (define-key dired-mode-map (kbd "E") #'eww-open-file) ; to render local HTML files
   (define-key eww-buffers-mode-map (kbd "d") #'eww-bookmark-kill)   ; it actually deletes
   (define-key eww-bookmark-mode-map (kbd "d") #'eww-bookmark-kill) ; same
   )
@@ -63,11 +63,11 @@
   (setq lp--elfeed-tags '(critical important personal))
 
   ;;; Elfeed feeds
-  ;; TODO: update
+  ;; TODO: update.
   (setq elfeed-feeds '("https://protesilaos.com/master.xml"
                        "https://ava.substack.com/feed"
 
-		       "https://rss.arxiv.org/rss/math.PR"
+		       "https://rss.arxiv.org/rss/math.PR" ;; TODO: add author to title somehow?
 		       "https://terrytao.wordpress.com/feed/"
 		       "https://johncarlosbaez.wordpress.com/atom.xml"
 		       "https://statisticaloddsandends.wordpress.com/atom.xml"
@@ -83,8 +83,9 @@
                        "https://www.benkuhn.net/index.xml" ;; harvard xd
                        "https://www.nayuki.io/rss20.xml" ;; swe in canada with classic math posts
                        "https://danluu.com/atom.xml" ;; plain blog but very good
+		       "https://feeds.feedblitz.com/marginalrevolution&x=1"
 
-
+		       "https://jacobin.com/feed"
                        )))
 
 ;;; epub reader

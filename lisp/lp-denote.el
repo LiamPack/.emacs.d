@@ -6,30 +6,38 @@
   (setq denote-excluded-directories-regexp "/_.*/")  
   (setq denote-excluded-files-regexp "/_.*/")  
   (setq denote-allow-multi-word-keywords t)
-  ;;; TODO: taxonomy could be better
+  ;;; TODO: focus the taxonomy
   (setq denote-known-keywords '("meeting" "note" "research" "writing" "emote" "meta" "list" "unfinished"
 				"movie" "anime" "book" "meeting" "bib"))
-  (setq denote-file-name-components-order '(identifier keywords signature title))
+  (setq denote-known-keywords '("list" "meta" "personal" "note"
+				"misc>wallpaper"
+				"research" "research>book" "research>paper"
+				"math" "math>prob" "math>pde" "math>analysis" "math>topology" "math>functional"
+				"media" "media>book" "media>anime"
+				"writing" "writing>philosophy" "writing>personal" "writing>literature"))
+  (setq denote-file-name-components-order '(identifier signature title keywords))
 
   (setq denote-infer-keywords nil)
   (setq denote-sort-keywords t)
-  (setq denote-file-type 'org)
+  (setq denote-file-type 'text)
   (setq denote-prompts '(signature title keywords file-type))
 
   (denote-rename-buffer-mode 1)
   (setq denote-rename-buffer-format "[D] %s = %>25t")
+  (setq denote-buffer-has-backlinks-string " (<--->)")
+  (setq denote-backlinks-show-context t)
 
   (add-hook 'dired-mode-hook #'denote-dired-mode)
   (add-hook 'find-file-hook #'denote-fontify-links-mode)
 
   (add-to-list 'display-buffer-alist
-	       '("\[D\].*\\(2022\\|2023\\|2024\\|journal\\).*"
+	       '("\[D\].*\\(2022\\|2023\\|2024\\|2025\\|2026\\|journal\\).*"
 		 (display-buffer-below-selected)
 		 (window-height 0.3)))
   
   ;;;; recurring notes
   ;;; TODO: potential here. (phil, kihoon, pierre, digestion, LIST, X-seminar).
-  (defvar my-denote-colleagues '("phil" "kihoon" "xieqing-drp" "prob-seminar" "digestion")
+  (defvar my-denote-colleagues '("phil" "kihoon" "pierre" "digestion")
     "List of names I collaborate with.
 There is at least one file in the variable `denote-directory' that has
 the name of this person.")
@@ -174,9 +182,12 @@ Perform the comparison with `string<'."
 ;;   (consult-notes-denote-mode +1))
 
 (lp-emacs-elpa-package 'consult-denote
-  (consult-denote-mode +1))
+  (consult-denote-mode +1)
+  (define-key global-map (kbd "C-c f f") #'consult-denote-find)
+  (define-key global-map (kbd "C-c f g") #'consult-denote-grep)
+  )
 
-;;; TODO: what's the point here
+;;; TODO: what's the point here. consolidate with bibtex and consult-bibtex
 (lp-emacs-elpa-package 'citar
   (setq citar-bibliography '("~/dropbox/grad/My Library.bib"))
   (setq citar-notes-paths (list (denote-directory))))
@@ -202,48 +213,48 @@ Perform the comparison with `string<'."
 ;; https://leahneukirchen.org/blog/archive/2022/03/note-taking-in-emacs-with-howm.html
 ;; https://kaorahi.github.io/howm/README.html
 ;;; TODO: failed experiment
-(lp-emacs-elpa-package 'howm
-  ;; Directory configuration
-  (setq howm-home-directory "~/dropbox/denotes/_howm/")
-  (setq howm-directory "~/dropbox/denotes/_howm/")
-  (setq howm-keyword-file (expand-file-name ".howm-keys" howm-home-directory))
-  (setq howm-history-file (expand-file-name ".howm-history" howm-home-directory))
-  (setq howm-file-name-format "%Y%m%dT%H%M%S.txt")
+;; (lp-emacs-elpa-package 'howm
+;;   ;; Directory configuration
+;;   (setq howm-home-directory "~/dropbox/denotes/_howm/")
+;;   (setq howm-directory "~/dropbox/denotes/_howm/")
+;;   (setq howm-keyword-file (expand-file-name ".howm-keys" howm-home-directory))
+;;   (setq howm-history-file (expand-file-name ".howm-history" howm-home-directory))
+;;   (setq howm-file-name-format "%Y%m%dT%H%M%S.txt")
 
-  ;; Use ripgrep as grep
-  (setq howm-view-use-grep t)
-  (setq howm-view-grep-command "rg")
-  (setq howm-view-grep-option "-nH --no-heading --color never")
-  (setq howm-view-grep-extended-option nil)
-  (setq howm-view-grep-fixed-option "-F")
-  (setq howm-view-grep-expr-option nil)
-  (setq howm-view-grep-file-stdin-option nil)
+;;   ;; Use ripgrep as grep
+;;   (setq howm-view-use-grep t)
+;;   (setq howm-view-grep-command "rg")
+;;   (setq howm-view-grep-option "-nH --no-heading --color never")
+;;   (setq howm-view-grep-extended-option nil)
+;;   (setq howm-view-grep-fixed-option "-F")
+;;   (setq howm-view-grep-expr-option nil)
+;;   (setq howm-view-grep-file-stdin-option nil)
 
-  ;; Default recent to sorting by mtime
-  (advice-add 'howm-list-recent :after #'howm-view-sort-by-mtime)
-  ;; Default all to sorting by creation, newest first
-  (advice-add 'howm-list-all :after #'(lambda () (howm-view-sort-by-date t)))
+;;   ;; Default recent to sorting by mtime
+;;   (advice-add 'howm-list-recent :after #'howm-view-sort-by-mtime)
+;;   ;; Default all to sorting by creation, newest first
+;;   (advice-add 'howm-list-all :after #'(lambda () (howm-view-sort-by-date t)))
 
-  ;; Rename buffers to their title
-  (add-hook 'howm-mode-hook 'howm-mode-set-buffer-name)
-  (add-hook 'after-save-hook 'howm-mode-set-buffer-name)
+;;   ;; Rename buffers to their title
+;;   (add-hook 'howm-mode-hook 'howm-mode-set-buffer-name)
+;;   (add-hook 'after-save-hook 'howm-mode-set-buffer-name)
 
-  (define-key howm-menu-mode-map "\C-h" nil)
-  (define-key riffle-summary-mode-map "\C-h" nil)
-  (define-key howm-view-contents-mode-map "\C-h" nil)
+;;   (define-key howm-menu-mode-map "\C-h" nil)
+;;   (define-key riffle-summary-mode-map "\C-h" nil)
+;;   (define-key howm-view-contents-mode-map "\C-h" nil)
 
-  ;; zotero://
-  (add-to-list 'action-lock-default-rules
-               (list "\\<zotero://\\S +" (lambda (&optional dummy)
-                                           (browse-url (match-string-no-properties 0)))))
-  ;; @bibtex
-  (add-to-list 'action-lock-default-rules
-               (list "\\s-\\(@\\([a-zA-Z0-9:-]+\\)\\)\\>"
-                     (lambda (&optional dummy)
-                       (browse-url (concat "zotero://select/items/bbt:"
-                                           (match-string-no-properties 2))))
-                     1))
+;;   ;; zotero://
+;;   (add-to-list 'action-lock-default-rules
+;;                (list "\\<zotero://\\S +" (lambda (&optional dummy)
+;;                                            (browse-url (match-string-no-properties 0)))))
+;;   ;; @bibtex
+;;   (add-to-list 'action-lock-default-rules
+;;                (list "\\s-\\(@\\([a-zA-Z0-9:-]+\\)\\)\\>"
+;;                      (lambda (&optional dummy)
+;;                        (browse-url (concat "zotero://select/items/bbt:"
+;;                                            (match-string-no-properties 2))))
+;;                      1))
 
-  )
+;;   )
 
 (provide 'lp-denote)
