@@ -2,7 +2,11 @@
 (("title")
  ("content")
  ("title-or-content"
-  (:text ".*[- ]SPDE[- s].*" :title-value 100 :content-value 20 :type R))
+  (:text ".*[- ]SPDE[- s].*" :title-value 100 :content-value 20 :type R)
+  (:text ".*log-Sobolev.*" :title-value 100 :content-value 20 :type R)
+  (:text ".*percolation.*" :title-value 100 :content-value 20 :type R)
+
+)
  ("tag")
  ("authors"
   (:text "Tom Hutchcroft" :value 300 :type S)

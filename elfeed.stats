@@ -4,14 +4,26 @@
 			rehash-threshold 0.8125 data
 			(#s(elfeed-score-title-or-content-rule
 			    ".*[- ]SPDE[- s].*" 100 20 R nil nil nil)
-			   #s(elfeed-score-rule-stats 7
-						      1731997640.1737814)
+			   #s(elfeed-score-rule-stats 21
+						      1731997895.0484073)
 			   #s(elfeed-score-authors-rule
 			      "Philippe Sosoe" 300 S nil nil nil)
-			   #s(elfeed-score-rule-stats 1
-						      1731997637.7039227)
+			   #s(elfeed-score-rule-stats 4
+						      1731997895.0462453)
 			   #s(elfeed-score-authors-rule "Kihoon Seong"
 							300 S nil nil
 							nil)
+			   #s(elfeed-score-rule-stats 4
+						      1731997895.0462537)
+			   #s(elfeed-score-authors-rule "Sky Cao" 300
+							S nil nil nil)
+			   #s(elfeed-score-rule-stats 2
+						      1731997895.503631)
+			   #s(elfeed-score-authors-rule
+			      "Martin Hairer" 300 S nil nil nil)
 			   #s(elfeed-score-rule-stats 1
-						      1731997637.7039258))))
+						      1731997897.3679662)
+			   #s(elfeed-score-authors-rule
+			      "Tom Hutchcroft" 300 S nil nil nil)
+			   #s(elfeed-score-rule-stats 1
+						      1731997901.131392))))
