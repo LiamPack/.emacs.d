@@ -9,10 +9,12 @@
   ;;; TODO: focus the taxonomy
   (setq denote-known-keywords '("meeting" "note" "research" "writing" "emote" "meta" "list" "unfinished"
 				"movie" "anime" "book" "meeting" "bib"))
-  (setq denote-known-keywords '("list" "meta" "personal" "note"
+  (setq denote-known-keywords '("list" "list>meeting"
+				"meta" "personal" "note"
 				"misc>wallpaper"
 				"research" "research>book" "research>paper"
 				"math" "math>prob" "math>pde" "math>analysis" "math>topology" "math>functional"
+				"math>prob>percolation"
 				"media" "media>book" "media>anime"
 				"writing" "writing>philosophy" "writing>personal" "writing>literature"))
   (setq denote-file-name-components-order '(identifier signature title keywords))
@@ -37,7 +39,7 @@
   
   ;;;; recurring notes
   ;;; TODO: potential here. (phil, kihoon, pierre, digestion, LIST, X-seminar).
-  (defvar my-denote-colleagues '("phil" "kihoon" "pierre" "digestion")
+  (defvar my-denote-colleagues '("phil" "kihoon" "pierre" "digestion" "incubator")
     "List of names I collaborate with.
 There is at least one file in the variable `denote-directory' that has
 the name of this person.")
@@ -62,7 +64,7 @@ If there are more than one files, prompt with completion for one among
 them.
 
 NAME is one among `my-denote-colleagues'."
-    (if-let ((files (denote-directory-files (format "_meeting.*%s" name)))
+    (if-let ((files (denote-directory-files (format "%s.*_list" name)))
              (length-of-files (length files)))
 	(cond
 	 ((= length-of-files 1)
@@ -82,7 +84,7 @@ Names are defined in `my-denote-colleagues'."
     (interactive)
     (let* ((name (my-denote-colleagues-prompt))
            (file (my-denote-colleagues-get-file name))
-           (time (format-time-string "%F %a %R")))  ; remove %R if you do not want the time
+           (time (format-time-string "%F %a")))  ; remove %R if you do not want the time
       (with-current-buffer (find-file file)
 	(goto-char (point-max))
 	;; Here I am assuming we are in `org-mode', hence the leading
@@ -91,12 +93,6 @@ Names are defined in `my-denote-colleagues'."
 
 ;;;; templates
   ;;; TODO: tune. (paper, thought, list, snippet).
-  (setq denote-templates
-	`((report . "* Some heading\n\n* Another heading")
-          (memo . ,(concat "* Some heading"
-                           "\n\n"
-                           "* Another heading"
-                           "\n\n"))))
 
   ;;;; Luhman signature sorting
   (defun my-denote--split-luhman-sig (signature)
@@ -193,22 +189,22 @@ Perform the comparison with `string<'."
   (setq citar-notes-paths (list (denote-directory))))
 
 ;;; TODO: does this work
-(lp-emacs-elpa-package 'citar-denote
-  ;; Package defaults
-  (setq citar-denote-keyword "bib")
-  (let ((map global-map))
-    (define-key map (kbd "C-c w n") #'citar-denote-open-note)
-    (define-key map (kbd "C-c w c") #'citar-create-note)
-    (define-key map (kbd "C-c w d") #'citar-denote-dwim)
-    (define-key map (kbd "C-c w e") #'citar-denote-open-reference-entry)
-    (define-key map (kbd "C-c w a") #'citar-denote-add-citekey)
-    (define-key map (kbd "C-c w k") #'citar-denote-remove-citekey)
-    (define-key map (kbd "C-c w r") #'citar-denote-find-reference)
-    (define-key map (kbd "C-c w l") #'citar-denote-link-reference)
-    (define-key map (kbd "C-c w f") #'citar-denote-find-citation)
-    (define-key map (kbd "C-c w x") #'citar-denote-nocite)
-    (define-key map (kbd "C-c w y") #'citar-denote-cite-nocite)
-    (define-key map (kbd "C-c w z") #'citar-denote-nobib)))
+;; (lp-emacs-elpa-package 'citar-denote
+;;   ;; Package defaults
+;;   (setq citar-denote-keyword "bib")
+;;   (let ((map global-map))
+;;     (define-key map (kbd "C-c w n") #'citar-denote-open-note)
+;;     (define-key map (kbd "C-c w c") #'citar-create-note)
+;;     (define-key map (kbd "C-c w d") #'citar-denote-dwim)
+;;     (define-key map (kbd "C-c w e") #'citar-denote-open-reference-entry)
+;;     (define-key map (kbd "C-c w a") #'citar-denote-add-citekey)
+;;     (define-key map (kbd "C-c w k") #'citar-denote-remove-citekey)
+;;     (define-key map (kbd "C-c w r") #'citar-denote-find-reference)
+;;     (define-key map (kbd "C-c w l") #'citar-denote-link-reference)
+;;     (define-key map (kbd "C-c w f") #'citar-denote-find-citation)
+;;     (define-key map (kbd "C-c w x") #'citar-denote-nocite)
+;;     (define-key map (kbd "C-c w y") #'citar-denote-cite-nocite)
+;;     (define-key map (kbd "C-c w z") #'citar-denote-nobib)))
 
 ;; https://leahneukirchen.org/blog/archive/2022/03/note-taking-in-emacs-with-howm.html
 ;; https://kaorahi.github.io/howm/README.html
