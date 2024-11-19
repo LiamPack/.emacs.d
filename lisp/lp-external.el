@@ -46,7 +46,7 @@
   (setq elfeed-search-filter "@2-weeks-ago +unread")
   (setq elfeed-sort-order 'descending)
   (setq elfeed-search-clipboard-type 'CLIPBOARD)
-  (setq elfeed-search-title-max-width 80)
+  (setq elfeed-search-title-max-width 60)
   (setq elfeed-search-title-min-width 30)
   (setq elfeed-search-trailing-width 25)
   (setq elfeed-show-truncate-long-urls t)
@@ -67,7 +67,12 @@
   (setq elfeed-feeds '("https://protesilaos.com/master.xml"
                        "https://ava.substack.com/feed"
 
-		       "https://rss.arxiv.org/rss/math.PR" ;; TODO: add author to title somehow?
+		       ;; "https://rss.arxiv.org/rss/math.PR" ;; TODO: add author to title somehow?
+		       ;; "https://rss.arxiv.org/rss/math.MP" ;; TODO: add author to title somehow?
+
+		       "http://export.arxiv.org/api/query?search_query=cat:math.PR&start=0&max_results=150&sortBy=submittedDate&sortOrder=descending"
+		       "http://export.arxiv.org/api/query?search_query=cat:math.MP&start=0&max_results=150&sortBy=submittedDate&sortOrder=descending"
+
 		       "https://terrytao.wordpress.com/feed/"
 		       "https://johncarlosbaez.wordpress.com/atom.xml"
 		       "https://statisticaloddsandends.wordpress.com/atom.xml"
@@ -86,7 +91,78 @@
 		       "https://feeds.feedblitz.com/marginalrevolution&x=1"
 
 		       "https://jacobin.com/feed"
-                       )))
+		       "https://feeds.acast.com/public/shows/58ad887a1608b1752663b04a"
+                       ))
+
+  ;; Ripping all arxiv-related feed stuff from https://cundy.me/post/elfeed/
+  (defun concatenate-authors (authors-list)
+    "Given AUTHORS-LIST, list of plists; return string of all authors
+concatenated."
+    (mapconcat
+     (lambda (author) (plist-get author :name))
+     authors-list ", "))
+  (defun my-search-print-fn (entry)
+    "Print ENTRY to the buffer."
+    (let* ((date (elfeed-search-format-date (elfeed-entry-date entry)))
+	   (title (or (elfeed-meta entry :title)
+		      (elfeed-entry-title entry) ""))
+	   (title-faces (elfeed-search--faces (elfeed-entry-tags entry)))
+	   (feed (elfeed-entry-feed entry))
+	   (feed-title
+	    (when feed
+	      (or (elfeed-meta feed :title) (elfeed-feed-title feed))))
+	   (entry-authors (concatenate-authors
+			   (elfeed-meta entry :authors)))
+	   (tags (mapcar #'symbol-name (elfeed-entry-tags entry)))
+	   (tags-str (mapconcat
+		      (lambda (s) (propertize s 'face
+					      'elfeed-search-tag-face))
+		      tags ","))
+	   (title-width (- (window-width) 10
+			   elfeed-search-trailing-width))
+	   (title-column (elfeed-format-column
+			  title (elfeed-clamp
+				 elfeed-search-title-min-width
+				 title-width
+				 elfeed-search-title-max-width)
+			  :left))
+	   (authors-width 40)
+	   (authors-column (elfeed-format-column
+			    entry-authors (elfeed-clamp
+					   elfeed-search-title-min-width
+					   authors-width
+					   40)
+			    :left)))
+
+      (insert (propertize date 'face 'elfeed-search-date-face) " ")
+
+      (insert (propertize title-column
+			  'face title-faces 'kbd-help title) " ")
+
+      (insert (propertize authors-column
+			  'face 'elfeed-search-date-face
+			  'kbd-help entry-authors) " ")
+
+      ;; (when feed-title
+      ;;   (insert (propertize entry-authors
+      ;; 'face 'elfeed-search-feed-face) " "))
+
+      (when entry-authors
+	(insert (propertize feed-title
+			    'face 'elfeed-search-feed-face) " "))
+
+      ;; (when tags
+      ;;   (insert "(" tags-str ")"))
+
+      )
+    )
+  (setq elfeed-search-print-entry-function #'my-search-print-fn)
+  )
+(lp-emacs-elpa-package 'elfeed-score
+  (elfeed-score-enable)
+  (define-key elfeed-search-mode-map (kbd "=") elfeed-score-map)
+  (setq elfeed-score-score-file (concat user-emacs-directory "elfeed.score"))
+  )
 
 ;;; epub reader
 ;;; TODO: i don't like this

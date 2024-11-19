@@ -1,0 +1,20 @@
+;;; Elfeed score file                                     -*- lisp -*-
+(("title")
+ ("content")
+ ("title-or-content"
+  (:text ".*[- ]SPDE[- s].*" :title-value 100 :content-value 20 :type R))
+ ("tag")
+ ("authors"
+  (:text "Tom Hutchcroft" :value 300 :type S)
+  (:text "Philippe Sosoe" :value 300 :type S)
+  (:text "Kihoon Seong" :value 300 :type S)
+  (:text "Roland Bauerschmidt" :value 300 :type S)
+  (:text "Massimiliano Gubinelli" :value 300 :type S)
+  (:text "Sarah-Jean Meyer" :value 300 :type S)
+  (:text "Sky Cao" :value 300 :type S)
+  (:text "Hao Shen" :value 300 :type S)
+  (:text "Martin Hairer" :value 300 :type S)
+
+)
+ ("feed")
+ (mark -600))

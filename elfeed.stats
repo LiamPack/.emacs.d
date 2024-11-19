@@ -1,0 +1,17 @@
+;;; Elfeed score rule stats file DO NOT EDIT       -*- lisp -*-
+(:version 1 :stats
+	  #s(hash-table size 65 test equal rehash-size 1.5
+			rehash-threshold 0.8125 data
+			(#s(elfeed-score-title-or-content-rule
+			    ".*[- ]SPDE[- s].*" 100 20 R nil nil nil)
+			   #s(elfeed-score-rule-stats 7
+						      1731997640.1737814)
+			   #s(elfeed-score-authors-rule
+			      "Philippe Sosoe" 300 S nil nil nil)
+			   #s(elfeed-score-rule-stats 1
+						      1731997637.7039227)
+			   #s(elfeed-score-authors-rule "Kihoon Seong"
+							300 S nil nil
+							nil)
+			   #s(elfeed-score-rule-stats 1
+						      1731997637.7039258))))
