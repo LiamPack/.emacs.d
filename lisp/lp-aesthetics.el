@@ -90,6 +90,10 @@
 ;; https://leahneukirchen.org/fonts/
 ;; bdftopcf, https://thristian.livejournal.com/90017.html
 ;; https://moritzfuerst.net/projects/smalltalk-type
+;; (set-frame-font :font "iosevka comfy" :height 120)
+(set-face-attribute 'default t
+		    :font "iosevka comfy motion fixed"
+		    :height 140)
 
 ;; (load-theme 'standard-light :no-confirm)
 ;; (load-theme 'standard-dark :no-confirm)

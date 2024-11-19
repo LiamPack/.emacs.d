@@ -39,7 +39,7 @@
   
   ;;;; recurring notes
   ;;; TODO: potential here. (phil, kihoon, pierre, digestion, LIST, X-seminar).
-  (defvar my-denote-colleagues '("phil" "kihoon" "pierre" "digestion" "incubator")
+  (defvar my-denote-colleagues '("phil" "kihoon" "pierre" "digestion" "incubator" "misc-incubator")
     "List of names I collaborate with.
 There is at least one file in the variable `denote-directory' that has
 the name of this person.")
