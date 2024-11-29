@@ -25,7 +25,8 @@
 ;;   )
 
 ;;; TODO: read manual
-(lp-emacs-elpa-package 'beframe
+(if nil
+    (lp-emacs-elpa-package 'beframe
   (setq beframe-functions-in-frames '(project-prompt-project-dir))
   (setq beframe-global-buffers '("*scratch*" "*Messages*" "*Backtrace*"))
 
@@ -57,7 +58,7 @@
 	 :action   ,#'switch-to-buffer
 	 :state    ,#'consult--buffer-state))
 
-    (add-to-list 'consult-buffer-sources 'beframe--consult-source)))
+    (add-to-list 'consult-buffer-sources 'beframe--consult-source))))
 
 ;; Thank you prot (see
 ;; https://protesilaos.com/dotemacs/#h:c110e399-3f43-4555-8427-b1afe44c0779)

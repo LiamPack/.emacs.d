@@ -68,7 +68,11 @@
   (setq dired-dwim-target t)
   (setq dired-auto-revert-buffer #'dired-directory-changed-p) ; also see `dired-do-revert-buffer'
   (add-hook 'dired-mode-hook #'dired-hide-details-mode)
-  (add-hook 'dired-mode-hook #'hl-line-mode))
+  (add-hook 'dired-mode-hook #'hl-line-mode)
+  (setq dired-clean-up-buffers-too t)
+  (setq dired-clean-confirm-killing-deleted-buffers t)
+  (setq dired-recursive-copies 'always)
+  (setq dired-recursive-deletes 'always))
 
 (lp-emacs-builtin-package 'dired-aux
   (setq dired-isearch-filenames 'dwim)
@@ -84,13 +88,29 @@
     (define-key map (kbd "C-x v v") #'dired-vc-next-action)))
 
 (lp-emacs-builtin-package 'dired-x
-  (setq dired-clean-up-buffers-too t)
-  (setq dired-clean-confirm-killing-deleted-buffers t)
   (setq dired-x-hands-off-my-keys t)    ; easier to show the keys I use
-  (setq dired-bind-man nil)
-  (setq dired-bind-info nil)
   (define-key dired-mode-map (kbd "I") #'dired-info))
 
+(lp-emacs-elpa-package 'dired-subtree
+  (let ((map dired-mode-map))
+    (define-key map (kbd "<tab>")  #'dired-subtree-toggle)
+    (define-key map (kbd "TAB")  #'dired-subtree-toggle)
+    (define-key map (kbd "<backtab>")  #'dired-subtree-remove)
+    (define-key map (kbd "S-TAB")  #'dired-subtree-remove))
+
+  (setq dired-subtree-use-backgrounds nil))
+
+
+(lp-emacs-elpa-package 'nerd-icons
+  (setq nerd-icons-scale-factor 1.0)
+  (setq nerd-icons-font-family "GohuFont 11 Nerd Font Mono")
+  )
+
+(lp-emacs-elpa-package 'nerd-icons-completion
+  (add-hook 'marginalia-mode-hook #'nerd-icons-completion-marginalia-setup))
+
+(lp-emacs-elpa-package 'nerd-icons-dired
+  (add-hook 'dired-mode-hook #'nerd-icons-dired-mode))
 
 ;;; "write"-grep -- allow editing of grep-like buffers
 (lp-emacs-elpa-package 'wgrep

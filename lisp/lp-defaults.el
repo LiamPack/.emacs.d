@@ -71,7 +71,7 @@
       (blink-cursor-mode -1)
       (setq visible-cursor t)))
 
-  (setq initial-scratch-message ";; Present Day
+  (setq initial-scratch-message ";; Find an oblique angle
 "
         visible-bell t)
   (define-key global-map (kbd "C-c s") #'scratch-buffer)
@@ -100,7 +100,7 @@
   (define-key global-map (kbd "C-c n") #'(lambda () (interactive) (whitespace-cleanup))) ;;; TODO doesn't really work anymore. taking up keybind
   (define-key global-map (kbd "<f5>")  #'revert-buffer)
 
-  (define-key global-map (kbd "M-z") #'zap-up-to-char) ;; i generally go up to a char non-inclusive
+  (define-key global-map (kbd "M-z") #'zap-up-to-char) ;; TODO: repeat map
   (define-key global-map (kbd "M-Z") #'zap-to-char)
 
   (define-key global-map (kbd "C-x C-M-e") #'pp-macroexpand-last-sexp)
