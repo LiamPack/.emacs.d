@@ -67,11 +67,11 @@
   )
 
 
-(lp-emacs-elpa-package 'spacious-padding
-  (setq spacious-padding-widths
-	'(:internal-border-width 14 :right-divider-width 8 :scroll-bar-width 5))
-  (setq spacious-padding-subtle-mode-line nil)
-  (spacious-padding-mode 1))
+;; (lp-emacs-elpa-package 'spacious-padding
+;;   (setq spacious-padding-widths
+;; 	'(:internal-border-width 14 :right-divider-width 8 :scroll-bar-width 5))
+;;   (setq spacious-padding-subtle-mode-line nil)
+;;   (spacious-padding-mode 1))
 
  (defun toggle-transparency ()
    (interactive)
@@ -91,13 +91,14 @@
 ;; bdftopcf, https://thristian.livejournal.com/90017.html
 ;; https://moritzfuerst.net/projects/smalltalk-type
 ;; (set-frame-font :font "iosevka comfy" :height 120)
-(set-face-attribute 'default t
-		    :font "iosevka comfy motion fixed"
-		    :height 140)
 
-;; (load-theme 'standard-light :no-confirm)
-;; (load-theme 'standard-dark :no-confirm)
-(load-theme 'modus-vivendi-tritanopia :no-confirm)
+(let ((mono-spaced-font "Iosevka Comfy Motion")
+      (proportionately-spaced-font "Iosevka Comfy Duo"))
+  (set-face-attribute 'default nil :family mono-spaced-font :height 100)
+  (set-face-attribute 'fixed-pitch nil :family mono-spaced-font :height 1.0)
+  (set-face-attribute 'variable-pitch nil :family proportionately-spaced-font :height 1.0))
+
+(load-theme 'standard-light :no-confirm)
 
 (global-set-key (kbd "C-c *") #'standard-themes-toggle)
 
