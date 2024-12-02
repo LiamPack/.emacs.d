@@ -41,8 +41,17 @@
 ;;; Avy jumping
 (lp-emacs-elpa-package 'avy
   (avy-setup-default) ; binds C-' in the isearch map
-  (define-key global-map (kbd "C-'") 'avy-goto-char-timer)
-  (define-key global-map (kbd "M-'") 'avy-resume))
+  (let ((map global-map))
+    (define-key global-map (kbd "C-' C-l") 'avy-goto-line)
+    (define-key global-map (kbd "C-' C-a") 'avy-goto-word-0-above)
+    (define-key global-map (kbd "C-' C-n") 'avy-goto-word-0-below)
+    ;; (define-key global-map (kbd "C-' C-i") 'avy-goto-char-timer)
+    
+    (define-key global-map (kbd "M-'") 'avy-resume))
+
+
+  (setq avy-timeout-seconds 0.4)
+  (setq avy-background nil))
 
 ;;; Right-click menus for emacs
 (lp-emacs-elpa-package 'embark

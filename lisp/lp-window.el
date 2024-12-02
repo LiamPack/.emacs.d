@@ -137,13 +137,12 @@
 
   (defvar traverse-buffer-repeat-map
     (let ((map (make-sparse-keymap)))
-      (define-key map "C-n" #'next-buffer)
-      (define-key map "C-p" #'previous-buffer)
-      (define-key map "C-f" #'find-file)
+      (define-key map "n" #'next-buffer)
+      (define-key map "p" #'previous-buffer)
+      (define-key map "f" #'find-file)
       (define-key map "b" #'consult-buffer)
       (define-key map "r" #'consult-ripgrep)
-      map)
-    "Keymap to repeat buffer-traversing commands. Used in `repeat-mode'.")
+      map))
 
   (put 'next-buffer 'repeat-map 'traverse-buffer-repeat-map)
   (put 'previous-buffer 'repeat-map 'traverse-buffer-repeat-map)
@@ -161,6 +160,7 @@
     (define-key map (kbd "C-x -") #'fit-window-to-buffer) ; hyphen
     (define-key map (kbd "C-x +") #'balance-windows-area)
     (define-key map (kbd "C-x }") #'enlarge-window)
+    (define-key map (kbd "C-x C-}") #'enlarge-window)
     (define-key map (kbd "C-x {") #'shrink-window)
     (define-key map (kbd "C-x >") #'enlarge-window-horizontally) ; override `scroll-right'
     (define-key map (kbd "C-x <") #'shrink-window-horizontally)) ; override `scroll-left'

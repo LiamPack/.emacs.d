@@ -4,9 +4,7 @@
  ("title-or-content"
   (:text ".*[- ]SPDE[- s].*" :title-value 100 :content-value 20 :type R)
   (:text ".*log-Sobolev.*" :title-value 100 :content-value 20 :type R)
-  (:text ".*percolation.*" :title-value 100 :content-value 20 :type R)
-
-)
+  (:text ".*percolation.*" :title-value 100 :content-value 20 :type R))
  ("tag")
  ("authors"
   (:text "Tom Hutchcroft" :value 300 :type S)
@@ -17,8 +15,7 @@
   (:text "Sarah-Jean Meyer" :value 300 :type S)
   (:text "Sky Cao" :value 300 :type S)
   (:text "Hao Shen" :value 300 :type S)
-  (:text "Martin Hairer" :value 300 :type S)
-
-)
- ("feed")
+  (:text "Martin Hairer" :value 300 :type S))
+ ("feed"
+  (:text "Protesilaos Stavrou: Master feed with all updates" :value 500 :type S :attr t))
  (mark -600))
