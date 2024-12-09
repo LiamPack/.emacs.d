@@ -155,7 +155,7 @@ tex-mode org-mode
 (charf "\\E[e^{i \\theta " q " }] ")
 (ex "\\E[" p "] ")
 (norml "\mathcal{N}(" p ", " q ") ")
-(eup "e^{" p "} ")
+(eup "e^{" q "} ")
 (expp "\\exp^{" p "} ")
 (xp "^{" q "} ")
 (sinn "\\sin(" q ") ")

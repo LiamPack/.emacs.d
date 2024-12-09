@@ -160,7 +160,6 @@
     (define-key map (kbd "C-x -") #'fit-window-to-buffer) ; hyphen
     (define-key map (kbd "C-x +") #'balance-windows-area)
     (define-key map (kbd "C-x }") #'enlarge-window)
-    (define-key map (kbd "C-x C-}") #'enlarge-window)
     (define-key map (kbd "C-x {") #'shrink-window)
     (define-key map (kbd "C-x >") #'enlarge-window-horizontally) ; override `scroll-right'
     (define-key map (kbd "C-x <") #'shrink-window-horizontally)) ; override `scroll-left'
