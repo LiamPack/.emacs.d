@@ -8,6 +8,10 @@
 ;; utilities that could easily be provided by snippets and cdlatex. Time will tell
 ;;
 ;; set dont-use-auctex-scope to NIL if you want to use auctex
+
+;; Must be loaded before auctex.
+(setq cdlatex-math-modify-prefix ?`)
+(setq cdlatex-math-symbol-prefix ?')
 (if-let ((dont-use-auctex-scope nil))
     nil
   (when (not (package-installed-p 'auctex))
@@ -26,7 +30,7 @@
   (setq-default TeX-master nil)
 
   ;; most crucial: turn-on-reftex
-  (setq lp--latex-hooks-fns '(auto-fill-mode TeX-source-correlate-mode flyspell-mode flyspell-buffer turn-on-reftex prettify-symbols-mode cdlatex-mode abbrev-mode))
+  (setq lp--latex-hooks-fns '(auto-fill-mode TeX-source-correlate-mode flyspell-mode flyspell-buffer turn-on-reftex prettify-symbols-mode turn-on-cdlatex abbrev-mode))
   (dolist (fn lp--latex-hooks-fns)
     (add-hook 'LaTeX-mode-hook fn)))
 ;; https://karthinks.com/software/latex-input-for-impatient-scholars/
@@ -34,8 +38,7 @@
 
 (lp-emacs-builtin-package 'reftex)
 
-(lp-emacs-elpa-package 'cdlatex
-  (add-hook 'latex-mode-hook #'cdlatex-mode))
+(lp-emacs-elpa-package 'cdlatex)
 
 ;;; TODO: synchronize with CITAR or remove bibtex-completion.
 (lp-emacs-builtin-package 'bibtex)

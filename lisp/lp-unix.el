@@ -100,18 +100,6 @@
 
   (setq dired-subtree-use-backgrounds nil))
 
-
-(lp-emacs-elpa-package 'nerd-icons
-  (setq nerd-icons-scale-factor 1.0)
-  (setq nerd-icons-font-family "GohuFont 11 Nerd Font Mono")
-  )
-
-(lp-emacs-elpa-package 'nerd-icons-completion
-  (add-hook 'marginalia-mode-hook #'nerd-icons-completion-marginalia-setup))
-
-(lp-emacs-elpa-package 'nerd-icons-dired
-  (add-hook 'dired-mode-hook #'nerd-icons-dired-mode))
-
 ;;; "write"-grep -- allow editing of grep-like buffers
 (lp-emacs-elpa-package 'wgrep
   (define-key grep-mode-map (kbd "C-x C-q") 'wgrep-change-to-wgrep-mode))

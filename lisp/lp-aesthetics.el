@@ -41,12 +41,7 @@
         ;; more complex alist to set weight, height, and optional
         ;; `variable-pitch' per heading level (t is for any level not
         ;; specified):
-	standard-themes-headings
-	      '((1 . (1.5))
-		(2 . (1.3))
-		(agenda-date . (1.3))
-		(agenda-structure . (variable-pitch light 1.8))
-		(t . (1.1))))
+	)
 
   (setq standard-dark-palette-overrides
 	'((bg-mode-line-active "#303030")
@@ -59,19 +54,13 @@
 	  (bg-mode-line-inactive bg-dim)
 	  (cursor red-warmer)
 	  (bg-region bg-yellow-intense)))
-  ;; (with-eval-after-load 'denote
-  ;;   (standard-themes-with-colors
-  ;;     (set-face-attribute 'denote-faces-title nil
-  ;; 			  :foreground fg-main
-  ;; 			  :box bg-alt)))
+  (with-eval-after-load 'denote
+    (standard-themes-with-colors
+      (set-face-attribute 'denote-faces-title nil
+			  :foreground fg-main
+			  :box bg-alt)))
   )
 
-
-;; (lp-emacs-elpa-package 'spacious-padding
-;;   (setq spacious-padding-widths
-;; 	'(:internal-border-width 14 :right-divider-width 8 :scroll-bar-width 5))
-;;   (setq spacious-padding-subtle-mode-line nil)
-;;   (spacious-padding-mode 1))
 
  (defun toggle-transparency ()
    (interactive)
@@ -92,13 +81,32 @@
 ;; https://moritzfuerst.net/projects/smalltalk-type
 ;; (set-frame-font :font "iosevka comfy" :height 120)
 
-(let ((mono-spaced-font "Iosevka Comfy Motion")
-      (proportionately-spaced-font "Iosevka Comfy Duo"))
-  (set-face-attribute 'default nil :family mono-spaced-font :height 100)
+(let (
+      (mono-spaced-font "Iosevka Comfy Motion Fixed")
+      (proportionately-spaced-font "Iosevka Comfy Duo")
+      ;; (mono-spaced-font "BigBlueTermPlus Nerd Font")
+      ;; (proportionately-spaced-font "BigBlueTermPlus Nerd Font")
+
+      )
+  (set-face-attribute 'default nil :family mono-spaced-font :height 110)
   (set-face-attribute 'fixed-pitch nil :family mono-spaced-font :height 1.0)
   (set-face-attribute 'variable-pitch nil :family proportionately-spaced-font :height 1.0))
 
-(load-theme 'standard-light :no-confirm)
+
+(lp-emacs-elpa-package 'nerd-icons
+  (setq nerd-icons-scale-factor 1.0)
+  (setq nerd-icons-font-family "BigBlueTermPlus Nerd Font")
+  )
+
+(lp-emacs-elpa-package 'nerd-icons-completion
+  (add-hook 'marginalia-mode-hook #'nerd-icons-completion-marginalia-setup))
+
+(lp-emacs-elpa-package 'nerd-icons-dired
+  (add-hook 'dired-mode-hook #'nerd-icons-dired-mode))
+
+
+
+(load-theme 'standard-dark :no-confirm)
 
 (global-set-key (kbd "C-c *") #'standard-themes-toggle)
 

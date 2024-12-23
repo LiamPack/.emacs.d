@@ -11,7 +11,8 @@
   (setq org-special-ctrl-k nil)
   (setq org-hide-emphasis-markers nil)
 
-  ;;; TODOs and refiles -- courtesy of some of prot's configuration of course
+  ;;; TODOs and refiles -- courtesy of some of prot's configuration of
+  ;;; course
   (setq org-refile-targets
         `((,(directory-files org-directory t ".*.org") . (:maxlevel . 2))
           (nil . (:maxlevel . 2))))
@@ -45,25 +46,7 @@
 
   ;;; tags
   (setq org-tag-alist
-        '(("personal")
-	  ("work")
-	  ("physics")
-	  ("cs")
-	  ("aiml")
-	  ("statistics")
-	  ("scifi")
-	  ("meeting")
-          ("emacs")
-          ("politics")
-          ("economics")
-          ("philosophy")
-	  ("cogsci")
-          ("book")
-	  ("site")
-	  ("tv")
-          ("essay")
-	  ("paper")
-          ("website")))
+        '())
 
   (setq org-auto-align-tags t)
   (setq org-tags-column 80)
@@ -117,61 +100,6 @@
 
   (setq org-use-sub-superscripts nil)   ; not a big fan of the ambiguity
   (setq org-insert-heading-respect-content t)
-
-  ;; Auto wrap paragraphs in some modes (auto-fill-mode)
-  ;; (add-hook 'text-mode-hook #'turn-on-auto-fill)
-  ;; (add-hook 'org-mode-hook #'turn-on-auto-fill)
-
-  ;;; capture
-  (setq lp--tasks-file (car (directory-files org-directory t ".*tasks.*org")))
-  (setq lp--to-read-file (car (directory-files org-directory t ".*to-read.*org")))
-  (setq org-capture-templates
-        `(("b" "Basic task for future review" entry
-           (file+headline lp--tasks-file "Tasks")
-           ,(concat "* TODO %^{Title} %^g\n"
-                    ":PROPERTIES:\n"
-                    ":CAPTURED: %U\n"
-                    ":END:\n\n"
-                    "%i%l")
-           :empty-lines-after 1)
-          ("c" "Clock in to a task" entry
-           (file+headline lp--tasks-file "Clocked tasks")
-           ,(concat "* TODO %^{Title}\n"
-                    "SCHEDULED: %T\n"
-                    ":PROPERTIES:\n"
-                    ":EFFORT: %^{Effort estimate in minutes|5|10|15|30|45|60|90|120}\n"
-                    ":END:\n\n"
-                    "%a\n")
-           :prepend t
-           :clock-in t
-           :clock-keep t
-           :immediate-finish t
-           :empty-lines-after 1)
-          ("m" "Memorandum of conversation" entry
-           (file+headline lp--tasks-flie "Tasks")
-           ,(concat "* Memorandum of conversation with %^{Person}\n"
-                    ":PROPERTIES:\n"
-                    ":CAPTURED: %U\n"
-                    ":END:\n\n"
-                    "%i%?")
-           :empty-lines-after 1)
-          ("t" "Task with a due date" entry
-           (file+headline lp--tasks-file "Tasks")
-           ,(concat "* TODO %^{Title} %^g\n"
-                    "SCHEDULED: %^t\n"
-                    ":PROPERTIES:\n"
-                    ":CAPTURED: %U\n"
-                    ":END:\n\n"
-                    "%a\n%i%?")
-           :empty-lines-after 1)
-	  ("r" "New to-read entry" entry
-	   (file+headline lp--to-read-file "inbox")
-	   ,(concat "* TODO [#A] %^{Title} %^g\n"
-                    ":PROPERTIES:\n"
-                    ":CAPTURED: %U\n"
-                    ":END:\n\n"
-                    "%x\n\n%a\n\n%?")
-	   :empty-lines-after 1)))
 
   ;;; archiving
   (setq org-archive-skip-archived-trees t)
@@ -370,53 +298,29 @@
 			 'notregexp ,(format "\\[#%s\\]" (char-to-string org-priority-highest))))
                       (org-agenda-overriding-header "to-reads\n")))))
 
-  (setq org-agenda-custom-commands
-        `(("A" "Daily agenda and top priority tasks"
-	   ,lp--custom-agenda
-	   ((org-agenda-fontify-priorities nil)
-	    (org-agenda-dim-blocked-tasks nil)))
-	  ("r" "to-read articles"
-	   ,lp--custom-toreads
-	   ((org-agenda-with-colors nil)
-	    (org-agenda-fontify-priorities nil)
-	    (org-agenda-prefix-format "%t %s")
-	    (org-agenda-current-time-string ,(car (last org-agenda-time-grid)))
-	    (org-agenda-remove-tags t)
-	    (org-agenda-file-regexp ".*to-read.*\.org")))))
-  
 ;;;;; Agenda habits
   (require 'org-habit)
   (setq org-habit-graph-column 50)
   (setq org-habit-preceding-days 9)
-  
-
-  ;; org capture templates
-  ;; org directory location
-  ;; org display agenda preferences
-  ;; binds
-  ;; (define-key global-map (kbd "C-c A") (lambda () (interactive) (org-agenda nil "A")))
-  ;; (define-key global-map (kbd "C-c r") (lambda () (interactive) (org-agenda nil "r")))
 
   (define-key text-mode-map (kbd "C-c q") #'auto-fill-mode)
   (define-key global-map (kbd "C-c l") #'org-store-link)
-  (define-key global-map (kbd "C-c C-l") #'org-insert-link-global)
+
   (let ((map global-map))
-    (define-key map (kbd "C-c a") #'org-agenda)
-    (define-key map (kbd "C-c c") #'org-capture)
     (define-key map (kbd "C-c l") #'org-store-link)
-    (define-key map (kbd "C-c o") #'org-open-at-point-global))
+    (define-key map (kbd "C-c o") #'org-open-at-point-global)
+    (define-key map (kbd "C-c M-l") #'org-insert-last-stored-link)
+    (define-key map (kbd "C-c C-M-l") #'org-toggle-link-display))
+
+  ;; Disable the gorillion keys that org binds
   (let ((map org-mode-map))
-    ;; I don't like that Org binds one zillion keys, so if I want one
-    ;; for something more important, I disable it from here.
     (define-key map (kbd "C-'") nil)
     (define-key map (kbd "C-,") nil)
     (define-key map (kbd "M-;") nil)
     (define-key map (kbd "<C-return>") nil)
     (define-key map (kbd "<C-S-return>") nil)
     (define-key map (kbd "C-M-S-<right>") nil)
-    (define-key map (kbd "C-M-S-<left>") nil)
-    (define-key map (kbd "C-c M-l") #'org-insert-last-stored-link)
-    (define-key map (kbd "C-c C-M-l") #'org-toggle-link-display)))
+    (define-key map (kbd "C-M-S-<left>") nil)))
 
 
 (with-eval-after-load 'ox-latex

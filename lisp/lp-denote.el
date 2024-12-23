@@ -7,16 +7,20 @@
   (setq denote-excluded-files-regexp "/_.*/")  
   (setq denote-allow-multi-word-keywords t)
   ;;; TODO: focus the taxonomy
-  (setq denote-known-keywords '("meeting" "note" "research" "writing" "emote" "meta" "list" "unfinished"
-				"movie" "anime" "book" "meeting" "bib"))
-  (setq denote-known-keywords '("list" "list>meeting"
-				"meta" "personal" "note"
+  (setq denote-known-keywords '("meta" "personal" "note" "source"
+
+				"list" "list>meeting"
 				"misc>wallpaper"
 				"research" "research>book" "research>paper"
+
 				"math" "math>prob" "math>pde" "math>analysis" "math>topology" "math>functional"
 				"math>prob>percolation"
+
 				"media" "media>book" "media>anime"
-				"writing" "writing>philosophy" "writing>personal" "writing>literature"))
+				"writing" "writing>philosophy" "writing>personal" "writing>literature"
+
+				"cooking" "cooking>recipe"
+				"tech"))
   (setq denote-file-name-components-order '(identifier signature title keywords))
 
   (setq denote-infer-keywords nil)
