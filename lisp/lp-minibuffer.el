@@ -19,7 +19,7 @@
   (setq completions-group t)
   (setq completions-group-sort nil)
 
-  (setq enable-recursive-minibuffers nil)
+  (setq enable-recursive-minibuffers t)
   (require 'minibuf-eldef)
   (setq minibuffer-eldef-shorten-default t) ;; default completion in [bracks]
 

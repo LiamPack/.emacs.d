@@ -300,5 +300,4 @@ The DWIM behaviour of this command is as follows:
                 scroll-margin 0
                 next-screen-context-lines 0))
 
-
 (provide 'lp-defaults)

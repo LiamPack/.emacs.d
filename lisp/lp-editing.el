@@ -23,6 +23,36 @@
     (define-key map (kbd "C-g") #'isearch-cancel) ; instead of `isearch-abort'
     (define-key map (kbd "M-/") #'isearch-complete)))
 
+(lp-emacs-builtin-package 'electric
+  (setq electric-pair-inhibit-predicate 'electric-pair-default-inhibit)
+  (setq electric-pair-preserve-balance t)
+  (setq electric-pair-pairs
+        '((?[ . ?])
+          (?{ . ?})
+	  (?( . ?))
+	  (?< . ?>)
+	  (?$ . ?$)
+	  (?* . ?*)
+          (?" . ?")
+	  (?' . ?')))
+  (setq electric-pair-skip-self 'electric-pair-default-skip-self)
+  (setq electric-pair-skip-whitespace t)
+  (setq electric-pair-skip-whitespace-chars '(9 10 32))
+  (setq electric-quote-context-sensitive t)
+  (setq electric-quote-paragraph t)
+  (setq electric-quote-string nil)
+  (setq electric-quote-replace-double t)
+  
+  ;; (electric-pair-mode t)
+  ;; (electric-quote-mode t)
+  ;; (electric-indent-mode t)
+  (add-hook 'prog-mode-hook #'electric-indent-local-mode)
+  (dolist (hook (list #'electric-indent-mode
+                      ;; #'electric-quote-mode
+                      #'electric-pair-mode
+                      ))
+    (add-hook 'text-mode-hook hook)))
+
 (lp-emacs-builtin-package 'replace
   (define-key global-map (kbd "M-s M-o") 'multi-occur)
   (define-key occur-mode-map (kbd "t") 'toggle-truncate-lines)
@@ -45,7 +75,6 @@
     (define-key global-map (kbd "C-' C-l") 'avy-goto-line)
     (define-key global-map (kbd "C-' C-a") 'avy-goto-word-0-above)
     (define-key global-map (kbd "C-' C-n") 'avy-goto-word-0-below)
-    ;; (define-key global-map (kbd "C-' C-i") 'avy-goto-char-timer)
     
     (define-key global-map (kbd "M-'") 'avy-resume))
 

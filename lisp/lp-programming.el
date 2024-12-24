@@ -4,32 +4,8 @@
             (lambda ()
               (font-lock-add-keywords
                nil
-               '(("\\<\\(FIXME\\|TODO\\|BUG\\)" 1 font-lock-warning-face prepend))))))
-
-
-;;; `electric' behavior
-(lp-emacs-builtin-package 'electric
-  (setq electric-pair-inhibit-predicate 'electric-pair-conservative-inhibit)
-  (setq electric-pair-preserve-balance t)
-  (setq electric-pair-pairs
-        '((8216 . 8217)
-          (8220 . 8221)
-          (171 . 187)))
-  (setq electric-pair-skip-self 'electric-pair-default-skip-self)
-  (setq electric-pair-skip-whitespace nil)
-  (setq electric-pair-skip-whitespace-chars '(9 10 32))
-  (setq electric-quote-context-sensitive t)
-  (setq electric-quote-paragraph t)
-  (setq electric-quote-string nil)
-  (setq electric-quote-replace-double t)
-  
-  (electric-pair-mode -1)
-  (electric-quote-mode -1)
-  ;; I don't like auto indents in Org and related.  They are okay for
-  ;; programming.
-  (electric-indent-mode -1)
-  (add-hook 'prog-mode-hook #'electric-indent-local-mode))
-
+               '(("\\<\\(FIXME\\|TODO\\|BUG\\)" 1 font-lock-warning-face prepend)))))
+	(add-hook 'prog-mode-hook #'electric-indent-local-mode))
 
 
 (lp-emacs-builtin-package 'compile

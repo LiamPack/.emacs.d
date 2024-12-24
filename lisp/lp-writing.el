@@ -3,7 +3,7 @@
   (add-hook 'text-mode-hook
             #'(lambda ()
                 (interactive)
-                (setq-local paragraph-start "\\|\\*\\| *-\\| *[1-9]\\.\\|[ 	]*$"))))
+                (setq-local paragraph-start "\\|\\*\\| *-\\| *[1-9]\\.\\|[ 	]*$\\| *+"))))
 
 (lp-emacs-builtin-package 'outline
   (setq outline-regexp "^= .+ =\n=+$\\|^- .+ -\n-+$\\|^[*]+"))
