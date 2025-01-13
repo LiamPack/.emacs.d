@@ -169,7 +169,7 @@
   (add-hook 'eww-mode-hook #'visual-line-mode)
   (add-hook 'text-mode-hook #'visual-line-mode)
 
-  (define-key global-map (kbd "C-x u") #'undelete-frame) ; I use only C-/ for `undo'
+  ;; (define-key global-map (kbd "C-x u") #'undelete-frame) ; I use only C-/ for `undo'
   (undelete-frame-mode 1))
 
 (lp-emacs-builtin-package 'winner

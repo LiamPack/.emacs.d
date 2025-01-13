@@ -1,10 +1,11 @@
 ;;; TODO: paragraph-start tuning. what's a paragraph, and is it consistent with an outline expression?
+
 (lp-emacs-builtin-package 'text-mode
   (add-hook 'text-mode-hook
             #'(lambda ()
                 (interactive)
-                (setq-local paragraph-start "\\|\\*\\| *-\\| *[1-9]\\.\\|[ 	]*$\\| *+"))))
-
+                (setq-local paragraph-start "\\|[ 	]*$\\|^[ ]*\\*\\|^[ ]*[1-9]+\\.\\|^[ ]*\\+\\|^x \\|^[ ]*-"))))
+;; "\\|\\*\\| *-\\| *[1-9]\\.\\|[ 	]*$\\| *+"
 (lp-emacs-builtin-package 'outline
   (setq outline-regexp "^= .+ =\n=+$\\|^- .+ -\n-+$\\|^[*]+"))
 

@@ -17,8 +17,22 @@
         modus-themes-italic-constructs t
         modus-themes-bold-constructs t
 	modus-themes-org-blocks 'gray-background
-	modus-themes-prompts '(italic bold)
-	modus-themes-region '(bg-only)))
+	modus-themes-prompts '(italic bold))
+
+  (setq modus-operandi-palette-overrides
+	'((bg-mode-line-active bg-red-subtle)
+	  (bg-mode-line-inactive bg-ochre)
+	  (bg-hl-line bg-red-nuanced)
+	  (cursor red-intense)))
+  (setq modus-vivendi-palette-overrides
+	'((bg-mode-line-active bg-red-subtle)
+	  (bg-mode-line-inactive bg-ochre)
+	  (bg-hl-line bg-red-nuanced)
+	  (cursor fg-clay)))
+
+  (setq modus-themes-to-toggle '(modus-operandi modus-vivendi))
+  (define-key global-map (kbd "C-c C-8") #'modus-themes-toggle)
+  )
 
 (lp-emacs-elpa-package 'ef-themes)
 
@@ -53,13 +67,7 @@
 	'((bg-mode-line-active bg-alt)
 	  (bg-mode-line-inactive bg-dim)
 	  (cursor red-warmer)
-	  (bg-region bg-yellow-intense)))
-  (with-eval-after-load 'denote
-    (standard-themes-with-colors
-      (set-face-attribute 'denote-faces-title nil
-			  :foreground fg-main
-			  :box bg-alt)))
-  )
+	  (bg-region bg-yellow-intense))))
 
 
  (defun toggle-transparency ()
@@ -88,7 +96,7 @@
       ;; (proportionately-spaced-font "BigBlueTermPlus Nerd Font")
 
       )
-  (set-face-attribute 'default nil :family mono-spaced-font :height 110)
+  (set-face-attribute 'default nil :family mono-spaced-font :height 100)
   (set-face-attribute 'fixed-pitch nil :family mono-spaced-font :height 1.0)
   (set-face-attribute 'variable-pitch nil :family proportionately-spaced-font :height 1.0))
 
@@ -106,8 +114,14 @@
 
 
 
-(load-theme 'standard-dark :no-confirm)
 
-(global-set-key (kbd "C-c *") #'standard-themes-toggle)
+(load-theme 'modus-vivendi :no-confirm)
+
+;; (global-set-key (kbd "C-c *") #'(lambda () (interactive)
+;; 				  (standard-themes-toggle)
+;; 				  (standard-themes-with-colors
+;; 				    (set-face-attribute 'denote-faces-title nil
+;; 							:foreground fg-main
+;; 							:box bg-alt))))
 
 (provide 'lp-aesthetics)

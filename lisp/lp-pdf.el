@@ -21,4 +21,10 @@
   (pdf-loader-install))
 
 
+;; (lp-emacs-elpa-package 'djvu
+;;   (lp-emacs-elpa-package 'svg)
+;;   (lp-emacs-git-package 'djvu3
+;;     "https://github.com/dalanicolai/djvu3.git"))
+
+
 (provide 'lp-pdf)

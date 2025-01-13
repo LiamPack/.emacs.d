@@ -101,6 +101,7 @@ org-mode
 (ascii & "#+begin_export ascii" n> r> n "#+end_export")
 
 tex-mode org-mode
+(phi43 "$\\phi^4_3$ ")
 (tb "	")
 (inv "^{-1} ")
 (rd "{\\color{red} " q "}")
@@ -241,6 +242,18 @@ tex-mode org-mode
 (iin "\\in ")
 (pl "+ ")
 (rm "\\mathrm{" q "} ")
+(docstart "\\documentclass[a4paper]{article}
+\\newcommand{\\wick}[1]{\\mathrel{:}#1\\mathrel{:}}
+\\input{preamble.tex}
+\\usepackage{scalerel} % to rescale the paraproduct symbols
+% \\addbibresource{qft2.bib}
+\\title{}
+\\author{Liam Packer}
+\\newcommand{\\Tt}{\\mathbb{T}^3}
+\\begin{document}
+
+\\end{document}
+")
 
 markdown-mode
 

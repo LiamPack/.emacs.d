@@ -217,7 +217,7 @@
                                 (Gib "1024 * Mib" "Giga Bit")
                                 (Mib "1024 * Kib" "Mega Bit")
                                 (Kib "1024 * b" "Kilo Bit")
-                                (b nil "B/8" "bit")))
+                                (b "B/8" "bit")))
   (setq math-units-table nil) ; clear the units table cache
   )
 

@@ -66,35 +66,40 @@
   ;; TODO: update.
   (setq elfeed-feeds '("https://protesilaos.com/master.xml"
                        "https://ava.substack.com/feed"
-
-		       ;; "https://rss.arxiv.org/rss/math.PR" ;; TODO: add author to title somehow?
-		       ;; "https://rss.arxiv.org/rss/math.MP" ;; TODO: add author to title somehow?
+		       "https://proustproject.substack.com/feed"
+		       "https://www.astralcodexten.com/feed"
+		       "https://jacobin.com/feed"
+		       "https://pahlkadot.substack.com/feed"
+		       "https://catalyst-journal.com/feed"
+		       "https://tetw.org/rss"
+		       
 
 		       "http://export.arxiv.org/api/query?search_query=cat:math.PR&start=0&max_results=150&sortBy=submittedDate&sortOrder=descending"
 		       "http://export.arxiv.org/api/query?search_query=cat:math.MP&start=0&max_results=150&sortBy=submittedDate&sortOrder=descending"
+		       "https://statmodeling.stat.columbia.edu/rss" ; columbia guy with variety of stats-adjacent subjects
+		       "https://djalil.chafai.net/blog/rss" ; hardcore french probability
+		       "https://mbounthavong.com/blog/rss.xml" ; clinical pharmacology prof at ucsd
+		       "https://scottaaronson.blog/rss"
+		       
 
 		       "https://terrytao.wordpress.com/feed/"
 		       "https://johncarlosbaez.wordpress.com/atom.xml"
-		       "https://statisticaloddsandends.wordpress.com/atom.xml"
-		       "https://mathematicaloddsandends.wordpress.com/atom.xml"
-		       "http://www.math3ma.com/blog/rss.xml" ;; tai danae bradley
 
-		       "https://borretti.me/feed.xml" ;; guy who did the astro+lisp post 
-                       "http://inconvergent.net/atom.xml"
-                       "http://nullprogram.com/feed/"
-		       "https://leahneukirchen.org/trivium/index.atom"
+		       "https://borretti.me/feed.xml" ; did the astro+lisp post 
+                       "http://inconvergent.net/atom.xml" ; lisp art
+                       "http://nullprogram.com/feed/" ; apl
+		       "https://leahneukirchen.org/trivium/index.atom" ; killer hacker
 
                        "https://gwern.substack.com/feed"
-                       "https://www.benkuhn.net/index.xml" ;; harvard xd
-                       "https://www.nayuki.io/rss20.xml" ;; swe in canada with classic math posts
-                       "https://danluu.com/atom.xml" ;; plain blog but very good
-		       "https://feeds.feedblitz.com/marginalrevolution&x=1"
+                       "https://www.benkuhn.net/index.xml" ; harvard xd
+                       "https://www.nayuki.io/rss20.xml" ; swe in canada, detailed
+                       "https://danluu.com/atom.xml" ; plain but good
 
-		       "https://jacobin.com/feed"
 		       "https://feeds.acast.com/public/shows/58ad887a1608b1752663b04a"
                        ))
 
-  ;; Ripping all arxiv-related feed stuff from https://cundy.me/post/elfeed/
+  ;; Ripping all arxiv-related feed stuff from
+  ;; https://cundy.me/post/elfeed/
   (defun concatenate-authors (authors-list)
     "Given AUTHORS-LIST, list of plists; return string of all authors
 concatenated."
@@ -220,5 +225,8 @@ concatenated."
   (setq arxiv-startup-with-abstract-window t)
   (setq arxiv-default-category "math.pr")
   )
+
+(setq load-path (append (list (expand-file-name "~/.emacs.d/local/")) load-path)) 
+(autoload 'LilyPond-mode "lilypond-mode")
 
 (provide 'lp-external)

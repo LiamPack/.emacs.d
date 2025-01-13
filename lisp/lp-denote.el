@@ -7,7 +7,7 @@
   (setq denote-excluded-files-regexp "/_.*/")  
   (setq denote-allow-multi-word-keywords t)
   ;;; TODO: focus the taxonomy
-  (setq denote-known-keywords '("meta" "personal" "note" "source"
+  (setq denote-known-keywords '("meta" "personal" "note" "source" "project" "daily"
 
 				"list" "list>meeting"
 				"misc>wallpaper"
@@ -28,7 +28,7 @@
   (setq denote-file-type 'text)
   (setq denote-prompts '(signature title keywords file-type))
 
-  (denote-rename-buffer-mode 1)
+  (denote-rename-buffer-mode -1)
   (setq denote-rename-buffer-format "[D] %s = %>25t")
   (setq denote-buffer-has-backlinks-string " (<--->)")
   (setq denote-backlinks-show-context t)
@@ -181,16 +181,16 @@ Perform the comparison with `string<'."
 ;; (lp-emacs-elpa-package 'consult-notes
 ;;   (consult-notes-denote-mode +1))
 
-(lp-emacs-elpa-package 'consult-denote
-  (consult-denote-mode +1)
-  (define-key global-map (kbd "C-c f f") #'consult-denote-find)
-  (define-key global-map (kbd "C-c f g") #'consult-denote-grep)
-  )
+;; (lp-emacs-elpa-package 'consult-denote
+;;   (consult-denote-mode +1)
+;;   (define-key global-map (kbd "C-c f f") #'consult-denote-find)
+;;   (define-key global-map (kbd "C-c f g") #'consult-denote-grep)
+;;   )
 
 ;;; TODO: what's the point here. consolidate with bibtex and consult-bibtex
-(lp-emacs-elpa-package 'citar
-  (setq citar-bibliography '("~/dropbox/grad/My Library.bib"))
-  (setq citar-notes-paths (list (denote-directory))))
+;; (lp-emacs-elpa-package 'citar
+;;   (setq citar-bibliography '("~/dropbox/grad/My Library.bib"))
+;;   (setq citar-notes-paths (list (denote-directory))))
 
 ;;; TODO: does this work
 ;; (lp-emacs-elpa-package 'citar-denote
