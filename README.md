@@ -11,10 +11,8 @@ user experience to the point of obsoletion of these huge hammers. I
 have a hard time understanding these over-powered packages, which
 makes me less comfortable in my own home.
 
-Just my emacs config. To see the deprecated literate-programming
-document form of my configuration, see [config.org](config.org), which
-may or may not be out of date now. Lisp and configuration is defined
-in [lisp/](lisp/).
+Configuration is defined in the [lisp/]() directory. Simple
+package-management macros are defined in [init.el]().
 
 We're always standing on the shoulders of giants. The giant I'm
 standing on is [protesilaos.com](prot), who has done so much for the
