@@ -30,7 +30,7 @@
   (setq calendar-daylight-time-zone-name "EDT")
 
   (require 'diary-lib)
-  (setq diary-file (file-truename "~/dropbox/denotes/diary"))
+  (setq diary-file "")
   (setq user-mail-address "liamp@TheCave")
   (setq diary-mail-addr user-mail-address)
   (setq diary-date-forms diary-iso-date-forms)
@@ -93,7 +93,11 @@
     (define-key map (kbd "C-c k o") #'timeclock-out)
     (define-key map (kbd "C-c k c") #'timeclock-change))
   (setq timeclock-file "~/dropbox/denotes/timelog")
-  (setq timeclock-project-list '(research homework reading)))
+  (setq timeclock-project-list '(research homework reading misc))
+  (setq timeclock-use-elapsed t)
+  (setq timeclock-workday (* 60 60 8))
+  ;; (setq timeclock-mode-string "[  ]")
+  )
 
 ;;; modified from prot. while its a great idea, it can be problematic to automatically email from different (work) computers
 ;; The idea is to get a reminder via email when I launch Emacs in the

@@ -26,12 +26,14 @@
                   mode-line-buffer-identification
                   " -- "
                   mode-line-position
-		  (vc-mode vc-mode)
+		  ;; (vc-mode vc-mode)
 		  " -- "
-                  mode-line-modes
-                  " -- "
+                  ;; mode-line-modes
+                  ;; " -- "
+                  mode-line
                   mode-line-misc-info
                   mode-line-end-spaces))
+  (timeclock-mode-line-display +1)
 
   ;; name on top of frame
   (setq frame-title-format '("%b [%m]"))

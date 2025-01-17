@@ -101,6 +101,7 @@ org-mode
 (ascii & "#+begin_export ascii" n> r> n "#+end_export")
 
 tex-mode org-mode
+(st "\\{" q "\\}")
 (phi43 "$\\phi^4_3$ ")
 (tb "	")
 (inv "^{-1} ")

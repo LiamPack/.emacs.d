@@ -9,7 +9,7 @@
   (setq completion-auto-wrap t)
   (setq completion-auto-select t)
   (setq completion-auto-help 'visible) ;; TODO tweak
-  (setq completions-format 'horizontal)
+  (setq completions-format 'one-column)
   (setq completions-max-height 20)
   ;; (setq completions-header-format nil)
   (setq completion-cycle-threshold nil)
@@ -43,14 +43,13 @@
         '(read-only t cursor-intangible t face minibuffer-prompt))
   (setq suggest-key-bindings t)
 
-  ;; (when (and (>= emacs-major-version 29))
-  ;;   (define-key minibuffer-mode-map (kbd "C-n") 'minibuffer-next-completion)
-  ;;   (define-key minibuffer-mode-map (kbd "C-p") 'minibuffer-previous-completion)
-  ;;   (define-key completion-in-region-mode-map (kbd "C-n") 'minibuffer-next-completion)
-  ;;   (define-key completion-in-region-mode-map (kbd "C-p") 'minibuffer-previous-completion)
-  ;;   (define-key completion-list-mode-map (kbd "C-n") 'next-completion)
-  ;;   (define-key completion-list-mode-map (kbd "C-p") 'previous-completion))
-  )
+  (when (and (>= emacs-major-version 29))
+    (define-key minibuffer-mode-map (kbd "C-n") 'minibuffer-next-completion)
+    (define-key minibuffer-mode-map (kbd "C-p") 'minibuffer-previous-completion)
+    (define-key completion-in-region-mode-map (kbd "C-n") 'minibuffer-next-completion)
+    (define-key completion-in-region-mode-map (kbd "C-p") 'minibuffer-previous-completion)
+    (define-key completion-list-mode-map (kbd "C-n") 'next-completion)
+    (define-key completion-list-mode-map (kbd "C-p") 'previous-completion)))
 
 
 ;;; orderless minibuffer completion
@@ -209,86 +208,6 @@
       (define-key map (kbd "C-j") #'icomplete-ret) ;; reverse C-j and <RET> behavior
       (define-key map (kbd "<RET>") #'icomplete-force-complete-and-exit))
     ))
-
-
-;;; Minibuffer Commander. 
-(lp-emacs-elpa-package 'mct
-  (setq mct-completion-window-size (cons #'mct-frame-height-third 1))
-  (setq mct-remove-shadowed-file-names t) ; works when `file-name-shadow-mode' is enabled
-  (setq mct-hide-completion-mode-line t)
-  (setq mct-minimum-input 3)
-  (setq mct-live-completion t)
-  (setq mct-live-update-delay 0.6)
-
-  ;; This is for commands or completion categories that should always pop
-  ;; up the completions' buffer.  It circumvents the default method of
-  ;; waiting for some user input (see `mct-minimum-input') before
-  ;; displaying and updating the completions' buffer.
-  (setq mct-completion-passlist
-	'(;; Some commands
-          Info-goto-node
-          Info-index
-          Info-menu
-          vc-retrieve-tag
-          ;; Some completion categories
-          imenu
-          file
-          buffer
-          kill-ring
-          consult-location))
-
-  ;; The blocklist follows the same principle as the passlist, except it
-  ;; disables live completions altogether.
-  (setq mct-completion-blocklist nil)
-
-  (mct-mode +1)
-
-  ;; Define the small wrapper functions
-  (defun my-mct-next-line-or-completion (n)
-    "Select next completion or move to next line N times.
-Select the next completion if `completion-in-region-mode' is
-active and the Completions window is on display."
-    (interactive "p")
-    (if (and completion-in-region-mode (mct--get-completion-window))
-	(minibuffer-next-completion n)
-      (next-line n)))
-
-  (defun my-mct-previous-line-or-completion (n)
-    "Select previous completion or move to previous line N times.
-Select the previous completion if `completion-in-region-mode' is
-active and the Completions window is on display."
-    (interactive "p")
-    (if (and completion-in-region-mode (mct--get-completion-window))
-	(minibuffer-previous-completion n)
-      (previous-line n)))
-
-  (defun my-mct-return-or-choose-completion (n)
-    "Choose current completion or create N newlines.
-Choose the current completion if `completion-in-region-mode' is
-active and the Completions window is on display."
-    (interactive "p")
-    (if (and completion-in-region-mode (mct--get-completion-window))
-	(minibuffer-choose-completion)
-      (newline n :interactive)))
-
-  ;; Get the key bindings
-  (let ((map completion-in-region-mode-map))
-    (define-key map (kbd "C-n") #'my-mct-next-line-or-completion)
-    (define-key map (kbd "C-p") #'my-mct-previous-line-or-completion)
-    (define-key map (kbd "RET") #'my-mct-return-or-choose-completion))
-
-  ;; Tweak the appearance
-  (setq completions-format 'one-column)
-  (setq completion-show-help nil)
-  (setq completion-auto-help t)
-
-  ;; Optionally, tweak the appearance further
-  (setq completions-detailed t)
-  (setq completion-show-inline-help nil)
-  (setq completions-max-height 6)
-  (setq completions-highlight-face 'completions-highlight)
-
-  )
 
 
 (provide 'lp-minibuffer)
