@@ -83,7 +83,7 @@
     (define-key map (kbd "C-c o") #'org-open-at-point-global)
     (define-key map (kbd "C-c M-l") #'org-insert-last-stored-link)
     (define-key map (kbd "C-c C-M-l") #'org-toggle-link-display)
-    (define-key map (kbd "C-c A") #'org-agenda))
+    (define-key map (kbd "C-c C-a") #'org-agenda))
 
   ;; Disable the gorillion keys that org binds
   (let ((map org-mode-map))
@@ -96,6 +96,7 @@
     (define-key map (kbd "C-M-S-<left>") nil)
     (define-key map (kbd "C-c C-j") nil) ; org-goto
     (define-key map (kbd "C-c C-o") nil)
+    (define-key map (kbd "C-c C-a") nil) ; org-attach
     )
 
   (setq org-agenda-diary-file 'diary-file) ; for inserting diary

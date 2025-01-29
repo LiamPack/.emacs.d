@@ -5,9 +5,20 @@
             #'(lambda ()
                 (interactive)
                 (setq-local paragraph-start "\\|[ 	]*$\\|^[ ]*\\*\\|^[ ]*[1-9]+\\.\\|^[ ]*\\+\\|^x \\|^[ ]*-"))))
+
 ;; "\\|\\*\\| *-\\| *[1-9]\\.\\|[ 	]*$\\| *+"
 (lp-emacs-builtin-package 'outline
-  (setq outline-regexp "^= .+ =\n=+$\\|^- .+ -\n-+$\\|^[*]+"))
+  (setq outline-regexp "^= .+ =\n=+$\\|^- .+ -\n-+$\\|^[*]+")
+  (setq outline-minor-mode-highlight t) ; emacs28
+  (setq outline-minor-mode-cycle t) ; emacs28
+  (setq outline-minor-mode-use-buttons nil) ; emacs29---bless you for the nil option!
+
+  (define-key global-map (kbd "<f10>") #'outline-minor-mode)
+  (let ((map outline-minor-mode-map))
+    (define-key map (kbd "<backtab>") #'outline-cycle-buffer)
+    )
+
+  )
 
 (lp-emacs-elpa-package 'markdown-mode)
 
