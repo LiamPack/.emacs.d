@@ -43,18 +43,20 @@
 ;;; TODO: synchronize with CITAR or remove bibtex-completion.
 (lp-emacs-builtin-package 'bibtex)
 (lp-emacs-elpa-package 'bibtex-completion
-  (setq bibtex-completion-bibliography '(
-                                         "~/org/bib/index.bib"
-                                         "~/org/bib/archive.bib"
+  (setq bibtex-completion-bibliography '("~/dropbox/grad/research/lock-in-writeups/qft2.bib"
+					 "~/dropbox/grad/research/lock-in-writeups/pierre/pierre.bib"
                                          )
-        bibtex-completion-library-path '("~/org/bib/pdfs/")
-        bibtex-completion-notes-path "~/org/bib/notes/"))
+        bibtex-completion-library-path '("~/dropbox/grad/research/lock-in-papers"
+"~/dropbox/grad/research/lock-in-books"
+					 )
+        bibtex-completion-notes-path "~/dropbox/denotes/"))
 
 ;;; TODO: what even is this.
 (lp-emacs-git-package
     'consult-bibtex "https://github.com/mohkale/consult-bibtex.git"
     (with-eval-after-load 'embark
       (add-to-list 'embark-keymap-alist '(bibtex-completion . consult-bibtex-embark-map)))
-    (setq consult-bibtex-default-action #'consult-bibtex-edit-notes))
+    ;; (setq consult-bibtex-default-action #'consult-bibtex-edit-notes)
+    )
 
 (provide 'lp-tex)
