@@ -1,6 +1,4 @@
 (lp-emacs-elpa-package 'denote
-  (require 'denote-sort)
-  (require 'denote-silo-extras)
 
   (setq denote-directory "~/dropbox/denotes/")
   (setq denote-excluded-directories-regexp "/_.*/")  
@@ -27,6 +25,7 @@
   (setq denote-sort-keywords t)
   (setq denote-file-type 'text)
   (setq denote-prompts '(signature title keywords file-type))
+  (setq denote-link-description-format "%t")
 
   (denote-rename-buffer-mode -1)
   (setq denote-rename-buffer-format "[D] %s = %>25t")
@@ -43,7 +42,7 @@
   
   ;;;; recurring notes
   ;;; TODO: potential here. (phil, kihoon, pierre, digestion, LIST, X-seminar).
-  (defvar my-denote-colleagues '("phil" "kihoon" "pierre" "digestion" "incubator" "misc-incubator")
+  (defvar my-denote-colleagues '("phil" "kihoon" "digestion" "incubator" "misc-incubator")
     "List of names I collaborate with.
 There is at least one file in the variable `denote-directory' that has
 the name of this person.")
@@ -124,12 +123,26 @@ Perform the comparison with `string<'."
   ;; Change the sorting function only when we sort by signature.
   (setq denote-sort-signature-comparison-function #'my-denote-sort-for-signatures)
 
-  ;;;; Journal
-  ;;; TODO: not as useful as i'd like
-  (require 'denote-journal-extras)
-  (setq denote-journal-extras-keyword "journal")
-  (setq denote-journal-extras-title-format 'day-date-month-year)
-  (setq lp--monthly-date-format "%b %Y")
+
+  (let ((map global-map))
+    (define-key map (kbd "C-c f j") #'denote-subdirectory) ; our custom command
+    (define-key map (kbd "C-c f n") #'denote)
+    (define-key map (kbd "C-c f m") #'my-denote-colleagues-new-meeting)
+    (define-key map (kbd "C-c f d") #'(lambda ()
+                                        (interactive)
+                                        (dired (denote-directory))))
+    (define-key map (kbd "C-c f i") #'denote-link-or-create) ; "insert" mnemonic
+    (define-key map (kbd "C-c f I") #'denote-add-links)
+    (define-key map (kbd "C-c f l") #'denote-find-link)
+    (define-key map (kbd "C-c f b") #'denote-find-backlink)
+    (define-key map (kbd "C-c f r") #'denote-rename-file)
+    (define-key map (kbd "C-c f R") #'denote-rename-file-using-front-matter)
+    (define-key map (kbd "C-c f s") #'denote-sort-dired)))
+
+(lp-emacs-elpa-package 'denote-journal
+  (setq denote-journal-keyword "journal")
+  (setq denote-journal-title-format 'day-date-month-year)
+  (add-hook 'calendar-mode-hook #'denote-journal-calendar-mode)
 
   (defun lp--denote-rename-fn (file)
     (let ((type (denote-filetype-heuristics file)))
@@ -143,6 +156,8 @@ Perform the comparison with `string<'."
                           (cons ?% "%"))
                     'delete))))
 
+  ;;; monthlies attempt
+  (setq lp--monthly-date-format "%b %Y")
   (defun lp--denote-pop-monthly ()
     (interactive)
     (let ((date (format-time-string lp--monthly-date-format))
@@ -161,100 +176,14 @@ Perform the comparison with `string<'."
 	      (switch-to-buffer monthly-name)))
 	(denote date '("monthly") 'org monthly-dir))))
 
-  (let ((map global-map))
-    (define-key map (kbd "C-c f j") #'denote-subdirectory) ; our custom command
-    (define-key map (kbd "C-c C-o") #'denote-journal-extras-new-or-existing-entry)
-    (define-key map (kbd "C-c C-m") #'lp--denote-pop-monthly)
-    (define-key map (kbd "C-c f n") #'denote)
-    (define-key map (kbd "C-c f m") #'my-denote-colleagues-new-meeting)
-    (define-key map (kbd "C-c f d") #'(lambda ()
-                                        (interactive)
-                                        (dired (denote-directory))))
-    (define-key map (kbd "C-c f i") #'denote-link-or-create) ; "insert" mnemonic
-    (define-key map (kbd "C-c f I") #'denote-add-links)
-    (define-key map (kbd "C-c f l") #'denote-find-link)
-    (define-key map (kbd "C-c f b") #'denote-find-backlink)
-    (define-key map (kbd "C-c f r") #'denote-rename-file)
-    (define-key map (kbd "C-c f R") #'denote-rename-file-using-front-matter)
-    (define-key map (kbd "C-c f s") #'denote-sort-dired)))
 
-;; (lp-emacs-elpa-package 'consult-notes
-;;   (consult-notes-denote-mode +1))
+  (define-key global-map (kbd "C-c C-m") #'lp--denote-pop-monthly)
+  (define-key global-map (kbd "C-c C-o") #'denote-journal-new-or-existing-entry)
 
-;; (lp-emacs-elpa-package 'consult-denote
-;;   (consult-denote-mode +1)
-;;   (define-key global-map (kbd "C-c f f") #'consult-denote-find)
-;;   (define-key global-map (kbd "C-c f g") #'consult-denote-grep)
-;;   )
+  )
 
-;;; TODO: what's the point here. consolidate with bibtex and consult-bibtex
-;; (lp-emacs-elpa-package 'citar
-;;   (setq citar-bibliography '("~/dropbox/grad/My Library.bib"))
-;;   (setq citar-notes-paths (list (denote-directory))))
-
-;;; TODO: does this work
-;; (lp-emacs-elpa-package 'citar-denote
-;;   ;; Package defaults
-;;   (setq citar-denote-keyword "bib")
-;;   (let ((map global-map))
-;;     (define-key map (kbd "C-c w n") #'citar-denote-open-note)
-;;     (define-key map (kbd "C-c w c") #'citar-create-note)
-;;     (define-key map (kbd "C-c w d") #'citar-denote-dwim)
-;;     (define-key map (kbd "C-c w e") #'citar-denote-open-reference-entry)
-;;     (define-key map (kbd "C-c w a") #'citar-denote-add-citekey)
-;;     (define-key map (kbd "C-c w k") #'citar-denote-remove-citekey)
-;;     (define-key map (kbd "C-c w r") #'citar-denote-find-reference)
-;;     (define-key map (kbd "C-c w l") #'citar-denote-link-reference)
-;;     (define-key map (kbd "C-c w f") #'citar-denote-find-citation)
-;;     (define-key map (kbd "C-c w x") #'citar-denote-nocite)
-;;     (define-key map (kbd "C-c w y") #'citar-denote-cite-nocite)
-;;     (define-key map (kbd "C-c w z") #'citar-denote-nobib)))
-
-;; https://leahneukirchen.org/blog/archive/2022/03/note-taking-in-emacs-with-howm.html
-;; https://kaorahi.github.io/howm/README.html
-;;; TODO: failed experiment
-;; (lp-emacs-elpa-package 'howm
-;;   ;; Directory configuration
-;;   (setq howm-home-directory "~/dropbox/denotes/_howm/")
-;;   (setq howm-directory "~/dropbox/denotes/_howm/")
-;;   (setq howm-keyword-file (expand-file-name ".howm-keys" howm-home-directory))
-;;   (setq howm-history-file (expand-file-name ".howm-history" howm-home-directory))
-;;   (setq howm-file-name-format "%Y%m%dT%H%M%S.txt")
-
-;;   ;; Use ripgrep as grep
-;;   (setq howm-view-use-grep t)
-;;   (setq howm-view-grep-command "rg")
-;;   (setq howm-view-grep-option "-nH --no-heading --color never")
-;;   (setq howm-view-grep-extended-option nil)
-;;   (setq howm-view-grep-fixed-option "-F")
-;;   (setq howm-view-grep-expr-option nil)
-;;   (setq howm-view-grep-file-stdin-option nil)
-
-;;   ;; Default recent to sorting by mtime
-;;   (advice-add 'howm-list-recent :after #'howm-view-sort-by-mtime)
-;;   ;; Default all to sorting by creation, newest first
-;;   (advice-add 'howm-list-all :after #'(lambda () (howm-view-sort-by-date t)))
-
-;;   ;; Rename buffers to their title
-;;   (add-hook 'howm-mode-hook 'howm-mode-set-buffer-name)
-;;   (add-hook 'after-save-hook 'howm-mode-set-buffer-name)
-
-;;   (define-key howm-menu-mode-map "\C-h" nil)
-;;   (define-key riffle-summary-mode-map "\C-h" nil)
-;;   (define-key howm-view-contents-mode-map "\C-h" nil)
-
-;;   ;; zotero://
-;;   (add-to-list 'action-lock-default-rules
-;;                (list "\\<zotero://\\S +" (lambda (&optional dummy)
-;;                                            (browse-url (match-string-no-properties 0)))))
-;;   ;; @bibtex
-;;   (add-to-list 'action-lock-default-rules
-;;                (list "\\s-\\(@\\([a-zA-Z0-9:-]+\\)\\)\\>"
-;;                      (lambda (&optional dummy)
-;;                        (browse-url (concat "zotero://select/items/bbt:"
-;;                                            (match-string-no-properties 2))))
-;;                      1))
-
-;;   )
+(lp-emacs-elpa-package 'denote-silo
+  ;; TODO
+  )
 
 (provide 'lp-denote)
