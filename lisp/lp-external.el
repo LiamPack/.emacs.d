@@ -67,20 +67,15 @@
   (setq elfeed-feeds '("https://protesilaos.com/master.xml"
                        "https://ava.substack.com/feed"
 		       "https://proustproject.substack.com/feed"
-		       "https://www.astralcodexten.com/feed"
-		       "https://jacobin.com/feed"
 		       "https://pahlkadot.substack.com/feed"
 		       "https://catalyst-journal.com/feed"
 		       "https://tetw.org/rss"
-		       
 
 		       "http://export.arxiv.org/api/query?search_query=cat:math.PR&start=0&max_results=150&sortBy=submittedDate&sortOrder=descending"
 		       "http://export.arxiv.org/api/query?search_query=cat:math.MP&start=0&max_results=150&sortBy=submittedDate&sortOrder=descending"
-		       "https://statmodeling.stat.columbia.edu/rss" ; columbia guy with variety of stats-adjacent subjects
 		       "https://djalil.chafai.net/blog/rss" ; hardcore french probability
 		       "https://mbounthavong.com/blog/rss.xml" ; clinical pharmacology prof at ucsd
 		       "https://scottaaronson.blog/rss"
-		       
 
 		       "https://terrytao.wordpress.com/feed/"
 		       "https://johncarlosbaez.wordpress.com/atom.xml"
@@ -186,7 +181,8 @@ concatenated."
 ;;; music player
 ;;; TODO: this isn't personalized
 (lp-emacs-elpa-package 'bongo
-  (setq bongo-default-directory "/media/lim/X1/")
+  ;; (setq bongo-default-directory "/media/lim/X1/")
+  (setq bongo-default-directory "/home/lim/dropbox/music/")  
   (setq bongo-display-inline-playback-progress t)
   (setq bongo-prefer-library-buffers nil)
   (setq bongo-insert-whole-directory-trees t)

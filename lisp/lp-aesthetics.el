@@ -34,6 +34,11 @@
   (define-key global-map (kbd "C-c C-8") #'modus-themes-toggle)
   )
 
+(lp-emacs-elpa-package 'doric-themes
+  (define-key global-map (kbd "C-c C-7") #'doric-themes-rotate)
+  )
+
+
 (lp-emacs-elpa-package 'ef-themes)
 
 ;;; I've grown fond of the default emacs themes
@@ -115,7 +120,7 @@
 
 
 
-(load-theme 'modus-vivendi :no-confirm)
+(load-theme 'doric-dark :no-confirm)
 
 ;; (global-set-key (kbd "C-c *") #'(lambda () (interactive)
 ;; 				  (standard-themes-toggle)

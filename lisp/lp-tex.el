@@ -32,9 +32,14 @@
   ;; most crucial: turn-on-reftex
   (setq lp--latex-hooks-fns '(auto-fill-mode TeX-source-correlate-mode flyspell-mode flyspell-buffer turn-on-reftex prettify-symbols-mode turn-on-cdlatex abbrev-mode))
   (dolist (fn lp--latex-hooks-fns)
-    (add-hook 'LaTeX-mode-hook fn)))
+    (add-hook 'LaTeX-mode-hook fn))
+
+  )
 ;; https://karthinks.com/software/latex-input-for-impatient-scholars/
-(lp-emacs-builtin-package 'tex-mode)
+(lp-emacs-builtin-package 'tex-mode
+  (let ((map tex-mode-map))
+    (define-key map (kbd "C-c C-o") nil)
+    (define-key map (kbd "C-c C-j") nil)))
 
 (lp-emacs-builtin-package 'reftex)
 
