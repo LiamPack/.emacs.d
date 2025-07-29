@@ -95,13 +95,13 @@
 ;; (set-frame-font :font "iosevka comfy" :height 120)
 
 (let (
-      (mono-spaced-font "Iosevka Comfy Motion Fixed")
-      (proportionately-spaced-font "Iosevka Comfy Duo")
+      (mono-spaced-font "Iosevka Comfy Wide Motion Fixed")
+      (proportionately-spaced-font "Iosevka Comfy Wide Duo")
       ;; (mono-spaced-font "BigBlueTermPlus Nerd Font")
       ;; (proportionately-spaced-font "BigBlueTermPlus Nerd Font")
 
       )
-  (set-face-attribute 'default nil :family mono-spaced-font :height 100)
+  (set-face-attribute 'default nil :family mono-spaced-font :height 120)
   (set-face-attribute 'fixed-pitch nil :family mono-spaced-font :height 1.0)
   (set-face-attribute 'variable-pitch nil :family proportionately-spaced-font :height 1.0))
 

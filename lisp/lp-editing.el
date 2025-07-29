@@ -69,6 +69,7 @@
   (avy-setup-default) ; binds C-' in the isearch map
   (let ((map global-map))
     (define-key global-map (kbd "C-' C-l") 'avy-goto-line)
+    ;; (define-key global-map (kbd "C-' C-'" 'avy-timer)) Just use avy in an isearch
     (define-key global-map (kbd "C-' C-a") 'avy-goto-word-0-above)
     (define-key global-map (kbd "C-' C-n") 'avy-goto-word-0-below)
     
