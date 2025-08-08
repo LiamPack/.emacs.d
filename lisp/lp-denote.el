@@ -19,8 +19,7 @@
 
 				"cooking" "cooking>recipe"
 				"tech"))
-  (setq denote-file-name-components-order '(identifier signature title keywords))
-
+  (setq denote-file-name-components-order '(title keywords signature identifier))
   (setq denote-infer-keywords nil)
   (setq denote-sort-keywords t)
   (setq denote-file-type 'text)
