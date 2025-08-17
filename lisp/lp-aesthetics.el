@@ -95,8 +95,10 @@
 ;; (set-frame-font :font "iosevka comfy" :height 120)
 
 (let (
-      (mono-spaced-font "Iosevka Comfy Wide Motion Fixed")
-      (proportionately-spaced-font "Iosevka Comfy Wide Duo")
+      ;; (mono-spaced-font "Iosevka Comfy Wide Motion Fixed")
+      ;; (proportionately-spaced-font "Iosevka Comfy Wide Duo")
+      (mono-spaced-font "Iosevka Comfy Wide Motion")
+      (proportionately-spaced-font "Iosevka Comfy Wide Motion Duo")
       ;; (mono-spaced-font "BigBlueTermPlus Nerd Font")
       ;; (proportionately-spaced-font "BigBlueTermPlus Nerd Font")
 

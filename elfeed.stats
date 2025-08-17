@@ -1,11 +1,10 @@
 ;;; Elfeed score rule stats file DO NOT EDIT       -*- lisp -*-
 (:version 1 :stats
-	  #s(hash-table size 65 test equal rehash-size 1.5
-			rehash-threshold 0.8125 data
+	  #s(hash-table test equal data
 			(#s(elfeed-score-title-or-content-rule
 			    ".*[- ]SPDE[- s].*" 100 20 R nil nil nil)
-			   #s(elfeed-score-rule-stats 21
-						      1731997895.0484073)
+			   #s(elfeed-score-rule-stats 37
+						      1754663369.0860753)
 			   #s(elfeed-score-authors-rule
 			      "Philippe Sosoe" 300 S nil nil nil)
 			   #s(elfeed-score-rule-stats 4
@@ -21,9 +20,34 @@
 						      1731997895.503631)
 			   #s(elfeed-score-authors-rule
 			      "Martin Hairer" 300 S nil nil nil)
-			   #s(elfeed-score-rule-stats 1
-						      1731997897.3679662)
+			   #s(elfeed-score-rule-stats 2
+						      1752765204.2504895)
 			   #s(elfeed-score-authors-rule
 			      "Tom Hutchcroft" 300 S nil nil nil)
 			   #s(elfeed-score-rule-stats 1
-						      1731997901.131392))))
+						      1731997901.131392)
+			   #s(elfeed-score-feed-rule
+			      "Protesilaos Stavrou: Master feed with all updates"
+			      500 S t nil nil)
+			   #s(elfeed-score-rule-stats 34
+						      1754663367.1622574)
+			   #s(elfeed-score-title-or-content-rule
+			      ".*percolation.*" 100 20 R nil nil nil)
+			   #s(elfeed-score-rule-stats 27
+						      1754663368.8393183)
+			   #s(elfeed-score-title-or-content-rule
+			      ".*log-Sobolev.*" 100 20 R nil nil nil)
+			   #s(elfeed-score-rule-stats 3
+						      1752765204.5118856)
+			   #s(elfeed-score-title-or-content-rule
+			      ".*random walk.*" 100 20 R nil nil nil)
+			   #s(elfeed-score-rule-stats 38
+						      1754663369.2371407)
+			   #s(elfeed-score-title-or-content-rule
+			      ".*Ising.*" 100 20 R nil nil nil)
+			   #s(elfeed-score-rule-stats 29
+						      1754663368.0615044)
+			   #s(elfeed-score-title-or-content-rule
+			      ".*Potts.*" 100 20 R nil nil nil)
+			   #s(elfeed-score-rule-stats 5
+						      1754162538.878106))))
