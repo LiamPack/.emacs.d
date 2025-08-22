@@ -122,7 +122,7 @@
 
 
 
-(load-theme 'doric-dark :no-confirm)
+(load-theme 'modus-vivendi-tritanopia :no-confirm)
 
 ;; (global-set-key (kbd "C-c *") #'(lambda () (interactive)
 ;; 				  (standard-themes-toggle)
