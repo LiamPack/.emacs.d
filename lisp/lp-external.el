@@ -71,6 +71,7 @@
 		       "https://catalyst-journal.com/feed"
 		       "https://tetw.org/rss"
 
+		       "http://export.arxiv.org/api/query?search_query=cat:math.AP&start=0&max_results=150&sortBy=submittedDate&sortOrder=descending"
 		       "http://export.arxiv.org/api/query?search_query=cat:math.PR&start=0&max_results=150&sortBy=submittedDate&sortOrder=descending"
 		       "http://export.arxiv.org/api/query?search_query=cat:math.MP&start=0&max_results=150&sortBy=submittedDate&sortOrder=descending"
 		       "https://djalil.chafai.net/blog/rss" ; hardcore french probability

@@ -1,27 +1,28 @@
 ;;; Elfeed score rule stats file DO NOT EDIT       -*- lisp -*-
 (:version 1 :stats
-	  #s(hash-table test equal data
+	  #s(hash-table size 65 test equal rehash-size 1.5
+			rehash-threshold 0.8125 data
 			(#s(elfeed-score-title-or-content-rule
 			    ".*[- ]SPDE[- s].*" 100 20 R nil nil nil)
-			   #s(elfeed-score-rule-stats 37
-						      1754663369.0860753)
+			   #s(elfeed-score-rule-stats 49
+						      1756149405.390664)
 			   #s(elfeed-score-authors-rule
 			      "Philippe Sosoe" 300 S nil nil nil)
-			   #s(elfeed-score-rule-stats 4
-						      1731997895.0462453)
+			   #s(elfeed-score-rule-stats 5
+						      1756149405.674438)
 			   #s(elfeed-score-authors-rule "Kihoon Seong"
 							300 S nil nil
 							nil)
-			   #s(elfeed-score-rule-stats 4
-						      1731997895.0462537)
+			   #s(elfeed-score-rule-stats 5
+						      1756149405.6744442)
 			   #s(elfeed-score-authors-rule "Sky Cao" 300
 							S nil nil nil)
-			   #s(elfeed-score-rule-stats 2
-						      1731997895.503631)
+			   #s(elfeed-score-rule-stats 4
+						      1756149405.421519)
 			   #s(elfeed-score-authors-rule
 			      "Martin Hairer" 300 S nil nil nil)
-			   #s(elfeed-score-rule-stats 2
-						      1752765204.2504895)
+			   #s(elfeed-score-rule-stats 6
+						      1756149412.2649279)
 			   #s(elfeed-score-authors-rule
 			      "Tom Hutchcroft" 300 S nil nil nil)
 			   #s(elfeed-score-rule-stats 1
@@ -29,25 +30,39 @@
 			   #s(elfeed-score-feed-rule
 			      "Protesilaos Stavrou: Master feed with all updates"
 			      500 S t nil nil)
-			   #s(elfeed-score-rule-stats 34
-						      1754663367.1622574)
+			   #s(elfeed-score-rule-stats 101
+						      1756149411.665287)
 			   #s(elfeed-score-title-or-content-rule
 			      ".*percolation.*" 100 20 R nil nil nil)
-			   #s(elfeed-score-rule-stats 27
-						      1754663368.8393183)
+			   #s(elfeed-score-rule-stats 78
+						      1756149412.2693908)
 			   #s(elfeed-score-title-or-content-rule
 			      ".*log-Sobolev.*" 100 20 R nil nil nil)
+			   #s(elfeed-score-rule-stats 8
+						      1756149406.9059203)
+			   #s(elfeed-score-authors-rule
+			      "Roland Bauerschmidt" 300 S nil nil nil)
 			   #s(elfeed-score-rule-stats 3
-						      1752765204.5118856)
+						      1756149405.3933628)
 			   #s(elfeed-score-title-or-content-rule
 			      ".*random walk.*" 100 20 R nil nil nil)
-			   #s(elfeed-score-rule-stats 38
-						      1754663369.2371407)
-			   #s(elfeed-score-title-or-content-rule
-			      ".*Ising.*" 100 20 R nil nil nil)
-			   #s(elfeed-score-rule-stats 29
-						      1754663368.0615044)
+			   #s(elfeed-score-rule-stats 63
+						      1756149412.231835)
 			   #s(elfeed-score-title-or-content-rule
 			      ".*Potts.*" 100 20 R nil nil nil)
-			   #s(elfeed-score-rule-stats 5
-						      1754162538.878106))))
+			   #s(elfeed-score-rule-stats 6
+						      1753974037.7780383)
+			   #s(elfeed-score-authors-rule
+			      "Massimiliano Gubinelli" 300 S nil nil
+			      nil)
+			   #s(elfeed-score-rule-stats 1
+						      1748901900.6444461)
+			   #s(elfeed-score-title-or-content-rule
+			      ".*Ising.*" 100 20 R nil nil nil)
+			   #s(elfeed-score-rule-stats 48
+						      1756149405.4888446)
+			   #s(elfeed-score-authors-rule "Jian Ding"
+							300 S nil nil
+							nil)
+			   #s(elfeed-score-rule-stats 2
+						      1750434830.4910858))))

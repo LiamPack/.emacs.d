@@ -22,6 +22,8 @@
   (:text "Martin Hairer" :value 300 :type S)
   (:text "Xue-Mei Li" :value 300 :type S)
   (:text "Jian Ding" :value 300 :type S)
+  (:text "Jean-Christophe Mourrat" :value 300 :type S)
+  (:text "Henrik Weber" :value 300 :type S)
   )
  ("feed"
   (:text "Protesilaos Stavrou: Master feed with all updates" :value 500 :type S :attr t))
