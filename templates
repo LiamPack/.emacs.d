@@ -188,7 +188,7 @@ tex-mode org-mode
 (lt "< ")
 (gt "> ")
 (lleq "\\leq ")
-(ggeq "\\leq ")
+(ggeq "\\geq ")
 (salg "\\sigma\\left(" q "\\right) ")
 (asb "a_{" q "} ")
 (bsb "b_{" q "} ")
@@ -200,9 +200,12 @@ tex-mode org-mode
 (sbs "_{s} ")
 (sbx "_{x} ")
 (sbn "_{n} ")
-(sbij "_{ij} ")
+(sbk "_{k} ")
+(sb1 "_{1} ")
+(sb2 "_{2} ")
 (sbi "_{i} ")
 (sbj "_{j} ")
+(sbij "_{ij} ")
 (sb "_{" q "} ")
 (sb1 "_{1} ")
 (sb2 "_{2} ")
@@ -233,6 +236,7 @@ tex-mode org-mode
 (prb "\\PP\\left(" q "\\right) ")
 (par "\\partial ")
 (prt "\\partial_t ")
+(prx "\\partial_x ")
 (pdt "\\frac{\\partial }{\\partial t} ")
 (dd "\\frac{\\mathrm{d} " p "}{\\mathrm{d}" q "} ")
 (ddx "\\frac{d}{dx} ")
@@ -257,7 +261,7 @@ tex-mode org-mode
 (mn "- ")
 (mul "\\cdot ")
 (rm "\\mathrm{" q "} ")
-(docstart "\\documentclass[a4paper]{article}
+(header "\\documentclass[a4paper]{article}
 \\newcommand{\\wick}[1]{\\mathrel{:}#1\\mathrel{:}}
 \\input{preamble.tex}
 \\usepackage{scalerel} % to rescale the paraproduct symbols
