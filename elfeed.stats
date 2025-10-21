@@ -4,54 +4,54 @@
 			rehash-threshold 0.8125 data
 			(#s(elfeed-score-title-or-content-rule
 			    ".*[- ]SPDE[- s].*" 100 20 R nil nil nil)
-			   #s(elfeed-score-rule-stats 49
-						      1756149405.390664)
+			   #s(elfeed-score-rule-stats 60
+						      1760622120.279058)
 			   #s(elfeed-score-authors-rule
 			      "Philippe Sosoe" 300 S nil nil nil)
-			   #s(elfeed-score-rule-stats 5
-						      1756149405.674438)
+			   #s(elfeed-score-rule-stats 7
+						      1760622120.2205749)
 			   #s(elfeed-score-authors-rule "Kihoon Seong"
 							300 S nil nil
 							nil)
-			   #s(elfeed-score-rule-stats 5
-						      1756149405.6744442)
+			   #s(elfeed-score-rule-stats 6
+						      1760622120.2205782)
 			   #s(elfeed-score-authors-rule "Sky Cao" 300
 							S nil nil nil)
-			   #s(elfeed-score-rule-stats 4
-						      1756149405.421519)
+			   #s(elfeed-score-rule-stats 5
+						      1757528263.333708)
 			   #s(elfeed-score-authors-rule
 			      "Martin Hairer" 300 S nil nil nil)
-			   #s(elfeed-score-rule-stats 6
-						      1756149412.2649279)
+			   #s(elfeed-score-rule-stats 9
+						      1761057891.4344234)
 			   #s(elfeed-score-authors-rule
 			      "Tom Hutchcroft" 300 S nil nil nil)
-			   #s(elfeed-score-rule-stats 1
-						      1731997901.131392)
+			   #s(elfeed-score-rule-stats 2
+						      1759938220.4921038)
 			   #s(elfeed-score-feed-rule
 			      "Protesilaos Stavrou: Master feed with all updates"
 			      500 S t nil nil)
-			   #s(elfeed-score-rule-stats 101
-						      1756149411.665287)
+			   #s(elfeed-score-rule-stats 124
+						      1760972725.1341941)
 			   #s(elfeed-score-title-or-content-rule
 			      ".*percolation.*" 100 20 R nil nil nil)
-			   #s(elfeed-score-rule-stats 78
-						      1756149412.2693908)
+			   #s(elfeed-score-rule-stats 122
+						      1761057890.8477042)
 			   #s(elfeed-score-title-or-content-rule
 			      ".*log-Sobolev.*" 100 20 R nil nil nil)
-			   #s(elfeed-score-rule-stats 8
-						      1756149406.9059203)
+			   #s(elfeed-score-rule-stats 15
+						      1761057891.4630806)
 			   #s(elfeed-score-authors-rule
 			      "Roland Bauerschmidt" 300 S nil nil nil)
 			   #s(elfeed-score-rule-stats 3
 						      1756149405.3933628)
 			   #s(elfeed-score-title-or-content-rule
 			      ".*random walk.*" 100 20 R nil nil nil)
-			   #s(elfeed-score-rule-stats 63
-						      1756149412.231835)
+			   #s(elfeed-score-rule-stats 112
+						      1761057891.448737)
 			   #s(elfeed-score-title-or-content-rule
 			      ".*Potts.*" 100 20 R nil nil nil)
-			   #s(elfeed-score-rule-stats 6
-						      1753974037.7780383)
+			   #s(elfeed-score-rule-stats 12
+						      1759938223.0786567)
 			   #s(elfeed-score-authors-rule
 			      "Massimiliano Gubinelli" 300 S nil nil
 			      nil)
@@ -59,10 +59,20 @@
 						      1748901900.6444461)
 			   #s(elfeed-score-title-or-content-rule
 			      ".*Ising.*" 100 20 R nil nil nil)
-			   #s(elfeed-score-rule-stats 48
-						      1756149405.4888446)
+			   #s(elfeed-score-rule-stats 78
+						      1760972724.3194914)
 			   #s(elfeed-score-authors-rule "Jian Ding"
 							300 S nil nil
 							nil)
 			   #s(elfeed-score-rule-stats 2
-						      1750434830.4910858))))
+						      1750434830.4910858)
+			   #s(elfeed-score-authors-rule
+			      "Jean-Christophe Mourrat" 300 S nil nil
+			      nil)
+			   #s(elfeed-score-rule-stats 1
+						      1759516317.9134529)
+			   #s(elfeed-score-authors-rule "Xue-Mei Li"
+							300 S nil nil
+							nil)
+			   #s(elfeed-score-rule-stats 1
+						      1760543529.51535))))

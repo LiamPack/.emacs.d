@@ -104,6 +104,7 @@ tex-mode org-mode
 (st "\\{" q "\\}")
 (phi43 "$\\phi^4_3$ ")
 (tb "	")
+(sp " \\, ")
 (inv "^{-1} ")
 (rd "{\\color{red} " q "}")
 (bar "" :post (backward-char 2)  (cdlatex-math-modify ?-))
@@ -143,6 +144,7 @@ tex-mode org-mode
 (wge "\\wedge ")
 (pm "\\pm ")
 (cdts "\\cdots ")
+(hb "\\hbar")
 (al "\\alpha ")
 (bet "\\beta ")
 (gam "\\gamma ")
@@ -259,18 +261,14 @@ tex-mode org-mode
 (iin "\\in ")
 (pl "+ ")
 (mn "- ")
-(mul "\\cdot ")
+(cd "\\cdot ")
 (rm "\\mathrm{" q "} ")
-(header "\\documentclass[a4paper]{article}
-\\newcommand{\\wick}[1]{\\mathrel{:}#1\\mathrel{:}}
+(tet "\\text{" q "} ")
+(docstart "\\documentclass[a4paper]{article}
 \\input{preamble.tex}
-\\usepackage{scalerel} % to rescale the paraproduct symbols
-% \\addbibresource{qft2.bib}
 \\title{}
 \\author{Liam Packer}
-\\newcommand{\\Tt}{\\mathbb{T}^3}
 \\begin{document}
-
 \\end{document}
 ")
 (ac "\\'" :pre (backward-char))
