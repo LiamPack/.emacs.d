@@ -43,11 +43,12 @@
   ;; (electric-quote-mode t)
   ;; (electric-indent-mode t)
   (add-hook 'prog-mode-hook #'electric-indent-local-mode)
-  (dolist (hook (list #'electric-indent-mode
-                      ;; #'electric-quote-mode
-                      #'electric-pair-mode
-                      ))
-    (add-hook 'text-mode-hook hook)))
+  ;; (dolist (hook (list #'electric-indent-mode
+  ;;                     ;; #'electric-quote-mode
+  ;;                     #'electric-pair-mode
+  ;;                     ))
+  ;;   (add-hook 'text-mode-hook hook))
+  )
 
 (lp-emacs-builtin-package 'replace
   (define-key global-map (kbd "M-s M-o") 'multi-occur)
