@@ -115,7 +115,14 @@
 		 ("\\subsection{%s}" . "\\subsection*{%s}")
 		 ("\\subsubsection{%s}" . "\\subsubsection*{%s}")
 		 ("\\paragraph{%s}" . "\\paragraph*{%s}")
-		 ("\\subparagraph{%s}" . "\\subparagraph*{%s}"))))
+		 ("\\subparagraph{%s}" . "\\subparagraph*{%s}")))
+ 
+ (setq org-latex-pdf-process '("%latex %b"
+			       "bibtex %b"
+			       "%latex %b"))
+ (setq org-latex-compiler "LaTeX")
+  )
+  
 
 
 (provide 'lp-org)
