@@ -31,37 +31,18 @@
 	  (cursor fg-clay)))
 
   (setq modus-themes-to-toggle '(modus-operandi modus-vivendi))
-  (define-key global-map (kbd "C-c C-8") #'modus-themes-toggle)
-  )
+  (define-key global-map (kbd "C-c C-8") #'modus-themes-toggle))
 
 (lp-emacs-elpa-package 'doric-themes
-  (define-key global-map (kbd "C-c C-7") #'doric-themes-rotate)
-  )
+  (define-key global-map (kbd "C-c C-7") #'doric-themes-rotate))
 
 
-(lp-emacs-elpa-package 'ef-themes)
+(lp-emacs-elpa-package 'ef-themes
+  (define-key global-map (kbd "C-c C-0") #'ef-themes-rotate))
 
 ;;; I've grown fond of the default emacs themes
 (lp-emacs-elpa-package 'standard-themes
-  (setq standard-themes-bold-constructs t
-        standard-themes-italic-constructs t
-	standard-themes-disable-other-themes t
-        standard-themes-mixed-fonts nil
-        standard-themes-variable-pitch-ui nil
-        standard-themes-prompts '(bold italic)
-
-        ;; Accepts a symbol value:
-        standard-themes-fringes 'subtle
-
-        ;; The following accept lists of properties
-        standard-themes-links '(neutral-underline)
-        standard-themes-region '(no-extend intense)
-
-        ;; more complex alist to set weight, height, and optional
-        ;; `variable-pitch' per heading level (t is for any level not
-        ;; specified):
-	)
-
+  (define-key global-map (kbd "C-c C-9") #'standard-themes-rotate)
   (setq standard-dark-palette-overrides
 	'((bg-mode-line-active "#303030")
 	  (bg-mode-line-inactive "#101010")
@@ -72,7 +53,9 @@
 	'((bg-mode-line-active bg-alt)
 	  (bg-mode-line-inactive bg-dim)
 	  (cursor red-warmer)
-	  (bg-region bg-yellow-intense))))
+	  (bg-region bg-yellow-intense)))
+
+  )
 
 
  (defun toggle-transparency ()
@@ -95,9 +78,10 @@
 ;; (set-frame-font :font "iosevka comfy" :height 120)
 
 (let (
-      (mono-spaced-font "Greybeard 11px")
-      (proportionately-spaced-font "Greybeard 11px")
-      ;; (mono-spaced-font "Iosevka Comfy Wide Motion Fixed")
+      ;; (mono-spaced-font "Greybeard 11px")
+      ;; (proportionately-spaced-font "Greybeard 11px")
+      (mono-spaced-font "Iosevka Comfy Wide Motion Fixed")
+      (proportionately-spaced-font "Iosevka Comfy Wide Motion Fixed")
       ;; (mono-spaced-font "BigBlueTermPlus Nerd Font")
       ;; (proportionately-spaced-font "BigBlueTermPlus Nerd Font")
 
@@ -121,7 +105,7 @@
 
 
 
-(load-theme 'modus-vivendi-tritanopia :no-confirm)
+(load-theme 'standard-light :no-confirm)
 
 ;; (global-set-key (kbd "C-c *") #'(lambda () (interactive)
 ;; 				  (standard-themes-toggle)

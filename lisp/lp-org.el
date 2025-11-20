@@ -41,18 +41,18 @@
   (setq org-fontify-whole-block-delimiter-line t)
   (setq org-highlight-latex-and-related '(latex entities)) ; other options affect elisp regexp in src blocks
 
-  (setq org-refile-targets
-        `((,(directory-files org-directory t ".*.org") . (:maxlevel . 2))
-          (nil . (:maxlevel . 2))))
+  ;; (setq org-refile-targets
+  ;;       `((,(directory-files org-directory t ".*.org") . (:maxlevel . 2))
+  ;;         (nil . (:maxlevel . 2))))
   (setq org-refile-use-outline-path t)
   (setq org-refile-allow-creating-parent-nodes 'confirm)
-  (setq org-refile-use-cache t)
+  ;; (setq org-refile-use-cache t)
   (setq org-reverse-note-order t)
 
   ;;; tags--should probably be the same as in denote? or file-specific
   (setq org-tag-alist
         '())
-  (setq org-agenda-files (list org-directory))
+  (setq org-agenda-files nil)
 
   (setq org-auto-align-tags t)
   (setq org-tags-column 80)
@@ -71,8 +71,8 @@
   ;;; archiving
   (setq org-archive-location "::* Archive")
   (setq org-agenda-skip-archived-trees t)
-  (setq org-columns-skip-archived-trees nil)
-  (setq org-cycle-open-archived-trees t)
+  (setq org-columns-skip-archived-trees t)
+  (setq org-cycle-open-archived-trees nil)
 
   ;;; keybinds
   (define-key text-mode-map (kbd "C-c q") #'auto-fill-mode)
@@ -120,8 +120,7 @@
  (setq org-latex-pdf-process '("%latex %b"
 			       "bibtex %b"
 			       "%latex %b"))
- (setq org-latex-compiler "LaTeX")
-  )
+ (setq org-latex-compiler "LaTeX"))
   
 
 
