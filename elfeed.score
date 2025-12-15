@@ -2,28 +2,49 @@
 (("title")
  ("content")
  ("title-or-content"
-  (:text ".*[- ]SPDE[- s].*" :title-value 100 :content-value 20 :type R)
-  (:text ".*log-Sobolev.*" :title-value 100 :content-value 20 :type R)
-  (:text ".*percolation.*" :title-value 100 :content-value 20 :type R)
-  (:text ".*Potts.*" :title-value 100 :content-value 20 :type R)
-  (:text ".*Ising.*" :title-value 100 :content-value 20 :type R)
-  (:text ".*random walk.*" :title-value 100 :content-value 20 :type R)
-  )
+
+  (:text ".*percolation.*" :title-value 10 :content-value 20 :type R)
+  (:text ".*Potts.*" :title-value 10 :content-value 20 :type R)
+  (:text ".*Ising.*" :title-value 10 :content-value 20 :type R)
+  (:text ".*random walk.*" :title-value 10 :content-value 20 :type R)
+
+  (:text ".*[Pp]hi.?4.*" :title-value 10 :content-value 20 :type R)
+  (:text ".*[Pp]hi.?3.*" :title-value 10 :content-value 20 :type R)
+  (:text ".*Yang.Mills.*" :title-value 10 :content-value 20 :type R)
+  (:text ".*[- ]SPDE[- s].*" :title-value 10 :content-value 20 :type R)
+  (:text ".*log-Sobolev.*" :title-value 10 :content-value 20 :type R)
+
+  (:text ".*Kuramoto.*" :title-value 10 :content-value 20 :type R))
+
  ("tag")
  ("authors"
-  (:text "Tom Hutchcroft" :value 300 :type S)
   (:text "Philippe Sosoe" :value 300 :type S)
   (:text "Kihoon Seong" :value 300 :type S)
-  (:text "Roland Bauerschmidt" :value 300 :type S)
-  (:text "Massimiliano Gubinelli" :value 300 :type S)
-  (:text "Sarah-Jean Meyer" :value 300 :type S)
-  (:text "Sky Cao" :value 300 :type S)
-  (:text "Hao Shen" :value 300 :type S)
+
   (:text "Martin Hairer" :value 300 :type S)
   (:text "Xue-Mei Li" :value 300 :type S)
-  (:text "Jian Ding" :value 300 :type S)
-  (:text "Jean-Christophe Mourrat" :value 300 :type S)
+
+  (:text "Hao Shen" :value 300 :type S)
+  (:text "Massimiliano Gubinelli" :value 300 :type S)
+  (:text "Sarah-Jean Meyer" :value 300 :type S)
+  (:text "Ajay Chandra" :value 300 :type S)
+  (:text "Nicolas Perkowski" :value 300 :type S)
   (:text "Henrik Weber" :value 300 :type S)
+  (:text "Sky Cao" :value 300 :type S)
+
+  (:text "Bjoern Bringmann" :value 300 :type S)
+  (:text "Tadahiro Oh" :value 300 :type S)
+  (:text "Leonardo Tolomeo" :value 300 :type S)
+
+  (:text "Roland Bauerschmidt" :value 300 :type S)
+  (:text "Tom Hutchcroft" :value 300 :type S)
+  (:text "Jian Ding" :value 300 :type S)
+
+  (:text "Trishen Gunaratnam" :value 300 :type S)
+  (:text "Christophe Garban" :value 300 :type S)
+  (:text "Jean-Christophe Mourrat" :value 300 :type S)
+  (:text "Hugo Duminil-Copin" :value 300 :type S)
+  (:text "Vincent Tassion" :value 300 :type S)
   )
  ("feed"
   (:text "Protesilaos Stavrou: Master feed with all updates" :value 500 :type S :attr t))
