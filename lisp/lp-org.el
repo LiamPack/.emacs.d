@@ -52,7 +52,7 @@
   ;;; tags--should probably be the same as in denote? or file-specific
   (setq org-tag-alist
         '())
-  (setq org-agenda-files nil)
+  (setq org-agenda-files '("~/dropbox/denotes/--todos__list@@20250729T142757.org"))
 
   (setq org-auto-align-tags t)
   (setq org-tags-column 80)

@@ -30,6 +30,8 @@
   (setq denote-rename-buffer-format "[D] %s = %>25t")
   (setq denote-buffer-has-backlinks-string " (<--->)")
   (setq denote-backlinks-show-context t)
+  (setq denote-org-store-link-to-heading t)
+
 
   (add-hook 'dired-mode-hook #'denote-dired-mode)
   (add-hook 'find-file-hook #'denote-fontify-links-mode)
