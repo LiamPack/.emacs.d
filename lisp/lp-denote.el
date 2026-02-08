@@ -16,7 +16,7 @@
 
 				"media" "media>book" "media>anime"
 				"writing" "writing>philosophy" "writing>personal" "writing>literature"
-
+				"teaching"
 				"cooking" "cooking>recipe"
 				"tech"))
   (setq denote-file-name-components-order '(title keywords signature identifier))
