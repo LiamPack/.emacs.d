@@ -186,5 +186,9 @@ Perform the comparison with `string<'."
 (lp-emacs-elpa-package 'denote-silo
   ;; TODO
   )
+(lp-emacs-elpa-package 'denote-org
+  ;; TODO
+  )
+
 
 (provide 'lp-denote)
