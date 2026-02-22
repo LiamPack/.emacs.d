@@ -3,8 +3,8 @@
 	  #s(hash-table test equal data
 			(#s(elfeed-score-title-or-content-rule
 			    ".*random walk.*" 10 20 R nil nil nil)
-			   #s(elfeed-score-rule-stats 27
-						      1767890279.8684254)
+			   #s(elfeed-score-rule-stats 39
+						      1768762704.4893987)
 			   #s(elfeed-score-authors-rule
 			      "Philippe Sosoe" 300 S nil nil nil)
 			   #s(elfeed-score-rule-stats 8
@@ -29,12 +29,12 @@
 			   #s(elfeed-score-feed-rule
 			      "Protesilaos Stavrou: Master feed with all updates"
 			      500 S t nil nil)
-			   #s(elfeed-score-rule-stats 132
-						      1767992117.7245986)
+			   #s(elfeed-score-rule-stats 137
+						      1768762687.3483202)
 			   #s(elfeed-score-title-or-content-rule
 			      ".*percolation.*" 10 20 R nil nil nil)
-			   #s(elfeed-score-rule-stats 6
-						      1767992121.3296373)
+			   #s(elfeed-score-rule-stats 11
+						      1768762703.3759131)
 			   #s(elfeed-score-authors-rule "Hao Shen" 300
 							S nil nil nil)
 			   #s(elfeed-score-rule-stats 1
@@ -45,17 +45,17 @@
 						      1756149405.3933628)
 			   #s(elfeed-score-title-or-content-rule
 			      ".*[- ]SPDE[- s].*" 10 20 R nil nil nil)
-			   #s(elfeed-score-rule-stats 1
-						      1767754125.1996696)
+			   #s(elfeed-score-rule-stats 2
+						      1768762705.5850785)
 			   #s(elfeed-score-title-or-content-rule
 			      ".*Ising.*" 10 20 R nil nil nil)
-			   #s(elfeed-score-rule-stats 6
-						      1767754133.3163776)
+			   #s(elfeed-score-rule-stats 8
+						      1768762701.8182814)
 			   #s(elfeed-score-authors-rule
 			      "Massimiliano Gubinelli" 300 S nil nil
 			      nil)
-			   #s(elfeed-score-rule-stats 1
-						      1748901900.6444461)
+			   #s(elfeed-score-rule-stats 2
+						      1768762711.4890144)
 			   #s(elfeed-score-authors-rule "Jian Ding"
 							300 S nil nil
 							nil)
@@ -73,5 +73,9 @@
 						      1760543529.51535)
 			   #s(elfeed-score-title-or-content-rule
 			      ".*Kuramoto.*" 10 20 R nil nil nil)
+			   #s(elfeed-score-rule-stats 2
+						      1768762715.4995224)
+			   #s(elfeed-score-authors-rule
+			      "Nicolas Perkowski" 300 S nil nil nil)
 			   #s(elfeed-score-rule-stats 1
-						      1767992123.105347))))
+						      1768762705.6039371))))
