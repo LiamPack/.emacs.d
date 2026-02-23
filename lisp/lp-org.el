@@ -44,7 +44,7 @@
   ;; (setq org-refile-targets
   ;;       `((,(directory-files org-directory t ".*.org") . (:maxlevel . 2))
   ;;         (nil . (:maxlevel . 2))))
-  (setq org-refile-targets '((nil . (:maxlevel . 2))))
+  (setq org-refile-targets '((nil . (:maxlevel . 4))))
   (setq org-refile-use-outline-path t)
   (setq org-refile-allow-creating-parent-nodes 'confirm)
   ;; (setq org-refile-use-cache t)

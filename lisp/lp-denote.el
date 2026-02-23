@@ -189,6 +189,7 @@ Perform the comparison with `string<'."
   )
 (lp-emacs-elpa-package 'denote-org
   ;; TODO
+  (setq denote-org-store-link-to-heading t)
   )
 
 

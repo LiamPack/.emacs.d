@@ -80,8 +80,8 @@
 (let (
       ;; (mono-spaced-font "Greybeard 11px")
       ;; (proportionately-spaced-font "Greybeard 11px")
-      (mono-spaced-font "Iosevka Comfy Wide Motion Fixed")
-      (proportionately-spaced-font "Iosevka Comfy Wide Motion Fixed")
+      (mono-spaced-font "Iosevka Comfy Wide Motion")
+      (proportionately-spaced-font "Iosevka Comfy Wide Motion")
       ;; (mono-spaced-font "BigBlueTermPlus Nerd Font")
       ;; (proportionately-spaced-font "BigBlueTermPlus Nerd Font")
 

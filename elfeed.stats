@@ -1,86 +1,77 @@
 ;;; Elfeed score rule stats file DO NOT EDIT       -*- lisp -*-
 (:version 1 :stats
 	  #s(hash-table test equal data
-			(#s(elfeed-score-authors-rule "Philippe Sosoe"
-						      300 S nil nil
-						      nil)
+			(#s(elfeed-score-title-or-content-rule
+			    ".*random walk.*" 10 20 R nil nil nil)
+			   #s(elfeed-score-rule-stats 27
+						      1767890279.8684254)
+			   #s(elfeed-score-authors-rule
+			      "Philippe Sosoe" 300 S nil nil nil)
 			   #s(elfeed-score-rule-stats 8
-						      1767640341.5780241)
+						      1767754124.6710007)
 			   #s(elfeed-score-authors-rule "Kihoon Seong"
 							300 S nil nil
 							nil)
 			   #s(elfeed-score-rule-stats 8
-						      1767640341.5780284)
+						      1767754124.6710162)
 			   #s(elfeed-score-authors-rule "Sky Cao" 300
 							S nil nil nil)
-			   #s(elfeed-score-rule-stats 4
-						      1757465428.2880433)
+			   #s(elfeed-score-rule-stats 5
+						      1757528263.333708)
 			   #s(elfeed-score-authors-rule
 			      "Martin Hairer" 300 S nil nil nil)
-			   #s(elfeed-score-rule-stats 7
-						      1765837062.8782737)
+			   #s(elfeed-score-rule-stats 9
+						      1761057891.4344234)
 			   #s(elfeed-score-authors-rule
 			      "Tom Hutchcroft" 300 S nil nil nil)
-			   #s(elfeed-score-rule-stats 9
-						      1765853507.4203594)
+			   #s(elfeed-score-rule-stats 2
+						      1759938220.4921038)
 			   #s(elfeed-score-feed-rule
 			      "Protesilaos Stavrou: Master feed with all updates"
 			      500 S t nil nil)
-			   #s(elfeed-score-rule-stats 152
-						      1767640337.207458)
+			   #s(elfeed-score-rule-stats 132
+						      1767992117.7245986)
+			   #s(elfeed-score-title-or-content-rule
+			      ".*percolation.*" 10 20 R nil nil nil)
+			   #s(elfeed-score-rule-stats 6
+						      1767992121.3296373)
+			   #s(elfeed-score-authors-rule "Hao Shen" 300
+							S nil nil nil)
+			   #s(elfeed-score-rule-stats 1
+						      1767754124.6710286)
+			   #s(elfeed-score-authors-rule
+			      "Roland Bauerschmidt" 300 S nil nil nil)
+			   #s(elfeed-score-rule-stats 3
+						      1756149405.3933628)
+			   #s(elfeed-score-title-or-content-rule
+			      ".*[- ]SPDE[- s].*" 10 20 R nil nil nil)
+			   #s(elfeed-score-rule-stats 1
+						      1767754125.1996696)
+			   #s(elfeed-score-title-or-content-rule
+			      ".*Ising.*" 10 20 R nil nil nil)
+			   #s(elfeed-score-rule-stats 6
+						      1767754133.3163776)
 			   #s(elfeed-score-authors-rule
 			      "Massimiliano Gubinelli" 300 S nil nil
 			      nil)
 			   #s(elfeed-score-rule-stats 1
-						      1748926675.7319522)
+						      1748901900.6444461)
 			   #s(elfeed-score-authors-rule "Jian Ding"
 							300 S nil nil
 							nil)
-			   #s(elfeed-score-rule-stats 1
-						      1750021219.2663422)
-			   #s(elfeed-score-authors-rule
-			      "Roland Bauerschmidt" 300 S nil nil nil)
-			   #s(elfeed-score-rule-stats 1
-						      1755900861.7698727)
-			   #s(elfeed-score-authors-rule "Xue-Mei Li"
-							300 S nil nil
-							nil)
-			   #s(elfeed-score-rule-stats 5
-						      1765837062.9981556)
+			   #s(elfeed-score-rule-stats 2
+						      1750434830.4910858)
 			   #s(elfeed-score-authors-rule
 			      "Jean-Christophe Mourrat" 300 S nil nil
 			      nil)
 			   #s(elfeed-score-rule-stats 1
-						      1759540957.0984037)
-			   #s(elfeed-score-authors-rule "Hao Shen" 300
-							S nil nil nil)
-			   #s(elfeed-score-rule-stats 2
-						      1767640341.5780323)
-			   #s(elfeed-score-title-or-content-rule
-			      ".*random walk.*" 10 20 R nil nil nil)
-			   #s(elfeed-score-rule-stats 42
-						      1767640348.8386536)
-			   #s(elfeed-score-title-or-content-rule
-			      ".*percolation.*" 10 20 R nil nil nil)
-			   #s(elfeed-score-rule-stats 33
-						      1767640348.9601228)
-			   #s(elfeed-score-title-or-content-rule
-			      ".*Ising.*" 10 20 R nil nil nil)
-			   #s(elfeed-score-rule-stats 13
-						      1767640346.1615539)
-			   #s(elfeed-score-title-or-content-rule
-			      ".*log-Sobolev.*" 10 20 R nil nil nil)
-			   #s(elfeed-score-rule-stats 2
-						      1765837063.311746)
-			   #s(elfeed-score-authors-rule
-			      "Leonardo Tolomeo" 300 S nil nil nil)
+						      1759516317.9134529)
+			   #s(elfeed-score-authors-rule "Xue-Mei Li"
+							300 S nil nil
+							nil)
 			   #s(elfeed-score-rule-stats 1
-						      1765837063.3129556)
-			   #s(elfeed-score-title-or-content-rule
-			      ".*[- ]SPDE[- s].*" 10 20 R nil nil nil)
-			   #s(elfeed-score-rule-stats 5
-						      1767640346.8228872)
+						      1760543529.51535)
 			   #s(elfeed-score-title-or-content-rule
 			      ".*Kuramoto.*" 10 20 R nil nil nil)
-			   #s(elfeed-score-rule-stats 3
-						      1765837264.7544112))))
+			   #s(elfeed-score-rule-stats 1
+						      1767992123.105347))))
