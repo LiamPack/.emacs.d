@@ -44,6 +44,7 @@
   ;; (setq org-refile-targets
   ;;       `((,(directory-files org-directory t ".*.org") . (:maxlevel . 2))
   ;;         (nil . (:maxlevel . 2))))
+  (setq org-refile-targets '((nil . (:maxlevel . 2))))
   (setq org-refile-use-outline-path t)
   (setq org-refile-allow-creating-parent-nodes 'confirm)
   ;; (setq org-refile-use-cache t)
@@ -81,8 +82,6 @@
   (let ((map global-map))
     (define-key map (kbd "C-c l") #'org-store-link)
     (define-key map (kbd "C-c o") #'org-open-at-point-global)
-    (define-key map (kbd "C-c M-l") #'org-insert-last-stored-link)
-    (define-key map (kbd "C-c C-M-l") #'org-toggle-link-display)
     (define-key map (kbd "C-c C-a") #'org-agenda))
 
   ;; Disable the gorillion keys that org binds
@@ -97,7 +96,9 @@
     (define-key map (kbd "C-c C-j") nil) ; org-goto
     (define-key map (kbd "C-c C-o") nil)
     (define-key map (kbd "C-c C-a") nil) ; org-attach
-    )
+    (define-key map (kbd "C-c M-l") #'org-insert-last-stored-link)
+    (define-key map (kbd "C-c C-M-l") #'org-toggle-link-display)
+    (define-key map (kbd "C-c o") #'org-open-at-point))
 
   (setq org-agenda-diary-file 'diary-file) ; for inserting diary
 					; entries from agenda

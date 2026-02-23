@@ -6,6 +6,7 @@
   (setq denote-allow-multi-word-keywords t)
   ;;; TODO: focus the taxonomy
   (setq denote-known-keywords '("meta" "personal" "note" "source" "project" "daily"
+				"application"
 
 				"list" "list>meeting"
 				"misc>wallpaper"
