@@ -146,43 +146,7 @@ Perform the comparison with `string<'."
   (setq denote-journal-title-format 'day-date-month-year)
   (add-hook 'calendar-mode-hook #'denote-journal-calendar-mode)
 
-  (defun lp--denote-rename-fn (file)
-    (let ((type (denote-filetype-heuristics file)))
-      (string-trim
-       (format-spec denote-rename-buffer-format
-                    (list (cons ?t (denote-retrieve-title-value file type))
-                          (cons ?i (denote-retrieve-filename-identifier file))
-                          (cons ?d (denote-retrieve-filename-identifier file))
-                          (cons ?s (denote-retrieve-filename-signature file))
-                          (cons ?k (denote-retrieve-keywords-value-as-string file type))
-                          (cons ?% "%"))
-                    'delete))))
-
-  ;;; monthlies attempt
-  (setq lp--monthly-date-format "%b %Y")
-  (defun lp--denote-pop-monthly ()
-    (interactive)
-    (let ((date (format-time-string lp--monthly-date-format))
-	  (monthly-dir (concat denote-directory "monthlies/")))
-      (if-let* ((fns (directory-files
-		      monthly-dir
-		      t
-		      (concat ".*" (denote-sluggify (downcase date)) ".*")))
-		(switch-to-buffer-obey-display-actions t)
-		(monthly-name  (lp--denote-rename-fn (car fns))))
-	  (cond
-	   ;; need this "window" since it should pop only if displaying
-	   ((get-buffer-window monthly-name)
-	    (delete-window (get-buffer-window monthly-name)))
-	   (t (find-file-noselect (car fns))
-	      (switch-to-buffer monthly-name)))
-	(denote date '("monthly") 'org monthly-dir))))
-
-
-  (define-key global-map (kbd "C-c C-m") #'lp--denote-pop-monthly)
-  (define-key global-map (kbd "C-c C-o") #'denote-journal-new-or-existing-entry)
-
-  )
+  (define-key global-map (kbd "C-c C-o") #'denote-journal-new-or-existing-entry))
 
 (lp-emacs-elpa-package 'denote-silo
   ;; TODO
@@ -190,6 +154,8 @@ Perform the comparison with `string<'."
 (lp-emacs-elpa-package 'denote-org
   ;; TODO
   (setq denote-org-store-link-to-heading t)
+  (define-key global-map (kbd "C-c f h") #'denote-org-link-to-heading)
+
   )
 
 
