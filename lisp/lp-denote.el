@@ -5,8 +5,7 @@
   (setq denote-excluded-files-regexp "/_.*/")  
   (setq denote-allow-multi-word-keywords t)
   ;;; TODO: focus the taxonomy
-  (setq denote-known-keywords '("meta" "note" "list" "log" "source" "media"
-				
+  (setq denote-known-keywords '("meta" "note" "list" "log" "source" "media" "paper"
 				"recipe"))
   ;; (setq denote-known-keywords '("meta" "personal" "note" "source" "project" "daily"
   ;; 				"application"
@@ -152,12 +151,18 @@ Perform the comparison with `string<'."
 
 (lp-emacs-elpa-package 'denote-silo
   ;; TODO
+
+  (setq denote-silo-directories '("~/dropbox/denotes/writings"
+				  "~/dropbox/denotes/research"
+				  "~/dropbox/denotes/research/references"))
+  (let ((map global-map))
+    (define-key map (kbd "C-c f p") #'denote-silo-open-or-create))
   )
+
 (lp-emacs-elpa-package 'denote-org
   ;; TODO
   (setq denote-org-store-link-to-heading t)
   (define-key global-map (kbd "C-c f h") #'denote-org-link-to-heading)
-
   )
 
 
