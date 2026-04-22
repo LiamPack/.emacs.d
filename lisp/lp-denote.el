@@ -5,21 +5,23 @@
   (setq denote-excluded-files-regexp "/_.*/")  
   (setq denote-allow-multi-word-keywords t)
   ;;; TODO: focus the taxonomy
-  (setq denote-known-keywords '("meta" "personal" "note" "source" "project" "daily"
-				"application"
+  (setq denote-known-keywords '("meta" "note" "list" "log" "source" "media"
+				
+				"recipe"))
+  ;; (setq denote-known-keywords '("meta" "personal" "note" "source" "project" "daily"
+  ;; 				"application"
 
-				"list" "list>meeting"
-				"misc>wallpaper"
-				"research" "research>book" "research>paper"
+  ;; 				"list" "log"
+  ;; 				"misc>wallpaper"
+  ;; 				"research" "research>book" "research>paper"
 
-				"math" "math>prob" "math>pde" "math>analysis" "math>topology" "math>functional"
-				"math>prob>percolation"
+  ;; 				"math" "math>prob" "math>pde" "math>analysis" "math>topology" "math>functional"
+  ;; 				"math>prob>percolation"
 
-				"media" "media>book" "media>anime"
-				"writing" "writing>philosophy" "writing>personal" "writing>literature"
-				"teaching"
-				"cooking" "cooking>recipe"
-				"tech"))
+  ;; 				"media" "media>book" "media>anime"
+  ;; 				"writing" "writing>philosophy" "writing>personal" "writing>literature"
+  ;; 				"cooking" "cooking>recipe"
+  ;; 				"tech"))
   (setq denote-file-name-components-order '(title keywords signature identifier))
   (setq denote-infer-keywords nil)
   (setq denote-sort-keywords t)

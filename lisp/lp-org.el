@@ -67,6 +67,7 @@
    '((emacs-lisp . t)
      (gnuplot . t)
      (shell . t)
+     (scheme .t)
      (julia . t)))
 
   ;;; archiving
@@ -97,11 +98,12 @@
     (define-key map (kbd "C-c C-o") nil)
     (define-key map (kbd "C-c C-a") nil) ; org-attach
     (define-key map (kbd "C-c M-l") #'org-insert-last-stored-link)
-    (define-key map (kbd "C-c C-M-l") #'org-toggle-link-display)
+    (define-key map (kbd "C-c M-L") #'org-toggle-link-display)
     (define-key map (kbd "C-c o") #'org-open-at-point))
 
   (setq org-agenda-diary-file 'diary-file) ; for inserting diary
 					; entries from agenda
+  (setq org-deadline-warning-days 6)
 )
 
 
