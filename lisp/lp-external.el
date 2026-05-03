@@ -223,7 +223,65 @@ concatenated."
   (setq arxiv-default-category "math.pr")
   )
 
+(lp-emacs-git-package 'buffer-to-pdf
+  "https://github.com/protesilaos/buffer-to-pdf.git"
+  (setq buffer-to-pdf-directory (expand-file-name "~/"))
+  (setq x-wait-for-event-timeout 10.0)
+
+  (require 'seq)
+
+  (setq x-wait-for-event-timeout 2.0) ; must be a float
+
+  (defun my-x-export--frame-list (frames)
+    (cond
+     ((null frames) (list (selected-frame)))
+     ((framep frames) (list frames))
+     ((listp frames) frames)
+     (t (error "Bad FRAMES argument to x-export-frames: %S" frames))))
+
+  (defun my-x-export--wait-for-frames-visible (frames &optional timeout)
+    "Make FRAMES visible and wait until Emacs reports them visible."
+    (let* ((frames (my-x-export--frame-list frames))
+           (timeout (or timeout 2.0))
+           (deadline (+ (float-time) timeout)))
+      ;; Request visibility for every page frame.
+      (dolist (f frames)
+	(unless (frame-live-p f)
+          (error "Dead frame in x-export-frames list: %S" f))
+	(make-frame-visible f))
+
+      ;; Process redisplay/window-system events until all are internally visible.
+      (while (and (seq-some
+                   (lambda (f)
+                     (not (eq (frame-visible-p f) t)))
+                   frames)
+                  (< (float-time) deadline))
+	(redisplay t)
+	(sit-for 0.05))
+
+      ;; Fail with useful diagnostics instead of the opaque C-level error.
+      (let ((bad (seq-filter
+                  (lambda (f)
+                    (not (eq (frame-visible-p f) t)))
+                  frames)))
+	(when bad
+          (error "Frames still not visible: %S"
+		 (mapcar
+                  (lambda (f)
+                    (list :name (frame-parameter f 'name)
+                          :visible (frame-visible-p f)
+                          :visibility-param (frame-parameter f 'visibility)
+                          :icon-name (frame-parameter f 'icon-name)))
+                  bad))))))
+
+  (defun my-x-export-frames-wait-visible (orig frames &optional type)
+    "Around-advice for `x-export-frames'."
+    (my-x-export--wait-for-frames-visible frames 2.0)
+    (funcall orig frames type))
+
+  (advice-add 'x-export-frames :around #'my-x-export-frames-wait-visible))
+
 (setq load-path (append (list (expand-file-name "~/.emacs.d/local/")) load-path)) 
-(autoload 'LilyPond-mode "lilypond-mode")
+;; (autoload 'LilyPond-mode "lilypond-mode")
 
 (provide 'lp-external)
