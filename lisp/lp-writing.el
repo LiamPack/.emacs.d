@@ -117,9 +117,13 @@
 
     ;; Blackboard / double-struck
     ("\\mathbb{N}"    . ?ℕ)
+    ("\\N"    . ?ℕ)
     ("\\mathbb{Z}"    . ?ℤ)
+    ("\\Z"    . ?ℤ)
     ("\\mathbb{Q}"    . ?ℚ)
+    ("\\Q"    . ?ℚ)
     ("\\mathbb{R}"    . ?ℝ)
+    ("\\R"    . ?ℝ)
     ("\\mathbb{C}"    . ?ℂ)
     ("\\mathbb{P}"    . ?ℙ)
     ("\\mathbb{E}"    . ?𝔼)
@@ -341,7 +345,7 @@ Rejects partial matches inside longer LaTeX control words, as in
               #'my-latex-prettify-compose-p)
   (prettify-symbols-mode 1))
 
-;; (add-hook 'text-mode-hook #'my-text-mode-prettify-latex)
+(add-hook 'text-mode-hook #'my-text-mode-prettify-latex)
 (add-hook 'org-mode-hook  #'my-text-mode-prettify-latex)
 
 (provide 'lp-writing)
