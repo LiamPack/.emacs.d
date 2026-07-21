@@ -65,20 +65,15 @@
   ;;; Elfeed feeds
   ;; TODO: update.
   (setq elfeed-feeds '("https://protesilaos.com/master.xml"
-                       "https://ava.substack.com/feed"
 		       "https://proustproject.substack.com/feed"
-		       "https://pahlkadot.substack.com/feed"
 		       "https://catalyst-journal.com/feed"
-		       "https://tetw.org/rss"
 
 		       "http://export.arxiv.org/api/query?search_query=cat:math.AP&start=0&max_results=150&sortBy=submittedDate&sortOrder=descending"
 		       "http://export.arxiv.org/api/query?search_query=cat:math.PR&start=0&max_results=150&sortBy=submittedDate&sortOrder=descending"
 		       "http://export.arxiv.org/api/query?search_query=cat:math.MP&start=0&max_results=150&sortBy=submittedDate&sortOrder=descending"
 		       "https://djalil.chafai.net/blog/feed" ; hardcore french probability
 		       "https://mbounthavong.com/blog/rss.xml" ; clinical pharmacology prof at ucsd
-		       "https://scottaaronson.blog/rss"
 
-		       "https://terrytao.wordpress.com/feed/"
 		       "https://johncarlosbaez.wordpress.com/atom.xml"
 
 		       "https://borretti.me/feed.xml" ; did the astro+lisp post 
