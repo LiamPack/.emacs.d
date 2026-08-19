@@ -6,7 +6,9 @@
   (setq denote-allow-multi-word-keywords t)
   ;;; TODO: focus the taxonomy
   (setq denote-known-keywords '("meta" "note" "list" "log" "source" "media" "paper"
-				"recipe"))
+				"recipe" ; cooking specific
+				"journal" ; writing specific
+				))
   ;; (setq denote-known-keywords '("meta" "personal" "note" "source" "project" "daily"
   ;; 				"application"
 
@@ -38,69 +40,15 @@
   (add-hook 'dired-mode-hook #'denote-dired-mode)
   (add-hook 'find-file-hook #'denote-fontify-links-mode)
 
+  ;; fixing buffer display for "monthly" notes
   (add-to-list 'display-buffer-alist
 	       '("\[D\].*\\(2022\\|2023\\|2024\\|2025\\|2026\\|journal\\).*"
 		 (display-buffer-below-selected)
 		 (window-height 0.3)))
-  
-  ;;;; recurring notes
-  ;;; TODO: potential here. (phil, kihoon, pierre, digestion, LIST, X-seminar).
-  (defvar my-denote-colleagues '("phil" "kihoon" "digestion" "incubator" "misc-incubator")
-    "List of names I collaborate with.
-There is at least one file in the variable `denote-directory' that has
-the name of this person.")
-
-  (defvar my-denote-colleagues-prompt-history nil
-    "Minibuffer history for `my-denote-colleagues-new-meeting'.")
-
-  (defun my-denote-colleagues-prompt ()
-    "Prompt with completion for a name among `my-denote-colleagues'.
-Use the last input as the default value."
-    (let ((default-value (car my-denote-colleagues-prompt-history)))
-      (completing-read
-       (format-prompt "New meeting with COLLEAGUE" default-value)
-       my-denote-colleagues
-       nil :require-match nil
-       'my-denote-colleagues-prompt-history
-       default-value)))
-
-  (defun my-denote-colleagues-get-file (name)
-    "Find file in variable `denote-directory' for NAME colleague.
-If there are more than one files, prompt with completion for one among
-them.
-
-NAME is one among `my-denote-colleagues'."
-    (if-let ((files (denote-directory-files (format "%s.*_list" name)))
-             (length-of-files (length files)))
-	(cond
-	 ((= length-of-files 1)
-          (car files))
-	 ((> length-of-files 1)
-          (completing-read "Select a file: " files nil :require-match)))
-      (user-error "No files for colleague with name `%s'" name)))
-
-  (defun my-denote-colleagues-new-meeting ()
-    "Prompt for the name of a colleague and insert a timestamped heading therein.
-The name of a colleague corresponds to at least one file in the variable
-`denote-directory'.  In case there are multiple files, prompt to choose
-one among them and operate therein.
-
-Names are defined in `my-denote-colleagues'."
-    (declare (interactive-only t))
-    (interactive)
-    (let* ((name (my-denote-colleagues-prompt))
-           (file (my-denote-colleagues-get-file name))
-           (time (format-time-string "%F %a")))  ; remove %R if you do not want the time
-      (with-current-buffer (find-file file)
-	(goto-char (point-max))
-	;; Here I am assuming we are in `org-mode', hence the leading
-	;; asterisk for the heading.  Adapt accordingly.
-	(insert (format "* [%s]\n\n" time)))))
-
-;;;; templates
-  ;;; TODO: tune. (paper, thought, list, snippet).
 
   ;;;; Luhman signature sorting
+  ;; see the Denote manual. signatures should be sorted
+  ;; alphanumerically, but 10a should come before 1a
   (defun my-denote--split-luhman-sig (signature)
     "Split numbers and letters in Luhmann-style SIGNATURE string."
     (replace-regexp-in-string
@@ -142,28 +90,25 @@ Perform the comparison with `string<'."
     (define-key map (kbd "C-c f R") #'denote-rename-file-using-front-matter)
     (define-key map (kbd "C-c f s") #'denote-sort-dired)))
 
-(lp-emacs-elpa-package 'denote-journal
-  (setq denote-journal-keyword "journal")
-  (setq denote-journal-title-format 'day-date-month-year)
-  (add-hook 'calendar-mode-hook #'denote-journal-calendar-mode)
+;; (lp-emacs-elpa-package 'denote-journal
+;;   (setq denote-journal-keyword "journal")
+;;   (setq denote-journal-title-format 'day-date-month-year)
+;;   (add-hook 'calendar-mode-hook #'denote-journal-calendar-mode)
 
-  (define-key global-map (kbd "C-c C-o") #'denote-journal-new-or-existing-entry))
+;;   (define-key global-map (kbd "C-c C-o") #'denote-journal-new-or-existing-entry))
 
 (lp-emacs-elpa-package 'denote-silo
-  ;; TODO
-
   (setq denote-silo-directories '("~/dropbox/denotes/writings"
+				  "~/dropbox/denotes/sources"
 				  "~/dropbox/denotes/research"
-				  "~/dropbox/denotes/research/references"))
+				  "~/dropbox/denotes/research/references"
+				  "~/dropbox/denotes/research/notes"))
   (let ((map global-map))
-    (define-key map (kbd "C-c f p") #'denote-silo-open-or-create))
-  )
+    (define-key map (kbd "C-c f p") #'denote-silo-open-or-create)))
 
 (lp-emacs-elpa-package 'denote-org
   ;; TODO
   (setq denote-org-store-link-to-heading t)
-  (define-key global-map (kbd "C-c f h") #'denote-org-link-to-heading)
-  )
-
+  (define-key global-map (kbd "C-c f h") #'denote-org-link-to-heading))
 
 (provide 'lp-denote)

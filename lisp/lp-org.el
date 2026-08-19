@@ -22,6 +22,9 @@
   ;; Org manual.  Evaluate: (info "(org) Tracking TODO state changes")
   (setq org-todo-keywords
         '((sequence "TODO(t)" "WAIT(w!)" "|" "CANCEL(c!)" "DONE(d!)")))
+  (setq org-todo-keyword-faces
+	'(("WAIT" . "yellow")
+	  ("CANCELLED" . "green")))
   (setq org-use-fast-todo-selection 'expert)
   (setq org-priority-faces
         '((?A . '(bold org-priority))
@@ -76,6 +79,23 @@
   (setq org-columns-skip-archived-trees t)
   (setq org-cycle-open-archived-trees nil)
 
+  ;;; capture
+  ;; Eval (info "(org) Template expansion") for possible template expansions
+  (setq org-default-notes-file (concat org-directory "--todos__list@@20250729T142757.org"))
+  (setq org-capture-templates
+	'(("t" "Todo" entry (file+headline "" "Inbox")
+	   "* TODO %? \n %u\n"
+	   :prepend :unnarrowed)
+	  ("s" "Sourced Todo" entry (file+headline "" "Inbox")
+	   "* TODO %? \n %u\n %a\n"
+	   :prepend :unnarrowed)
+	  ))
+
+  ;;; habit
+  ;; note: K to hide habits in agenda view
+  ;; (info "(org) Tracking your habits")
+  (setq org-habit-graph-column 60)
+  
   ;;; keybinds
   (define-key text-mode-map (kbd "C-c q") #'auto-fill-mode)
   (define-key global-map (kbd "C-c l") #'org-store-link)
@@ -83,7 +103,8 @@
   (let ((map global-map))
     (define-key map (kbd "C-c l") #'org-store-link)
     (define-key map (kbd "C-c o") #'org-open-at-point-global)
-    (define-key map (kbd "C-c C-a") #'org-agenda))
+    (define-key map (kbd "C-c a") #'org-agenda)
+    (define-key map (kbd "C-c c") #'org-capture))
 
   ;; Disable the gorillion keys that org binds
   (let ((map org-mode-map))
@@ -103,8 +124,7 @@
 
   (setq org-agenda-diary-file 'diary-file) ; for inserting diary
 					; entries from agenda
-  (setq org-deadline-warning-days 6)
-)
+  (setq org-deadline-warning-days 6))
 
 
 (with-eval-after-load 'ox-latex

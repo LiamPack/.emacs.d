@@ -111,6 +111,9 @@
   (define-key global-map (kbd "C-S-p") #'(lambda () (interactive) (previous-line 7)))
   (define-key global-map (kbd "C-S-n") #'(lambda () (interactive) (next-line 7)))
   (define-key global-map (kbd "C-S-w") #'(lambda () (interactive) (duplicate-line) (next-line 1)))
+  (define-key global-map (kbd "C-M-d") #'up-list)
+  (define-key global-map (kbd "C-c p") #'delete-pair)
+  
   (defun prot/keyboard-quit-dwim ()
     "Do-What-I-Mean behaviour for a general `keyboard-quit'.
 

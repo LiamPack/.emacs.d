@@ -27,6 +27,8 @@
   (setq eww-form-checkbox-selected-symbol "[X]")
   (setq eww-form-checkbox-symbol "[ ]")
   (setq eww-retrieve-command nil)
+  (setq eww-auto-rename-buffer 'title)
+  (setq eww-buffer-name-length 60)
 
   (define-key eww-link-keymap (kbd "v") nil) ; stop overriding `eww-view-source'
   (define-key eww-mode-map (kbd "L") #'eww-list-bookmarks)
@@ -68,9 +70,9 @@
 		       "https://proustproject.substack.com/feed"
 		       "https://catalyst-journal.com/feed"
 
-		       "http://export.arxiv.org/api/query?search_query=cat:math.AP&start=0&max_results=150&sortBy=submittedDate&sortOrder=descending"
-		       "http://export.arxiv.org/api/query?search_query=cat:math.PR&start=0&max_results=150&sortBy=submittedDate&sortOrder=descending"
-		       "http://export.arxiv.org/api/query?search_query=cat:math.MP&start=0&max_results=150&sortBy=submittedDate&sortOrder=descending"
+		       ;; "http://export.arxiv.org/api/query?search_query=cat:math.AP&start=0&max_results=150&sortBy=submittedDate&sortOrder=descending"
+		       ;; "http://export.arxiv.org/api/query?search_query=cat:math.PR&start=0&max_results=150&sortBy=submittedDate&sortOrder=descending"
+		       ;; "http://export.arxiv.org/api/query?search_query=cat:math.MP&start=0&max_results=150&sortBy=submittedDate&sortOrder=descending"
 		       "https://djalil.chafai.net/blog/feed" ; hardcore french probability
 		       "https://mbounthavong.com/blog/rss.xml" ; clinical pharmacology prof at ucsd
 
