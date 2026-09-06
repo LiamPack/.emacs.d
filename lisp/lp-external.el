@@ -39,13 +39,6 @@
 
 ;;; RSS feed
 (lp-emacs-elpa-package 'elfeed
-    (progn
-  (require 'cl-lib)
-  (unless (fboundp 'decf)
-    (defalias 'decf (symbol-function 'cl-decf)))
-  (unless (fboundp 'incf)
-    (defalias 'incf (symbol-function 'cl-incf)))
-  (load (locate-library "elfeed.el") nil t t))
   (define-key global-map (kbd "C-c e") #'elfeed)
 
   (setq elfeed-use-curl nil)

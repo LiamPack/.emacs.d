@@ -9,16 +9,19 @@
 
 ;;; minibuffer defaults
 (lp-emacs-builtin-package 'minibuffer
-  (setq completion-show-inline-help t)
+  (setq completion-show-help nil)
+  (setq completion-show-inline-help nil)
   (setq completions-detailed t)
+  (setq copmletions-format 'one-column)
+  (setq completions-max-height 12)
   (setq completion-ignore-case t)
-  (setq completion-auto-wrap t)
-  (setq completion-auto-select t)
-  (setq completion-auto-help 'visible) ;; TODO tweak
-  (setq completions-format 'one-column)
-  (setq completions-max-height 20)
-  ;; (setq completions-header-format nil)
-  (setq completion-cycle-threshold nil)
+  (setq completions-sort 'historical)
+  (setq completions-auto-help t)
+  (setq completion-auto-select nil
+	minibuffer-visible-completions t)
+
+  (setq completion-eager-display t)
+  (setq completion-eager-update t)
   (setq read-minibuffer-restore-windows t)
 
   ;; emacs28 completion stuff
@@ -34,9 +37,8 @@
 
   (setq resize-mini-windows t)
 
-  (file-name-shadow-mode 1)
   (minibuffer-depth-indicate-mode 1)
-  (minibuffer-electric-default-mode 1) ;; update default completion if change
+  ;; (minibuffer-electric-default-mode 1) ;; update default completion if change
 
   ;; Add prompt indicator to `completing-read-multiple'.
   (defun crm-indicator (args)
@@ -49,13 +51,15 @@
         '(read-only t cursor-intangible t face minibuffer-prompt))
   (setq suggest-key-bindings t)
 
-  (when (and (>= emacs-major-version 29))
-    (define-key minibuffer-mode-map (kbd "C-n") 'minibuffer-next-completion)
-    (define-key minibuffer-mode-map (kbd "C-p") 'minibuffer-previous-completion)
-    (define-key completion-in-region-mode-map (kbd "C-n") 'minibuffer-next-completion)
-    (define-key completion-in-region-mode-map (kbd "C-p") 'minibuffer-previous-completion)
-    (define-key completion-list-mode-map (kbd "C-n") 'next-completion)
-    (define-key completion-list-mode-map (kbd "C-p") 'previous-completion)))
+  ;; (when (and (>= emacs-major-version 29))
+  ;;   (define-key minibuffer-mode-map (kbd "C-n") 'minibuffer-next-completion)
+  ;;   (define-key minibuffer-mode-map (kbd "C-p") 'minibuffer-previous-completion)
+  ;;   (define-key completion-in-region-mode-map (kbd "C-n") 'minibuffer-next-completion)
+  ;;   (define-key completion-in-region-mode-map (kbd "C-p") 'minibuffer-previous-completion)
+  ;;   (define-key completion-list-mode-map (kbd "C-n") 'next-completion)
+  ;;   (define-key completion-list-mode-map (kbd "C-p") 'previous-completion))
+
+  )
 
 
 ;;; orderless minibuffer completion
@@ -100,13 +104,6 @@
 ;;; Enhancing built-in commands with better minibuffer completion
 ;;; capabilities
 (lp-emacs-elpa-package 'consult
-  (progn
-  (require 'cl-lib)
-  (unless (fboundp 'decf)
-    (defalias 'decf (symbol-function 'cl-decf)))
-  (unless (fboundp 'incf)
-    (defalias 'incf (symbol-function 'cl-incf)))
-  (load (locate-library "consult.el") nil t t))
   (setq consult-goto-map
         (let ((map (make-sparse-keymap)))
           (define-key map (kbd "e") #'consult-compile-error)
@@ -200,9 +197,9 @@
   (setq xref-search-program 'ripgrep)
   )
 
-(lp-emacs-elpa-package 'marginalia
-  (setq marginalia-max-relative-age 0) ; time is absolute here!
-  (marginalia-mode 1))
+;; (lp-emacs-elpa-package 'marginalia
+;;   (setq marginalia-max-relative-age 0) ; time is absolute here!
+;;   (marginalia-mode 1))
 
 ;;; for when things are really tough, some icomplete
 (when (and (<= emacs-major-version 27))

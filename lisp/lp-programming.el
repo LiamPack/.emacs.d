@@ -53,6 +53,8 @@
 ;;; julia
 (lp-emacs-elpa-package 'julia-mode)
 
+;; julia-snail dependency
+(lp-emacs-elpa-package 'vterm)
 (lp-emacs-elpa-package 'julia-snail
   (add-hook 'julia-mode-hook 'julia-snail-mode)
   (setq julia-snail-multimedia-enable t)
@@ -61,7 +63,6 @@
   (setq julia-snail-extensions '(repl-history formatter))
   (setq julia-snail-repl-display-eval-results t))
 
-(lp-emacs-elpa-package 'vterm)
 
 ;;; c{,++}
 (lp-emacs-builtin-package 'cc-mode

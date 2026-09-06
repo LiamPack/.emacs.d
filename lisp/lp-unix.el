@@ -8,37 +8,19 @@
   (setq comint-prompt-read-only t)
   (setq comint-use-prompt-regexp nil)
   (setq comint-completion-recexact t)
-  (setq comint-buffer-maximum-size 9999)
-  )
+  (setq comint-buffer-maximum-size 9999))
 
 ;;; shells
 (lp-emacs-builtin-package 'shell
-  (setq shell-command-prompt-show-cwd t) ; Emacs 27.1
+  (setq shell-command-prompt-show-cwd t)
   (setq shell-kill-buffer-on-exit t)
   (setq ansi-color-for-comint-mode t))
-;;; TODO: perosnalize.
+
 (lp-emacs-builtin-package 'eshell
-  (require 'esh-mode)
-  (require 'esh-module)
-  (setq eshell-modules-list             ; It works but may need review
-        '(eshell-alias                  ; aliases
-          eshell-basic
-          eshell-cmpl                   ; tab completion
-          eshell-dirs                   ; view the ring with `cd =`
-          eshell-glob ; unix-style globbing (with recursive (**), not (~), {zero,one}-or-more (#, ##), ...)
-          eshell-hist ; unix-style history (!ls, !?ls, ...)
-          eshell-ls   ; ls
-          eshell-pred ; zsh-like argument predication (see its man page or zsh examples)
-          eshell-prompt       ; prompt navigation
-          eshell-script       ; running `eshell` script files (source, ./, ...)
-          eshell-term         ; for visual programs (vi, vim, top, ...)
-          eshell-tramp        ; u kno
-          eshell-unix))       ; standard unix commands
   (setenv "PAGER" "cat")      ; solves issues, such as with 'git log' and the default 'less'
-  (require 'em-cmpl)
-  (require 'em-dirs)
   (setq eshell-cd-on-directory t)
 
+  ;; ssh & tramp configuration for eshell
   (require 'em-tramp)
   (setq password-cache t)
   (setq password-cache-expiry 600)
@@ -51,9 +33,7 @@
         eshell-destroy-buffer-when-process-dies t)
   (global-set-key (kbd "<f1>") 'eshell))
 
-
 ;;; directory editing
-;;; TODO: personalize, check manual and settings.
 (lp-emacs-builtin-package 'dired
   (add-hook 'dired-mode-hook
             (lambda ()
@@ -66,7 +46,7 @@
   (setq dired-listing-switches
         "-AGFhlv --group-directories-first --time-style=long-iso")
   (setq dired-dwim-target t)
-  (setq dired-auto-revert-buffer #'dired-directory-changed-p) ; also see `dired-do-revert-buffer'
+  (setq dired-auto-revert-buffer t)
   (add-hook 'dired-mode-hook #'dired-hide-details-mode)
   (add-hook 'dired-mode-hook #'hl-line-mode)
   (setq dired-clean-up-buffers-too t)
@@ -76,10 +56,8 @@
 
 (lp-emacs-builtin-package 'dired-aux
   (setq dired-isearch-filenames 'dwim)
-  ;; The following variables were introduced in Emacs 27.1
   (setq dired-create-destination-dirs 'ask)
   (setq dired-vc-rename-file t)
-  ;; And this is for Emacs 28
   (setq dired-do-revert-buffer (lambda (dir) (not (file-remote-p dir))))
 
   (let ((map dired-mode-map))
@@ -88,7 +66,6 @@
     (define-key map (kbd "C-x v v") #'dired-vc-next-action)))
 
 (lp-emacs-builtin-package 'dired-x
-  (setq dired-x-hands-off-my-keys t)    ; easier to show the keys I use
   (define-key dired-mode-map (kbd "I") #'dired-info))
 
 (lp-emacs-elpa-package 'dired-subtree
@@ -109,7 +86,6 @@
   ;; :diminish ediff-mode
   (setq ediff-diff-options "-w"))
 
-
 ;;; A top-like package for emcas
 (lp-emacs-builtin-package 'proced
   (setq proced-auto-update-flag t)
@@ -129,7 +105,6 @@
 
   (setq tramp-verbose 3) ;; can go up to 11! 3 is the default.
   (add-to-list 'tramp-remote-process-environment
-               (format "DISPLAY=localhost:10"))
-  )
+               (format "DISPLAY=localhost:10")))
 
 (provide 'lp-unix)

@@ -12,6 +12,7 @@
 	  pdf-view-themed-minor-mode
 	  pdf-annot-minor-mode
 	  pdf-sync-minor-mode))
+  ;; view-roll minor mode...
   (setq pdf-view-display-size 'fit-width)
   (setq pdf-view-continuous t)
   (setq pdf-view-use-dedicated-register t)

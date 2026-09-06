@@ -42,20 +42,9 @@
 
   ;; scroll
   (setq auto-window-vscroll nil)  ; avoid next-line to trigger line-move-partial
-  (setq scroll-conservatively 10)
-  (setq scroll-margin 5)
-  (setq scroll-step 0)                  ; see info of `scroll-step`: as long as `scroll-conservatively`
-                                        ; is a "large value" this should be fine
-  ;; (menu-bar-mode -1)
-  ;; (when (fboundp 'tool-bar-mode) (tool-bar-mode -1))
-  ;; (when (fboundp 'scroll-bar-mode) (scroll-bar-mode -1))
-  ;; (when (fboundp 'set-horizontal-scroll-bar-mode)
-  ;;   (set-horizontal-scroll-bar-mode nil))
+  (setq pixel-scroll-precision-mode t)
+  (when (fboundp 'tool-bar-mode) (tool-bar-mode -1))
 
-  (setq mouse-wheel-scroll-amount '(1 ((shift) . 3) ((control) . nil)))
-  (setq mouse-wheel-follow-mouse 't)
-
-  ;;; TODO: sort or remove duplicates
   ;; other basiscs
   (setq ring-bell-function 'ignore)
 
@@ -267,5 +256,11 @@ The DWIM behaviour of this command is as follows:
 (lp-emacs-builtin-package 'mouse
   (mouse-wheel-mode +1)
   (setq mouse-autoselect-window t))
+
+(lp-emacs-builtin-package 'tab-bar
+  (setopt tab-bar-show 0)
+  (setopt tab-bar-history-mode t))
+
+
 
 (provide 'lp-defaults)

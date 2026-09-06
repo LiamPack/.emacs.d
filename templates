@@ -139,6 +139,7 @@ tex-mode org-mode
 (intst "\\int_{s}^{t} ")
 (intii "\\int_{-\\infty}^{\\infty} ")
 (intin "\\int_{" q "} ")
+(intr  "\\int_{\\R}")
 (chse "{" p " \\choose " q "} ")
 (nck "{n \\choose k} ")
 (wge "\\wedge ")

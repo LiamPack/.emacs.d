@@ -62,6 +62,6 @@
   (setq nerd-icons-font-family "BigBlueTermPlus Nerd Font"))
 (lp-emacs-elpa-package 'nerd-icons-dired
   (add-hook 'dired-mode-hook #'nerd-icons-dired-mode))
-(load-theme 'standard-wombat :no-confirm)
+(load-theme 'standard-light :no-confirm)
 
 (provide 'lp-themes)

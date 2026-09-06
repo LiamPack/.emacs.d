@@ -86,17 +86,17 @@
   '(lp-defaults ; clean
     lp-themes ; clean
     lp-calendar ; clean
-    lp-completion ; ...
-    lp-editing
+    lp-completion ; clean
+    lp-editing ; clean
     lp-external
-    lp-minibuffer
+    lp-minibuffer ; clean
     lp-org
-    lp-pdf
-    lp-programming
+    lp-pdf ; clean
+    lp-programming ; clean enough
     lp-project-vc
     lp-tex
     lp-time
-    lp-unix
+    lp-unix ; clean
     lp-window
     lp-writing
     lp-denote
