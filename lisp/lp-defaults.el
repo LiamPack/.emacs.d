@@ -46,11 +46,11 @@
   (setq scroll-margin 5)
   (setq scroll-step 0)                  ; see info of `scroll-step`: as long as `scroll-conservatively`
                                         ; is a "large value" this should be fine
-  (menu-bar-mode -1)
-  (when (fboundp 'tool-bar-mode) (tool-bar-mode -1))
-  (when (fboundp 'scroll-bar-mode) (scroll-bar-mode -1))
-  (when (fboundp 'set-horizontal-scroll-bar-mode)
-    (set-horizontal-scroll-bar-mode nil))
+  ;; (menu-bar-mode -1)
+  ;; (when (fboundp 'tool-bar-mode) (tool-bar-mode -1))
+  ;; (when (fboundp 'scroll-bar-mode) (scroll-bar-mode -1))
+  ;; (when (fboundp 'set-horizontal-scroll-bar-mode)
+  ;;   (set-horizontal-scroll-bar-mode nil))
 
   (setq mouse-wheel-scroll-amount '(1 ((shift) . 3) ((control) . nil)))
   (setq mouse-wheel-follow-mouse 't)
@@ -58,7 +58,6 @@
   ;;; TODO: sort or remove duplicates
   ;; other basiscs
   (setq ring-bell-function 'ignore)
-  (setq inhibit-startup-screen t)
 
   ;; create backups in separate folder
   (setq backup-directory-alist `(("." . "~/.emacs.d/saves")))
@@ -73,9 +72,7 @@
       (blink-cursor-mode -1)
       (setq visible-cursor t)))
 
-  (setq initial-scratch-message ";; Find an oblique angle
-"
-        visible-bell t)
+  (setq visible-bell t)
   (define-key global-map (kbd "C-c s") #'scratch-buffer)
 
   (show-paren-mode t)
@@ -85,32 +82,17 @@
         help-window-select t                 ; focus on help window when openend
         window-combination-resize nil) ; i'd rather do this myself
 
-  (defun lp--clean-up-buffer-or-region ()
-    "Untabifies, indents and deletes trailing whitespace from buffer or region."
-    (interactive)
-    (save-excursion
-      (unless (region-active-p)
-        (mark-whole-buffer))
-      (untabify (region-beginning) (region-end))
-      (indent-region (region-beginning) (region-end))
-      (save-restriction
-        (narrow-to-region (region-beginning) (region-end))
-        (delete-trailing-whitespace))))
-
   (define-key global-map (kbd "C-x k") #'(lambda () (interactive) (kill-buffer nil)))
   (define-key global-map (kbd "C-x K") #'(lambda () (interactive) (kill-buffer nil) (delete-window)))
-  (define-key global-map (kbd "C-c n") #'(lambda () (interactive) (whitespace-cleanup))) ;;; TODO doesn't really work anymore. taking up keybind
   (define-key global-map (kbd "<f5>")  #'revert-buffer)
 
   (define-key global-map (kbd "M-z") #'zap-up-to-char) ;; TODO: repeat map
   (define-key global-map (kbd "M-Z") #'zap-to-char)
 
-  (define-key global-map (kbd "C-x C-M-e") #'pp-macroexpand-last-sexp)
   (define-key global-map (kbd "C-h j") #'describe-keymap)
   (define-key global-map (kbd "C-c C-j") #'join-line)
-  (define-key global-map (kbd "C-S-p") #'(lambda () (interactive) (previous-line 7)))
-  (define-key global-map (kbd "C-S-n") #'(lambda () (interactive) (next-line 7)))
-  (define-key global-map (kbd "C-S-w") #'(lambda () (interactive) (duplicate-line) (next-line 1)))
+  (define-key global-map (kbd "C-S-p") #'(lambda () (interactive) (previous-line 6)))
+  (define-key global-map (kbd "C-S-n") #'(lambda () (interactive) (next-line 6)))
   (define-key global-map (kbd "C-M-d") #'up-list)
   (define-key global-map (kbd "C-c p") #'delete-pair)
   
@@ -227,7 +209,9 @@ The DWIM behaviour of this command is as follows:
   
   )
 
-;; thanks prot for showing this package off :) !
+;; thanks prot for showing this package off :) !  makes a separate
+;; window to display helpful information on mouse-hover; otherwise, it's
+;; put in the minibuffer.
 (lp-emacs-builtin-package 'tooltip
   (setq tooltip-delay 0.5
         tooltip-short-delay 0.5
@@ -241,10 +225,6 @@ The DWIM behaviour of this command is as follows:
   (autoload #'tooltip-mode "tooltip")
   (tooltip-mode 1)
   )
-
-;;; Visualize unwanted whitespace
-(lp-emacs-builtin-package 'whitespace
-  (setq whitespace-style (quote (face spaces tabs newline space-mark tab-mark newline-mark))))
 
 ;;; Advice around useful functions
 (defun lp--provide-mark-line-or-region (&rest args)
@@ -286,23 +266,6 @@ The DWIM behaviour of this command is as follows:
   ;;;; Mouse and mouse wheel behaviour
 (lp-emacs-builtin-package 'mouse
   (mouse-wheel-mode +1)
-  (setq mouse-autoselect-window t)
-
-  ;; In Emacs 27+, use Control + mouse wheel to scale text.
-  (setq mouse-wheel-scroll-amount
-        '(1
-          ((shift) . 5)
-          ((meta) . 0.5)
-          ((control) . text-scale))
-        mouse-drag-copy-region nil
-        make-pointer-invisible t
-        mouse-wheel-progressive-speed t
-        mouse-wheel-follow-mouse t)
-
-  ;; Scrolling behaviour
-  (setq-default scroll-preserve-screen-position t
-                scroll-conservatively 1 ; affects `scroll-step'
-                scroll-margin 0
-                next-screen-context-lines 0))
+  (setq mouse-autoselect-window t))
 
 (provide 'lp-defaults)

@@ -5,8 +5,7 @@
               (font-lock-add-keywords
                nil
                '(("\\<\\(FIXME\\|TODO\\|BUG\\)" 1 font-lock-warning-face prepend)))))
-	(add-hook 'prog-mode-hook #'electric-indent-local-mode))
-
+  (add-hook 'prog-mode-hook #'electric-indent-local-mode))
 
 (lp-emacs-builtin-package 'compile
   (setq compilation-ask-about-save nil)
@@ -14,8 +13,7 @@
   (setq compilation-skip-threshold 2)
   (setq compilation-scroll-output 'first-error)
   (setq compilation-always-kill t)
-  (setq compilation-auto-jump-to-first-error t)
-  )
+  (setq compilation-auto-jump-to-first-error t))
 
 (lp-emacs-builtin-package 'flymake
   (setq flymake-fringe-indicator-position 'left-fringe)
@@ -40,25 +38,6 @@
     (define-key map (kbd "C-c y n") #'flymake-goto-next-error)
     (define-key map (kbd "C-c y p") #'flymake-goto-prev-error)))
 
-
-(lp-emacs-elpa-package 'flymake-diagnostic-at-point
-  (setq flymake-diagnostic-at-point-display-diagnostic-function
-        'flymake-diagnostic-at-point-display-minibuffer))
-
-  ;;; Flymake + Shellcheck
-(lp-emacs-elpa-package 'flymake-shellcheck
-  (add-hook 'sh-mode-hook 'flymake-shellcheck-load))
-
-  ;;; Flymake + Proselint
-;; (lp-emacs-elpa-package 'flymake-proselint
-;;   (add-hook 'text-mode-hook #'flymake-mode)
-;;   (add-hook 'markdown-mode-hook #'flymake-proselint-setup)
-;;   (add-hook 'org-mode-hook #'flymake-proselint-setup)
-;;   (add-hook 'text-mode-hook #'flymake-proselint-setup))
-
-(lp-emacs-elpa-package 'flymake-python-pyflakes
-  (add-hook 'python-mode-hook 'flymake-python-pyflakes-load))
-
 ;;; pyton :)
 (lp-emacs-elpa-package 'python
   (setq python-indent-offset 4
@@ -71,27 +50,8 @@
     (setq python-shell-interpreter "ipython")
     (setq python-shell-interpreter-args "--simple-prompt")))
 
-(lp-emacs-elpa-package 'pyvenv)
-
-(when (executable-find "conda")
-  (lp-emacs-elpa-package 'conda
-    (conda-env-initialize-interactive-shells)
-    (conda-env-initialize-eshell)
-
-    ;; TODO: these need to be based on environment variables from conda
-    ;; ~/.conda configuration
-    (setq conda-anaconda-home (expand-file-name "~/miniconda3/")
-					conda-env-home-directory (expand-file-name "~/miniconda3/")
-					conda-env-subdirectory "envs")
-    ))
-
-(when (executable-find "jupyter") (lp-emacs-elpa-package 'ein))
-(lp-emacs-elpa-package 'code-cells) ; for generic code-block editing
-
 ;;; julia
 (lp-emacs-elpa-package 'julia-mode)
-
-(lp-emacs-elpa-package 'vterm)
 
 (lp-emacs-elpa-package 'julia-snail
   (add-hook 'julia-mode-hook 'julia-snail-mode)
@@ -101,11 +61,7 @@
   (setq julia-snail-extensions '(repl-history formatter))
   (setq julia-snail-repl-display-eval-results t))
 
-;;; java, unfortunately
-(add-hook 'java-mode-hook
-          #'(lambda ()
-              (interactive)
-              (setq-local tab-width 2)))
+(lp-emacs-elpa-package 'vterm)
 
 ;;; c{,++}
 (lp-emacs-builtin-package 'cc-mode
@@ -113,9 +69,6 @@
   (setq gdb-many-windows 't)
   (setq tab-width 2)
   (setq c-basic-offset 4)
-
-  (define-key c-mode-map (kbd "C-j") 'c-indent-new-comment-line)
-  (define-key c++-mode-map (kbd "C-j") 'c-indent-new-comment-line)
   (add-hook 'c++-mode-hook
             #'(lambda ()
                 (setq compile-command "cmake .. -DCMAKE_EXRORT_COMPILE_COMMANDS=1 -DCMAKE_BUILD_TYPE=Debug; cmake --build . -j8")))
@@ -144,42 +97,13 @@
 (lp-emacs-elpa-package 'eldoc-cmake
   (add-hook 'cmake-mode-hook 'eldoc-cmake-enable))
 
-;;; ocaml
-(lp-emacs-elpa-package 'tuareg
-  (setq tuareg-opam-insinuate t))
-
-(lp-emacs-elpa-package 'utop
-  (setq utop-command "opam config exec -- dune utop . -- -emacs")
-  ;; (setq utop-command "opam config exec -- dune utop . -- -emacs")
-
-  (autoload 'utop-minor-mode "utop" "Minor mode for utop" t)
-  (add-hook 'tuareg-mode-hook 'utop-minor-mode))
-(lp-emacs-elpa-package 'dune)
-
-;;; structured parenthesis editing, paredit replacement
-;; (lp-emacs-elpa-package 'puni
-;;   (setq lp--puni-mode-hooks
-;; 	'(prog-mode-hook sgml-mode-hook nxml-mode-hook tex-mode-hook eval-expression-minibuffer-setup-hook))
-
-;;   (dolist (hook lp--puni-mode-hooks)
-;;     (add-hook hook #'puni-mode))
-
-;;   (define-key puni-mode-map [remap puni-kill-active-region] #'kill-region)
-;;   (add-hook 'term-mode-hook #'puni-disable-puni-mode))
-
 ;;; lisps and schemes and racket
 (lp-emacs-elpa-package 'sly
   (setq inferior-lisp-program "/usr/bin/sbcl")
-	(define-key sly-mode-map (kbd "C-c C-k") #'sly-eval-buffer)
-	)
-
+	(define-key sly-mode-map (kbd "C-c C-k") #'sly-eval-buffer))
 (lp-emacs-elpa-package 'sly-asdf)
-
 (lp-emacs-elpa-package 'sly-quicklisp)
 
-;; eldoc provides minibuffer hints for elisp things. it's super nice
-(lp-emacs-elpa-package 'eldoc
-  (global-eldoc-mode 1))
 
 (lp-emacs-elpa-package 'rainbow-delimiters
   (add-hook 'prog-mode-hook 'rainbow-delimiters-mode))

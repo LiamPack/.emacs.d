@@ -94,11 +94,11 @@
     (define-key map (kbd "F") #'vc-update)
     (define-key map (kbd "P") #'vc-push)))
 
-(lp-emacs-elpa-package 'magit
-  (setq
-   ;; don't put "origin-" in front of new branch names by default
-   magit-default-tracking-name-function 'magit-default-tracking-name-branch-only
-   magit-push-always-verify t)
-  (define-key global-map (kbd "C-x g") 'magit-status))
+;; (lp-emacs-elpa-package 'magit
+;;   (setq
+;;    ;; don't put "origin-" in front of new branch names by default
+;;    magit-default-tracking-name-function 'magit-default-tracking-name-branch-only
+;;    magit-push-always-verify t)
+;;   (define-key global-map (kbd "C-x g") 'magit-status))
 
 (provide 'lp-project-vc)

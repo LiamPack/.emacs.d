@@ -83,9 +83,10 @@
   (exec-path-from-shell-initialize))
 
 (defvar lp--lisp-packages
-  '(lp-defaults
-    lp-calendar
-    lp-completion
+  '(lp-defaults ; clean
+    lp-themes ; clean
+    lp-calendar ; clean
+    lp-completion ; ...
     lp-editing
     lp-external
     lp-minibuffer
@@ -104,12 +105,5 @@
 
     (dolist (p lp--lisp-packages)
       (require p))
-(if (daemonp)
-    (add-hook 'after-make-frame-functions
-	      (lambda (frame)
-		(select-frame frame)
-		(require 'lp-aesthetics)))
-    (require 'lp-aesthetics))
-
 
 (load-file (expand-file-name "post-init.el" user-emacs-directory))

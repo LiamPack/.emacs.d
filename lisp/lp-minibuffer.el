@@ -1,6 +1,12 @@
+
 ;;;; This file is has perhaps the most ambiguous name. Packages
 ;;;; specified here are derived from the `minibuffer' group, which you
 ;;;; can reach via "M-x customize-group RET minibuffer".
+
+;; eldoc provides minibuffer hints for elisp things. it's super nice
+(lp-emacs-elpa-package 'eldoc
+  (global-eldoc-mode 1))
+
 ;;; minibuffer defaults
 (lp-emacs-builtin-package 'minibuffer
   (setq completion-show-inline-help t)
@@ -94,6 +100,13 @@
 ;;; Enhancing built-in commands with better minibuffer completion
 ;;; capabilities
 (lp-emacs-elpa-package 'consult
+  (progn
+  (require 'cl-lib)
+  (unless (fboundp 'decf)
+    (defalias 'decf (symbol-function 'cl-decf)))
+  (unless (fboundp 'incf)
+    (defalias 'incf (symbol-function 'cl-incf)))
+  (load (locate-library "consult.el") nil t t))
   (setq consult-goto-map
         (let ((map (make-sparse-keymap)))
           (define-key map (kbd "e") #'consult-compile-error)
@@ -164,7 +177,7 @@
   (setq xref-show-xrefs-function #'consult-xref)
   (setq xref-show-definitions-function #'consult-xref)
   (define-key completion-list-mode-map (kbd "C-o") #'consult-preview-at-point)
-  (add-hook 'completion-list-mode-hook #'consult-preview-at-point-mode) ;;!?
+  ;; (add-hook 'completion-list-mode-hook #'consult-preview-at-point-mode) ;;!?
 
   (setq completion-in-region-function #'consult-completion-in-region)
   (add-hook 'minibuffer-setup-hook
@@ -208,6 +221,7 @@
       (define-key map (kbd "C-j") #'icomplete-ret) ;; reverse C-j and <RET> behavior
       (define-key map (kbd "<RET>") #'icomplete-force-complete-and-exit))
     ))
+
 
 
 (provide 'lp-minibuffer)

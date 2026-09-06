@@ -1,12 +1,3 @@
-(lp-emacs-builtin-package 'sendmail
- (setq send-mail-function 'sendmail-send-it
-        ;; ;; NOTE 2023-08-08: We do not need this if we have the Arch
-        ;; ;; Linux `msmtp-mta' package installed: it replaces the
-        ;; ;; generic sendmail executable with msmtp.
-        ;;
-        ;; sendmail-program (executable-find "msmtp")
-        message-sendmail-envelope-from 'header))
-
 (lp-emacs-builtin-package 'calendar
   ;; lots ripped from prot
   (setq calendar-mark-diary-entries-flag t)
@@ -16,24 +7,21 @@
         '(24-hours ":" minutes
                    (when time-zone
                      (format "(%s)" time-zone))))
-  (setq calendar-week-start-day 1)      ; Monday
+  (setq calendar-week-start-day 7)
   (setq calendar-date-style 'iso)
   (setq calendar-date-display-form calendar-iso-date-display-form)
-  (setq calendar-time-zone-style 'numeric) ; Emacs 28.1
+  (setq calendar-time-zone-style 'numeric)
 
   (require 'solar)
-  (setq calendar-latitude 39.0         ; Not my actual coordinates
-        calendar-longitude -76.4)
+  (setq calendar-latitude 40.7         ; Not my actual coordinates
+        calendar-longitude -74.0)
 
   (require 'cal-dst)
   (setq calendar-standard-time-zone-name "EST")
   (setq calendar-daylight-time-zone-name "EDT")
 
   (require 'diary-lib)
-  (setq diary-file "")
-  (setq user-mail-address "liamp@TheCave")
-  (setq diary-mail-addr user-mail-address)
-  (setq diary-date-forms diary-iso-date-forms)
+  (setq diary-file "~/dropbox/denotes/diary")
   (setq diary-comment-start ";;")
   (setq diary-comment-end "")
   (setq diary-nonmarking-symbol "!")
@@ -49,7 +37,6 @@
   (add-hook 'diary-list-entries-hook 'diary-sort-entries t)
   (add-hook 'diary-mode-hook #'goto-address-mode) ; buttonise plain text links
 
-  ;; Those presuppose (setq diary-display-function #'diary-fancy-display)
   (add-hook 'diary-list-entries-hook 'diary-include-other-diary-files)
   (add-hook 'diary-mark-entries-hook 'diary-mark-included-diary-files)
 
@@ -73,39 +60,7 @@
   (let ((map global-map))
     (define-key map (kbd "C-c d c") #'calendar)
     (define-key map (kbd "C-c d i") #'diary-insert-entry)
-    (define-key map (kbd "C-c d m") #'diary-mail-entries))
-  )
-
-(lp-emacs-builtin-package 'appt
-  ;; (setq appt-display-diary nil)
-  (setq appt-disp-window-function #'appt-disp-window)
-  (setq appt-display-mode-line t)
-  (setq appt-display-interval 3)
-  (setq appt-audible nil)
-  (setq appt-warning-time-regexp "appt \\([0-9]+\\)")
-  (setq appt-message-warning-time 6)
-
-  (appt-activate 1))
-
-(lp-emacs-builtin-package 'timeclock
-  (let ((map global-map))
-    (define-key map (kbd "C-c k i") #'timeclock-in)
-    (define-key map (kbd "C-c k o") #'timeclock-out)
-    (define-key map (kbd "C-c k c") #'timeclock-change))
-  (setq timeclock-file "~/dropbox/denotes/timelog")
-  (setq timeclock-project-list '(research homework reading misc))
-  (setq timeclock-use-elapsed t)
-  (setq timeclock-workday (* 60 60 8))
-  ;; (setq timeclock-mode-string "[  ]")
-  )
-
-;;; modified from prot. while its a great idea, it can be problematic to automatically email from different (work) computers
-;; The idea is to get a reminder via email when I launch Emacs in the
-;; morning and this file is evaluated.  Obviously this is not a super
-;; sophisticated approach, though I do not need one.
-;; (let ((time (string-to-number (format-time-string "%H"))))
-;;   (when (and (> time 4) (< time 9))
-;;     (run-at-time (* 60 5) nil #'diary-mail-entries)))
+    (define-key map (kbd "C-c d m") #'diary-mail-entries)))
 
 (lp-emacs-builtin-package 'holidays)
 

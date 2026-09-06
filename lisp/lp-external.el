@@ -39,6 +39,13 @@
 
 ;;; RSS feed
 (lp-emacs-elpa-package 'elfeed
+    (progn
+  (require 'cl-lib)
+  (unless (fboundp 'decf)
+    (defalias 'decf (symbol-function 'cl-decf)))
+  (unless (fboundp 'incf)
+    (defalias 'incf (symbol-function 'cl-incf)))
+  (load (locate-library "elfeed.el") nil t t))
   (define-key global-map (kbd "C-c e") #'elfeed)
 
   (setq elfeed-use-curl nil)
@@ -66,30 +73,25 @@
 
   ;;; Elfeed feeds
   ;; TODO: update.
-  (setq elfeed-feeds '("https://protesilaos.com/master.xml"
-		       "https://proustproject.substack.com/feed"
-		       "https://catalyst-journal.com/feed"
+  (setq elfeed-feeds '(("https://protesilaos.com/master.xml" blog)
+		       ("https://proustproject.substack.com/feed" blog)
+		       ("https://catalyst-journal.com/feed" blog)
 
-		       ;; "http://export.arxiv.org/api/query?search_query=cat:math.AP&start=0&max_results=150&sortBy=submittedDate&sortOrder=descending"
-		       ;; "http://export.arxiv.org/api/query?search_query=cat:math.PR&start=0&max_results=150&sortBy=submittedDate&sortOrder=descending"
-		       ;; "http://export.arxiv.org/api/query?search_query=cat:math.MP&start=0&max_results=150&sortBy=submittedDate&sortOrder=descending"
-		       "https://djalil.chafai.net/blog/feed" ; hardcore french probability
+		       ("http://export.arxiv.org/api/query?search_query=cat:math.AP&start=0&max_results=150&sortBy=submittedDate&sortOrder=descending" arxiv math)
+		       ("http://export.arxiv.org/api/query?search_query=cat:math.PR&start=0&max_results=150&sortBy=submittedDate&sortOrder=descending" arxiv math)
+		       ("http://export.arxiv.org/api/query?search_query=cat:math.MP&start=0&max_results=150&sortBy=submittedDate&sortOrder=descending" arxiv math)
+		       ("https://djalil.chafai.net/blog/feed" math) ; hardcore french probability
 		       "https://mbounthavong.com/blog/rss.xml" ; clinical pharmacology prof at ucsd
 
 		       "https://johncarlosbaez.wordpress.com/atom.xml"
 
 		       "https://borretti.me/feed.xml" ; did the astro+lisp post 
                        "http://inconvergent.net/atom.xml" ; lisp art
-                       "http://nullprogram.com/feed/" ; apl
 		       "https://leahneukirchen.org/trivium/index.atom" ; killer hacker
 
-                       "https://gwern.substack.com/feed"
-                       "https://www.benkuhn.net/index.xml" ; harvard xd
                        "https://www.nayuki.io/rss20.xml" ; swe in canada, detailed
                        "https://danluu.com/atom.xml" ; plain but good
-
-		       "https://feeds.acast.com/public/shows/58ad887a1608b1752663b04a"
-                       ))
+		       ))
 
   ;; Ripping all arxiv-related feed stuff from
   ;; https://cundy.me/post/elfeed/
