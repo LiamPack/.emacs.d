@@ -70,8 +70,8 @@
 		       ("https://proustproject.substack.com/feed" blog)
 		       ("https://catalyst-journal.com/feed" blog)
 
-		       ("http://export.arxiv.org/api/query?search_query=cat:math.AP&start=0&max_results=150&sortBy=submittedDate&sortOrder=descending" arxiv math)
-		       ("http://export.arxiv.org/api/query?search_query=cat:math.PR&start=0&max_results=150&sortBy=submittedDate&sortOrder=descending" arxiv math)
+		       ("http://export.arxiv.org/api/query?search_query=cat:math.AP&start=0&max_results=300&sortBy=submittedDate&sortOrder=descending" arxiv math)
+		       ("http://export.arxiv.org/api/query?search_query=cat:math.PR&start=0&max_results=2000&sortBy=submittedDate&sortOrder=descending" arxiv math)
 		       ("http://export.arxiv.org/api/query?search_query=cat:math.MP&start=0&max_results=150&sortBy=submittedDate&sortOrder=descending" arxiv math)
 		       ("https://djalil.chafai.net/blog/feed" math) ; hardcore french probability
 		       "https://mbounthavong.com/blog/rss.xml" ; clinical pharmacology prof at ucsd

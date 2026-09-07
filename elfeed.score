@@ -8,11 +8,15 @@
   (:text ".*Ising.*" :title-value 10 :content-value 20 :type R)
   (:text ".*random walk.*" :title-value 10 :content-value 20 :type R)
 
+  (:text ".*KdV.*" :title-value 10 :content-value 20 :type R)
+  (:text ".*Ben-Ono.*" :title-value 10 :content-value 20 :type R)
+  (:text ".*Benjamin-Ono.*" :title-value 10 :content-value 20 :type R)
+  (:text ".*white noise.*" :title-value 10 :content-value 20 :type R)
+
   (:text ".*[Pp]hi.?4.*" :title-value 10 :content-value 20 :type R)
   (:text ".*[Pp]hi.?3.*" :title-value 10 :content-value 20 :type R)
   (:text ".*Yang.Mills.*" :title-value 10 :content-value 20 :type R)
   (:text ".*[- ]SPDE[- s].*" :title-value 10 :content-value 20 :type R)
-  (:text ".*log-Sobolev.*" :title-value 10 :content-value 20 :type R)
 
   (:text ".*Kuramoto.*" :title-value 10 :content-value 20 :type R))
 
