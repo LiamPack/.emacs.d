@@ -58,7 +58,8 @@
     (define-key map (kbd "C-x v f") #'vc-log-incoming)  ; the actual git fetch
     (define-key map (kbd "C-x v o") #'vc-log-outgoing)
     (define-key map (kbd "C-x v F") #'vc-update)        ; "F" because "P" is push
-    (define-key map (kbd "C-x v d") #'vc-diff))
+    (define-key map (kbd "C-x v D") #'vc-diff)
+    (define-key map (kbd "C-x v d") #'vc-dir))
   
   (let ((map vc-dir-mode-map))
     (define-key map (kbd "o") #'vc-log-outgoing)
