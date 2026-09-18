@@ -259,7 +259,7 @@ The DWIM behaviour of this command is as follows:
   (setq mouse-autoselect-window t))
 
 (lp-emacs-builtin-package 'tab-bar
-  (setopt tab-bar-show 0)
+  (setopt tab-bar-show t)
   (setopt tab-bar-history-mode t))
 
 
