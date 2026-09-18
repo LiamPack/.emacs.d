@@ -43,23 +43,23 @@
 ;; https://leahneukirchen.org/fonts/
 ;; bdftopcf, https://thristian.livejournal.com/90017.html
 ;; https://moritzfuerst.net/projects/smalltalk-type
-;; (set-frame-font :font "iosevka comfy" :height 120)
-;; (let (
-;;       ;; (mono-spaced-font "Greybeard 11px")
-;;       ;; (proportionately-spaced-font "Greybeard 11px")
-;;       (mono-spaced-font "Iosevka Comfy Wide Motion")
-;;       (proportionately-spaced-font "Iosevka Comfy Wide Motion")
-;;       ;; (mono-spaced-font "BigBlueTermPlus Nerd Font")
-;;       ;; (proportionately-spaced-font "BigBlueTermPlus Nerd Font")
+;; (set-frame-font :font "aporetic sans mono" :height 120)
+(let (
+      ;; (mono-spaced-font "Greybeard 11px")
+      ;; (proportionately-spaced-font "Greybeard 11px")
+      (mono-spaced-font "aporetic serif mono")
+      (proportionately-spaced-font "aporetic serif")
+      ;; (mono-spaced-font "BigBlueTermPlus Nerd Font")
+      ;; (proportionately-spaced-font "BigBlueTermPlus Nerd Font")
 
-;;       )
-;;   (set-face-attribute 'default nil :family mono-spaced-font :height 120)
-;;   (set-face-attribute 'fixed-pitch nil :family mono-spaced-font :height 1.0)
-;;   (set-face-attribute 'variable-pitch nil :family proportionately-spaced-font :height 1.0))
+      )
+  (set-face-attribute 'default nil :family mono-spaced-font :height 120)
+  (set-face-attribute 'fixed-pitch nil :family mono-spaced-font :height 1.0)
+  (set-face-attribute 'variable-pitch nil :family proportionately-spaced-font :height 1.0))
 
 (lp-emacs-elpa-package 'nerd-icons
   (setq nerd-icons-scale-factor 1.0)
-  (setq nerd-icons-font-family "BigBlueTermPlus Nerd Font"))
+  (setq nerd-icons-font-family "Aporetic"))
 (lp-emacs-elpa-package 'nerd-icons-dired
   (add-hook 'dired-mode-hook #'nerd-icons-dired-mode))
 (load-theme 'standard-light :no-confirm)
