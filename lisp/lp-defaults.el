@@ -260,8 +260,10 @@ The DWIM behaviour of this command is as follows:
 
 (lp-emacs-builtin-package 'tab-bar
   (setopt tab-bar-show t)
-  (setopt tab-bar-history-mode t))
+  (setopt tab-bar-history-mode t)
+  (tab-bar-mode +1))
 
-
+(lp-emacs-builtin-package 'scroll-bar
+  (scroll-bar-mode -1))
 
 (provide 'lp-defaults)
