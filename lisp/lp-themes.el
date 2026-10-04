@@ -16,14 +16,14 @@
   (setq modus-operandi-palette-overrides
 	'((cursor red-intense)))
   (setq modus-themes-to-toggle '(modus-operandi modus-vivendi))
-  (define-key global-map (kbd "C-c C-8") #'modus-themes-toggle))
+  (define-key global-map (kbd "C-c C-7") #'modus-themes-toggle))
 
 (lp-emacs-elpa-package 'doric-themes
-  (define-key global-map (kbd "C-c C-7") #'doric-themes-rotate))
+  (define-key global-map (kbd "C-c C-9") #'doric-themes-rotate))
 (lp-emacs-elpa-package 'ef-themes
-  (define-key global-map (kbd "C-c C-0") #'ef-themes-rotate))
+  (define-key global-map (kbd "C-c C-8") #'ef-themes-rotate))
 (lp-emacs-elpa-package 'standard-themes
-  (define-key global-map (kbd "C-c C-9") #'standard-themes-rotate))
+  (define-key global-map (kbd "C-c C-0") #'standard-themes-rotate))
 
 (defun toggle-transparency ()
   (interactive)
@@ -57,11 +57,11 @@
   (set-face-attribute 'fixed-pitch nil :family mono-spaced-font :height 1.0)
   (set-face-attribute 'variable-pitch nil :family proportionately-spaced-font :height 1.0))
 
-(lp-emacs-elpa-package 'nerd-icons
-  (setq nerd-icons-scale-factor 1.0)
-  (setq nerd-icons-font-family "Aporetic"))
-(lp-emacs-elpa-package 'nerd-icons-dired
-  (add-hook 'dired-mode-hook #'nerd-icons-dired-mode))
-(load-theme 'standard-light :no-confirm)
+;; (lp-emacs-elpa-package 'nerd-icons
+;;   (setq nerd-icons-scale-factor 1.0)
+;;   (setq nerd-icons-font-family "Aporetic"))
+;; (lp-emacs-elpa-package 'nerd-icons-dired
+;;   (add-hook 'dired-mode-hook #'nerd-icons-dired-mode))
+(load-theme 'standard-dark :no-confirm)
 
 (provide 'lp-themes)

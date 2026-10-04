@@ -5,7 +5,8 @@
   (setq denote-excluded-files-regexp "/_.*/")  
   (setq denote-allow-multi-word-keywords t)
   ;;; TODO: focus the taxonomy
-  (setq denote-known-keywords '("meta" "note" "list" "log" "source" "media" "paper"
+  (setq denote-known-keywords '("meta" "note" "list" "log"
+				"source" "media" "paper" "textbook"
 				"recipe" ; cooking specific
 				"journal" ; writing specific
 				))
