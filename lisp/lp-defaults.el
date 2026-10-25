@@ -44,6 +44,7 @@
   (setq auto-window-vscroll nil)  ; avoid next-line to trigger line-move-partial
   (pixel-scroll-mode -1)
   (pixel-scroll-precision-mode 1)
+  (setq pixel-scroll-precision-interpolate-mice t)
   (when (fboundp 'tool-bar-mode) (tool-bar-mode -1))
 
   ;; other basiscs

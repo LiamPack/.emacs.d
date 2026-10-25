@@ -15,10 +15,11 @@
 	  pdf-view-roll-minor-mode))
   ;; view-roll minor mode...
   (setq pdf-view-display-size 'fit-width)
-  (setq pdf-view-continuous t)
+  (setq pdf-view-continuous nil)
   (setq pdf-view-use-dedicated-register t)
   (setq pdf-view-max-image-width 2160)
   (setq pdf-outline-imenu-use-flat-menus t)
+
 
   (pdf-loader-install))
 
