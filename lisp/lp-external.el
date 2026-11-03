@@ -43,7 +43,7 @@
 
   (setq elfeed-use-curl nil)
   (setq elfeed-curl-max-connections 10)
-  (setq elfeed-db-directory  "~/dropbox/denotes/.elfeed/")
+  (setq elfeed-db-directory  "~/.emacs.d/.elfeed/")
   (setq elfeed-enclosure-default-dir "~/Downloads/")
   (setq elfeed-search-filter "@2-weeks-ago +unread")
   (setq elfeed-sort-order 'descending)

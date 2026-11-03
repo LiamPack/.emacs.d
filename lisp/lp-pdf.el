@@ -1,6 +1,3 @@
-;;; TODO: personalize. This could be the most important part of the
-;;; config.  (scrolling, bookmarking and marking, seamless transition
-;;; between pdfs).
 (lp-emacs-elpa-package 'pdf-tools
   (setq pdf-tools-enabled-modes
         '(pdf-history-minor-mode
@@ -20,8 +17,19 @@
   (setq pdf-view-max-image-width 2160)
   (setq pdf-outline-imenu-use-flat-menus t)
 
+  (pixel-scroll-mode -1)
+  (pixel-scroll-precision-mode 1)
+  (setq pixel-scroll-precision-interpolate-mice t)
 
-  (pdf-loader-install))
+  (pdf-loader-install)
+  ;; Roll mode can mistake the current-line highlight overlay for a page
+  ;; overlay.  Exclude PDF buffers from highlighting before redisplay.
+  (defun lp-pdf-disable-line-highlighting ()
+    (setq-local global-hl-line-buffers nil)
+    (when (bound-and-true-p hl-line-mode)
+      (hl-line-mode -1)))
+
+  (add-hook 'pdf-view-mode-hook #'lp-pdf-disable-line-highlighting))
 
 
 ;; (lp-emacs-elpa-package 'djvu
@@ -30,13 +38,6 @@
 ;;     "https://github.com/dalanicolai/djvu3.git"))
 
 
-;; Roll mode can mistake the current-line highlight overlay for a page
-;; overlay.  Exclude PDF buffers from highlighting before redisplay.
-(defun lp-pdf-disable-line-highlighting ()
-  (setq-local global-hl-line-buffers nil)
-  (when (bound-and-true-p hl-line-mode)
-    (hl-line-mode -1)))
 
-(add-hook 'pdf-view-mode-hook #'lp-pdf-disable-line-highlighting)
 
 (provide 'lp-pdf)

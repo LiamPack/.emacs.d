@@ -166,7 +166,7 @@
   (defvar eglot-prog-mode-hooks
     '(cc-mode-hook c-mode-hook c++-mode-hook cuda-mode-hook
                    rjsx-mode-hook python-mode-hook java-mode-hook
-                   julia-mode-hook))
+                   julia-mode-hook LaTeX-mode-hook))
   (dolist (mode eglot-prog-mode-hooks)
     (add-hook mode 'eglot-ensure))
 
@@ -181,6 +181,7 @@
   ;; non-project files its easy to use other servers, but pylsp has the
   ;; least problems imo
   (add-to-list 'eglot-server-programs '(python-mode "pylsp"))
+  (add-to-list 'eglot-server-programs '(LaTeX-mode "texlab"))
   )
 
 (lp-emacs-elpa-package 'eglot-java
