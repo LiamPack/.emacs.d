@@ -1,4 +1,4 @@
-;;; timers
+;;; timers  -*- lexical-binding: t; -*-
 (lp-emacs-elpa-package 'tmr
   ;; Works on most unix-based systems I think, unsure on Mac
   (setq tmr-sound-file "/usr/share/sounds/freedesktop/stereo/alarm-clock-elapsed.oga")
@@ -12,7 +12,7 @@
 
   (let ((map global-map))
     (define-key map (kbd "C-c t t") #'tmr)
-    (define-key map (kbd "C-c t d") #'tmr-with-description)
+    (define-key map (kbd "C-c t d") #'tmr-edit-description)
     (define-key map (kbd "C-c t T") #'tmr-clone)
     (define-key map (kbd "C-c t c") #'tmr-cancel)
     (define-key map (kbd "C-c t r") #'tmr-remove-finished)

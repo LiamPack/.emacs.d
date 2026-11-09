@@ -1,4 +1,4 @@
-;; auctex requires special configuration..
+;; auctex requires special configuration..  -*- lexical-binding: t; -*-
 ;;
 ;; system needs:
 ;; - tex installation
@@ -22,10 +22,9 @@
 ;; Must be loaded before auctex.
 (setq cdlatex-math-modify-prefix ?`)
 (setq cdlatex-math-symbol-prefix ?')
-(if-let ((dont-use-auctex-scope nil))
-    nil
-  (when (not (package-installed-p 'auctex))
-    (package-install 'auctex))
+
+(lp-emacs-elpa-package 'auctex
+  (require 'tex)
   (setq reftex-plug-into-AUCTeX t)
   ;; revert pdf-view after compilation
   (add-hook 'TeX-after-compilation-finished-functions #'TeX-revert-document-buffer)
@@ -38,10 +37,9 @@
   (setq TeX-auto-save t)
   (setq TeX-parse-self t)
   (setq-default TeX-master nil)
-
   (let ((map TeX-mode-map))
     (define-key map (kbd "C-M-i") nil))
-
+  
   ;; most crucial: turn-on-reftex
   (setq lp--latex-hooks-fns '(auto-fill-mode TeX-fold-mode TeX-source-correlate-mode
 					     flyspell-mode flyspell-buffer prettify-symbols-mode
@@ -71,12 +69,5 @@
 ;; "~/dropbox/grad/research/lock-in-books"
 ;; 					 )
 ;;         bibtex-completion-notes-path "~/dropbox/denotes/"))
-
-(lp-emacs-git-package
-    'consult-bibtex "https://github.com/mohkale/consult-bibtex.git"
-    (with-eval-after-load 'embark
-      (add-to-list 'embark-keymap-alist '(bibtex-completion . consult-bibtex-embark-map)))
-    ;; (setq consult-bibtex-default-action #'consult-bibtex-edit-notes)
-    )
 
 (provide 'lp-tex)

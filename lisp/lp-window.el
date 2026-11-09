@@ -1,3 +1,4 @@
+;; -*- lexical-binding: t; -*-
 (define-key global-map (kbd "M-o") 'other-window)
 (define-key global-map (kbd "M-O") (lambda () (interactive) (other-window -1)))
 

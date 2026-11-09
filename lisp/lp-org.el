@@ -1,3 +1,4 @@
+;; -*- lexical-binding: t; -*-
 (lp-emacs-builtin-package 'org
 
   ;;; general
@@ -129,7 +130,7 @@
 
 (with-eval-after-load 'ox-latex
   (add-to-list 'org-latex-classes
-               '("org-plain-latex"
+	       '("org-plain-latex"
 		 "\\documentclass{article}
            [NO-DEFAULT-PACKAGES]
            [PACKAGES]
@@ -139,11 +140,11 @@
 		 ("\\subsubsection{%s}" . "\\subsubsection*{%s}")
 		 ("\\paragraph{%s}" . "\\paragraph*{%s}")
 		 ("\\subparagraph{%s}" . "\\subparagraph*{%s}")))
- 
- (setq org-latex-pdf-process '("%latex %b"
-			       "bibtex %b"
-			       "%latex %b"))
- (setq org-latex-compiler "LaTeX"))
+  (setq org-latex-pdf-process '("%latex %b"
+				"bibtex %b"
+				"%latex %b"))
+  (setq org-latex-compiler "LaTeX")
+  )
   
 
 

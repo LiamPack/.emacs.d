@@ -1,3 +1,4 @@
+;; -*- lexical-binding: t; -*-
 (lp-emacs-builtin-package 'project
   (define-key global-map (kbd "C-x p a") 'ff-find-other-file))
 
@@ -55,15 +56,15 @@
   (let ((map global-map))
     (define-key map (kbd "C-x v b") #'vc-retrieve-tag)  ; "branch" switch
     (define-key map (kbd "C-x v t") #'vc-create-tag)
-    (define-key map (kbd "C-x v f") #'vc-log-incoming)  ; the actual git fetch
-    (define-key map (kbd "C-x v o") #'vc-log-outgoing)
+    (define-key map (kbd "C-x v f") #'vc-root-log-incoming)  ; the actual git fetch
+    (define-key map (kbd "C-x v o") #'vc-root-log-outgoing)
     (define-key map (kbd "C-x v F") #'vc-update)        ; "F" because "P" is push
     (define-key map (kbd "C-x v D") #'vc-diff)
     (define-key map (kbd "C-x v d") #'vc-dir))
   
   (let ((map vc-dir-mode-map))
-    (define-key map (kbd "o") #'vc-log-outgoing)
-    (define-key map (kbd "f") #'vc-log-incoming) ; git fetch, replaces `vc-dir-find-file' (use RET)
+    (define-key map (kbd "o") #'vc-root-log-outgoing)
+    (define-key map (kbd "f") #'vc-root-log-incoming) ; git fetch, replaces `vc-dir-find-file' (use RET)
     (define-key map (kbd "F") #'vc-update)       ; symmetric with P: `vc-push'
     (define-key map (kbd "d") #'vc-diff)         ; parallel to D: `vc-root-diff'
     (define-key map (kbd "k") #'vc-dir-clean-files)
@@ -72,7 +73,7 @@
       (define-key map "b" lp-vc-git-branch-map)
       (define-key lp-vc-git-branch-map "n" #'vc-create-tag) ; new branch/tag
       (define-key lp-vc-git-branch-map "b" #'vc-retrieve-tag) ; switch branch/tag
-      (define-key lp-vc-git-branch-map "l" #'vc-print-branch-log)))
+      (define-key lp-vc-git-branch-map "l" #'vc-root-print-branch-log)))
   
   (let ((map vc-git-stash-shared-map))
     (define-key map "a" 'vc-git-stash-apply-at-point)
@@ -90,8 +91,8 @@
     (define-key map (kbd "<tab>") #'log-view-toggle-entry-display)
     (define-key map (kbd "<return>") #'log-view-find-revision)
     (define-key map (kbd "s") #'vc-log-search)
-    (define-key map (kbd "o") #'vc-log-outgoing)
-    (define-key map (kbd "f") #'vc-log-incoming)
+    (define-key map (kbd "o") #'vc-root-log-outgoing)
+    (define-key map (kbd "f") #'vc-root-log-incoming)
     (define-key map (kbd "F") #'vc-update)
     (define-key map (kbd "P") #'vc-push)))
 

@@ -1,3 +1,4 @@
+;; -*- lexical-binding: t; -*-
 (lp-emacs-elpa-package 'denote
 
   (setq denote-directory "~/dropbox/denotes/")
@@ -31,10 +32,9 @@
   (setq denote-prompts '(signature title keywords file-type))
   (setq denote-link-description-format "%t")
 
-  (denote-rename-buffer-mode -1)
+  (denote-rename-buffer-mode +1)
   (setq denote-rename-buffer-format "[D] %s = %>25t")
   (setq denote-buffer-has-backlinks-string " (<--->)")
-  (setq denote-backlinks-show-context t)
   (setq denote-org-store-link-to-heading t)
 
 
@@ -47,7 +47,7 @@
 		 (display-buffer-below-selected)
 		 (window-height 0.3)))
 
-  ;;;; Luhman signature sorting
+  ;;;; Luhman signature sorting.
   ;; see the Denote manual. signatures should be sorted
   ;; alphanumerically, but 10a should come before 1a
   (defun my-denote--split-luhman-sig (signature)
@@ -71,18 +71,15 @@
     "Return non-nil if SIG1 is smaller that SIG2.
 Perform the comparison with `string<'."
     (string< (my-denote--pad-sig sig1) (my-denote--pad-sig sig2)))
-
-  ;; Change the sorting function only when we sort by signature.
   (setq denote-sort-signature-comparison-function #'my-denote-sort-for-signatures)
 
 
   (let ((map global-map))
     (define-key map (kbd "C-c f j") #'denote-subdirectory) ; our custom command
     (define-key map (kbd "C-c f n") #'denote)
-    (define-key map (kbd "C-c f m") #'my-denote-colleagues-new-meeting)
     (define-key map (kbd "C-c f d") #'(lambda ()
                                         (interactive)
-                                        (dired (denote-directory))))
+                                        (dired (denote-directories))))
     (define-key map (kbd "C-c f i") #'denote-link-or-create) ; "insert" mnemonic
     (define-key map (kbd "C-c f I") #'denote-add-links)
     (define-key map (kbd "C-c f l") #'denote-find-link)
@@ -90,13 +87,6 @@ Perform the comparison with `string<'."
     (define-key map (kbd "C-c f r") #'denote-rename-file)
     (define-key map (kbd "C-c f R") #'denote-rename-file-using-front-matter)
     (define-key map (kbd "C-c f s") #'denote-sort-dired)))
-
-;; (lp-emacs-elpa-package 'denote-journal
-;;   (setq denote-journal-keyword "journal")
-;;   (setq denote-journal-title-format 'day-date-month-year)
-;;   (add-hook 'calendar-mode-hook #'denote-journal-calendar-mode)
-
-;;   (define-key global-map (kbd "C-c C-o") #'denote-journal-new-or-existing-entry))
 
 (lp-emacs-elpa-package 'denote-silo
   (setq denote-silo-directories '("~/dropbox/denotes/writings"

@@ -1,3 +1,4 @@
+;; -*- lexical-binding: t; -*-
 (lp-emacs-elpa-package 'simple-httpd)
 (lp-emacs-elpa-package 'f)
 (lp-emacs-elpa-package 's)

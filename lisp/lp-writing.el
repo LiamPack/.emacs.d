@@ -1,4 +1,4 @@
-;;; TODO: paragraph-start tuning. what's a paragraph, and is it consistent with an outline expression?
+;;; TODO: paragraph-start tuning. what's a paragraph, and is it consistent with an outline expression?  -*- lexical-binding: t; -*-
 
 (lp-emacs-builtin-package 'text-mode
   (add-hook 'text-mode-hook
@@ -33,7 +33,7 @@
         `((text-mode .  "") ; just use the page-break to make things
 			      ; simple
           (org-mode . "^\\*+ +")
-          (t . ,(or outline-regexp logos--page-delimiter))))
+          (t . ,(or outline-regexp logos-page-delimiter))))
 
   (setq-default logos-hide-mode-line t
                 logos-hide-buffer-boundaries nil

@@ -1,4 +1,4 @@
-;;; isearch, of course
+;;; isearch, of course  -*- lexical-binding: t; -*-
 (lp-emacs-builtin-package 'isearch
   (setq search-highlight t)
   (setq search-whitespace-regexp ".*?")

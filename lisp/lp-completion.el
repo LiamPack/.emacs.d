@@ -1,3 +1,4 @@
+;; -*- lexical-binding: t; -*-
 (lp-emacs-builtin-package 'abbrev
   (setq abbrev-suggest nil)
   (setq save-abbrevs 'silently)

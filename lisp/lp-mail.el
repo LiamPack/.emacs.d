@@ -57,8 +57,7 @@
 	user-full-name "Liam Packer"
 	user-mail-address "lp492@cornell.edu"
 
-	notmuch-identities
-	'("Liam Packer <lp492@cornell.edu>")
+	notmuch-identities '("Liam Packer <lp492@cornell.edu>")
 
 	notmuch-show-logo nil
         notmuch-hello-auto-refresh t

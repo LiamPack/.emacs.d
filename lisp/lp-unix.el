@@ -1,4 +1,4 @@
-;;; process communication backend
+;;; process communication backend  -*- lexical-binding: t; -*-
 (lp-emacs-builtin-package 'comint
   (setq comint-delete-old-input t)
   (setq comint-eol-on-send t)
@@ -66,7 +66,7 @@
     (define-key map (kbd "C-x v v") #'dired-vc-next-action)))
 
 (lp-emacs-builtin-package 'dired-x
-  (define-key dired-mode-map (kbd "I") #'dired-info))
+  (define-key dired-mode-map (kbd "I") #'dired-do-info))
 
 (lp-emacs-elpa-package 'dired-subtree
   (let ((map dired-mode-map))

@@ -1,3 +1,4 @@
+;; -*- lexical-binding: t; -*-
 (require 'calendar)
 
 ;;; LP Journal -- simple journal management
@@ -66,8 +67,8 @@
 
 (defun lp--get-journal-files-next-date (criterion date)
   ""
-  (if-let ((sorted-journal-files (sort (directory-files lp--journal-dir) criterion))
-           (result (member (concat (lp--get-journal-file-date) ".org") sorted-journal-files)))
+  (if-let* ((sorted-journal-files (sort (directory-files lp--journal-dir) criterion))
+            (result (member (concat (lp--get-journal-file-date) ".org") sorted-journal-files)))
       (find-file (concat lp--journal-dir (cadr result)))
     (print "No date before current file")))
 

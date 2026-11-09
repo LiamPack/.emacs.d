@@ -1,3 +1,4 @@
+;; -*- lexical-binding: t; -*-
 (add-to-list 'load-path "~/.emacs.d/lisp/")
 
 (require 'package)
@@ -42,10 +43,10 @@
 (defmacro lp-emacs-elpa-package (package &rest body)
   (declare (indent 1))
   `(progn
-     (condition-case nil
+     (condition-case err
 	 (when (not (package-installed-p ,package))
 	   (package-install ,package))
-       nil)
+	 (message (error-message-string err)))
      (if (require ,package nil 'noerror)
          (progn ,@body)
        (print (format "[Warning]: Loading `%s' failed" ,package))

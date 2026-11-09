@@ -1,3 +1,4 @@
+;; -*- lexical-binding: t; -*-
 (lp-emacs-builtin-package 'prog-mode
   ;; Mark TODOs , FIXME, BUG as red in src code
   (add-hook 'prog-mode-hook

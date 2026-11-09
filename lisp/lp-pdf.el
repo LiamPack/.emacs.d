@@ -1,3 +1,4 @@
+;; -*- lexical-binding: t; -*-
 (lp-emacs-elpa-package 'pdf-tools
   (setq pdf-tools-enabled-modes
         '(pdf-history-minor-mode

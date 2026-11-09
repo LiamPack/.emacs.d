@@ -1,4 +1,4 @@
-;;; Emacs defaults
+;;; Emacs defaults  -*- lexical-binding: t; -*-
 (lp-emacs-builtin-package 'emacs
   ;; hacky way to remove the =custom-variables= generation in =init.el=
   (setq custom-file (make-temp-file "emacs-custom-"))
@@ -125,13 +125,12 @@ The DWIM behaviour of this command is as follows:
 
 ;;; Time on modeline
 (lp-emacs-builtin-package 'time
-  (setq display-time-world-time-format "%H:%M %Z, %d. %b"
-        display-time-world-list '(("America/New_York" "New York (USA)")
-                                  ("America/Winnipeg" "Winnipeg (CA)")
-                                  ("Asia/Tokyo"       "Tokyo (JP)")
-                                  ("Europe/London"    "London")
-                                  ("Europe/Istanbul"  "Istanbul")
-                                  ))
+  (setq world-clock-time-format "%H:%M %Z, %d. %b"
+        world-clock-list '(("America/New_York" "New York (USA)")
+                           ("America/Winnipeg" "Winnipeg (CA)")
+                           ("Asia/Tokyo"       "Tokyo (JP)")
+                           ("Europe/London"    "London")
+                           ("Europe/Istanbul"  "Istanbul")))
   (setq display-time-default-load-average 0
         display-time-use-mail-icon t
         display-time-24hr-format t
@@ -218,7 +217,7 @@ The DWIM behaviour of this command is as follows:
 (defun lp--provide-mark-line-or-region (&rest args)
   "Force interactive arguments to provide (current line->current
   line + 1) if no active region. Otherwise, provide the original
-  parameter specification (mark, point, 'region). `ARGS' discarded"
+  parameter specification `(mark, point, 'region)'. `ARGS' discarded"
   (interactive
    (if mark-active
        (list (mark) (point) 'region)

@@ -1,4 +1,4 @@
-;;; Fringe mode
+;;; Fringe mode  -*- lexical-binding: t; -*-
 (lp-emacs-builtin-package 'fringe
   (fringe-mode +1)
   (setq-default fringes-outside-margins nil)
@@ -12,7 +12,7 @@
         modus-themes-italic-constructs t
         modus-themes-bold-constructs t
 	modus-themes-org-blocks 'gray-background
-	modus-themes-prompts '(italic bold))
+	modus-themes-bold-constructs t)
   (setq modus-operandi-palette-overrides
 	'((cursor red-intense)))
   (setq modus-themes-to-toggle '(modus-operandi modus-vivendi))
@@ -55,13 +55,15 @@
       )
   (set-face-attribute 'default nil :family mono-spaced-font :height 120)
   (set-face-attribute 'fixed-pitch nil :family mono-spaced-font :height 1.0)
-  (set-face-attribute 'variable-pitch nil :family proportionately-spaced-font :height 1.0))
+  (set-face-attribute 'variable-pitch nil :family proportionately-spaced-font :height 1.0)
+  )
 
 ;; (lp-emacs-elpa-package 'nerd-icons
 ;;   (setq nerd-icons-scale-factor 1.0)
 ;;   (setq nerd-icons-font-family "Aporetic"))
 ;; (lp-emacs-elpa-package 'nerd-icons-dired
 ;;   (add-hook 'dired-mode-hook #'nerd-icons-dired-mode))
+
 (load-theme 'standard-dark :no-confirm)
 
 (provide 'lp-themes)

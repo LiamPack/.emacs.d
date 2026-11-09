@@ -1,3 +1,4 @@
+;; -*- lexical-binding: t; -*-
 
 ;;;; This file is has perhaps the most ambiguous name. Packages
 ;;;; specified here are derived from the `minibuffer' group, which you
@@ -216,8 +217,7 @@
       (define-key icomplete-minibuffer-map (kbd "C-p") #'icomplete-backward-completions)
       (define-key icomplete-minibuffer-map (kbd "TAB")  #'icomplete-force-complete)
       (define-key map (kbd "C-j") #'icomplete-ret) ;; reverse C-j and <RET> behavior
-      (define-key map (kbd "<RET>") #'icomplete-force-complete-and-exit))
-    ))
+      (define-key map (kbd "<RET>") #'icomplete-force-complete-and-exit))))
 
 
 

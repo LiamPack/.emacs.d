@@ -1,3 +1,4 @@
+;; -*- lexical-binding: t; -*-
 (lp-emacs-builtin-package 'calendar
   ;; lots ripped from prot
   (setq calendar-mark-diary-entries-flag t)
